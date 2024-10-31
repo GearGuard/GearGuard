@@ -1,26 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+/*
+  User: GearGurd
+*/
 
-use GearGurd\Framework\Http\Request;
-use GearGurd\Framework\Http\Response;
-use GearGurd\Framework\Http\Kernel;
+require_once __DIR__. '/../vendor/autoload.php';
 
-require_once dirname(__DIR__). '/vendor/autoload.php';
+use app\controllers\SiteController;
+use app\core\Application;
 
-//Request Received
-$request = \GearGurd\Framework\Http\Request::createFromGlobals();
-//print_r($request);
+$app = new Application(dirname(__DIR__));
 
-// process request
-
-
-
-// send response (string of content)
-//$content = '<h1>Hello World</h1>';
-//$response = new \GearGurd\Framework\Http\Response(content: $content, status:200, header:[]);
-$kernel = new \GearGurd\Framework\Http\Kernel();
-
-$response = $kernel->handle($request);
-$response->send();
+$app -> router->get('/', [SiteController::class, 'home']);
+$app -> router->get('/contact', [SiteController::class, 'contact']);
+$app -> router->post('/contact', [SiteController::class, 'handleContact']);
 
 
-
+$app->run();
