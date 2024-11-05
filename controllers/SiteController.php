@@ -15,10 +15,10 @@ class SiteController extends Controller
         ];
         return $this->render('home', $params);
     }
-   public function contact()
-   {
-       return Application::$app->router->renderView('contact');
-   }
+    public function contact()
+    {
+        return Application::$app->router->renderView('contact');
+    }
     public function handleContact(Request $request)
     {
         $body = $request->getBody();
