@@ -1,3 +1,94 @@
 vendor
 .idea
 composer.lock
+
+# Composer dependencies
+/vendor/
+/composer.lock
+
+# PHP specific
+*.php~
+*.log
+.phpunit.result.cache
+.php_cs.cache
+/.php_cs.cache
+*.cache
+
+# Node modules (if using Node for SASS or JavaScript packages)
+/node_modules/
+/npm-debug.log*
+/yarn-error.log*
+
+# CSS and SASS output
+/public/css/*.css.map
+/public/css/*.css
+/.sass-cache/
+
+# HTML temporary files
+*.html~
+
+# JavaScript build files (if using any bundler)
+/dist/
+/build/
+/public/js/*.js.map
+
+# GitHub Actions
+/.github/workflows/*-output.log
+.github/actions/cache/
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.production
+.env.testing
+.env.development
+
+# MySQL Database Dumps
+*.sql
+*.sql.gz
+
+# Docker
+docker-compose.override.yml
+**/docker-compose.override.yml
+docker-compose.yml
+**/docker-compose.yml
+**/Dockerfile
+
+# IDE and Editor Settings
+.idea/
+/*.sublime-project
+/.vscode/
+/*.code-workspace
+
+# MacOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+ehthumbs.db
+
+# General System Files
+*.swp
+*.lock
+*.pid
+*.seed
+*.backup
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Coverage reports and test artifacts
+coverage/
+.clover
+.phpunit.result.cache
+.phpunit.cache
+phpunit.xml
+
+# Logs and temporary files
+*.log
+/logs/
+temp/
+tmp/
+
