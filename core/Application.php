@@ -2,6 +2,8 @@
 
 namespace app\core;
 
+use app\core\Database;
+
 class Application
 {
     public static string $ROOT_DIR;
@@ -10,13 +12,16 @@ class Application
     public Response $response;
     public static Application $app;
     public Controller $controller;
-    public function __construct($rootPath)
+	public Database $db;
+    public function __construct($rootPath, array $config)
     {
         self::$ROOT_DIR = $rootPath;
         self::$app = $this;
         $this->request = new Request();
         $this->response = new Response();
         $this->router = new Router($this->request, $this->response);
+
+		$this->db = new Database($config['db']);
     }
     public function run()
     {
