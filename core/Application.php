@@ -1,4 +1,5 @@
 <?php
+
 namespace app\core;
 
 class Application
@@ -19,7 +20,7 @@ class Application
     }
     public function run()
     {
-        echo $this -> router -> resolve();
+        echo $this->router->resolve();
     }
 
     /**

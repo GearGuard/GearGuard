@@ -28,16 +28,16 @@ class Router
     {
         $path = $this->request->getPath();
         $method = $this->request->method();
-        $callback = $this->routes[$method][$path]?? false;
+        $callback = $this->routes[$method][$path] ?? false;
 
-        if($callback === false){
+        if ($callback === false) {
             $this->response->setStatusCode(404);
             return $this->renderView("_404");
         }
-        if(is_string($callback)){
+        if (is_string($callback)) {
             return $this->renderView($callback);
         }
-        if(is_array($callback)){
+        if (is_array($callback)) {
             Application::$app->controller =  new $callback[0]();
             $callback[0] = Application::$app->controller;
         }
