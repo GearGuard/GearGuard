@@ -1,6 +1,7 @@
 vendor
 .idea
 composer.lock
+.vscode
 
 # Composer dependencies
 /vendor/
@@ -91,4 +92,3 @@ phpunit.xml
 /logs/
 temp/
 tmp/
-

@@ -1,1 +1,10 @@
-https://www.youtube.com/watch?v=Fnc-KUXjNFU
+https://youtu.be/Fnc-KUXjNFU?si=J6lbtCuQZfV4EsqL&t=788
+
+13:08(error)
+
+
+
+
+-- Use of other packages
+1) For .env
+https://github.com/vlucas/phpdotenv
