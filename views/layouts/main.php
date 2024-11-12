@@ -2,12 +2,17 @@
 ?>
 
 <?php
+
 use app\core\Application;
+
+
+
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,20 +25,24 @@ use app\core\Application;
             padding: 0;
             text-align: center;
         }
+
         header {
             background-color: #4CAF50;
             color: white;
             padding: 15px;
         }
+
         nav a {
             margin: 0 15px;
             text-decoration: none;
             color: white;
             font-weight: bold;
         }
+
         section {
             padding: 20px;
         }
+
         footer {
             background-color: #333;
             color: white;
@@ -42,6 +51,7 @@ use app\core\Application;
             bottom: 0;
             width: 100%;
         }
+
         .alert {
             position: relative;
             padding: 0.75rem 1.25rem;
@@ -49,39 +59,48 @@ use app\core\Application;
             border: 1px solid transparent;
             border-radius: 0.25rem;
         }
+
         .alert-success {
-            color: #0f5132; /* Dark green text */
-            background-color: #d1e7dd; /* Light green background */
-            border-color: #badbcc; /* Green border */
+            color: #0f5132;
+            /* Dark green text */
+            background-color: #d1e7dd;
+            /* Light green background */
+            border-color: #badbcc;
+            /* Green border */
         }
-
-
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>Welcome to My Homepage</h1>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/contact">Contact</a>
-        <a href="/register">Register</a>
-        <a href="/login">Login</a>
-    </nav>
-</header>
+    <header>
+        <h1>Welcome to My Homepage</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/contact">Contact</a>
+            
+            <?php if (Application::isGuest()): ?>
+                <a href="/register">Register</a>
+                <a href="/login">Login</a>
+            <?php else: ?>
+                <a href="/logout">Welcome <?php echo Application::$app->user->getDisplayName()?>(Logout)</a>
+            <?php endif; ?>
+        </nav>
+    </header>
 
-<div class = "container">
-    <?php if (app\core\Application::$app->session->getFlash('success')): ?>
-        <div class="alert alert-success">
-            <?php echo app\core\Application::$app->session->getFlash('success') ?>
-        </div>
-    <?php endif; ?>
-    {{content}}
-</div>
+    <div class="container">
+        <?php if (app\core\Application::$app->session->getFlash('success')): ?>
+            <div class="alert alert-success">
+                <?php echo app\core\Application::$app->session->getFlash('success') ?>
+            </div>
+        <?php endif; ?>
+        {{content}}
+    </div>
 
-<footer>
-    <p>&copy; 2024 My Simple Homepage</p>
-</footer>
+    <footer>
+        <p>&copy; 2024 My Simple Homepage</p>
+    </footer>
 
 </body>
+
 </html>
