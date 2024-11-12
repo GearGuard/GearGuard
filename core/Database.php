@@ -23,23 +23,23 @@ class Database
 	{
 		$this->createMigrationsTable();
 		$applyMigrations = $this->getAppliedMigrations();
-		
-		
+
+
 		$newMigrations = [];
 		$files = scandir(Application::$ROOT_DIR . '/migrations'); //scandir gives all files list of the dir
 		$toApplyMigrations = array_diff($files, $applyMigrations); //array_diff gives the files which are not in the applied migrations
-		
+
 		foreach ($toApplyMigrations as $migration) {
 			if ($migration === '.' || $migration === '..') {
 				continue;
 			}
 			require_once Application::$ROOT_DIR . '/migrations/' . $migration;
-		
+
 			$className = pathinfo($migration, PATHINFO_FILENAME);
 			$instance = new $className();
-			$this->log("Applying migration $migration". PHP_EOL);;
+			$this->log("Applying migration $migration" . PHP_EOL);;
 			$instance->up();
-			$this->log("Applying migration $migration". PHP_EOL);;
+			$this->log("Applying migration $migration" . PHP_EOL);;
 			$newMigrations[] = $migration;
 		}
 		if (!empty($newMigrations)) {
@@ -68,7 +68,7 @@ class Database
 	}
 	public function  saveMigrations(array $migrations)
 	{
-		
+
 		$str = implode(",", array_map(fn($m) => "('$m')", $migrations));
 		$statement = $this->pdo->prepare("INSERT INTO migrations (migration) VALUES
 			$str
@@ -76,6 +76,11 @@ class Database
 		$statement->execute();
 	}
 	
+	public function prepare($sql)
+	{
+		return $this->pdo->prepare($sql);
+	}
+
 	protected function log($message)
 	{
 		echo '[' . date('Y-m-d H:i:s') . '] - ' . $message . PHP_EOL;

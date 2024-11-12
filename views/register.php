@@ -75,6 +75,19 @@ use app\core\form\Form;
         .form-button:hover {
             background-color: #0056b3;
         }
+
+        .invalid-feedback {
+            display: none; /* Initially hidden */
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em; /* Smaller text */
+            color: #dc3545; /* Red text for error message */
+        }
+
+        .is-invalid ~ .invalid-feedback {
+            display: block; /* Display feedback when input is invalid */
+        }
+
     </style>
 </head>
 
