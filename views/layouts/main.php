@@ -83,6 +83,7 @@ use app\core\Application;
                 <a href="/register">Register</a>
                 <a href="/login">Login</a>
             <?php else: ?>
+                <a href="/profile">Profile</a>
                 <a href="/logout">Welcome <?php echo Application::$app->user->getDisplayName()?>(Logout)</a>
             <?php endif; ?>
         </nav>

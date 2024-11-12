@@ -9,24 +9,29 @@ use app\core\Application;
 use app\core\Response;
 use app\core\Router;
 use app\models\LoginForm;
+use app\core\middlewares\AuthMiddleware;
 
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        $this->registerMiddleware(new AuthMiddleware(['profile']));
+    }
     public function login(Request $request, Response $response)
     {
-		$loginForm = new LoginForm();
-		if ($request->isPost()) {
-			$loginForm->loadData($request->getBody());
-			if ($loginForm->validate() && $loginForm->login()) {
-				Application::$app->response->redirect('/');
-				return;
-			}
-		}
-		
+        $loginForm = new LoginForm();
+        if ($request->isPost()) {
+            $loginForm->loadData($request->getBody());
+            if ($loginForm->validate() && $loginForm->login()) {
+                Application::$app->response->redirect('/');
+                return;
+            }
+        }
+
         $this->setLayout('auth');
         return $this->render('login', [
-			'model' => $loginForm
-		]);
+            'model' => $loginForm
+        ]);
     }
     public function register(Request $request)
     {
@@ -50,9 +55,14 @@ class AuthController extends Controller
             'model' => $user
         ]);
     }
-	public function logOut(Request $request, Response $response)
-	{
-		Application::$app->logout();
-		$response->redirect('/');
-	}
+    public function logOut(Request $request, Response $response)
+    {
+        Application::$app->logout();
+        $response->redirect('/');
+    }
+
+    public function profile()
+    {
+        return $this->render('profile');
+    }
 }
