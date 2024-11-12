@@ -1,7 +1,7 @@
 <?php
 
-use app\models\RegisterModel;
-use app\core\form\Form;
+/** @var $model \app\models\User */
+
 
 ?>
 <!DOCTYPE html>
@@ -77,24 +77,31 @@ use app\core\form\Form;
         }
 
         .invalid-feedback {
-            display: none; /* Initially hidden */
+            display: none;
+            /* Initially hidden */
             width: 100%;
             margin-top: 0.25rem;
-            font-size: 0.875em; /* Smaller text */
-            color: #dc3545; /* Red text for error message */
+            font-size: 0.875em;
+            /* Smaller text */
+            color: #dc3545;
+            /* Red text for error message */
         }
 
-        .is-invalid ~ .invalid-feedback {
-            display: block; /* Display feedback when input is invalid */
+        .is-invalid~.invalid-feedback {
+            display: block;
+            /* Display feedback when input is invalid */
         }
-
     </style>
 </head>
 
 <body>
     <div class="form-container">
         <h2 class="form-title">Register</h2>
+        <?php
 
+        use app\models\RegisterModel;
+        use app\core\form\Form;
+        ?>
         <!-- PHP Form with Custom Form Handling -->
         <?php $form = \app\core\form\Form::begin('', "post") ?>
 
