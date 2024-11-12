@@ -30,14 +30,19 @@ class Field
 			'
 			<div class="form-group">
         		<label class="form-label">%s</label>
-				<input type="%s" name="%s" placeholder="Enter your %s" class="form-input%s">
+				<input type="%s" name="%s" value="%s" placeholder="Enter your %s" class="form-input%s">
+				<div class="invalid-feedback">
+					%s
+				</div>
 			</div>
 			',
-			$this->attribute,
+			$this->model->getLabel($this->attribute),
 			$this->type,
 			$this->attribute,
-			$this->attribute,
-			$this->model->hasError($this->attribute) ? 'is-invalid' : ''
+			$this->model->{$this->attribute},
+			$this->model->getLabel($this->attribute),
+			$this->model->hasError($this->attribute) ? 'is-invalid' : '',
+			$this->model->getFirstError($this->attribute)
 		);
 	}
 

@@ -2,7 +2,7 @@
 ?>
 
 <?php
-
+use app\core\Application;
 
 ?>
 
@@ -42,6 +42,20 @@
             bottom: 0;
             width: 100%;
         }
+        .alert {
+            position: relative;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+        }
+        .alert-success {
+            color: #0f5132; /* Dark green text */
+            background-color: #d1e7dd; /* Light green background */
+            border-color: #badbcc; /* Green border */
+        }
+
+
     </style>
 </head>
 <body>
@@ -57,6 +71,11 @@
 </header>
 
 <div class = "container">
+    <?php if (app\core\Application::$app->session->getFlash('success')): ?>
+        <div class="alert alert-success">
+            <?php echo app\core\Application::$app->session->getFlash('success') ?>
+        </div>
+    <?php endif; ?>
     {{content}}
 </div>
 
@@ -66,4 +85,3 @@
 
 </body>
 </html>
-
