@@ -19,12 +19,12 @@ class LoginForm extends Model
 			'password' => [self::RULE_REQUIRED]
 		];
 	}
-	
+
 	public function attributes(): array
 	{
 		return ['email', 'password'];
 	}
-	
+
 	public function labels(): array
 	{
 		return [
@@ -44,8 +44,7 @@ class LoginForm extends Model
 		if (!password_verify($this->password, $user->password)) {
 			$this->addError('password', 'Password is incorrect');
 			return false;
-		}
-	;
+		};
 		return 	Application::$app->login($user);;
 	}
 }
