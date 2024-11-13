@@ -1,8 +1,3 @@
-https://youtu.be/nikoPDqTvKI?si=GQchvYCTjaSdu61s
-47:31(working/no errors)
-
-
-
 
 -- Use of other packages
 1) For .env
