@@ -3,6 +3,11 @@
 namespace app\core;
 use app\core\middlewares\BaseMiddleware;
 
+/**
+ * @author Sandhavi Wanigasooriya
+ * @package app/core
+ */
+
 class Controller
 {
 	/*
