@@ -2,6 +2,11 @@
 
 namespace app\core;
 
+/**
+ * @author Sandhavi Wanigasooriya
+ * @package app/core
+ */
+
 class Request
 {
     public function getPath()

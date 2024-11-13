@@ -1,6 +1,12 @@
 <?php
 	
 	namespace app\core;
+
+	/**
+ * @author Sandhavi Wanigasooriya
+ * @package app/core
+ */
+
 	
 	class View
 	{

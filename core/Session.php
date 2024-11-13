@@ -2,6 +2,12 @@
 
 namespace app\core;
 
+/**
+ * @author Sandhavi Wanigasooriya
+ * @package app/core
+ */
+
+
 class Session
 {
 	protected const FLASH_KEY = 'flash_messages';

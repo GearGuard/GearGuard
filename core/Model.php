@@ -2,6 +2,11 @@
 
 namespace app\core;
 
+/**
+ * @author Sandhavi Wanigasooriya
+ * @package app/core
+ */
+
 abstract class Model
 {
 	public const RULE_REQUIRED = 'required';

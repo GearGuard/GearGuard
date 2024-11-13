@@ -5,6 +5,11 @@ use app\core\middlewares\BaseMiddleware;
 use app\core\middlewares\AuthMiddleware;
 use app\core\exception\NotFoundException;
 
+/**
+ * @author Sandhavi Wanigasooriya
+ * @package app/core
+ */
+
 
 class Router
 {
