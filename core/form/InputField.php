@@ -5,7 +5,7 @@ namespace app\core\form;
 use app\core\Model;
 use app\core\form\BaseField;
 
-class Field extends BaseField
+class InputField extends BaseField
 {
 	public const TYPE_TEXT = 'text';
 	public const TYPE_PASSWORD = 'password';
