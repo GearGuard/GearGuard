@@ -1,15 +1,3 @@
-<?php
-?>
-
-<?php
-
-use app\core\Application;
-
-
-
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,31 +8,86 @@ use app\core\Application;
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #fbfbfe;
             margin: 0;
             padding: 0;
             text-align: center;
         }
 
         header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px;
+            background-color: #fbfbfe;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
         }
 
-        nav a {
-            margin: 0 15px;
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            margin-left: 20px;
+        }
+
+        .nav-links a {
             text-decoration: none;
-            color: white;
+            color: #555;
             font-weight: bold;
         }
 
-        section {
-            padding: 20px;
+        .nav-links a:hover {
+            color: #333;
+        }
+
+        .login-button {
+            background-color: #002366;
+            color: white;
+            border: none;
+            padding: 9px 25px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .login-button:hover {
+            background-color: #fff;
+            color: #002366;
+            border: 2px solid #002366;
+        }
+
+        .register-button {
+            background-color: #fff;
+            color: #002366;
+            border: 2px solid #002366;
+            padding: 9px 25px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .register-button:hover {
+            background-color: #002366;
+            color: #fff;
         }
 
         footer {
-            background-color: #333;
+            background-color: #002366;
             color: white;
             padding: 10px;
             position: fixed;
@@ -62,11 +105,8 @@ use app\core\Application;
 
         .alert-success {
             color: #0f5132;
-            /* Dark green text */
             background-color: #d1e7dd;
-            /* Light green background */
             border-color: #badbcc;
-            /* Green border */
         }
     </style>
 </head>
@@ -74,18 +114,19 @@ use app\core\Application;
 <body>
 
     <header>
-        <h1>Welcome to My Homepage</h1>
         <nav>
-            <a href="/">Home</a>
-            <a href="/contact">Contact</a>
-            
-            <?php if (Application::isGuest()): ?>
-                <a href="/register">Register</a>
-                <a href="/login">Login</a>
-            <?php else: ?>
-                <a href="/profile">Profile</a>
-                <a href="/logout">Welcome <?php echo Application::$app->user->getDisplayName()?>(Logout)</a>
-            <?php endif; ?>
+            <div class="logo">
+                <img src="/assets/logo.png" alt="Logo">
+                <div class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="/service">Services</a>
+                    <a href="/contact">Contact Us</a>
+                </div>
+            </div>
+            <div>
+                <a href="/register" class="register-button">Register</a>
+                <a href="/login" class="login-button">Login</a>
+            </div>
         </nav>
     </header>
 
@@ -99,7 +140,7 @@ use app\core\Application;
     </div>
 
     <footer>
-        <p>&copy; 2024 My Simple Homepage</p>
+        <p>&copy; 2024 GearGuard</p>
     </footer>
 
 </body>
