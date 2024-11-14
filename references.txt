@@ -2,6 +2,6 @@
 1) For .env
 https://github.com/vlucas/phpdotenv
 
-2) For database
+2) For database creations and migration
 1. Follow the .evn.example file to create .env file
 2. Create a database in your local server
