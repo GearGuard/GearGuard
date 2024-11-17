@@ -1,133 +1,50 @@
+<?php
+
+use app\core\Application;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="icon" href="/assets/img/favicon.png">
+    <link rel="icon" href="/assets/img/favicon.png">
+    <link rel="stylesheet" href="/assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title><?php echo $this->title ?></title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fbfbfe;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-
-        header {
-            background-color: #fbfbfe;
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo img {
-            height: 50px;
-            width: auto;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            margin-left: 20px;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #555;
-            font-weight: bold;
-        }
-
-        .nav-links a:hover {
-            color: #333;
-        }
-
-        .login-button {
-            background-color: #002366;
-            color: white;
-            border: none;
-            padding: 9px 25px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .login-button:hover {
-            background-color: #fff;
-            color: #002366;
-            border: 2px solid #002366;
-        }
-
-        .register-button {
-            background-color: #fff;
-            color: #002366;
-            border: 2px solid #002366;
-            padding: 9px 25px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-right: 20px;
-        }
-
-        .register-button:hover {
-            background-color: #002366;
-            color: #fff;
-        }
-
-        footer {
-            background-color: #002366;
-            color: white;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .alert {
-            position: relative;
-            padding: 0.75rem 1.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid transparent;
-            border-radius: 0.25rem;
-        }
-
-        .alert-success {
-            color: #0f5132;
-            background-color: #d1e7dd;
-            border-color: #badbcc;
-        }
-    </style>
 </head>
 
 <body>
 
     <header>
         <nav>
-            <div class="logo">
-                <img src="/assets/img/favicon.png" alt="Logo">
-                <div class="nav-links">
-                    <a href="/">Home</a>
-                    <a href="/service">Services</a>
-                    <a href="/contact">Contact Us</a>
+            <?php if (Application::isGuest()): ?>
+                <div class="logo">
+                    <img src="/assets/img/favicon.png" alt="Logo">
+                    <div class="nav-links">
+                        <a href="/">Home</a>
+                        <a href="/service">Services</a>
+                        <a href="/contact">Contact Us</a>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <a href="/register" class="register-button">Register</a>
-                <a href="/login" class="login-button">Login</a>
-            </div>
+                <div>
+                    <a href="/register" class="register-button">Register</a>
+                    <a href="/login" class="login-button">Login</a>
+                </div>
+            <?php else: ?>
+                <!-- <div class="nav-links">
+                   
+                </div>
+                <div class="user-nav">
+                    <a href="/notifications" class="notification-icon" title="Notifications">
+                        <i class="fas fa-bell"></i> 
+                    </a>
+                    <a href="/profile" class="profile-button" title="Profile">
+                        <i class="fas fa-user-circle avatar"></i> 
+                    </a>
+                </div> -->
+            <?php endif; ?>
         </nav>
     </header>
 
@@ -139,10 +56,6 @@
         <?php endif; ?>
         {{content}}
     </div>
-
-    <footer>
-        <p>&copy; 2024 GearGuard</p>
-    </footer>
 
 </body>
 

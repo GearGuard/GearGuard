@@ -25,6 +25,8 @@ class SiteController extends Controller
         ];
         return $this->render('common', $params);
     }
+
+   
     public function contact(Request $request, Response $response)
     {
         $contact = new ContactForm();
