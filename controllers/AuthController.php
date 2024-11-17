@@ -13,9 +13,11 @@ use app\core\middlewares\AuthMiddleware;
 
 class AuthController extends Controller
 {
+    // public string $layout = 'customer'; 
     public function __construct()
     {
         $this->registerMiddleware(new AuthMiddleware(['profile']));
+        $this->registerMiddleware(new AuthMiddleware(['customer']));
     }
     public function login(Request $request, Response $response)
     {
@@ -63,7 +65,19 @@ class AuthController extends Controller
 
     public function profile()
     {
-		
+
         return $this->render('profile');
+    }
+
+    public function customer()
+    {
+        return $this->render('customer');
+    }
+
+    public function appointment()
+    {
+        return Application::$app->view->renderView('customer/appointment', [
+            'title' => 'Customer Appointment'
+        ]);
     }
 }

@@ -13,8 +13,8 @@ use  app\core\db\DbModel;
 
 class Application
 {
-    public ?string $layout = null;
     public static string $ROOT_DIR;
+    public string $layout = 'main';
     public string $userClass;
     public Router $router;
     public Request $request;
