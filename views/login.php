@@ -1,6 +1,7 @@
 <?php
+
 /** @var $model \app\models\User */
-    
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,14 +98,14 @@
         <h2 class="form-title">Login</h2>
 
         <!-- PHP Form with Custom Form Handling -->
-        <?php $form = \app\core\form\Form::begin('', 'post') ?>
+        <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post') ?>
 
         <?php echo $form->field($model, 'email') ?>
         <?php echo $form->field($model, 'password')->passwordField() ?>
 
         <button type="submit" class="form-button">Login</button>
 
-        <?php echo \app\core\form\Form::end() ?>
+        <?php echo \gearguard\phpmvc\form\Form::end() ?>
     </div>
 </body>
 

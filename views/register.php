@@ -100,10 +100,10 @@
         <?php
 
         use app\models\RegisterModel;
-        use app\core\form\Form;
+        use gearguard\phpmvc\form\Form;
         ?>
         <!-- PHP Form with Custom Form Handling -->
-        <?php $form = \app\core\form\Form::begin('', "post") ?>
+        <?php $form = \gearguard\phpmvc\form\Form::begin('', "post") ?>
 
         <?php echo $form->field($model, 'firstname') ?>
         <?php echo $form->field($model, 'lastname') ?>
@@ -113,7 +113,7 @@
 
         <button type="submit" class="form-button">Register</button>
 
-        <?php echo \app\core\form\Form::end() ?>
+        <?php echo \gearguard\phpmvc\form\Form::end() ?>
     </div>
 </body>
 

@@ -1,6 +1,6 @@
 <?php
 
-use app\core\Application;
+use gearguard\phpmvc\Application;
 
 class m0001_initial
 {

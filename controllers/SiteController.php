@@ -2,11 +2,11 @@
 
 namespace app\controllers;
 
-use app\core\Application;
-use app\core\Controller;
-use app\core\Request;
-use app\core\View;
-use app\core\Response;
+use gearguard\phpmvc\Application;
+use gearguard\phpmvc\Controller;
+use gearguard\phpmvc\Request;
+use gearguard\phpmvc\View;
+use gearguard\phpmvc\Response;
 use app\models\ContactForm;
 
 class SiteController extends Controller
@@ -26,7 +26,7 @@ class SiteController extends Controller
         return $this->render('common', $params);
     }
 
-   
+
     public function contact(Request $request, Response $response)
     {
         $contact = new ContactForm();

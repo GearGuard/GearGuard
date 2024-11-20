@@ -1,6 +1,6 @@
 <?php
 
-use app\core\Application;
+use gearguard\phpmvc\Application;
 ?>
 
 <!DOCTYPE html>
@@ -49,9 +49,9 @@ use app\core\Application;
     </header>
 
     <div class="container">
-        <?php if (app\core\Application::$app->session->getFlash('success')): ?>
+        <?php if (gearguard\phpmvc\Application::$app->session->getFlash('success')): ?>
             <div class="alert alert-success">
-                <?php echo app\core\Application::$app->session->getFlash('success') ?>
+                <?php echo gearguard\phpmvc\Application::$app->session->getFlash('success') ?>
             </div>
         <?php endif; ?>
         {{content}}

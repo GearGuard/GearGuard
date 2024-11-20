@@ -1,3 +1,6 @@
+<?php
+$this->title = 'Customer Appointment';
+?>
 <!DOCTYPE html>
 <html lang="en">
 

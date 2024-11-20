@@ -1,6 +1,7 @@
 <?php
-	/** @var $this \app\core\View  */
-    $this->title = 'Home Page';
+
+/** @var $this \gearguard\phpmvc\View  */
+$this->title = 'Home Page';
 ?>
 
 <!DOCTYPE html>
@@ -12,13 +13,14 @@
     <title><?php echo $this->title ?></title>
     <style></style>
 </head>
+
 <body>
     <h1>Home Page</h1>
     <h3>Welcome
         <?php
-            $name
+        $name
         ?>
     </h3>
 </body>
-</html>
 
+</html>

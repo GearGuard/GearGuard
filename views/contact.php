@@ -1,8 +1,8 @@
 <?php
 
-/** @var $this \app\core\View  */
+/** @var $this \gearguard\phpmvc\View  */
 /** @var $this \app\models\ContactForm  */
-/** @var $this \app\core\form/TextField  */
+/** @var $this \gearguard\phpmvc\form/TextField  */
 
 $this->title = 'Contact Us';
 ?>
@@ -18,12 +18,12 @@ $this->title = 'Contact Us';
 </head>
 
 <body>
-    <?php $form = \app\core\form\Form::begin('', 'post') ?>
+    <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post') ?>
     <?php echo $form->field($model, 'subject') ?>
     <?php echo $form->field($model, 'email') ?>
-    <?php echo new \app\core\form\TextAreaField($model, 'body') ?>
+    <?php echo new \gearguard\phpmvc\form\TextAreaField($model, 'body') ?>
     <button type='submit' class='form-button'>Send</button>
-    <?php \app\core\form\Form::end() ?>
+    <?php \gearguard\phpmvc\form\Form::end() ?>
 </body>
 
 </html>

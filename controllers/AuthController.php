@@ -2,14 +2,14 @@
 
 namespace app\controllers;
 
-use app\core\Controller;
-use app\core\Request;
+use gearguard\phpmvc\Controller;
+use gearguard\phpmvc\Request;
 use app\models\User;
-use app\core\Application;
-use app\core\Response;
-use app\core\Router;
+use gearguard\phpmvc\Application;
+use gearguard\phpmvc\Response;
+use gearguard\phpmvc\Router;
 use app\models\LoginForm;
-use app\core\middlewares\AuthMiddleware;
+use gearguard\phpmvc\middlewares\AuthMiddleware;
 
 class AuthController extends Controller
 {
