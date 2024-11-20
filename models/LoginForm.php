@@ -2,10 +2,10 @@
 
 namespace app\models;
 
-use app\core\Model;
+use gearguard\phpmvc\Model;
 use app\models\User;
-use app\core\Application;
-use app\core\DbModel;
+use gearguard\phpmvc\Application;
+use gearguard\phpmvc\DbModel;
 
 
 class LoginForm extends Model

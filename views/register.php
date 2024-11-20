@@ -100,10 +100,10 @@
         <?php
 
         use app\models\RegisterModel;
-        use app\core\form\Form;
+        use gearguard\phpmvc\form\Form;
         ?>
         <!-- PHP Form with Custom Form Handling -->
-        <?php $form = \app\core\form\Form::begin('', "post") ?>
+        <?php $form = \gearguard\phpmvc\form\Form::begin('', "post") ?>
 
         <?php echo $form->field($model, 'firstname') ?>
         <?php echo $form->field($model, 'lastname') ?>
@@ -113,47 +113,7 @@
 
         <button type="submit" class="form-button">Register</button>
 
-        <?php echo \app\core\form\Form::end() ?>
-
-        <!-- Direct HTML Form Example -->
-        <!--    <form method="POST" class="custom-form">-->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">First Name:</label>-->
-        <!--            <input type="text" name="firstname" value="--><?php //echo $model->firstname 
-                                                                        ?><!--"-->
-        <!--                   placeholder="Enter your first name"-->
-        <!--                   class="form-input --><?php //echo $model->hasError('firstname') ? 'is-invalid' : '' 
-                                                    ?><!--">-->
-        <!--			--><?php //if ($model->hasError('firstname')): 
-                            ?>
-        <!--                <div class="invalid-feedback">--><?php //echo $model->getFirstError('firstname'); 
-                                                                ?><!--</div>-->
-        <!--			--><?php //endif; 
-                            ?>
-        <!--        </div>-->
-        <!---->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">Last Name:</label>-->
-        <!--            <input type="text" name="lastname" placeholder="Enter your last name" class="form-input">-->
-        <!--        </div>-->
-        <!---->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">Email:</label>-->
-        <!--            <input type="email" name="email" placeholder="Enter your email" class="form-input">-->
-        <!--        </div>-->
-        <!---->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">Password:</label>-->
-        <!--            <input type="password" name="password" placeholder="Enter your password" class="form-input">-->
-        <!--        </div>-->
-        <!---->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">Confirm Password:</label>-->
-        <!--            <input type="password" name="passwordConfirm" placeholder="Confirm your password" class="form-input">-->
-        <!--        </div>-->
-        <!---->
-        <!--        <button type="submit" class="form-button">Register</button>-->
-        <!--    </form>-->
+        <?php echo \gearguard\phpmvc\form\Form::end() ?>
     </div>
 </body>
 

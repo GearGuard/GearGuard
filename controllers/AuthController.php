@@ -2,20 +2,22 @@
 
 namespace app\controllers;
 
-use app\core\Controller;
-use app\core\Request;
+use gearguard\phpmvc\Controller;
+use gearguard\phpmvc\Request;
 use app\models\User;
-use app\core\Application;
-use app\core\Response;
-use app\core\Router;
+use gearguard\phpmvc\Application;
+use gearguard\phpmvc\Response;
+use gearguard\phpmvc\Router;
 use app\models\LoginForm;
-use app\core\middlewares\AuthMiddleware;
+use gearguard\phpmvc\middlewares\AuthMiddleware;
 
 class AuthController extends Controller
 {
+    // public string $layout = 'customer'; 
     public function __construct()
     {
         $this->registerMiddleware(new AuthMiddleware(['profile']));
+        $this->registerMiddleware(new AuthMiddleware(['customer']));
     }
     public function login(Request $request, Response $response)
     {
@@ -63,7 +65,19 @@ class AuthController extends Controller
 
     public function profile()
     {
-		
+
         return $this->render('profile');
+    }
+
+    public function customer()
+    {
+        return $this->render('customer');
+    }
+
+    public function appointment()
+    {
+        return Application::$app->view->renderView('customer/appointment', [
+            'title' => 'Customer Appointment'
+        ]);
     }
 }

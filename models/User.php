@@ -2,9 +2,9 @@
 
 namespace app\models;
 
-use app\core\Model;
-use app\core\DbModel;
-use app\core\UserModel;
+use gearguard\phpmvc\Model;
+use gearguard\phpmvc\DbModel;
+use gearguard\phpmvc\UserModel;
 
 class User extends UserModel
 {
