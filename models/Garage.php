@@ -8,15 +8,15 @@ use gearguard\phpmvc\UserModel;
 
 class Garage extends UserModel
 {
-	const STATUS_INACTIVE = 0;
-	const STATUS_ACTIVE = 1;
-	const STATUS_DELETED = 2;
+	const STATUS_INACTIVE = 1;
+	const STATUS_ACTIVE = 2;
+	const STATUS_DELETED = 3;
 
     private int $id;
     public string $username = '';
 	public string $name = '';
 	public string $email = '';
-	public int $status = self::STATUS_INACTIVE;
+	public int $status_id = self::STATUS_INACTIVE;
 	public string $password = '';
 	public string $passwordConfirm = '';
     public string $address = '';
@@ -35,7 +35,7 @@ class Garage extends UserModel
 
 	public function save()
 	{
-		$this->status = self::STATUS_INACTIVE;
+		$this->status_id = self::STATUS_INACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
 		return parent::save();
 	}

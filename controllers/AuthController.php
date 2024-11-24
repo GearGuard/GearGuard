@@ -95,7 +95,7 @@ class AuthController extends Controller
                 Application::$app->response->redirect('/');
                 exit;
             }
-            return $this->render('register', [
+            return $this->render('garage/signup', [
                 'model' => $garage
             ]);
         }

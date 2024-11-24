@@ -38,5 +38,6 @@ $app->router->post('/register', [AuthController::class, 'register']);
 $app->router->get('/logout', [AuthController::class, 'logout']);
 $app->router->get('/profile', [AuthController::class, 'profile']);
 $app->router->get('/garage/register', [AuthController::class, 'garageSignup']);
+$app->router->post('/garage/register', [AuthController::class, 'garageSignup']);
 
 $app->run();
