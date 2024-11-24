@@ -5,6 +5,7 @@ namespace app\controllers;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\Request;
 use app\models\User;
+use app\models\Garage;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Router;
@@ -78,6 +79,29 @@ class AuthController extends Controller
     {
         return Application::$app->view->renderView('customer/appointment', [
             'title' => 'Customer Appointment'
+        ]);
+    }
+
+    public function garageSignup(Request $request)
+    {
+        $errors = [];
+        $garage = new Garage();
+        if ($request->isPost()) {
+            $garage->loadData($request->getBody());
+
+
+            if ($garage->validate() && $garage->save()) {
+                Application::$app->session->setFlash('success', 'Thanks for Registering');
+                Application::$app->response->redirect('/');
+                exit;
+            }
+            return $this->render('register', [
+                'model' => $garage
+            ]);
+        }
+        $this->setLayout('auth');
+        return $this->render('garage/signup', [
+            'model' => $garage
         ]);
     }
 }
