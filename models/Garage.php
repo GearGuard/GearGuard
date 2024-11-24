@@ -12,7 +12,7 @@ class Garage extends UserModel
 	const STATUS_ACTIVE = 2;
 	const STATUS_DELETED = 3;
 
-    private int $id;
+    public int $id;
     public string $username = '';
 	public string $name = '';
 	public string $email = '';

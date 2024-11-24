@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\LoginFormGarage;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\Request;
 use app\models\User;
@@ -102,6 +103,24 @@ class AuthController extends Controller
         $this->setLayout('auth');
         return $this->render('garage/signup', [
             'model' => $garage
+        ]);
+    }
+
+    public function garageLogin(Request $request, Response $response)
+    {
+        $loginForm = new LoginFormGarage();
+        if ($request->isPost()) {
+            $loginForm->loadData($request->getBody());
+            if ($loginForm->validate() && $loginForm->login()) {
+                Application::$app->session->set('isGarage', true);
+                Application::$app->response->redirect('/');
+                return;
+            }
+        }
+
+        $this->setLayout('auth');
+        return $this->render('garage/signin', [
+            'model' => $loginForm
         ]);
     }
 }
