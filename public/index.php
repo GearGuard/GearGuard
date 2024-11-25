@@ -19,7 +19,6 @@ $config = [
 		'user' => $_ENV['DB_USER'],
 		'password' => $_ENV['DB_PASSWORD'],
 	]
-
 ];
 
 $app = new Application(dirname(__DIR__), $config);
@@ -37,5 +36,9 @@ $app->router->get('/register', [AuthController::class, 'register']);
 $app->router->post('/register', [AuthController::class, 'register']);
 $app->router->get('/logout', [AuthController::class, 'logout']);
 $app->router->get('/profile', [AuthController::class, 'profile']);
+$app->router->get('/garage/register', [AuthController::class, 'garageSignup']);
+$app->router->post('/garage/register', [AuthController::class, 'garageSignup']);
+$app->router->get('/garage/login', [AuthController::class, 'garageLogin']);
+$app->router->post('/garage/login', [AuthController::class, 'garageLogin']);
 
 $app->run();

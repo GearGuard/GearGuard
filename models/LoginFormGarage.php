@@ -8,43 +8,43 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\DbModel;
 
 
-class LoginForm extends Model
+class LoginFormGarage extends Model
 {
-	public string $email = '';
+	public string $username = '';
 	public string $password = '';
 	public function rules(): array
 	{
 		return [
-			'email' => [self::RULE_REQUIRED, self::RULE_EMAIL],
+			'username' => [self::RULE_REQUIRED],
 			'password' => [self::RULE_REQUIRED]
 		];
 	}
 
 	public function attributes(): array
 	{
-		return ['email', 'password'];
+		return ['username', 'password'];
 	}
 
 	public function labels(): array
 	{
 		return [
-			'email' => 'Your Email',
+			'username' => 'Username',
 			'password' => 'Password'
 		];
 	}
 
 	public function login()
 	{
-		$userModel = new User();
-		$user = $userModel->findOne(['email' => $this->email]);
-		if (!$user) {
-			$this->addError('email', 'User does not exist with this email');
+		$garageModel = new Garage();
+		$garage = $garageModel->findOne(['username' => $this->username]);
+		if (!$garage) {
+			$this->addError('username', 'User does not exist with this username');
 			return false;
 		}
-		if (!password_verify($this->password, $user->password)) {
+		if (!password_verify($this->password, $garage->password)) {
 			$this->addError('password', 'Password is incorrect');
 			return false;
 		};
-        return 	Application::$app->login($user);
+        return 	Application::$app->login($garage);
 	}
 }
