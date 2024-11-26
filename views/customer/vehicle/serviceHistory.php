@@ -5,6 +5,16 @@
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #C0C0C0FF;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,21 +22,21 @@
         }
 
         body {
-            background: #f8fafc;
+            background: var(--background);
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: var(--text);
             line-height: 1.6;
-            padding: 10px;
+            padding: 20px;
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 67.5%;
+            width: 70%;
             padding: 1rem;
             margin: 0 auto 2rem;
             position: sticky;
@@ -35,23 +45,41 @@
         }
 
         .navMenu a {
-            color: #64748b;
+            color: var(--primary);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
-            padding: 0.75rem 2.25rem;
+            padding: 0.75rem 1.25rem;
             border-radius: 8px;
             transition: all 0.3s ease;
         }
 
         .navMenu a.active {
-            color: #2563eb;
-            background: #eff6ff;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu a:hover {
-            color: #2563eb;
-            background: #f8fafc;
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+
+        .navMenu .dot {
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .navMenu a:hover .dot,
+        .navMenu a.active .dot {
+            opacity: 1;
         }
 
         .container {
@@ -69,20 +97,21 @@
         }
 
         .title {
-            color: #1e293b;
+            color: var(--primary);
             font-size: 1.5rem;
             font-weight: 600;
         }
 
         .accordion {
-            background-color: white;
+            background-color: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             margin-bottom: 1rem;
+            padding: 1rem;
         }
 
         .accordion-item {
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border);
         }
 
         .accordion-header {
@@ -91,16 +120,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #eff6ff;
+            background-color: var(--secondary);
             font-weight: 800;
+            color: var(--primary);
         }
 
         .accordion-header:hover {
-            background-color: #f8fafc;
+            background-color: var(--hover-bg);
         }
 
         .accordion-title {
-            color: #1e293b;
+            color: var(--primary);
         }
 
         .accordion-content {
@@ -108,13 +138,9 @@
             display: none;
             overflow: hidden;
             text-align: justify;
-            /* Justify text alignment */
             display: grid;
-            /* Use grid for two columns */
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            /* Two equal columns */
             gap: 20px;
-            /* Space between columns */
         }
 
         .accordion-content p {
@@ -124,14 +150,39 @@
         .description {
             grid-column: span 2;
         }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .navMenu {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .navMenu a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 
 <body>
     <nav class="navMenu">
-        <a href="#">New Vehicle</a>
-        <a href="#">My Vehicle</a>
-        <a href="#" class="active">Service History</a>
+        <a href="#">New Vehicle<span class="dot"></span></a>
+        <a href="#">My Vehicle<span class="dot"></span></a>
+        <a href="#" class="active">Service History<span class="dot"></span></a>
     </nav>
     <div class="container">
         <div class="header">

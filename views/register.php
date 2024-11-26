@@ -105,9 +105,13 @@
         <!-- PHP Form with Custom Form Handling -->
         <?php $form = \gearguard\phpmvc\form\Form::begin('', "post") ?>
 
-        <?php echo $form->field($model, 'firstname') ?>
-        <?php echo $form->field($model, 'lastname') ?>
+        <?php echo $form->field($model, 'first_name') ?>
+        <?php echo $form->field($model, 'last_name') ?>
         <?php echo $form->field($model, 'email') ?>
+        <?php echo $form->field($model, 'nic') ?>
+        <?php echo $form->field($model, 'address') ?>
+        <?php echo $form->field($model, 'contact_no') ?>
+        <?php echo $form->field($model, 'username') ?>
         <?php echo $form->field($model, 'password')->passwordField() ?>
         <?php echo $form->field($model, 'passwordConfirm')->passwordField() ?>
 

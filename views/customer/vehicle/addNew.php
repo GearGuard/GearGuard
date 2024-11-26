@@ -5,6 +5,16 @@
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #C0C0C0FF;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,16 +22,16 @@
         }
 
         body {
-            background: #f8fafc;
+            background: var(--background);
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: var(--text);
             line-height: 1.6;
             padding: 10px;
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             display: flex;
             justify-content: center;
@@ -35,7 +45,7 @@
         }
 
         .navMenu a {
-            color: #64748b;
+            color: var(--primary);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
@@ -47,26 +57,26 @@
         }
 
         .navMenu a.active {
-            color: #2563eb;
-            background: #eff6ff;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu a:hover {
-            color: #2563eb;
-            background: #f8fafc;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .vehicle-form {
-            background: white;
+            background: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             max-width: 1000px;
             margin: 0 auto;
             padding: 2rem;
         }
 
         .title {
-            color: #1e293b;
+            color: var(--primary);
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 2rem;
@@ -91,7 +101,7 @@
             display: block;
             font-size: 0.875rem;
             font-weight: 500;
-            color: #475569;
+            color: var(--text);
             margin-bottom: 0.5rem;
         }
 
@@ -105,12 +115,13 @@
         select {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
             background-color: #fff;
-            color: #1e293b;
+            color: var(--primary);
             font-size: 0.95rem;
             transition: all 0.2s ease;
+            background-color: var(--secondary);
         }
 
         input[type="text"]:hover,
@@ -122,7 +133,7 @@
         input[type="text"]:focus,
         input[type="date"]:focus,
         select:focus {
-            border-color: #2563eb;
+            border-color: var(--accent);
             outline: none;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
@@ -138,7 +149,7 @@
             width: 1rem;
             height: 1rem;
             border-radius: 4px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             cursor: pointer;
             margin-bottom: 6px;
         }
@@ -151,8 +162,8 @@
         }
 
         .submit-button {
-            background: #2563eb;
-            color: white;
+            background: var(--accent);
+            color: var(--text);
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             border: none;
@@ -163,7 +174,7 @@
         }
 
         .submit-button:hover {
-            background: #1d4ed8;
+            background: #1b4ebd;
             transform: translateY(-1px);
         }
 
@@ -173,10 +184,10 @@
 
         .clear-button {
             background: #f1f5f9;
-            color: #475569;
+            color: var(--background);
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             font-size: 0.95rem;
             font-weight: 500;
             cursor: pointer;
@@ -184,8 +195,8 @@
         }
 
         .clear-button:hover {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: #002D8DFF;
+            color: var(--text);
         }
 
         @media (max-width: 768px) {
@@ -293,90 +304,30 @@
             <div class="form-row">
                 <div class="form-column">
                     <div class="form-group">
-                        <label for="bought-date">Vehicle Bought Date<span class="required-dot">*</span></label>
-                        <input type="date" id="bought-date" name="bought_date" required>
+                        <label for="fuel-type">Fuel Type<span class="required-dot">*</span></label>
+                        <select id="fuel-type" name="fuel_type" required>
+                            <option value="">Select Vehicle Fuel Type</option>
+                            <option value="car">Petrol</option>
+                            <option value="motorcycle">Diesel</option>
+                            <option value="truck">Electric</option>
+
+                        </select>
                     </div>
                 </div>
                 <div class="form-column">
                     <div class="form-group">
-                        <label for="fuel-type">Fuel Type<span class="required-dot">*</span></label>
-                        <select id="fuel-type" name="fuel_type" required>
-                            <option value="">Select Fuel Type</option>
-                            <option value="petrol">Petrol</option>
-                            <option value="diesel">Diesel</option>
-                            <option value="electric">Electric</option>
-                        </select>
+                        <label for="registration-date">Registration Date<span class="required-dot">*</span></label>
+                        <input type="date" id="registration-date" name="registration_date" required>
                     </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="is-hybrid" name="is_hybrid">
-                    <label for="is-hybrid">This is a hybrid vehicle</label>
-                </div>
-            </div>
-
             <div class="button-container">
-                <button type="reset" class="clear-button">Clear Form</button>
+                <button type="reset" class="clear-button">Clear</button>
                 <button type="submit" class="submit-button">Register Vehicle</button>
             </div>
         </form>
     </div>
-
-    <script>
-        // Populate year dropdown with years from 1990 to current year
-        function populateYears() {
-            const yearSelect = document.getElementById('year');
-            const currentYear = new Date().getFullYear();
-
-            for (let year = currentYear; year >= 1990; year--) {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                yearSelect.appendChild(option);
-            }
-        }
-
-        // Set max date for bought date to today
-        function setMaxDate() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('bought-date').setAttribute('max', today);
-        }
-
-        // Form validation
-        function validateForm(event) {
-            const plateNumber = document.getElementById('plate-number').value;
-            const nic = document.getElementById('nic').value;
-
-            // Add your custom validation rules here
-            // For example, validate plate number format, NIC format, etc.
-
-            // This is a basic example - modify according to your needs
-            if (plateNumber.length < 6) {
-                alert('Please enter a valid plate number');
-                event.preventDefault();
-                return false;
-            }
-
-            if (nic.length < 10) {
-                alert('Please enter a valid NIC number');
-                event.preventDefault();
-                return false;
-            }
-
-            return true;
-        }
-
-        // Initialize form
-        window.onload = function() {
-            populateYears();
-            setMaxDate();
-
-            // Add form validation on submit
-            document.getElementById('vehicleForm').addEventListener('submit', validateForm);
-        };
-    </script>
 </body>
 
 </html>

@@ -8,7 +8,7 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\DbModel;
 
 
-class LoginForm extends Model
+class LoginFormGarage extends Model
 {
 	public string $username = '';
 	public string $password = '';
@@ -28,23 +28,23 @@ class LoginForm extends Model
 	public function labels(): array
 	{
 		return [
-			'username' => 'Your Username',
+			'username' => 'Username',
 			'password' => 'Password'
 		];
 	}
 
 	public function login()
 	{
-		$userModel = new User();
-		$user = $userModel->findOne(['username' => $this->username]);
-		if (!$user) {
+		$garageModel = new Garage();
+		$garage = $garageModel->findOne(['username' => $this->username]);
+		if (!$garage) {
 			$this->addError('username', 'User does not exist with this username');
 			return false;
 		}
-		if (!password_verify($this->password, $user->password)) {
+		if (!password_verify($this->password, $garage->password)) {
 			$this->addError('password', 'Password is incorrect');
 			return false;
 		};
-		return 	Application::$app->login($user);
+        return 	Application::$app->login($garage);
 	}
 }

@@ -15,34 +15,31 @@
         }
 
         body {
-            background: #f8fafc;
+            background: #1e293b;
+            /* Dark background */
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: #e2e8f0;
+            /* Light text color */
             line-height: 1.6;
             padding: 20px;
         }
 
-        /* Center title using flexbox */
         .page-title-container {
             display: flex;
             justify-content: center;
-            /* Horizontally center */
             align-items: center;
-            /* Vertically center */
             margin-bottom: 2rem;
         }
 
         .page-title {
             font-size: 2rem;
             font-weight: 600;
-            color: #1e293b;
-            /* Alternative centering method using text-align */
-            /* text-align: center; */
-            /* width: 100%; */
+            color: #e2e8f0;
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(37, 99, 235, 0.1);
+            /* Soft blue background */
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             display: flex;
@@ -93,7 +90,8 @@
         }
 
         .question-card {
-            background: white;
+            background: #2d3748;
+            /* Darker card background */
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
@@ -106,13 +104,14 @@
             align-items: flex-start;
             margin-bottom: 1rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #4b5563;
         }
 
         .question-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1e293b;
+            color: #e2e8f0;
+            /* Light text color */
             flex-grow: 1;
             text-align: justify;
             margin-right: 1rem;
@@ -135,12 +134,12 @@
         }
 
         .edit-button {
-            background: #f1f5f9;
-            color: #475569;
+            background: #4b5563;
+            color: #e2e8f0;
         }
 
         .edit-button:hover {
-            background: #e2e8f0;
+            background: #334155;
         }
 
         .delete-button {
@@ -154,14 +153,14 @@
 
         .question-meta {
             font-size: 0.875rem;
-            color: #64748b;
+            color: #a1a1aa;
             margin-bottom: 1rem;
         }
 
         .question-content {
-            color: #475569;
+            color: #e2e8f0;
             margin-bottom: 1.5rem;
-            text-align: justify
+            text-align: justify;
         }
 
         .answers-section {
@@ -171,17 +170,18 @@
         .answers-header {
             font-size: 1rem;
             font-weight: 600;
-            color: #475569;
+            color: #e2e8f0;
             margin-bottom: 1rem;
         }
 
         .answer {
-            background: #f8fafc;
+            background: #2d3748;
+            /* Dark background for answers */
             border-radius: 8px;
             padding: 1rem;
             margin-bottom: 1rem;
             text-align: justify;
-            border: 1px solid #E2F0FFFF
+            border: 1px solid #4b5563;
         }
 
         .answer:last-child {
@@ -190,12 +190,12 @@
 
         .answer-meta {
             font-size: 0.875rem;
-            color: #64748b;
+            color: #a1a1aa;
             margin-bottom: 0.5rem;
         }
 
         .answer-content {
-            color: #475569;
+            color: #e2e8f0;
         }
 
         .modal {
@@ -210,7 +210,7 @@
         }
 
         .modal-content {
-            background: white;
+            background: #1e293b;
             width: 90%;
             max-width: 600px;
             margin: 50px auto;
@@ -223,6 +223,7 @@
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
+            color: #e2e8f0;
         }
 
         .modal-form input,
@@ -230,9 +231,11 @@
             width: 100%;
             padding: 0.75rem;
             margin-bottom: 1rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #4b5563;
             border-radius: 8px;
             font-family: inherit;
+            background: #2d3748;
+            color: #e2e8f0;
         }
 
         .modal-form textarea {
@@ -282,10 +285,8 @@
             <a href="#">New Post</a>
             <a href="#" class="active">My Posts</a>
         </div>
-        <!-- <a href="#" class="new-post-button" onclick="showNewPostModal()">New Discussion</a> -->
     </nav>
 
-    <!-- Title centered using flexbox container -->
     <div class="page-title-container">
         <h1 class="page-title">My Questions</h1>
     </div>
@@ -358,7 +359,7 @@
                     
                     <div class="answers-section">
                         <h3 class="answers-header">Answers (${question.answers.length})</h3>
-                        ${question.answers.map(answer => `
+                        ${question.answers.map(answer => ` 
                             <div class="answer">
                                 <div class="answer-meta">
                                     ${answer.author} · ${answer.timestamp}

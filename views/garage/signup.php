@@ -1,6 +1,7 @@
 <?php
 
-/** @var $model \app\models\User */
+/** @var $model \app\models\Garage */
+
 
 ?>
 <!DOCTYPE html>
@@ -95,15 +96,25 @@
 
 <body>
     <div class="form-container">
-        <h2 class="form-title">Login</h2>
+        <h2 class="form-title">Register</h2>
+        <?php
 
+        use app\models\RegisterModel;
+        use gearguard\phpmvc\form\Form;
+        ?>
         <!-- PHP Form with Custom Form Handling -->
-        <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post') ?>
+        <?php $form = \gearguard\phpmvc\form\Form::begin('', "post") ?>
 
         <?php echo $form->field($model, 'username') ?>
+        <?php echo $form->field($model, 'name') ?>
+        <?php echo $form->field($model, 'email') ?>
         <?php echo $form->field($model, 'password')->passwordField() ?>
+        <?php echo $form->field($model, 'passwordConfirm')->passwordField() ?>
+        <?php echo $form->field($model, 'contact_no') ?>
+        <?php echo $form->field($model, 'address') ?>
+        <?php echo $form->field($model, 'registration_no') ?>
 
-        <button type="submit" class="form-button">Login</button>
+        <button type="submit" class="form-button">Register</button>
 
         <?php echo \gearguard\phpmvc\form\Form::end() ?>
     </div>

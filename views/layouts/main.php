@@ -20,7 +20,7 @@ use gearguard\phpmvc\Application;
     <header>
         <nav>
             <?php if (Application::isGuest()): ?>
-                <div class="logo">
+                <!-- <div class="logo">
                     <img src="/assets/img/favicon.png" alt="Logo">
                     <div class="nav-links">
                         <a href="/">Home</a>
@@ -31,7 +31,7 @@ use gearguard\phpmvc\Application;
                 <div>
                     <a href="/register" class="register-button">Register</a>
                     <a href="/login" class="login-button">Login</a>
-                </div>
+                </div> -->
             <?php else: ?>
                 <!-- <div class="nav-links">
                    

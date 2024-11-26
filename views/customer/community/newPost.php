@@ -8,6 +8,16 @@
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #C0C0C0FF;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,9 +25,9 @@
         }
 
         body {
-            background: #f8fafc;
+            background: var(--background);
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: var(--text);
             line-height: 1.6;
             padding: 20px;
         }
@@ -32,12 +42,12 @@
         .page-title {
             font-size: 2rem;
             font-weight: 600;
-            color: #1e293b;
+            color: var(--primary);
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             display: flex;
             justify-content: space-between;
@@ -57,7 +67,7 @@
         }
 
         .navMenu a {
-            color: #64748b;
+            color: var(--primary);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
@@ -67,8 +77,8 @@
         }
 
         .navMenu a.active {
-            color: #2563eb;
-            background: #eff6ff;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .main-container {
@@ -77,9 +87,9 @@
         }
 
         .problem-form {
-            background: white;
+            background: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             padding: 2rem;
         }
 
@@ -90,7 +100,7 @@
         .form-group label {
             display: block;
             font-weight: 500;
-            color: #475569;
+            color: var(--primary);
             margin-bottom: 0.5rem;
             text-align: left;
         }
@@ -99,17 +109,19 @@
         .form-group textarea {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
             font-family: inherit;
             font-size: 1rem;
+            color: var(--text);
             transition: border-color 0.2s ease;
+            background-color: var(--secondary);
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #2563eb;
+            border-color: var(--accent);
         }
 
         .form-group textarea {
@@ -135,22 +147,23 @@
 
         .btn-clear {
             background: #f1f5f9;
-            color: #475569;
+            color: var(--accent);
         }
 
         .btn-clear:hover {
-            background: #e2e8f0;
+            background: var(--hover-bg);
         }
 
         .btn-post {
-            background: #2563eb;
-            color: white;
+            background: var(--accent);
+            color: var(--text);
         }
 
         .btn-post:hover {
             background: #1d4ed8;
         }
 
+        /* Responsive design */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
