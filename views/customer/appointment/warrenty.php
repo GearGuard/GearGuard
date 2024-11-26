@@ -11,6 +11,16 @@ $this->title = 'Spare Part Warranty';
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #c7adad;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -18,21 +28,21 @@ $this->title = 'Spare Part Warranty';
         }
 
         body {
-            background: #f8fafc;
+            background: var(--background);
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: var(--text);
             line-height: 1.6;
             padding: 10px;
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 67.5%;
+            width: 70%;
             padding: 1rem;
             margin: 0 auto 2rem;
             position: sticky;
@@ -41,7 +51,7 @@ $this->title = 'Spare Part Warranty';
         }
 
         .navMenu a {
-            color: #64748b;
+            color: var(--primary);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
@@ -52,19 +62,19 @@ $this->title = 'Spare Part Warranty';
         }
 
         .navMenu a.active {
-            color: #2563eb;
-            background: #eff6ff;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu a:hover {
-            color: #2563eb;
-            background: #f8fafc;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu .dot {
             width: 4px;
             height: 4px;
-            background: #2563eb;
+            background: var(--accent);
             border-radius: 50%;
             position: absolute;
             bottom: 4px;
@@ -80,23 +90,23 @@ $this->title = 'Spare Part Warranty';
         }
 
         .warranty-container {
-            background: white;
+            background: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             max-width: 1000px;
             margin: 0 auto;
             padding: 1.5rem;
         }
 
         .title {
-            color: #1e293b;
+            color: var(--text);
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
         }
 
         .warranty-card {
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
@@ -123,12 +133,12 @@ $this->title = 'Spare Part Warranty';
 
         .part-name {
             font-weight: 600;
-            color: #1e293b;
+            color: var(--text);
             font-size: 1.1rem;
         }
 
         .part-brand {
-            color: #64748b;
+            color: var(--primary);
             font-size: 0.9rem;
         }
 
@@ -169,7 +179,7 @@ $this->title = 'Spare Part Warranty';
 
         .section-title {
             font-size: 0.875rem;
-            color: #64748b;
+            color: var(--primary);
             font-weight: 600;
             margin-bottom: 0.75rem;
             text-transform: uppercase;
@@ -191,17 +201,17 @@ $this->title = 'Spare Part Warranty';
 
         .detail-label {
             font-size: 0.875rem;
-            color: #64748b;
+            color: var(--primary);
             font-weight: 500;
         }
 
         .detail-value {
-            color: #334155;
+            color: var(--text);
             font-weight: 500;
         }
 
         .part-description {
-            background: #f8fafc;
+            background: var(--secondary);
             padding: 1rem;
             border-radius: 6px;
             margin-bottom: 1.5rem;
@@ -209,7 +219,7 @@ $this->title = 'Spare Part Warranty';
         }
 
         .warranty-info {
-            background: #eff6ff;
+            background: var(--hover-bg);
             padding: 1rem;
             border-radius: 6px;
             margin-bottom: 1.5rem;
@@ -217,7 +227,7 @@ $this->title = 'Spare Part Warranty';
 
         .price-tag {
             font-weight: 600;
-            color: #1e293b;
+            color: var(--text);
             font-size: 1.1rem;
         }
 
@@ -298,95 +308,12 @@ $this->title = 'Spare Part Warranty';
                     <span class="detail-value">AutoCare Plus - G1</span>
                 </div>
                 <div class="detail-group">
-                    <span class="detail-label">Supplier</span>
-                    <span class="detail-value">Supreme Auto Parts</span>
-                </div>
-                <div class="detail-group">
                     <span class="detail-label">Installation Date</span>
                     <span class="detail-value">March 15, 2024</span>
                 </div>
             </div>
-
-            <div class="warranty-info">
-                <h3 class="section-title">Warranty Details</h3>
-                <div class="warranty-details">
-                    <div class="detail-group">
-                        <span class="detail-label">Coverage Period</span>
-                        <span class="detail-value">24 Months</span>
-                    </div>
-                    <div class="detail-group">
-                        <span class="detail-label">Expiry Date</span>
-                        <span class="detail-value">March 15, 2026</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="warranty-card">
-            <div class="warranty-header">
-                <div class="part-info">
-                    <span class="part-name">Air Filter System</span>
-                    <span class="part-brand">by K&N</span>
-                </div>
-                <div class="status-container">
-                    <span class="time-left-expire">Expired 4 months ago</span>
-                    <span class="warranty-status expired">Warranty Expired</span>
-                </div>
-            </div>
-
-            <h3 class="section-title">Part Information</h3>
-            <div class="warranty-details">
-                <div class="detail-group">
-                    <span class="detail-label">Part Number</span>
-                    <span class="detail-value">KN-2023-A456</span>
-                </div>
-                <div class="detail-group">
-                    <span class="detail-label">Price</span>
-                    <span class="detail-value price-tag">$89.99</span>
-                </div>
-                <div class="detail-group">
-                    <span class="detail-label">Manufactured Date</span>
-                    <span class="detail-value">June 2023</span>
-                </div>
-            </div>
-
-            <div class="part-description">
-                <h3 class="section-title">Description</h3>
-                <p>High-flow washable air filter designed for maximum engine protection and improved performance. Features double-layered synthetic filter media and reinforced rubber seals for superior filtration.</p>
-            </div>
-
-            <h3 class="section-title">Installation Details</h3>
-            <div class="warranty-details">
-                <div class="detail-group">
-                    <span class="detail-label">Installed At</span>
-                    <span class="detail-value">BrakeMasters - G2</span>
-                </div>
-                <div class="detail-group">
-                    <span class="detail-label">Supplier</span>
-                    <span class="detail-value">AutoZone</span>
-                </div>
-                <div class="detail-group">
-                    <span class="detail-label">Installation Date</span>
-                    <span class="detail-value">July 10, 2023</span>
-                </div>
-            </div>
-
-            <div class="warranty-info">
-                <h3 class="section-title">Warranty Details</h3>
-                <div class="warranty-details">
-                    <div class="detail-group">
-                        <span class="detail-label">Coverage Period</span>
-                        <span class="detail-value">12 Months</span>
-                    </div>
-                    <div class="detail-group">
-                        <span class="detail-label">Expiry Date</span>
-                        <span class="detail-value">July 10, 2024</span>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
-
 </body>
 
 </html>
