@@ -11,6 +11,16 @@ $this->title = 'Appointment';
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #C0C0C0FF;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -18,21 +28,21 @@ $this->title = 'Appointment';
         }
 
         body {
-            background: #f8fafc;
+            background: var(--background);
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: var(--text);
             line-height: 1.6;
             padding: 20px;
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 67.5%;
+            width: 70%;
             padding: 1rem;
             margin: 0 auto 2rem;
             position: sticky;
@@ -41,7 +51,7 @@ $this->title = 'Appointment';
         }
 
         .navMenu a {
-            color: #64748b;
+            color: var(--primary);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
@@ -52,19 +62,19 @@ $this->title = 'Appointment';
         }
 
         .navMenu a.active {
-            color: #2563eb;
-            background: #eff6ff;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu a:hover {
-            color: #2563eb;
-            background: #f8fafc;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu .dot {
             width: 4px;
             height: 4px;
-            background: #2563eb;
+            background: var(--accent);
             border-radius: 50%;
             position: absolute;
             bottom: 4px;
@@ -80,19 +90,20 @@ $this->title = 'Appointment';
         }
 
         .appointment-table {
-            background: white;
+            background: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             max-width: 1000px;
             margin: 0 auto;
             padding: 1.5rem;
         }
 
         .title {
-            color: #1e293b;
+            color: var(--primary);
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
+            text-align: center;
         }
 
         table {
@@ -102,20 +113,20 @@ $this->title = 'Appointment';
         }
 
         th {
-            background: #f8fafc;
-            color: #475569;
+            background: var(--secondary);
+            color: var(--primary);
             font-weight: 600;
             font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             padding: 1rem;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 2px solid var(--border);
         }
 
         td {
             padding: 1rem;
-            border-bottom: 1px solid #e2e8f0;
-            color: #334155;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
         }
 
         tr:last-child td {
@@ -123,23 +134,22 @@ $this->title = 'Appointment';
         }
 
         tr:hover {
-            background: #f8fafc;
+            background: var(--hover-bg);
             transition: all 0.2s ease;
         }
 
         .button-container {
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             justify-content: center;
-
         }
 
         .action-button {
-            background: #6186D6FF;
-            color: white;
+            background: var(--accent);
+            color: var(--text);
             border: none;
             padding: 0.5rem 1rem;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
@@ -147,7 +157,7 @@ $this->title = 'Appointment';
         }
 
         .action-button:hover {
-            background: #1d4ed8;
+            background: #1b4ebd;
             transform: translateY(-1px);
         }
 
@@ -157,14 +167,14 @@ $this->title = 'Appointment';
 
         /* View button styling */
         .action-button[onclick^="viewAppointment"] {
-            background: #f8fafc;
-            color: #2563eb;
-            border: 1px solid #e2e8f0;
+            background: var(--secondary);
+            color: var(--accent);
+            border: 1px solid var(--border);
         }
 
         .action-button[onclick^="viewAppointment"]:hover {
-            background: #eff6ff;
-            border-color: #2563eb;
+            background: var(--hover-bg);
+            border-color: var(--accent);
         }
 
         /* Responsive design */
@@ -198,7 +208,6 @@ $this->title = 'Appointment';
 
             .action-button {
                 width: 100%;
-
             }
         }
     </style>
