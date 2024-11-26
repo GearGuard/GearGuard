@@ -10,25 +10,25 @@ use gearguard\phpmvc\DbModel;
 
 class LoginForm extends Model
 {
-	public string $email = '';
+	public string $username = '';
 	public string $password = '';
 	public function rules(): array
 	{
 		return [
-			'email' => [self::RULE_REQUIRED, self::RULE_EMAIL],
+			'username' => [self::RULE_REQUIRED],
 			'password' => [self::RULE_REQUIRED]
 		];
 	}
 
 	public function attributes(): array
 	{
-		return ['email', 'password'];
+		return ['username', 'password'];
 	}
 
 	public function labels(): array
 	{
 		return [
-			'email' => 'Your Email',
+			'username' => 'Your Username',
 			'password' => 'Password'
 		];
 	}
@@ -36,15 +36,15 @@ class LoginForm extends Model
 	public function login()
 	{
 		$userModel = new User();
-		$user = $userModel->findOne(['email' => $this->email]);
+		$user = $userModel->findOne(['username' => $this->username]);
 		if (!$user) {
-			$this->addError('email', 'User does not exist with this email');
+			$this->addError('username', 'User does not exist with this username');
 			return false;
 		}
 		if (!password_verify($this->password, $user->password)) {
 			$this->addError('password', 'Password is incorrect');
 			return false;
 		};
-        return 	Application::$app->login($user);
+		return 	Application::$app->login($user);
 	}
 }

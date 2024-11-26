@@ -100,7 +100,7 @@
         <!-- PHP Form with Custom Form Handling -->
         <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post') ?>
 
-        <?php echo $form->field($model, 'email') ?>
+        <?php echo $form->field($model, 'username') ?>
         <?php echo $form->field($model, 'password')->passwordField() ?>
 
         <button type="submit" class="form-button">Login</button>
