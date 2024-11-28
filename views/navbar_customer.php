@@ -207,19 +207,19 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="appointments.php" class="nav-link">
+                <a href="/customer/appointment/appoint" class="nav-link">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Appointments</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="vehicles.php" class="nav-link">
+                <a href="/customer/vehicle/register" class="nav-link">
                     <i class="fas fa-car-side"></i>
                     <span class="nav-text">My Vehicles</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="community.php" class="nav-link">
+                <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>
@@ -258,6 +258,34 @@
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('collapsed');
             }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                const href = link.getAttribute('href');
+
+                try {
+                    const response = await fetch(href);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    const html = await response.text();
+                    mainContent.innerHTML = html;
+
+                    mainContent.querySelectorAll("script").forEach(script => {
+                        const newScript = document.createElement("script");
+                        newScript.textContent = script.textContent;
+                        document.head.appendChild(newScript).parentNode.removeChild(newScript);
+                    });
+
+
+                } catch (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                    mainContent.innerHTML = '<p>There was an error loading the content. Please try again later.</p>';
+                }
+            });
         });
     </script>
 </body>
