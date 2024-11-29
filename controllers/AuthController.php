@@ -133,4 +133,27 @@ class AuthController extends Controller
             'model' => $loginForm
         ]);
     }
+
+    //  Not sure about this, i used this for file permission, its kinda working but not sure @PasinduRavimal can you check this
+    public function garage()
+    {
+        // Check if the user is logged in
+        if (Application::isGuest()) {
+            // If not logged in, redirect to login page
+            Application::$app->response->redirect('/login');
+            return;
+        }
+
+        // Check if the logged-in user is a garage
+        if (!Application::$app->user->isGarage()) {
+            // If not a garage, redirect to an appropriate page (e.g., home or error page)
+            Application::$app->response->redirect('/');
+            return;
+        }
+
+        // If the user is logged in and is a garage, render the garage dashboard
+        return $this->render('garage/garage', [
+            'title' => 'Garage Dashboard'
+        ]);
+    }
 }
