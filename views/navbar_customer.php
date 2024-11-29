@@ -281,6 +281,10 @@
                                             document.head.appendChild(newScript).parentNode.removeChild(newScript);
                                         });
 
+                    document.querySelectorAll('.nav-link').forEach(lnk => lnk.classList.remove('active'));
+
+                    link.classList.add('active');
+
                 } catch (error) {
                     console.error('There was a problem with the fetch operation:', error);
                     mainContent.innerHTML = '<p>There was an error loading the content. Please try again later.</p>';
