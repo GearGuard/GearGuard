@@ -29,6 +29,10 @@ $app->router->post('/contact', [SiteController::class, 'contact']);
 $app->router->get('/about', [SiteController::class, 'about']);
 $app->router->get('/common', [SiteController::class, 'common']);
 $app->router->get('/type', [SiteController::class, 'type']);
+$app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']);
+$app->router->get('/customer/appointment/appoint', [SiteController::class, 'newAppointments']);
+$app->router->get('/customer/vehicle/register', [SiteController::class, 'addVehicle']);
+$app->router->get('/community', [SiteController::class, 'community']);
 
 $app->router->get('/customer', [AuthController::class, 'customer']);
 $app->router->get('/login', [AuthController::class, 'login']);

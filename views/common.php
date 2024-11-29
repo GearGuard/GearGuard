@@ -234,82 +234,82 @@ $this->title = 'Customer Appointment';
 </head>
 
 <body>
-    <nav class="navMenu">
-        <a href="#" class="active">Book Appointment</a>
-        <a href="#">My Appointments</a>
-        <a href="#">Service History</a>
-        <a href="#">Spare Parts Warranty</a>
-    </nav>
+<nav class="navMenu">
+    <a href="#" class="active">Book Appointment</a>
+    <a href="#">My Appointments</a>
+    <a href="#">Service History</a>
+    <a href="#">Spare Parts Warranty</a>
+</nav>
 
-    <div class="appointment-form">
-        <h2 class="title">Book Your Appointment</h2>
-        <form action="/submit-appointment" method="POST">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="fname">First Name<span class="required-dot">*</span></label>
-                        <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="lname">Last Name<span class="required-dot">*</span></label>
-                        <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
-                    </div>
+<div class="appointment-form">
+    <h2 class="title">Book Your Appointment</h2>
+    <form action="/submit-appointment" method="POST">
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="fname">First Name<span class="required-dot">*</span></label>
+                    <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
                 </div>
             </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="email">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" required placeholder="Enter your email">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="phone">Contact Number<span class="required-dot">*</span></label>
-                        <input type="text" id="phone" name="phone" required placeholder="Enter your phone number">
-                    </div>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="lname">Last Name<span class="required-dot">*</span></label>
+                    <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
                 </div>
             </div>
+        </div>
 
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
-                        <select id="vehicle-type" name="vehicle_type" required>
-                            <option value="" disabled selected>Select Vehicle Type</option>
-                            <option value="car">Car</option>
-                            <option value="motorcycle">Motorcycle</option>
-                            <option value="truck">Truck</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="service-type">Service Type<span class="required-dot">*</span></label>
-                        <select id="service-type" name="service_type" required>
-                            <option value="" disabled selected>Select Service Type</option>
-                            <option value="oil_change">Oil Change</option>
-                            <option value="tire_rotation">Tire Rotation</option>
-                            <option value="general_checkup">General Checkup</option>
-                        </select>
-                    </div>
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="email">Email<span class="required-dot">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
                 </div>
             </div>
-
-            <div class="form-group">
-                <label for="notes">Additional Notes</label>
-                <textarea id="notes" name="notes" class="notes" placeholder="Enter any additional details (optional)"></textarea>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="phone">Contact Number<span class="required-dot">*</span></label>
+                    <input type="text" id="phone" name="phone" required placeholder="Enter your phone number">
+                </div>
             </div>
+        </div>
 
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="book-button">Book Appointment</button>
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
+                    <select id="vehicle-type" name="vehicle_type" required>
+                        <option value="" disabled selected>Select Vehicle Type</option>
+                        <option value="car">Car</option>
+                        <option value="motorcycle">Motorcycle</option>
+                        <option value="truck">Truck</option>
+                    </select>
+                </div>
             </div>
-        </form>
-    </div>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="service-type">Service Type<span class="required-dot">*</span></label>
+                    <select id="service-type" name="service_type" required>
+                        <option value="" disabled selected>Select Service Type</option>
+                        <option value="oil_change">Oil Change</option>
+                        <option value="tire_rotation">Tire Rotation</option>
+                        <option value="general_checkup">General Checkup</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Additional Notes</label>
+            <textarea id="notes" name="notes" class="notes" placeholder="Enter any additional details (optional)"></textarea>
+        </div>
+
+        <div class="button-container">
+            <button type="reset" class="clear-button">Clear</button>
+            <button type="submit" class="book-button">Book Appointment</button>
+        </div>
+    </form>
+</div>
 </body>
 
 </html>
