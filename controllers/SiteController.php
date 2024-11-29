@@ -42,6 +42,21 @@ class SiteController extends Controller
             'model' => $contact
         ]);
     }
+    public function login()
+    {
+        $params = [
+            'name' => "The GearGurd"
+        ];
+        return $this->render('common', $params);
+    }
+
+    public function type()
+    {
+        $params = [
+            'name' => "The GearGurd - User Type"
+        ];
+        return $this->render('type', $params);
+    }
 
     public function navbar_customer(Request $request, Response $response){
         return $this->render('navbar_customer', ['name' => 'The GearGuard']);

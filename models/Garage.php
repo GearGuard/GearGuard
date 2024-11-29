@@ -12,16 +12,16 @@ class Garage extends UserModel
 	const STATUS_ACTIVE = 2;
 	const STATUS_DELETED = 3;
 
-    public int $id;
-    public string $username = '';
+	public int $id;
+	public string $username = '';
 	public string $name = '';
 	public string $email = '';
 	public int $status_id = self::STATUS_INACTIVE;
 	public string $password = '';
 	public string $passwordConfirm = '';
-    public string $address = '';
-    public string $contact_no = '';
-    public string $registration_no = '';
+	public string $address = '';
+	public string $contact_no = '';
+	public string $registration_no = '';
 
 	public function tableName(): string
 	{
@@ -48,30 +48,29 @@ class Garage extends UserModel
 			'email' => [self::RULE_REQUIRED, self::RULE_EMAIL,],
 			'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 24]],
 			'passwordConfirm' => [self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']],
-            'address' => [self::RULE_REQUIRED],
-            'contact_no' => [self::RULE_REQUIRED],
-            'status_id' => [self::RULE_REQUIRED],
+			'address' => [self::RULE_REQUIRED],
+			'contact_no' => [self::RULE_REQUIRED],
+			'status_id' => [self::RULE_REQUIRED],
 		];
 	}
 
 	public function attributes(): array
 	{
 		return ['username', 'password', 'name', 'address', 'email', 'contact_no', 'registration_no', 'status_id'];
-
 	}
 
 	public function labels(): array
 	{
 		return [
 			'username' => 'Username',
-            'password' => 'Password',
-            'name' => 'Name',
-            'address' => 'Address',
-            'email' => 'Email',
-            'contact_no' => 'Contact No',
-            'registration_no' => 'Registration No',
-            'status_id' => 'Status',
-            'passwordConfirm' => 'Confirm Password',
+			'password' => 'Password',
+			'name' => 'Name',
+			'address' => 'Address',
+			'email' => 'Email',
+			'contact_no' => 'Contact No',
+			'registration_no' => 'Registration No',
+			'status_id' => 'Status',
+			'passwordConfirm' => 'Confirm Password',
 		];
 	}
 	public function getDisplayName(): string
