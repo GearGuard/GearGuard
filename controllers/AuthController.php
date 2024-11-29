@@ -73,15 +73,25 @@ class AuthController extends Controller
 
     public function customer()
     {
-        return $this->render('customer');
-    }
-
-    public function appointment()
-    {
-        return Application::$app->view->renderView('customer/appointment', [
-            'title' => 'Customer Appointment'
+        return $this->render('customer/customer', [
+            'title' => 'Customer Dashboard'
         ]);
     }
+    public function customerAppointment()
+    {
+        return $this->render('customer/appointment/myAppointment', [
+            'title' => 'Customer Dashboard'
+        ]);
+    }
+
+
+
+    // public function appointment()
+    // {
+    //     return Application::$app->view->renderView('customer/appointment', [
+    //         'title' => 'Customer Appointment'
+    //     ]);
+    // }
 
     public function garageSignup(Request $request)
     {
