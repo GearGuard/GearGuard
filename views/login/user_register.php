@@ -1,3 +1,8 @@
+<?php
+
+/** @var $model \app\models\User */
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,6 +10,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service Registration - GearGuard</title>
+    <?php
+
+    use app\models\RegisterModel;
+    use gearguard\phpmvc\form\Form;
+    ?>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -200,49 +210,49 @@
                 <h1>Create Account</h1>
                 <p>Join our platform and take control of your vehicle's health</p>
             </div>
-            <form id="registerForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="firstName">First Name</label>
-                        <input type="text" id="firstName" name="firstName" required placeholder="John">
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Last Name</label>
-                        <input type="text" id="lastName" name="lastName" required placeholder="Doe">
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" required placeholder="johndoe@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" name="phone" required placeholder="+1 (234) 567-8900">
-                    </div>
-                    <div class="form-group">
-                        <label for="nic">National Identity Card</label>
-                        <input type="text" id="nic" name="nic" required placeholder="XXXX-XXXXXXX-X">
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="address">Full Address</label>
-                        <input type="text" id="address" name="address" required placeholder="123 Vehicle Street, Maintenance City">
-                    </div>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required placeholder="vehicleowner123">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required>
-                    </div>
+            <?php $form = \gearguard\phpmvc\form\Form::begin('', "post") ?>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" required placeholder="John">
                 </div>
-                <button type="submit" class="register-button">Create Account</button>
-                <div class="login-link">
-                    <a href="#">Already have an account? Sign In</a>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" required placeholder="Doe">
                 </div>
+                <div class="form-group full-width">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="johndoe@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="+1 (234) 567-8900">
+                </div>
+                <div class="form-group">
+                    <label for="nic">National Identity Card</label>
+                    <input type="text" id="nic" name="nic" required placeholder="XXXX-XXXXXXX-X">
+                </div>
+                <div class="form-group full-width">
+                    <label for="address">Full Address</label>
+                    <input type="text" id="address" name="address" required placeholder="123 Vehicle Street, Maintenance City">
+                </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="vehicleowner123">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group full-width">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+            </div>
+            <button type="submit" class="register-button">Create Account</button>
+            <div class="login-link">
+                <a href="#">Already have an account? Sign In</a>
+            </div>
             </form>
         </div>
     </div>
