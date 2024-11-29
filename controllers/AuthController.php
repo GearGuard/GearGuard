@@ -2,20 +2,24 @@
 
 namespace app\controllers;
 
-use app\core\Controller;
-use app\core\Request;
+use app\models\LoginFormGarage;
+use gearguard\phpmvc\Controller;
+use gearguard\phpmvc\Request;
 use app\models\User;
-use app\core\Application;
-use app\core\Response;
-use app\core\Router;
+use app\models\Garage;
+use gearguard\phpmvc\Application;
+use gearguard\phpmvc\Response;
+use gearguard\phpmvc\Router;
 use app\models\LoginForm;
-use app\core\middlewares\AuthMiddleware;
+use gearguard\phpmvc\middlewares\AuthMiddleware;
 
 class AuthController extends Controller
 {
+    // public string $layout = 'customer'; 
     public function __construct()
     {
         $this->registerMiddleware(new AuthMiddleware(['profile']));
+        $this->registerMiddleware(new AuthMiddleware(['customer']));
     }
     public function login(Request $request, Response $response)
     {
@@ -63,7 +67,70 @@ class AuthController extends Controller
 
     public function profile()
     {
-		
+
         return $this->render('profile');
+    }
+
+    public function customer()
+    {
+        return $this->render('customer/customer', [
+            'title' => 'Customer Dashboard'
+        ]);
+    }
+    public function customerAppointment()
+    {
+        return $this->render('customer/appointment/myAppointment', [
+            'title' => 'Customer Dashboard'
+        ]);
+    }
+
+
+
+    // public function appointment()
+    // {
+    //     return Application::$app->view->renderView('customer/appointment', [
+    //         'title' => 'Customer Appointment'
+    //     ]);
+    // }
+
+    public function garageSignup(Request $request)
+    {
+        $errors = [];
+        $garage = new Garage();
+        if ($request->isPost()) {
+            $garage->loadData($request->getBody());
+
+
+            if ($garage->validate() && $garage->save()) {
+                Application::$app->session->setFlash('success', 'Thanks for Registering');
+                Application::$app->response->redirect('/');
+                exit;
+            }
+            return $this->render('garage/signup', [
+                'model' => $garage
+            ]);
+        }
+        $this->setLayout('auth');
+        return $this->render('garage/signup', [
+            'model' => $garage
+        ]);
+    }
+
+    public function garageLogin(Request $request, Response $response)
+    {
+        $loginForm = new LoginFormGarage();
+        if ($request->isPost()) {
+            $loginForm->loadData($request->getBody());
+            if ($loginForm->validate() && $loginForm->login()) {
+                Application::$app->session->set('isGarage', true);
+                Application::$app->response->redirect('/');
+                return;
+            }
+        }
+
+        $this->setLayout('auth');
+        return $this->render('garage/signin', [
+            'model' => $loginForm
+        ]);
     }
 }

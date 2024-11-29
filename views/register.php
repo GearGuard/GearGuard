@@ -1,159 +1,269 @@
 <?php
 
-/** @var $model \app\models\User */
-
-
-?>
+/** @var $model \app\models\User */ ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Page</title>
+    <title>Service Registration - GearGuard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom CSS for styling */
-        .form-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        :root {
+            --text: #FFFFFFFF;
+            --background: #181a20;
+            --primary: #c7adad;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --border: #33363f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .registration-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1500px;
+            background-color: var(--secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .registration-info {
+            flex: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--secondary);
+        }
+
+        .registration-info img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .registration-info h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .registration-info p {
+            color: var(--text);
+            opacity: 0.8;
+            line-height: 1.6;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .registration-form {
+            flex: 2;
+            padding: 3rem;
+            background-color: var(--background);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 2px solid var(--secondary);
         }
 
         .form-title {
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .form-title h1 {
+            font-size: 2rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-title p {
+            color: var(--text);
+            opacity: 0.7;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 0.25rem;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .required-dot {
+            color: #ef4444;
+            margin-left: 4px;
         }
 
         .form-input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background-color: #33363f;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:hover {
+            border-color: var(--accent);
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
         }
 
         .form-input.is-invalid {
-            border-color: #e74c3c;
-            /* Red border for invalid input */
-            background-color: #fce4e4;
+            border-color: #ef4444;
         }
 
         .invalid-feedback {
-            color: #e74c3c;
-            font-size: 12px;
-            margin-top: 5px;
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
             display: block;
         }
 
-        .form-button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .register-button {
+            width: 40%;
+            padding: 0.875rem;
+            background-color: var(--accent);
+            color: var(--text);
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
         }
 
-        .form-button:hover {
-            background-color: #0056b3;
+        .register-button:hover {
+            background-color: #1b4ebd;
+            transform: translateY(-2px);
         }
 
-        .invalid-feedback {
-            display: none;
-            /* Initially hidden */
-            width: 100%;
-            margin-top: 0.25rem;
-            font-size: 0.875em;
-            /* Smaller text */
-            color: #dc3545;
-            /* Red text for error message */
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
         }
 
-        .is-invalid~.invalid-feedback {
-            display: block;
-            /* Display feedback when input is invalid */
+        .login-link a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .registration-wrapper {
+                flex-direction: column;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: span 1;
+            }
+
+            .register-button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="form-container">
-        <h2 class="form-title">Register</h2>
-        <?php
-
-        use app\models\RegisterModel;
-        use app\core\form\Form;
-        ?>
-        <!-- PHP Form with Custom Form Handling -->
-        <?php $form = \app\core\form\Form::begin('', "post") ?>
-
-        <?php echo $form->field($model, 'firstname') ?>
-        <?php echo $form->field($model, 'lastname') ?>
-        <?php echo $form->field($model, 'email') ?>
-        <?php echo $form->field($model, 'password')->passwordField() ?>
-        <?php echo $form->field($model, 'passwordConfirm')->passwordField() ?>
-
-        <button type="submit" class="form-button">Register</button>
-
-        <?php echo \app\core\form\Form::end() ?>
-
-        <!-- Direct HTML Form Example -->
-        <!--    <form method="POST" class="custom-form">-->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">First Name:</label>-->
-        <!--            <input type="text" name="firstname" value="--><?php //echo $model->firstname 
-                                                                        ?><!--"-->
-        <!--                   placeholder="Enter your first name"-->
-        <!--                   class="form-input --><?php //echo $model->hasError('firstname') ? 'is-invalid' : '' 
-                                                    ?><!--">-->
-        <!--			--><?php //if ($model->hasError('firstname')): 
-                            ?>
-        <!--                <div class="invalid-feedback">--><?php //echo $model->getFirstError('firstname'); 
-                                                                ?><!--</div>-->
-        <!--			--><?php //endif; 
-                            ?>
-        <!--        </div>-->
-        <!---->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">Last Name:</label>-->
-        <!--            <input type="text" name="lastname" placeholder="Enter your last name" class="form-input">-->
-        <!--        </div>-->
-        <!---->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">Email:</label>-->
-        <!--            <input type="email" name="email" placeholder="Enter your email" class="form-input">-->
-        <!--        </div>-->
-        <!---->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">Password:</label>-->
-        <!--            <input type="password" name="password" placeholder="Enter your password" class="form-input">-->
-        <!--        </div>-->
-        <!---->
-        <!--        <div class="form-group">-->
-        <!--            <label class="form-label">Confirm Password:</label>-->
-        <!--            <input type="password" name="passwordConfirm" placeholder="Confirm your password" class="form-input">-->
-        <!--        </div>-->
-        <!---->
-        <!--        <button type="submit" class="form-button">Register</button>-->
-        <!--    </form>-->
+    <div class="registration-wrapper">
+        <div class="registration-info">
+            <img src="/assets/img/favicon.png" alt="GearGuard Logo">
+            <h2>Welcome to GearGuard</h2>
+            <p>Your ultimate companion for hassle-free vehicle maintenance! By creating an account, you gain access to a comprehensive suite of professional services designed to keep your vehicle in top condition.</p>
+        </div>
+        <div class="registration-form">
+            <div class="form-title">
+                <h1>Create Account</h1>
+                <p>Join our platform and take control of your vehicle's health</p>
+            </div>
+            <?php $form = \gearguard\phpmvc\form\Form::begin('', "post") ?>
+            <div class="form-grid">
+                <div class="form-group">
+                    <?php echo $form->field($model, 'first_name') ?>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->field($model, 'last_name') ?>
+                </div>
+                <div class="form-group full-width">
+                    <?php echo $form->field($model, 'email') ?>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->field($model, 'contact_no') ?>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->field($model, 'nic') ?>
+                </div>
+                <div class="form-group full-width">
+                    <?php echo $form->field($model, 'address') ?>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->field($model, 'username') ?>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->field($model, 'password')->passwordField() ?>
+                </div>
+                <div class="form-group full-width">
+                    <?php echo $form->field($model, 'passwordConfirm')->passwordField() ?>
+                </div>
+            </div>
+            <button type="submit" class="register-button">Create Account</button>
+            <?php echo \gearguard\phpmvc\form\Form::end() ?>
+            <div class="login-link">
+                <a href="/login">Already have an account? Sign In</a>
+            </div>
+        </div>
     </div>
 </body>
 

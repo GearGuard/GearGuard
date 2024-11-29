@@ -1,11 +1,11 @@
 <?php
 /*
-  User: GearGurd
+User: GearGurd
 */
 
 use app\controllers\AuthController;
 use app\controllers\SiteController;
-use app\core\Application;
+use gearguard\phpmvc\Application;
 
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -19,7 +19,6 @@ $config = [
 		'user' => $_ENV['DB_USER'],
 		'password' => $_ENV['DB_PASSWORD'],
 	]
-
 ];
 
 $app = new Application(dirname(__DIR__), $config);
@@ -27,13 +26,21 @@ $app = new Application(dirname(__DIR__), $config);
 $app->router->get('/', [SiteController::class, 'home']);
 $app->router->get('/contact', [SiteController::class, 'contact']);
 $app->router->post('/contact', [SiteController::class, 'contact']);
+$app->router->get('/about', [SiteController::class, 'about']);
+$app->router->get('/common', [SiteController::class, 'common']);
+$app->router->get('/type', [SiteController::class, 'type']);
 
+$app->router->get('/customer', [AuthController::class, 'customer']);
 $app->router->get('/login', [AuthController::class, 'login']);
 $app->router->post('/login', [AuthController::class, 'login']);
 $app->router->get('/register', [AuthController::class, 'register']);
 $app->router->post('/register', [AuthController::class, 'register']);
 $app->router->get('/logout', [AuthController::class, 'logout']);
 $app->router->get('/profile', [AuthController::class, 'profile']);
-
+$app->router->get('/garage/register', [AuthController::class, 'garageSignup']);
+$app->router->post('/garage/register', [AuthController::class, 'garageSignup']);
+$app->router->get('/garage/login', [AuthController::class, 'garageLogin']);
+$app->router->post('/garage/login', [AuthController::class, 'garageLogin']);
+$app->router->get('/customer/appointment/', [SiteController::class, 'login']);
 
 $app->run();
