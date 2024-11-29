@@ -41,4 +41,19 @@ class SiteController extends Controller
             'model' => $contact
         ]);
     }
+    public function login()
+    {
+        $params = [
+            'name' => "The GearGurd"
+        ];
+        return $this->render('common', $params);
+    }
+
+    public function type()
+    {
+        $params = [
+            'name' => "The GearGurd - User Type"
+        ];
+        return $this->render('type', $params);
+    }
 }

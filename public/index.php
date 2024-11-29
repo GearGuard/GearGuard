@@ -28,6 +28,7 @@ $app->router->get('/contact', [SiteController::class, 'contact']);
 $app->router->post('/contact', [SiteController::class, 'contact']);
 $app->router->get('/about', [SiteController::class, 'about']);
 $app->router->get('/common', [SiteController::class, 'common']);
+$app->router->get('/type', [SiteController::class, 'type']);
 
 $app->router->get('/customer', [AuthController::class, 'customer']);
 $app->router->get('/login', [AuthController::class, 'login']);
@@ -40,5 +41,6 @@ $app->router->get('/garage/register', [AuthController::class, 'garageSignup']);
 $app->router->post('/garage/register', [AuthController::class, 'garageSignup']);
 $app->router->get('/garage/login', [AuthController::class, 'garageLogin']);
 $app->router->post('/garage/login', [AuthController::class, 'garageLogin']);
+$app->router->get('/customer/appointment/', [SiteController::class, 'login']);
 
 $app->run();

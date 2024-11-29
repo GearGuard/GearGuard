@@ -1,13 +1,16 @@
 <?php
 
-/** @var $model \app\models\User */ ?>
+/** @var $model \app\models\Garage */
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Registration - GearGuard</title>
+    <title>Garage Registration - GearGuard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -38,8 +41,9 @@
 
         .registration-wrapper {
             display: flex;
+            flex-direction: column;
             width: 100%;
-            max-width: 1500px;
+            max-width: 1200px;
             background-color: var(--secondary);
             border-radius: 20px;
             overflow: hidden;
@@ -47,25 +51,25 @@
         }
 
         .registration-info {
-            flex: 1;
-            padding: 1rem;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             background: var(--secondary);
+            text-align: center;
         }
 
         .registration-info img {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
             margin-bottom: 1.5rem;
             border-radius: 12px;
         }
 
         .registration-info h2 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 1rem;
             color: var(--text);
         }
@@ -74,18 +78,17 @@
             color: var(--text);
             opacity: 0.8;
             line-height: 1.6;
-            text-align: center;
-            padding: 0 1rem;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .registration-form {
-            flex: 2;
             padding: 3rem;
             background-color: var(--background);
             display: flex;
             flex-direction: column;
             justify-content: center;
-            border: 2px solid var(--secondary);
+            border-top: 2px solid var(--accent);
         }
 
         .form-title {
@@ -94,7 +97,7 @@
         }
 
         .form-title h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             color: var(--text);
             margin-bottom: 0.5rem;
         }
@@ -106,7 +109,7 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 1.5rem;
         }
 
@@ -164,16 +167,17 @@
         }
 
         .register-button {
-            width: 40%;
-            padding: 0.875rem;
+            width: 100%;
+            padding: 1rem;
             background-color: var(--accent);
             color: var(--text);
             border: none;
             border-radius: 8px;
             font-weight: 600;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 1rem;
+            margin-top: 2rem;
         }
 
         .register-button:hover {
@@ -183,7 +187,7 @@
 
         .login-link {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
 
         .login-link a {
@@ -196,21 +200,19 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 768px) {
-            .registration-wrapper {
-                flex-direction: column;
+        @media (max-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
             }
+        }
 
+        @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
             }
 
             .full-width {
                 grid-column: span 1;
-            }
-
-            .register-button {
-                width: 100%;
             }
         }
     </style>
@@ -220,30 +222,27 @@
     <div class="registration-wrapper">
         <div class="registration-info">
             <img src="/assets/img/favicon.png" alt="GearGuard Logo">
-            <h2>Welcome to GearGuard</h2>
-            <p>Your ultimate companion for hassle-free vehicle maintenance! By creating an account, you gain access to a comprehensive suite of professional services designed to keep your vehicle in top condition.</p>
+            <h2>Join GearGuard Network</h2>
+            <p>Become a part of our trusted network of garages. Expand your business reach and provide top-notch services to vehicle owners through our platform.</p>
         </div>
         <div class="registration-form">
             <div class="form-title">
-                <h1>Create Account</h1>
-                <p>Join our platform and take control of your vehicle's health</p>
+                <h1>Register Your Garage</h1>
+                <p>Fill in the details below to get started</p>
             </div>
             <?php $form = \gearguard\phpmvc\form\Form::begin('', "post") ?>
             <div class="form-grid">
                 <div class="form-group">
-                    <?php echo $form->field($model, 'first_name') ?>
+                    <?php echo $form->field($model, 'name')->label('Garage Name') ?>
                 </div>
                 <div class="form-group">
-                    <?php echo $form->field($model, 'last_name') ?>
+                    <?php echo $form->field($model, 'registration_no')->label('Business Registration Number') ?>
                 </div>
-                <div class="form-group full-width">
+                <div class="form-group">
                     <?php echo $form->field($model, 'email') ?>
                 </div>
                 <div class="form-group">
-                    <?php echo $form->field($model, 'contact_no') ?>
-                </div>
-                <div class="form-group">
-                    <?php echo $form->field($model, 'nic') ?>
+                    <?php echo $form->field($model, 'contact_no')->label('Contact Number') ?>
                 </div>
                 <div class="form-group full-width">
                     <?php echo $form->field($model, 'address') ?>
@@ -254,14 +253,14 @@
                 <div class="form-group">
                     <?php echo $form->field($model, 'password')->passwordField() ?>
                 </div>
-                <div class="form-group full-width">
-                    <?php echo $form->field($model, 'passwordConfirm')->passwordField() ?>
+                <div class="form-group">
+                    <?php echo $form->field($model, 'passwordConfirm')->passwordField()->label('Confirm Password') ?>
                 </div>
             </div>
-            <button type="submit" class="register-button">Create Account</button>
+            <button type="submit" class="register-button">Register Garage</button>
             <?php echo \gearguard\phpmvc\form\Form::end() ?>
             <div class="login-link">
-                <a href="/login">Already have an account? Sign In</a>
+                <a href="/garage/login">Already registered? Sign In to your garage account</a>
             </div>
         </div>
     </div>

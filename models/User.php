@@ -3,7 +3,8 @@
 namespace app\models;
 
 use gearguard\phpmvc\Model;
-use gearguard\phpmvc\DbModel;
+use gearguard\phpmvc\db\Database;
+use gearguard\phpmvc\db\DbModel;
 use gearguard\phpmvc\UserModel;
 
 class User extends UserModel
@@ -11,6 +12,7 @@ class User extends UserModel
 	const STATUS_INACTIVE = 1;
 	const STATUS_ACTIVE = 2;
 	const STATUS_DELETED = 3;
+
 	public string $first_name = '';
 	public string $last_name = '';
 	public string $email = '';
@@ -66,12 +68,43 @@ class User extends UserModel
 			'first_name' => 'First Name',
 			'last_name' => 'Last Name',
 			'email' => 'Email',
+			'nic' => 'NIC',
+			'address' => 'Address',
+			'contact_no' => 'Contact No',
+			'username' => 'Username',
 			'password' => 'Password',
 			'passwordConfirm' => 'Confirm Password',
 		];
 	}
+
 	public function getDisplayName(): string
 	{
 		return $this->first_name . ' ' . $this->last_name;
+	}
+
+	public function getUserType(): string
+	{
+		$sql = "SELECT 
+            CASE 
+                WHEN uo.user_id IS NOT NULL THEN 'vehicle_owner'
+                WHEN uv.user_id IS NOT NULL THEN 'vehicle_user'
+                WHEN ua.user_id IS NOT NULL THEN 'admin'
+                WHEN g.id IS NOT NULL THEN 'garage'
+                WHEN gm.id IS NOT NULL THEN 'mechanic'
+                ELSE 'unknown'
+            END AS user_type
+        FROM gg_user u
+        LEFT JOIN gg_user_owner uo ON u.id = uo.user_id
+        LEFT JOIN gg_user_vehicleuser uv ON u.id = uv.user_id
+        LEFT JOIN gg_user_admin ua ON u.id = ua.user_id
+        LEFT JOIN gg_garage g ON u.id = g.id
+        LEFT JOIN gg_garage_mechanic gm ON u.id = gm.id
+        WHERE u.id = :user_id";
+
+		$statement = $this->prepare($sql);
+		$statement->bindValue(':user_id', $this->id);
+		$statement->execute();
+
+		return $statement->fetchColumn();
 	}
 }
