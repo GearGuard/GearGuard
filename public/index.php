@@ -47,5 +47,5 @@ $app->router->post('/garage/register', [AuthController::class, 'garageSignup']);
 $app->router->get('/garage/login', [AuthController::class, 'garageLogin']);
 $app->router->post('/garage/login', [AuthController::class, 'garageLogin']);
 $app->router->get('/customer/appointment/', [SiteController::class, 'login']);
-
+$app->router->get('/appointment/getServices', [SiteController::class, 'getServices']);
 $app->run();
