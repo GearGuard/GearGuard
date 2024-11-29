@@ -52,18 +52,18 @@
 
 <body>
 
-    <header>
+    <!-- <header>
         <h1>Welcome to My Homepage</h1>
 
-    </header>
+    </header> -->
 
     <div class="container">
         {{content}}
     </div>
 
-    <footer>
+    <!-- <footer>
         <p>&copy; 2024 My Simple Homepage</p>
-    </footer>
+    </footer> -->
 
 </body>
 
