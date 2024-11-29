@@ -272,14 +272,14 @@
                         throw new Error('Network response was not ok: ' + response.statusText);
                     }
                     const html = await response.text();
+
                     mainContent.innerHTML = html;
 
                     mainContent.querySelectorAll("script").forEach(script => {
-                        const newScript = document.createElement("script");
-                        newScript.textContent = script.textContent;
-                        document.head.appendChild(newScript).parentNode.removeChild(newScript);
-                    });
-
+                                            const newScript = document.createElement("script");
+                                            newScript.textContent = `(() => {${script.textContent}})();`;
+                                            document.head.appendChild(newScript).parentNode.removeChild(newScript);
+                                        });
 
                 } catch (error) {
                     console.error('There was a problem with the fetch operation:', error);
