@@ -1,10 +1,22 @@
 <?php
-$this->title = 'Customer Appointment';
+
+/** @var $model \app\models\Appointment */
+/** @var $garages array */
+
+use gearguard\phpmvc\form\Form;
+use gearguard\phpmvc\form\TextAreaField;
+
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - GearGuard</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -115,6 +127,7 @@ $this->title = 'Customer Appointment';
         input[type="text"],
         input[type="email"],
         input[type="date"],
+        input[type="time"],
         select,
         textarea {
             width: 100%;
@@ -127,9 +140,15 @@ $this->title = 'Customer Appointment';
             transition: all 0.2s ease;
         }
 
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
         input[type="text"]:hover,
         input[type="email"]:hover,
         input[type="date"]:hover,
+        input[type="time"]:hover,
         select:hover,
         textarea:hover {
             border-color: var(--accent);
@@ -138,6 +157,7 @@ $this->title = 'Customer Appointment';
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="date"]:focus,
+        input[type="time"]:focus,
         select:focus,
         textarea:focus {
             border-color: var(--accent);
@@ -231,85 +251,97 @@ $this->title = 'Customer Appointment';
             }
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const minDate = new Date(today.setDate(today.getDate() + 3));
+            const maxDate = new Date(today.setDate(today.getDate() + 30));
+            const dateInput = document.getElementById('appointment_date');
+            dateInput.min = minDate.toISOString().split('T')[0];
+            dateInput.max = maxDate.toISOString().split('T')[0];
+
+            $('#garage_id').change(function() {
+                var garageId = $(this).val();
+                if (garageId) {
+                    $.ajax({
+                        url: '/appointment/getServices',
+                        type: 'GET',
+                        data: {
+                            garage_id: garageId
+                        },
+                        success: function(response) {
+                            $('#service_id').html(response);
+                        }
+                    });
+                } else {
+                    $('#service_id').html('<option value="">Select Service Type</option>');
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            $('#garage_id').change(function() {
+                var garageId = $(this).val();
+                if (garageId) {
+                    $.ajax({
+                        url: '/appointment/getServices',
+                        type: 'GET',
+                        data: {
+                            garage_id: garageId
+                        },
+                        success: function(response) {
+                            $('#service_id').html(response);
+                        }
+                    });
+                } else {
+                    $('#service_id').html('<option value="">Select Garage first</option>');
+                }
+            });
+        });
+    </script>
 </head>
 
 <body>
-<nav class="navMenu">
-    <a href="#" class="active">Book Appointment</a>
-    <a href="#">My Appointments</a>
-    <a href="#">Service History</a>
-    <a href="#">Spare Parts Warranty</a>
-</nav>
-
-<div class="appointment-form">
-    <h2 class="title">Book Your Appointment</h2>
-    <form action="/submit-appointment" method="POST">
+    <nav class="navMenu">
+        <a href="#" class="active">Book Appointment</a>
+        <a href="#">My Appointments</a>
+        <a href="#">Service History</a>
+        <a href="#">Spare Parts Warranty</a>
+    </nav>
+    <div class="appointment-form">
+        <h2 class="title">Book Your Appointment</h2>
+        <?php $form = Form::begin('', "post") ?>
         <div class="form-row">
             <div class="form-column">
-                <div class="form-group">
-                    <label for="fname">First Name<span class="required-dot">*</span></label>
-                    <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
-                </div>
-            </div>
-            <div class="form-column">
-                <div class="form-group">
-                    <label for="lname">Last Name<span class="required-dot">*</span></label>
-                    <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
-                </div>
+                <?php echo $form->dropDownList($model, 'vehicle_id', $garages)->renderInput() ?>
             </div>
         </div>
-
         <div class="form-row">
             <div class="form-column">
-                <div class="form-group">
-                    <label for="email">Email<span class="required-dot">*</span></label>
-                    <input type="email" id="email" name="email" required placeholder="Enter your email">
-                </div>
+                <?php echo $form->dropDownList($model, 'garage_id', $garages)->renderInput() ?>
             </div>
             <div class="form-column">
-                <div class="form-group">
-                    <label for="phone">Contact Number<span class="required-dot">*</span></label>
-                    <input type="text" id="phone" name="phone" required placeholder="Enter your phone number">
-                </div>
+                <?php echo $form->dropDownList($model, 'service_id', [])->renderInput() ?>
             </div>
         </div>
-
         <div class="form-row">
             <div class="form-column">
-                <div class="form-group">
-                    <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
-                    <select id="vehicle-type" name="vehicle_type" required>
-                        <option value="" disabled selected>Select Vehicle Type</option>
-                        <option value="car">Car</option>
-                        <option value="motorcycle">Motorcycle</option>
-                        <option value="truck">Truck</option>
-                    </select>
-                </div>
+                <?php echo $form->dateField($model, 'appointment_date')->renderInput() ?>
             </div>
             <div class="form-column">
-                <div class="form-group">
-                    <label for="service-type">Service Type<span class="required-dot">*</span></label>
-                    <select id="service-type" name="service_type" required>
-                        <option value="" disabled selected>Select Service Type</option>
-                        <option value="oil_change">Oil Change</option>
-                        <option value="tire_rotation">Tire Rotation</option>
-                        <option value="general_checkup">General Checkup</option>
-                    </select>
-                </div>
+                <?php echo $form->timeField($model, 'appointment_time')->renderInput() ?>
             </div>
         </div>
-
         <div class="form-group">
-            <label for="notes">Additional Notes</label>
-            <textarea id="notes" name="notes" class="notes" placeholder="Enter any additional details (optional)"></textarea>
+            <?php echo new TextAreaField($model, 'notes') ?>
         </div>
-
         <div class="button-container">
             <button type="reset" class="clear-button">Clear</button>
             <button type="submit" class="book-button">Book Appointment</button>
         </div>
-    </form>
-</div>
+        <?php echo Form::end() ?>
+    </div>
 </body>
 
 </html>
