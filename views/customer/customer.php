@@ -238,8 +238,6 @@
                     <span class="nav-text">Settings</span>
                 </a>
             </li>
-
-            
         </ul>
     </div>
 
