@@ -220,13 +220,13 @@
 
 <body>
     <nav class="navMenu">
-        <a href="#" class="active">Add New Spare Part</a>
-        <a href="#">View All Spare Parts</a>
+        <a href="/customer/addsparepart" class="active">Add New Spare Part</a>
+        <a href="/customer/viewsparepart">View All Spare Parts</a>
     </nav>
 
     <div class="spare-part-form">
         <h2 class="title">Add New Spare Part</h2>
-        <form action="/submit-spare-part" method="POST">
+        <form action="/sparepart/add" method="POST">
             <div class="form-row">
                 <div class="form-column">
                     <div class="form-group">

@@ -196,6 +196,19 @@ class SiteController extends Controller
         return $this->render('admin/q&a');
     }
 
+
+    //Add spare parts
+    public function addSparepart(Request $request, Response $response)
+    {
+        $this->setLayout('admin_navbar');
+        return $this->render('customer/sparepart/newPart');
+    }
+    public function viewSparepart(Request $request, Response $response)
+    {
+        $this->setLayout('admin_navbar');
+        return $this->render('customer/sparepart/viewPart');
+    }
+
     public function tets()
     {
         $params = [

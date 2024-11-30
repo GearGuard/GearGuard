@@ -5,6 +5,7 @@ User: GearGurd
 
 use app\controllers\AuthController;
 use app\controllers\SiteController;
+use app\controllers\SparepartController;
 use gearguard\phpmvc\Application;
 
 
@@ -70,4 +71,14 @@ $app->router->get('/admin/editvehicle', [SiteController::class, 'editVehicleByAd
 
 $app->router->get('/admin/transaction', [SiteController::class, 'admin_transaction']);
 $app->router->get('/admin/q&a', [SiteController::class, 'questions']);
+
+$app->router->get('/customer/addsparepart', [SiteController::class, 'addSparepart']);
+$app->router->get('/customer/viewsparepart', [SiteController::class, 'viewSparepart']);
+
+//spare pats
+$app->router->post('/sparepart/add', [SparepartController::class, 'addSparePart']);
+$app->router->get('/sparepart/get', [SparepartController::class, 'getSparePart']);
+$app->router->post('/sparepart/delete', [SparepartController::class, 'deleteSparePart']);
+$app->router->post('/sparepart/edit', [SparepartController::class, 'editSparePart']);
+
 $app->run();
