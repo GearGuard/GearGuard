@@ -301,7 +301,7 @@ $this->title = 'Customer Appointment';
 
             <div class="form-group">
                 <label for="notes">Additional Notes</label>
-                <textarea id="notes" name="notes" class="notes" placeholder="Enter any additional details (optional)"></textarea>
+                <textarea id="notes" name="notes" class="notes" placeholder="Enter any additional details"></textarea>
             </div>
 
             <div class="button-container">
