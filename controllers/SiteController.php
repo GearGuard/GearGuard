@@ -11,6 +11,7 @@ use gearguard\phpmvc\Response;
 use app\models\ContactForm;
 use app\models\Appointment;
 
+
 class SiteController extends Controller
 {
     public function home()
@@ -116,6 +117,12 @@ class SiteController extends Controller
     public function community(Request $request, Response $response)
     {
         return $this->render('community/allPosts', ['name' => 'The GearGuard']);
+    }
+
+    public function admin(Request $request, Response $response)
+    {
+        $this->setLayout('admin_navbar');
+        return $this->render('admin');
     }
 
     public function tets()
