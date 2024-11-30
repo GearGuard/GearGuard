@@ -1,292 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Settings</title>
+    <link rel="icon" href="/assets/img/favicon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>GearGuard - Vehicle Dashboard</title>
     <style>
         :root {
-            --text: #f5f5f5;
-            --background: #181a20;
-            --primary: #C0C0C0;
-            --secondary: #25272d;
-            --accent: #2463eb;
-            --hover-bg: rgba(36, 99, 235, 0.1);
-            --border: #33363f;
-            --success: #4CAF50;
-            --warning: #FF9800;
+            --text-primary: #e6e6e6;
+            --text-secondary: #a0a0a0;
+            --background-dark: #121418;
+            --background-card: #1e2329;
+            --accent-primary: #2463eb;
+            --accent-secondary: #4a7fff;
+            --border-color: #2c3036;
+            --hover-overlay: rgba(36, 99, 235, 0.15);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            scroll-behavior: smooth;
+            transition: all 0.3s ease;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--background);
-            color: var(--text);
+            background-color: var(--background-dark);
+            color: var(--text-primary);
             line-height: 1.6;
-            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem;
+        .dashboard {
+            max-width: 1400px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
         }
 
-        .settings-grid {
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+s
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            letter-spacing: -1px;
+        }
+
+        .last-login {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .dashboard-grid {
             display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
         }
 
-        .settings-section {
-            background-color: var(--secondary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+        .dashboard-card {
+            background-color: var(--background-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             padding: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(0);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .settings-section-header {
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            background-color: color-mix(in srgb, var(--background-card) 95%, var(--accent-primary));
+        }
+
+        .card-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
 
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border);
+        .card-icon {
+            font-size: 1.8rem;
+            margin-right: 0.8rem;
+            color: var(--accent-primary);
+            opacity: 0.8;
         }
 
-        .setting-item:last-child {
-            border-bottom: none;
-        }
-
-        .setting-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .setting-label {
+        .card-title {
+            font-size: 1.3rem;
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            color: var(--text-primary);
         }
 
-        .setting-description {
-            color: var(--primary);
-            font-size: 0.85rem;
+        .card-content {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
         }
 
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
+        .highlight {
+            color: var(--accent-secondary);
+            font-weight: 600;
         }
 
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: color-mix(in srgb, var(--border-color) 50%, transparent);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
         }
 
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--primary);
-            transition: .4s;
-            border-radius: 34px;
+        .progress {
+            height: 100%;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-        .toggle-switch input:checked + .toggle-slider {
-            background-color: var(--accent);
-        }
+            .last-login {
+                margin-top: 0.5rem;
+            }
 
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(26px);
-        }
-
-        /* Additional Styles */
-        .action-button {
-            background-color: var(--accent);
-            color: var(--text);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .action-button:hover {
-            background-color: color-mix(in srgb, var(--accent) 80%, white);
-        }
-
-        .login-activity-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--background);
-            padding: 0.75rem;
-            border-radius: 5px;
-            margin-bottom: 0.5rem;
-        }
-
-        .icon {
-            margin-right: 0.75rem;
-            color: var(--accent);
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="settings-grid">
-            <!-- Data & Privacy Section -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <h2><i class="fas fa-shield-alt icon"></i> Data & Privacy</h2>
-                </div>
-                
-                <div class="setting-item">
-                    <div class="setting-details">
-                        <div class="setting-label">Download Personal Data</div>
-                        <div class="setting-description">Export all your personal information</div>
-                    </div>
-                    <button class="action-button">Export</button>
-                </div>
+    <div class="dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Welcome, John</h1>
+            <span class="last-login">Last login: 2 days ago</span>
+        </div>
 
-                <div class="setting-item">
-                    <div class="setting-details">
-                        <div class="setting-label">Activity Logs Export</div>
-                        <div class="setting-description">Download your recent activity history</div>
-                    </div>
-                    <button class="action-button">Export Logs</button>
+        <div class="dashboard-grid">
+            <!-- Next Appointment Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-alt card-icon"></i>
+                    <h2 class="card-title">Next Appointment</h2>
                 </div>
-
-                <div class="setting-item">
-                    <div class="setting-details">
-                        <div class="setting-label">Cookie and Tracking Settings</div>
-                        <div class="setting-description">Manage your data collection preferences</div>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox">
-                        <span class="toggle-slider"></span>
-                    </label>
+                <div class="card-content">
+                    <p><span class="highlight">In 5 days</span></p>
+                    <p>Date: November 5, 2024</p>
+                    <p>Time: 2:00 PM</p>
+                    <p>Garage: AutoCare Center</p>
+                    <p>Service: Annual Maintenance</p>
+                    <p>Vehicle: Toyota Camry</p>
                 </div>
             </div>
 
-            <!-- Appearance & Themes Section -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <h2><i class="fas fa-palette icon"></i> Appearance & Themes</h2>
+            <!-- Warranty Expiration Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-shield-alt card-icon"></i>
+                    <h2 class="card-title">Closest Warranty Expiration</h2>
                 </div>
-                
-                <div class="setting-item">
-                    <div class="setting-details">
-                        <div class="setting-label">Dark Mode / Light Mode</div>
-                        <div class="setting-description">Switch between dark and light themes</div>
+                <div class="card-content">
+                    <p>Part: Brake Pads</p>
+                    <p>Expires in: <span class="highlight">30 days</span></p>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 75%;"></div>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox">
-                        <span class="toggle-slider"></span>
-                    </label>
                 </div>
             </div>
 
-            <!-- Notification Preferences Section -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <h2><i class="fas fa-bell icon"></i> Notification Preferences</h2>
+            <!-- Latest Service Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-wrench card-icon"></i>
+                    <h2 class="card-title">Latest Service</h2>
                 </div>
-                
-                <div class="setting-item">
-                    <div class="setting-details">
-                        <div class="setting-label">Email Notifications</div>
-                        <div class="setting-description">Receive updates via email</div>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-details">
-                        <div class="setting-label">SMS Notifications</div>
-                        <div class="setting-description">Receive updates via SMS</div>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-
-                <div class="setting-item">
-                    <div class="setting-details">
-                        <div class="setting-label">Push Notifications</div>
-                        <div class="setting-description">Receive real-time mobile notifications</div>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox">
-                        <span class="toggle-slider"></span>
-                    </label>
+                <div class="card-content">
+                    <p>Date: October 15, 2024</p>
+                    <p>Service: Oil Change & Tire Rotation</p>
+                    <p>Mileage: 45,000 km</p>
+                    <p>Garage: QuickFix Auto Shop</p>
                 </div>
             </div>
 
-            <!-- Login Activity Section -->
-            <div class="settings-section">
-                <div class="settings-section-header">
-                    <h2><i class="fas fa-history icon"></i> Login Activity</h2>
+            <!-- Vehicle Health Score Card -->
+            <!-- <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-heartbeat card-icon"></i>
+                    <h2 class="card-title">Vehicle Health Score</h2>
                 </div>
-                
-                <div class="login-activity-item">
-                    <div>
-                        <strong>Desktop - Chrome</strong>
-                        <div style="color: var(--primary); font-size: 0.8rem;">
-                            November 30, 2024 at 10:45 AM
-                        </div>
+                <div class="card-content">
+                    <p>Current Score: <span class="highlight">85/100</span></p>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 85%;"></div>
                     </div>
-                    <span style="color: var(--primary);">IP: 192.168.1.100</span>
+                    <p>Last Updated: 3 days ago</p>
                 </div>
+            </div> -->
 
-                <div class="login-activity-item">
-                    <div>
-                        <strong>Mobile - iOS App</strong>
-                        <div style="color: var(--primary); font-size: 0.8rem;">
-                            November 29, 2024 at 3:20 PM
-                        </div>
+            <!-- Fuel Efficiency Card -->
+            <!-- <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-gas-pump card-icon"></i>
+                    <h2 class="card-title">Fuel Efficiency</h2>
+                </div>
+                <div class="card-content">
+                    <p>Average: <span class="highlight">7.5 L/100km</span></p>
+                    <p>Last Trip: 7.2 L/100km</p>
+                    <p>Improvement: <span class="highlight">+4%</span></p>
+                </div>
+            </div> -->
+
+            <!-- Maintenance Tips Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-lightbulb card-icon"></i>
+                    <h2 class="card-title">Maintenance Tip</h2>
+                </div>
+                <div class="card-content">
+                    <p>Regular tire pressure checks can improve fuel efficiency and extend tire life.</p>
+                </div>
+            </div>
+
+            <!-- Financial Overview Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line card-icon"></i>
+                    <h2 class="card-title">Financial Overview</h2>
+                </div>
+                <div class="card-content">
+                    <p>Total Expenses YTD: <span class="highlight">Rs.86,000</span></p>
+                    <p>Budget Remaining: <span class="highlight">Rs.14,000</span></p>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 81%;"></div>
                     </div>
-                    <span style="color: var(--primary);">IP: 10.0.0.55</span>
+                </div>
+            </div>
+
+            <!-- Service Expenses Trend Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-money-bill-wave card-icon"></i>
+                    <h2 class="card-title">Service Expenses Trend</h2>
+                </div>
+                <div class="card-content">
+                    <p>Last 3 Months: <span class="highlight">Rs.5,750</span></p>
+                    <p>Last 6 Months: <span class="highlight">Rs.31,200</span></p>
+                    <p>Last 12 Months: <span class="highlight">Rs92,100</span></p>
+                </div>
+            </div>
+
+            <!-- Pending Payments Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-exclamation-circle card-icon"></i>
+                    <h2 class="card-title">Pending Payments</h2>
+                </div>
+                <div class="card-content">
+                    <p>Oil Change: <span class="highlight">Rs.4000 due in 5 days</span></p>
+                    <p>Tire Rotation: <span class="highlight">Rs.9050 due in 2 weeks</span></p>
+                </div>
+            </div>
+
+            <!-- Maintenance Cost Tracker Card -->
+            <!-- <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-calculator card-icon"></i>
+                    <h2 class="card-title">Maintenance Cost Tracker</h2>
+                </div>
+                <div class="card-content">
+                    <p>Estimated Monthly: <span class="highlight">$150</span></p>
+                    <p>Estimated Yearly: <span class="highlight">$1,800</span></p>
+                    <p>YTD Actual: <span class="highlight">$1,650</span></p>
+                </div>
+            </div> -->
+
+            <!-- Recommended Services Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <i class="fas fa-tools card-icon"></i>
+                    <h2 class="card-title">Recommended Services</h2>
+                </div>
+                <div class="card-content">
+                    <p>Air Filter Replacement: <span class="highlight">Due in 500 km</span></p>
+                    <p>Brake Fluid Change: <span class="highlight">Due in 2 months</span></p>
+                    <p>Spark Plugs: <span class="highlight">Due in 5,000 km</span></p>
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>
