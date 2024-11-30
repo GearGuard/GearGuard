@@ -156,4 +156,14 @@ class AuthController extends Controller
             'title' => 'Garage Dashboard'
         ]);
     }
+
+    public function newAppointments(Request $request, Response $response)
+    {
+        return $this->render('customer/appointment/newAppointment', ['name' => 'The GearGuard']);
+    }
+
+    public function addVehicle(Request $request, Response $response)
+    {
+        return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
+    }
 }

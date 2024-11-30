@@ -221,7 +221,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="community" class="nav-link">
+                <a href="../community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>

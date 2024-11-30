@@ -98,21 +98,6 @@ class SiteController extends Controller
         return $this->render('type', $params);
     }
 
-    public function navbar_customer(Request $request, Response $response)
-    {
-        return $this->render('navbar_customer', ['name' => 'The GearGuard']);
-    }
-
-    public function newAppointments(Request $request, Response $response)
-    {
-        return $this->render('customer/appointment/newAppointment', ['name' => 'The GearGuard']);
-    }
-
-    public function addVehicle(Request $request, Response $response)
-    {
-        return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
-    }
-
     public function community(Request $request, Response $response)
     {
         return $this->render('community/allPosts', ['name' => 'The GearGuard']);
