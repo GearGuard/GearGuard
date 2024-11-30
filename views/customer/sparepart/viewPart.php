@@ -264,8 +264,6 @@
     <nav class="navMenu">
         <a href="#">Add New Spare Part<span class="dot"></span></a>
         <a href="#" class="active">View All Spare Parts<span class="dot"></span></a>
-        <a href="#">Edit Spare Part<span class="dot"></span></a>
-        <a href="#">Delete Spare Part<span class="dot"></span></a>
     </nav>
 
     <div class="spare-parts-table">
