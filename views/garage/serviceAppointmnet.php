@@ -41,11 +41,10 @@ $this->title = 'Add Service Details';
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: var(--background);
+            background: var(--secondary);
             border-radius: 12px;
             padding: 2rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--primary);
         }
 
         h1 {
@@ -101,7 +100,6 @@ $this->title = 'Add Service Details';
             display: block;
             width: 100%;
             margin-top: 1rem;
-
         }
 
         button:hover {
@@ -123,25 +121,10 @@ $this->title = 'Add Service Details';
             border-radius: 8px;
             padding: 1rem;
             margin-bottom: 1.5rem;
-            border: 1px solid var(--text);
-
         }
 
         .details-group p {
             margin-bottom: 0.5rem;
-        }
-
-        fieldset.details-group {
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        legend {
-            color: var(--primary);
-            font-weight: 600;
-            padding: 0 0.5rem;
         }
 
         @media (max-width: 768px) {
@@ -176,49 +159,26 @@ $this->title = 'Add Service Details';
         </div>
 
         <form id="serviceForm">
-            <fieldset class="details-group">
-                <legend>Add Service Details</legend>
-                <div class="form-group">
-                    <label for="description">Description:</label>
-                    <input type="text" id="description" name="description" required>
-                </div>
-                <div class="form-group">
-                    <label for="totalCost">Total Cost:</label>
-                    <input type="number" id="totalCost" name="totalCost" required>
-                </div>
-            </fieldset>
+            <div class="form-group">
+                <label for="serviceType">Service Type:</label>
+                <select id="serviceType" name="serviceType" required>
+                    <option value="">Select Service Type</option>
+                    <option value="oil_change">Oil Change</option>
+                    <option value="tire_rotation">Tire Rotation</option>
+                    <option value="brake_service">Brake Service</option>
+                    <option value="general_inspection">General Inspection</option>
+                </select>
+            </div>
 
-            <fieldset class="details-group">
-                <legend>Spare Part</legend>
-                <div class="form-group">
-                    <label for="serialNumber">Serial Number:</label>
-                    <input type="text" id="serialNumber" name="serialNumber">
-                </div>
-                <div class="form-group">
-                    <label for="partType">Type:</label>
-                    <input type="text" id="partType" name="partType">
-                </div>
-                <div class="form-group">
-                    <label for="manufacturer">Manufacturer:</label>
-                    <input type="text" id="manufacturer" name="manufacturer">
-                </div>
-                <div class="form-group">
-                    <label for="price">Price:</label>
-                    <input type="number" id="price" name="price">
-                </div>
-                <div class="form-group">
-                    <label for="manufacturedDate">Manufactured Date:</label>
-                    <input type="date" id="manufacturedDate" name="manufacturedDate">
-                </div>
-                <div class="form-group">
-                    <label for="installedDate">Installed Date:</label>
-                    <input type="date" id="installedDate" name="installedDate">
-                </div>
-                <div class="form-group">
-                    <label for="expireDate">Expire Date:</label>
-                    <input type="date" id="expireDate" name="expireDate">
-                </div>
-            </fieldset>
+            <div class="form-group">
+                <label for="serviceDate">Service Date:</label>
+                <input type="date" id="serviceDate" name="serviceDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="serviceNotes">Service Notes:</label>
+                <textarea id="serviceNotes" name="serviceNotes" rows="4"></textarea>
+            </div>
 
             <button type="submit">Submit Service Details</button>
         </form>
@@ -229,8 +189,10 @@ $this->title = 'Add Service Details';
             const username = document.getElementById('username').value;
             const plateNumber = document.getElementById('plateNumber').value;
 
-            if (username === 'abc' && plateNumber === '123') {
+            if (username && plateNumber) {
+                // Simulating an API call to fetch vehicle details
 
+                // In a real application, you would make an AJAX request to your server
                 setTimeout(() => {
                     document.getElementById('customerName').textContent = 'John Doe';
                     document.getElementById('vehicleModel').textContent = 'Toyota Camry';

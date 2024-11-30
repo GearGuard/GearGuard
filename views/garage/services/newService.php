@@ -1,10 +1,10 @@
-<?php
-$this->title = 'Customer Appointment';
-?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Garage Service - GearGuard</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -68,7 +68,7 @@ $this->title = 'Customer Appointment';
             background: var(--hover-bg);
         }
 
-        .appointment-form {
+        .service-form {
             background: var(--secondary);
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -113,9 +113,7 @@ $this->title = 'Customer Appointment';
         }
 
         input[type="text"],
-        input[type="email"],
-        input[type="date"],
-        select,
+        input[type="number"],
         textarea {
             width: 100%;
             padding: 0.75rem;
@@ -128,17 +126,13 @@ $this->title = 'Customer Appointment';
         }
 
         input[type="text"]:hover,
-        input[type="email"]:hover,
-        input[type="date"]:hover,
-        select:hover,
+        input[type="number"]:hover,
         textarea:hover {
             border-color: var(--accent);
         }
 
         input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="date"]:focus,
-        select:focus,
+        input[type="number"]:focus,
         textarea:focus {
             border-color: var(--accent);
             outline: none;
@@ -150,7 +144,7 @@ $this->title = 'Customer Appointment';
             color: #c7c7c7;
         }
 
-        .notes {
+        .description {
             height: 120px;
             resize: vertical;
             min-height: 120px;
@@ -164,7 +158,7 @@ $this->title = 'Customer Appointment';
             margin-top: 2rem;
         }
 
-        .book-button {
+        .add-button {
             background: var(--accent);
             color: var(--text);
             padding: 0.75rem 1.5rem;
@@ -176,7 +170,7 @@ $this->title = 'Customer Appointment';
             transition: all 0.2s ease;
         }
 
-        .book-button:hover {
+        .add-button:hover {
             background: #1b4ebd;
             transform: translateY(-1px);
         }
@@ -217,7 +211,7 @@ $this->title = 'Customer Appointment';
                 gap: 0;
             }
 
-            .appointment-form {
+            .service-form {
                 padding: 1rem;
             }
 
@@ -225,7 +219,7 @@ $this->title = 'Customer Appointment';
                 flex-direction: column-reverse;
             }
 
-            .book-button,
+            .add-button,
             .clear-button {
                 width: 100%;
             }
@@ -235,80 +229,47 @@ $this->title = 'Customer Appointment';
 
 <body>
     <nav class="navMenu">
-        <a href="#" class="active">Book Appointment</a>
-        <a href="#">My Appointments</a>
+        <a href="#" class="active">Add New Service</a>
+        <a href="#">Manage Services</a>
         <a href="#">Service History</a>
-        <a href="#">Spare Parts Warranty</a>
+        <a href="#">Dashboard</a>
     </nav>
+    <div class="service-form">
+        <h2 class="title">Add New Garage Service</h2>
+        <?php
 
-    <div class="appointment-form">
-        <h2 class="title">Book Your Appointment</h2>
-        <form action="/submit-appointment" method="POST">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="fname">First Name<span class="required-dot">*</span></label>
-                        <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="lname">Last Name<span class="required-dot">*</span></label>
-                        <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
-                    </div>
-                </div>
+        use gearguard\phpmvc\form\Form;
+        use gearguard\phpmvc\form\TextAreaField;
+
+        $form = Form::begin('', "post");
+        // $garage_id = \gearguard\phpmvc\Application::$app->user->id; // Get the logged-in user's ID
+        ?>
+
+        <input type="hidden" name="garage_id" value="<?php echo htmlspecialchars($garage_id); ?>">
+
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field($model, 'type') ?>
             </div>
 
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="email">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" required placeholder="Enter your email">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="phone">Contact Number<span class="required-dot">*</span></label>
-                        <input type="text" id="phone" name="phone" required placeholder="Enter your phone number">
-                    </div>
-                </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
             </div>
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
+            </div>
+        </div>
+        <div class="form-group">
+            <?php echo new TextAreaField($model, 'description'); ?>
+        </div>
+        <div class="button-container">
+            <button type="reset" class="clear-button">Clear</button>
+            <button type="submit" class="add-button">Add Service</button>
+        </div>
 
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
-                        <select id="vehicle-type" name="vehicle_type" required>
-                            <option value="" disabled selected>Select Vehicle Type</option>
-                            <option value="car">Car</option>
-                            <option value="motorcycle">Motorcycle</option>
-                            <option value="truck">Truck</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="service-type">Service Type<span class="required-dot">*</span></label>
-                        <select id="service-type" name="service_type" required>
-                            <option value="" disabled selected>Select Service Type</option>
-                            <option value="oil_change">Oil Change</option>
-                            <option value="tire_rotation">Tire Rotation</option>
-                            <option value="general_checkup">General Checkup</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="notes">Additional Notes</label>
-                <textarea id="notes" name="notes" class="notes" placeholder="Enter any additional details"></textarea>
-            </div>
-
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="book-button">Book Appointment</button>
-            </div>
-        </form>
+        <?php echo Form::end(); ?>
     </div>
 </body>
 
