@@ -107,4 +107,12 @@ class User extends UserModel
 
 		return $statement->fetchColumn();
 	}
+
+	// check if the user is a vehicle owner @PasinduRavimal pls check this :)
+	public function isGarage()
+
+	{
+
+		return $this->role === 'garage';
+	}
 }

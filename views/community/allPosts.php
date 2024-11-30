@@ -315,7 +315,7 @@
                 </div>
             </form>
         </div>
-    </div>a
+    </div>
 
     <script>
         // Sample data structure

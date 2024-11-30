@@ -29,6 +29,11 @@ $app->router->post('/contact', [SiteController::class, 'contact']);
 $app->router->get('/about', [SiteController::class, 'about']);
 $app->router->get('/common', [SiteController::class, 'common']);
 $app->router->get('/type', [SiteController::class, 'type']);
+$app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']);
+$app->router->get('/customer/appointment/appoint', [SiteController::class, 'newAppointments']);
+$app->router->get('/customer/vehicle/register', [SiteController::class, 'addVehicle']);
+$app->router->get('/community', [SiteController::class, 'community']);
+$app->router->get('/tets', [SiteController::class, 'tets']);
 
 $app->router->get('/customer', [AuthController::class, 'customer']);
 $app->router->get('/login', [AuthController::class, 'login']);
@@ -37,10 +42,11 @@ $app->router->get('/register', [AuthController::class, 'register']);
 $app->router->post('/register', [AuthController::class, 'register']);
 $app->router->get('/logout', [AuthController::class, 'logout']);
 $app->router->get('/profile', [AuthController::class, 'profile']);
+$app->router->get('/garage', [AuthController::class, 'garage']);
 $app->router->get('/garage/register', [AuthController::class, 'garageSignup']);
 $app->router->post('/garage/register', [AuthController::class, 'garageSignup']);
 $app->router->get('/garage/login', [AuthController::class, 'garageLogin']);
 $app->router->post('/garage/login', [AuthController::class, 'garageLogin']);
 $app->router->get('/customer/appointment/', [SiteController::class, 'login']);
-
+$app->router->get('/appointment/getServices', [SiteController::class, 'getServices']);
 $app->run();

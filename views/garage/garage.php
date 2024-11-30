@@ -217,7 +217,13 @@
             <li class="nav-item">
                 <a href="/customer/vehicle/register" class="nav-link">
                     <i class="fas fa-car-side"></i>
-                    <span class="nav-text">My Vehicles</span>
+                    <span class="nav-text">Services</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="settings.php" class="nav-link">
+                    <i class="fa fa-street-view" aria-hidden="true"></i>
+                    <span class="nav-text">Customer</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -226,6 +232,19 @@
                     <span class="nav-text">Community</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="profile.php" class="nav-link">
+                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                    <span class="nav-text">Mechanic</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="settings.php" class="nav-link">
+                    <i class="fa fa-file" aria-hidden="true"></i>
+                    <span class="nav-text">Report</span>
+                </a>
+            </li>
+
             <li class="nav-item">
                 <a href="profile.php" class="nav-link">
                     <i class="fas fa-user-circle"></i>
@@ -238,6 +257,8 @@
                     <span class="nav-text">Settings</span>
                 </a>
             </li>
+
+
         </ul>
     </div>
 

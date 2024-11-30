@@ -1,10 +1,10 @@
-<?php
-$this->title = 'Customer Appointment';
-?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Spare Part</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -68,7 +68,7 @@ $this->title = 'Customer Appointment';
             background: var(--hover-bg);
         }
 
-        .appointment-form {
+        .spare-part-form {
             background: var(--secondary);
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -113,10 +113,9 @@ $this->title = 'Customer Appointment';
         }
 
         input[type="text"],
-        input[type="email"],
+        input[type="number"],
         input[type="date"],
-        select,
-        textarea {
+        select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -128,33 +127,19 @@ $this->title = 'Customer Appointment';
         }
 
         input[type="text"]:hover,
-        input[type="email"]:hover,
+        input[type="number"]:hover,
         input[type="date"]:hover,
-        select:hover,
-        textarea:hover {
+        select:hover {
             border-color: var(--accent);
         }
 
         input[type="text"]:focus,
-        input[type="email"]:focus,
+        input[type="number"]:focus,
         input[type="date"]:focus,
-        select:focus,
-        textarea:focus {
+        select:focus {
             border-color: var(--accent);
             outline: none;
             box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
-        }
-
-        input::placeholder,
-        textarea::placeholder {
-            color: #c7c7c7;
-        }
-
-        .notes {
-            height: 120px;
-            resize: vertical;
-            min-height: 120px;
-            font-family: "Inter", sans-serif;
         }
 
         .button-container {
@@ -164,7 +149,7 @@ $this->title = 'Customer Appointment';
             margin-top: 2rem;
         }
 
-        .book-button {
+        .add-button {
             background: var(--accent);
             color: var(--text);
             padding: 0.75rem 1.5rem;
@@ -176,7 +161,7 @@ $this->title = 'Customer Appointment';
             transition: all 0.2s ease;
         }
 
-        .book-button:hover {
+        .add-button:hover {
             background: #1b4ebd;
             transform: translateY(-1px);
         }
@@ -217,7 +202,7 @@ $this->title = 'Customer Appointment';
                 gap: 0;
             }
 
-            .appointment-form {
+            .spare-part-form {
                 padding: 1rem;
             }
 
@@ -225,7 +210,7 @@ $this->title = 'Customer Appointment';
                 flex-direction: column-reverse;
             }
 
-            .book-button,
+            .add-button,
             .clear-button {
                 width: 100%;
             }
@@ -235,51 +220,19 @@ $this->title = 'Customer Appointment';
 
 <body>
     <nav class="navMenu">
-        <a href="#" class="active">Book Appointment</a>
-        <a href="#">My Appointments</a>
-        <a href="#">Service History</a>
-        <a href="#">Spare Parts Warranty</a>
+        <a href="#" class="active">Add New Spare Part</a>
+        <a href="#">View All Spare Parts</a>
     </nav>
 
-    <div class="appointment-form">
-        <h2 class="title">Book Your Appointment</h2>
-        <form action="/submit-appointment" method="POST">
+    <div class="spare-part-form">
+        <h2 class="title">Add New Spare Part</h2>
+        <form action="/submit-spare-part" method="POST">
             <div class="form-row">
                 <div class="form-column">
                     <div class="form-group">
-                        <label for="fname">First Name<span class="required-dot">*</span></label>
-                        <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="lname">Last Name<span class="required-dot">*</span></label>
-                        <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="email">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" required placeholder="Enter your email">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="phone">Contact Number<span class="required-dot">*</span></label>
-                        <input type="text" id="phone" name="phone" required placeholder="Enter your phone number">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
-                        <select id="vehicle-type" name="vehicle_type" required>
-                            <option value="" disabled selected>Select Vehicle Type</option>
+                        <label for="vehicle">Vehicle<span class="required-dot">*</span></label>
+                        <select id="vehicle" name="vehicle" required>
+                            <option value="" disabled selected>Select Vehicle</option>
                             <option value="car">Car</option>
                             <option value="motorcycle">Motorcycle</option>
                             <option value="truck">Truck</option>
@@ -288,25 +241,60 @@ $this->title = 'Customer Appointment';
                 </div>
                 <div class="form-column">
                     <div class="form-group">
-                        <label for="service-type">Service Type<span class="required-dot">*</span></label>
-                        <select id="service-type" name="service_type" required>
-                            <option value="" disabled selected>Select Service Type</option>
-                            <option value="oil_change">Oil Change</option>
-                            <option value="tire_rotation">Tire Rotation</option>
-                            <option value="general_checkup">General Checkup</option>
-                        </select>
+                        <label for="serial-number">Serial Number<span class="required-dot">*</span></label>
+                        <input type="text" id="serial-number" name="serial_number" required placeholder="Enter serial number">
                     </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="notes">Additional Notes</label>
-                <textarea id="notes" name="notes" class="notes" placeholder="Enter any additional details (optional)"></textarea>
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="type">Type<span class="required-dot">*</span></label>
+                        <input type="text" id="type" name="type" required placeholder="Enter spare part type">
+                    </div>
+                </div>
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="manufacturer">Manufacturer<span class="required-dot">*</span></label>
+                        <input type="text" id="manufacturer" name="manufacturer" required placeholder="Enter manufacturer">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="price">Price<span class="required-dot">*</span></label>
+                        <input type="number" id="price" name="price" step="0.01" required placeholder="Enter price">
+                    </div>
+                </div>
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="manufactured-date">Manufactured Date<span class="required-dot">*</span></label>
+                        <input type="date" id="manufactured-date" name="manufactured_date" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="installed-date">Installed Date<span class="required-dot">*</span></label>
+                        <input type="date" id="installed-date" name="installed_date">
+                    </div>
+                </div>
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="installed-date">Expire Date<span class="required-dot">*</span></label>
+                        <input type="date" id="installed-date" name="installed_date">
+                    </div>
+                </div>
             </div>
 
             <div class="button-container">
                 <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="book-button">Book Appointment</button>
+                <button type="submit" class="add-button">Add Spare Part</button>
             </div>
         </form>
     </div>
