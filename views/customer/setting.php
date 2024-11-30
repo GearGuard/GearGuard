@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -126,11 +127,11 @@
             border-radius: 50%;
         }
 
-        .toggle-switch input:checked + .toggle-slider {
+        .toggle-switch input:checked+.toggle-slider {
             background-color: var(--accent);
         }
 
-        .toggle-switch input:checked + .toggle-slider:before {
+        .toggle-switch input:checked+.toggle-slider:before {
             transform: translateX(26px);
         }
 
@@ -165,6 +166,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="settings-grid">
@@ -173,7 +175,7 @@
                 <div class="settings-section-header">
                     <h2><i class="fas fa-shield-alt icon"></i> Data & Privacy</h2>
                 </div>
-                
+
                 <div class="setting-item">
                     <div class="setting-details">
                         <div class="setting-label">Download Personal Data</div>
@@ -207,7 +209,7 @@
                 <div class="settings-section-header">
                     <h2><i class="fas fa-palette icon"></i> Appearance & Themes</h2>
                 </div>
-                
+
                 <div class="setting-item">
                     <div class="setting-details">
                         <div class="setting-label">Dark Mode / Light Mode</div>
@@ -225,7 +227,7 @@
                 <div class="settings-section-header">
                     <h2><i class="fas fa-bell icon"></i> Notification Preferences</h2>
                 </div>
-                
+
                 <div class="setting-item">
                     <div class="setting-details">
                         <div class="setting-label">Email Notifications</div>
@@ -265,7 +267,7 @@
                 <div class="settings-section-header">
                     <h2><i class="fas fa-history icon"></i> Login Activity</h2>
                 </div>
-                
+
                 <div class="login-activity-item">
                     <div>
                         <strong>Desktop - Chrome</strong>
@@ -289,4 +291,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -33,6 +33,7 @@ $app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']
 $app->router->get('/customer/appointment/appoint', [SiteController::class, 'newAppointments']);
 $app->router->get('/customer/vehicle/register', [SiteController::class, 'addVehicle']);
 $app->router->get('/community', [SiteController::class, 'community']);
+$app->router->get('/tets', [SiteController::class, 'tets']);
 
 $app->router->get('/customer', [AuthController::class, 'customer']);
 $app->router->get('/login', [AuthController::class, 'login']);

@@ -117,4 +117,12 @@ class SiteController extends Controller
     {
         return $this->render('community/allPosts', ['name' => 'The GearGuard']);
     }
+
+    public function tets()
+    {
+        $params = [
+            'name' => "The GearGurd - User Type"
+        ];
+        return $this->render('tets', $params);
+    }
 }
