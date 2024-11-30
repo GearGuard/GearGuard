@@ -8,7 +8,7 @@ $currentRoute = Application::$app->request->getPath();
 // Function to check if user is on the /customer route
 function isOnCustomerRoute($route)
 {
-    return $route === '/customer';
+    return $route === '/customer' || strpos($route, '/customer/') === 0  || strpos($route, '/community') === 0;
 }
 
 // Determine if the navbar should be hidden

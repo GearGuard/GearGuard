@@ -156,11 +156,13 @@
             margin-left: 260px;
             padding: 30px;
             flex-grow: 1;
-            transition: margin-left 0.3s ease;
+            width: calc(100vw - 260px);
+            transition: all 0.3s ease;
         }
 
         .main-content.collapsed {
             margin-left: 70px;
+            width: calc(100vw - 70px);
         }
 
         /* Responsive Design */
@@ -207,19 +209,19 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="customer/appointment/newAppointment" class="nav-link">
+                <a href="/customer/appointment/appoint" class="nav-link">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Appointments</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="vehicles.php" class="nav-link">
+                <a href="/customer/vehicle/register" class="nav-link">
                     <i class="fas fa-car-side"></i>
                     <span class="nav-text">My Vehicles</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="community.php" class="nav-link">
+                <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>
@@ -241,7 +243,7 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <h1>Welcome to GearGuard Dashboard</h1>
+        <iframe id="content-iframe" location="relative" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
     </div>
 
     <script>
@@ -260,23 +262,25 @@
             }
         });
 
-        document.querySelectorAll('.nav-item').forEach(link => link.addEventListener('click', function(e) {
-            e.preventDefault();
-            fetch(link.getAttribute('href'))
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(html => {
-                    mainContent.innerHTML = html;
-                })
-                .catch(error => {
-                    console.error("Error loading content:", error);
-                    mainContent.innerHTML = "<p>Error loading content. Please try again later.</p>";
-                });
-        }));
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                const href = link.getAttribute('href');
+
+                try {
+                    document.getElementById("content-iframe").setAttribute("src", href);
+
+                    document.querySelectorAll('.nav-link').forEach(lnk => lnk.classList.remove('active'));
+
+                    link.classList.add('active');
+
+                } catch (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                    mainContent.innerHTML = '<p>There was an error loading the content. Please try again later.</p>';
+                }
+            });
+        });
     </script>
 </body>
 
