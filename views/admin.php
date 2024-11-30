@@ -203,37 +203,37 @@
         </div>
         <ul class="nav-list">
             <li class="nav-item">
-                <a href="dashboard.php" class="nav-link active">
+                <a href="/admin/dashboard" class="nav-link active">
                     <i class="fas fa-gauge"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/customer/appointment/appoint" class="nav-link">
+                <a href="/admin/viewusers" class="nav-link">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Users</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/customer/vehicle/register" class="nav-link">
+                <a href="/admin/viewservices" class="nav-link">
                     <i class="fas fa-car-side"></i>
                     <span class="nav-text">Services</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="community" class="nav-link">
+                <a href="/admin/viewvehicles" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Vehicles</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="profile.php" class="nav-link">
+                <a href="/admin/transaction" class="nav-link">
                     <i class="fas fa-user-circle"></i>
                     <span class="nav-text">Transactions</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="settings.php" class="nav-link">
+                <a href="/admin/q&a" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Q & As</span>
                 </a>
@@ -243,7 +243,7 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <iframe id="content-iframe" location="relative" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
+        <iframe id="content-iframe" location="relative" style="border: transparent; scroll-behavior: auto; width: 100%; height: 100vh;"></iframe>
     </div>
 
     <script>
