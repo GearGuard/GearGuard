@@ -156,11 +156,13 @@
             margin-left: 260px;
             padding: 30px;
             flex-grow: 1;
-            transition: margin-left 0.3s ease;
+            width: calc(100vw - 260px);
+            transition: all 0.3s ease;
         }
 
         .main-content.collapsed {
             margin-left: 70px;
+            width: calc(100vw - 70px);
         }
 
         /* Responsive Design */
@@ -241,7 +243,7 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <h1>Welcome to GearGuard Dashboard</h1>
+        <iframe id="content-iframe" location="relative" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
     </div>
 
     <script>
@@ -267,19 +269,7 @@
                 const href = link.getAttribute('href');
 
                 try {
-                    const response = await fetch(href);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
-                    }
-                    const html = await response.text();
-
-                    mainContent.innerHTML = html;
-
-                    mainContent.querySelectorAll("script").forEach(script => {
-                                            const newScript = document.createElement("script");
-                                            newScript.textContent = `(() => {${script.textContent}})();`;
-                                            document.head.appendChild(newScript).parentNode.removeChild(newScript);
-                                        });
+                    document.getElementById("content-iframe").setAttribute("src", href);
 
                     document.querySelectorAll('.nav-link').forEach(lnk => lnk.classList.remove('active'));
 
