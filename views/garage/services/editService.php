@@ -293,18 +293,17 @@
                 return;
             }
 
-            document.getElementById('editForm').style.display = 'block';
-
             fetch('/garage/services/getService', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    garage_id: <?php echo $garage_id; ?>,
-                    type: searchType
-                })
-            })
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            type: searchType
+                        })
+                    });
+
+            document.getElementById('editForm').style.display = 'block';
 
             // Populate form fields with dummy data (replace this with actual data from your backend)
             document.querySelector('input[name="type"]').value = searchType;
