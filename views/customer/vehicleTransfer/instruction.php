@@ -194,7 +194,7 @@
 <body>
     <nav class="navMenu">
         <a href="/customer/vehicleTransfer/instruction" class="active">Instruction</a>
-        <a href="/customer/appointment/my_appointment" target='_self'>Transfer Form</a>
+        <a href="/customer/vehicleTransfer/transfer" target='_self'>Transfer Form</a>
     </nav>
 
     <div class="header">

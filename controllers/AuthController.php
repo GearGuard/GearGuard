@@ -273,9 +273,24 @@ class AuthController extends Controller
 
     public function transferVehicle(Request $request, Response $response)
     {
-        return $this->render('customer/vehicleTransfer/instruction', ['name' => 'The GearGuard']);
+        if (Application::$app->user instanceof User)
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                return $this->render('customer/vehicleTransfer/tranferForm', [
+                    'name' => 'The GearGuard',
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
+
+        throw new NotFoundException();
     }
 
+    public function transferInstructions(Request $request, Response $response)
+    {
+        return $this->render('customer/vehicleTransfer/instruction', [
+            'name' => 'The GearGuard',
+        ]);
+    }
 
     private function getGarages()
     {
