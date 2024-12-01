@@ -249,7 +249,7 @@
 
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field($model, 'type') ?>
+                <input type="text" name="search_type" placeholder="Please enter the type of the service"/>
             </div>
             <div class="form-column" style="display: flex; align-items: flex-end;">
                 <button type="button" class="search-button" onclick="searchService()">Search</button>
@@ -287,9 +287,24 @@
     <script>
         function searchService() {
             const searchType = document.querySelector('input[name="search_type"]').value;
-            // Here you would typically make an AJAX call to your backend to fetch the service details
-            // For this example, we'll just show the form and populate it with dummy data
+
+            if (!searchType) {
+                alert('Please enter the type of the service');
+                return;
+            }
+
             document.getElementById('editForm').style.display = 'block';
+
+            fetch('/garage/services/getService', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    garage_id: <?php echo $garage_id; ?>,
+                    type: searchType
+                })
+            })
 
             // Populate form fields with dummy data (replace this with actual data from your backend)
             document.querySelector('input[name="type"]').value = searchType;
