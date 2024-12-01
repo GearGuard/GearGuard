@@ -67,10 +67,11 @@ class AuthController extends Controller
         $response->redirect('/');
     }
 
-    public function profile()
+    public function myProfile()
     {
-
-        return $this->render('profile');
+        return $this->render('customer/profile/myProfile', [
+            'title' => 'My Profile'
+        ]);
     }
 
     public function customer()
@@ -79,21 +80,30 @@ class AuthController extends Controller
             'title' => 'Customer Dashboard'
         ]);
     }
-    public function customerAppointment()
-    {
-        return $this->render('customer/appointment/myAppointment', [
+
+    public function dashboard(){
+        return $this->render('customer/dashboard', [
             'title' => 'Customer Dashboard'
         ]);
     }
 
+    public function settings(){
+        return $this->render('customer/setting', [
+            'title' => 'Settings'
+        ]);
+    }
 
+    public function newSparepart(){
+        return $this->render('customer/sparepart/newPart', [
+            'title' => 'Add Sparepart'
+        ]);
+    }
 
-    // public function appointment()
-    // {
-    //     return Application::$app->view->renderView('customer/appointment', [
-    //         'title' => 'Customer Appointment'
-    //     ]);
-    // }
+    public function viewSparepart(){
+        return $this->render('customer/sparepart/viewPart', [
+            'title' => 'View Spareparts'
+        ]);
+    }
 
     public function garageSignup(Request $request)
     {
