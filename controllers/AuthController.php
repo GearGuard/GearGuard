@@ -81,25 +81,29 @@ class AuthController extends Controller
         ]);
     }
 
-    public function dashboard(){
+    public function dashboard()
+    {
         return $this->render('customer/dashboard', [
             'title' => 'Customer Dashboard'
         ]);
     }
 
-    public function settings(){
+    public function settings()
+    {
         return $this->render('customer/setting', [
             'title' => 'Settings'
         ]);
     }
 
-    public function newSparepart(){
+    public function newSparepart()
+    {
         return $this->render('customer/sparepart/newPart', [
             'title' => 'Add Sparepart'
         ]);
     }
 
-    public function viewSparepart(){
+    public function viewSparepart()
+    {
         return $this->render('customer/sparepart/viewPart', [
             'title' => 'View Spareparts'
         ]);
@@ -171,7 +175,7 @@ class AuthController extends Controller
 
     public function newAppointments(Request $request, Response $response)
     {
-        if ((Application::$app->user->isVehicleOwner()?? false) && Application::$app->user->getOwnedVehiclesList()) {
+        if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
             $model = new Appointment();
 
             // Fetch garages from the database
@@ -203,7 +207,8 @@ class AuthController extends Controller
         return $this->render('customer/appointment/warrenty', ['name' => 'The GearGuard']);
     }
 
-    private function getVehiclesListForDropDown() : array {
+    private function getVehiclesListForDropDown(): array
+    {
         $vehicles = Application::$app->user->getOwnedVehiclesList();
 
         $vehicles_list = [];
@@ -219,6 +224,11 @@ class AuthController extends Controller
     {
         return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
     }
+    public function transferVehicle(Request $request, Response $response)
+    {
+        return $this->render('customer/vehicleTransfer/instruction', ['name' => 'The GearGuard']);
+    }
+
 
 
     private function getGarages()
