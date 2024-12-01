@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Appointment;
+use app\models\GarageService;
 use app\models\LoginFormGarage;
 use app\models\VehicleOwner;
 use gearguard\phpmvc\Controller;
@@ -383,8 +384,11 @@ class AuthController extends Controller
     public function addServices(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            $model = new GarageService();
             return $this->render('garage/services/newService', [
                 'name' => 'The GearGuard',
+                'garage_id' => Application::$app->session->get('user'),
+                'model' => $model
             ]);
         }
 
@@ -394,8 +398,11 @@ class AuthController extends Controller
     public function editServices(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            $model = new GarageService();
             return $this->render('garage/services/editService', [
                 'name' => 'The GearGuard',
+                'garage_id' => Application::$app->session->get('user'),
+                'model' => $model
             ]);
         }
 
