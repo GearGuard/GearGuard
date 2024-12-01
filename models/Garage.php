@@ -22,6 +22,7 @@ class Garage extends UserModel
 	public string $address = '';
 	public string $contact_no = '';
 	public string $registration_no = '';
+	
 
 	public function tableName(): string
 	{
@@ -77,4 +78,6 @@ class Garage extends UserModel
 	{
 		return $this->name;
 	}
+
+	
 }

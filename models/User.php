@@ -25,6 +25,13 @@ class User extends UserModel
 	public int $status_id = self::STATUS_INACTIVE;
 	public string $passwordConfirm = '';
 
+    private VehicleOwner $vehicleOwner;
+
+    public function __construct()
+    {
+        $this->vehicleOwner = new VehicleOwner();
+    }
+
 	public function tableName(): string
 	{
 		return 'gg_user';
@@ -107,4 +114,21 @@ class User extends UserModel
 
 		return $statement->fetchColumn();
 	}
+
+	// check if the user is a vehicle owner @PasinduRavimal pls check this :)
+	public function isGarage()
+
+	{
+		return $this->role === 'garage';
+	}
+
+    public function isVehicleOwner() : bool
+    {
+        return $this->vehicleOwner->getOwnedVehiclesList() !== null;
+    }
+
+    public function getOwnedVehiclesList() : array
+    {
+        return $this->vehicleOwner->getOwnedVehiclesList()?? [];
+    }
 }

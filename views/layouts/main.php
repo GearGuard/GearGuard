@@ -1,6 +1,18 @@
 <?php
 
 use gearguard\phpmvc\Application;
+
+// Get the current route
+$currentRoute = Application::$app->request->getPath();
+
+// Function to check if user is on the /customer route
+function isOnCustomerRoute($route)
+{
+    return $route === '/customer' || strpos($route, '/customer/') === 0  || strpos($route, '/community') === 0;
+}
+
+// Determine if the navbar should be hidden
+$hideNavbar = isOnCustomerRoute($currentRoute);
 ?>
 
 <!DOCTYPE html>
@@ -81,6 +93,10 @@ use gearguard\phpmvc\Application;
             transition: color 0.3s ease, transform 0.2s ease;
         }
 
+        .navbar.hidden {
+            display: none;
+        }
+
         .welcome-message:hover {
             color: var(--accent);
         }
@@ -125,47 +141,44 @@ use gearguard\phpmvc\Application;
 </head>
 
 <body>
-
     <header>
-        <nav>
-            <nav class="navbar">
-                <div class="container navbar-content">
+        <nav class="navbar <?php echo $hideNavbar ? 'hidden' : ''; ?>">
+            <div class="container navbar-content">
 
-                    <!-- Logo and Welcome Message -->
-                    <div class="logo-container">
-                        <div class="logo">
-                            <img src="assets/img/favicon.png" alt="GearGuard Logo">
-                        </div>
-                        <?php if (!Application::isGuest()): ?>
-                            <a class="nav-link welcome-message" href="/login">
-                                Welcome <?php echo Application::$app->user->getDisplayName() ?>
-                            </a>
-                        <?php endif; ?>
+                <!-- Logo and Welcome Message -->
+                <div class="logo-container">
+                    <div class="logo">
+                        <img src="assets/img/favicon.png" alt="GearGuard Logo">
                     </div>
-
-                    <!-- Navigation Links -->
-                    <div class="nav-links">
-                        <a href="#home">Home</a>
-                        <a href="#about">About</a>
-                        <a href="#services">Services</a>
-                        <a href="#feedback">Feedback</a>
-                        <a href="#contact">Contact</a>
-                        <?php if (Application::isGuest()): ?>
-                            <a href="/login">Login</a>
-                        <?php else: ?>
-                            <a href="/customer">Dashboard</a>
-                            <a href="/logout">Logout</a>
-                        <?php endif; ?>
-                    </div>
-
-                    <button class="mobile-menu-btn">
-                        <i class="fas fa-bars"></i>
-                    </button>
+                    <?php if (!Application::isGuest()): ?>
+                        <a class="nav-link welcome-message" href="/login">
+                            Welcome <?php echo Application::$app->user->getDisplayName() ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
-            </nav>
-        </nav>
-    </header>
 
+                <!-- Navigation Links -->
+                <div class="nav-links">
+                    <a href="#home">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#services">Services</a>
+                    <a href="#feedback">Feedback</a>
+                    <a href="#contact">Contact</a>
+                    <?php if (Application::isGuest()): ?>
+                        <a href="/login">Login</a>
+                    <?php else: ?>
+                        <a href="/customer">Dashboard</a>
+                        <a href="/logout">Logout</a>
+                    <?php endif; ?>
+                </div>
+
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+    </header>
     <div class="container">
         <?php if (gearguard\phpmvc\Application::$app->session->getFlash('success')): ?>
             <div class="alert alert-success">
@@ -174,7 +187,6 @@ use gearguard\phpmvc\Application;
         <?php endif; ?>
         {{content}}
     </div>
-
 </body>
 
 </html>

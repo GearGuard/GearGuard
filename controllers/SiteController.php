@@ -2,12 +2,15 @@
 
 namespace app\controllers;
 
+use Couchbase\RequestSpan;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\View;
 use gearguard\phpmvc\Response;
 use app\models\ContactForm;
+use app\models\Appointment;
+use app\models\GarageService;
 
 class SiteController extends Controller
 {
@@ -18,13 +21,52 @@ class SiteController extends Controller
         ];
         return $this->render('home', $params);
     }
-    public function common()
+
+    // Used for the newAppointment page in the customer section
+    public function common(Request $request, Response $response)
     {
-        $params = [
-            'name' => "The GearGurd"
-        ];
-        return $this->render('common', $params);
+        $model = new Appointment();
+
+        // Fetch garages from the database
+        $garages = $this->getGarages();
+
+        return $this->render('common', [
+            'model' => $model,
+            'garages' => $garages
+        ]);
     }
+
+    private function getGarages()
+    {
+        $sql = "SELECT id, name FROM gg_garage WHERE status_id = 1"; // Assuming 2 is the status for active garages
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    public function getServices(Request $request)
+    {
+        $garageId = $request->getBody()['garage_id'];
+        $services = $this->getServicesByGarage($garageId);
+
+        $options = '<option value="">Select Service</option>';
+        foreach ($services as $id => $name) {
+            $options .= "<option value=\"{$id}\">{$name}</option>";
+        }
+
+        return $options;
+    }
+
+    private function getServicesByGarage($garageId)
+    {
+        $sql = "SELECT id, type FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $garageId);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    // end of the newAppointment page in the customer section
 
 
     public function contact(Request $request, Response $response)
@@ -55,5 +97,20 @@ class SiteController extends Controller
             'name' => "The GearGurd - User Type"
         ];
         return $this->render('type', $params);
+    }
+
+    public function community(Request $request, Response $response)
+    {
+        return $this->render('community/allPosts', ['name' => 'The GearGuard']);
+    }
+
+    public function tets(Request $request, Response $response)
+    {
+        $model = new GarageService(); 
+        $services = []; // Initialize the $services variable
+        return $this->render('tets', [
+            'model' => $model,
+            'services' => $services
+        ]);
     }
 }

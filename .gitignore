@@ -45,7 +45,6 @@ composer.lock
 .env.development
 
 # MySQL Database Dumps
-*.sql
 *.sql.gz
 
 # Docker
