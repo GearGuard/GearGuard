@@ -46,7 +46,7 @@ $app->router->get('/customer/appointment/service_history', [AuthController::clas
 $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::class, 'sparepartsWarranty']);
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepart']);
 $app->router->get('/customer/sparepart/view_sparepart', [AuthController::class, 'viewSparepart']);
-$app->router->get('/customer/profile/my_profile', [AuthController::class, 'myProfile']);
+$app->router->get('/customer/my_profile', [AuthController::class, 'myProfile']);
 
 $app->router->get('/login', [AuthController::class, 'login']);
 $app->router->post('/login', [AuthController::class, 'login']);
