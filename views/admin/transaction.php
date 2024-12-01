@@ -1,10 +1,10 @@
+<?php
+$this->title = 'Customer Appointment';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Spare Part</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -39,7 +39,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 70%;
+            width: fit-content;
             padding: 1rem;
             margin: 0 auto 2rem;
             position: sticky;
@@ -68,11 +68,11 @@
             background: var(--hover-bg);
         }
 
-        .spare-part-form {
+        .appointment-form {
             background: var(--secondary);
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
@@ -113,9 +113,10 @@
         }
 
         input[type="text"],
-        input[type="number"],
+        input[type="email"],
         input[type="date"],
-        select {
+        select,
+        textarea {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -127,19 +128,33 @@
         }
 
         input[type="text"]:hover,
-        input[type="number"]:hover,
+        input[type="email"]:hover,
         input[type="date"]:hover,
-        select:hover {
+        select:hover,
+        textarea:hover {
             border-color: var(--accent);
         }
 
         input[type="text"]:focus,
-        input[type="number"]:focus,
+        input[type="email"]:focus,
         input[type="date"]:focus,
-        select:focus {
+        select:focus,
+        textarea:focus {
             border-color: var(--accent);
             outline: none;
             box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #c7c7c7;
+        }
+
+        .notes {
+            height: 120px;
+            resize: vertical;
+            min-height: 120px;
+            font-family: "Inter", sans-serif;
         }
 
         .button-container {
@@ -149,7 +164,7 @@
             margin-top: 2rem;
         }
 
-        .add-button {
+        .book-button {
             background: var(--accent);
             color: var(--text);
             padding: 0.75rem 1.5rem;
@@ -161,7 +176,7 @@
             transition: all 0.2s ease;
         }
 
-        .add-button:hover {
+        .book-button:hover {
             background: #1b4ebd;
             transform: translateY(-1px);
         }
@@ -202,7 +217,7 @@
                 gap: 0;
             }
 
-            .spare-part-form {
+            .appointment-form {
                 padding: 1rem;
             }
 
@@ -210,96 +225,99 @@
                 flex-direction: column-reverse;
             }
 
-            .add-button,
+            .book-button,
             .clear-button {
                 width: 100%;
             }
         }
     </style>
+    <link rel="stylesheet" href="/assets/css/admin-user.css">
 </head>
 
 <body>
-    <nav class="navMenu">
 
-        <a href="/customer/addsparepart" class="active">Add New Spare Part</a>
-        <a href="/customer/viewsparepart">View All Spare Parts</a>
-
-    </nav>
-
-    <div class="spare-part-form">
-        <h2 class="title">Add New Spare Part</h2>
-        <form action="/sparepart/add" method="POST">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="vehicle">Vehicle<span class="required-dot">*</span></label>
-                        <select id="vehicle" name="vehicle" required>
-                            <option value="" disabled selected>Select Vehicle</option>
-                            <option value="car">Car</option>
-                            <option value="motorcycle">Motorcycle</option>
-                            <option value="truck">Truck</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="serial-number">Serial Number<span class="required-dot">*</span></label>
-                        <input type="text" id="serial-number" name="serial_number" required placeholder="Enter serial number">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="type">Type<span class="required-dot">*</span></label>
-                        <input type="text" id="type" name="type" required placeholder="Enter spare part type">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="manufacturer">Manufacturer<span class="required-dot">*</span></label>
-                        <input type="text" id="manufacturer" name="manufacturer" required placeholder="Enter manufacturer">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="price">Price<span class="required-dot">*</span></label>
-                        <input type="number" id="price" name="price" step="0.01" required placeholder="Enter price">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="manufactured-date">Manufactured Date<span class="required-dot">*</span></label>
-                        <input type="date" id="manufactured-date" name="manufactured_date" required>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="installed-date">Installed Date<span class="required-dot">*</span></label>
-                        <input type="date" id="installed-date" name="installed_date">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="installed-date">Expire Date<span class="required-dot">*</span></label>
-                        <input type="date" id="installed-date" name="installed_date">
-                    </div>
-                </div>
-            </div>
-
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="add-button">Add Spare Part</button>
-            </div>
-        </form>
+<div class="appointment-form">
+    <h2 class="title">View Transactions</h2>
+    <div class="view-users-section">
+        <h2>Transaction History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Vehicle Owner</th>
+                    <th>Vehicle Make</th>
+                    <th>Vehicle Model</th>
+                    <th>Transaction Date</th>
+                    <th>Amount ($)</th>
+                    <th>Garage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TXN001</td>
+                    <td>Arishana Chandimal</td>
+                    <td>Toyota</td>
+                    <td>Camry</td>
+                    <td>2023-01-15</td>
+                    <td>50</td>
+                    <td>Downtown Garage</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button>View Details</button>
+                            <button>Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>TXN002</td>
+                    <td>Kavinda Dewmith</td>
+                    <td>Honda</td>
+                    <td>Accord</td>
+                    <td>2023-02-20</td>
+                    <td>40</td>
+                    <td>Main Street Garage</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button>View Details</button>
+                            <button>Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>TXN003</td>
+                    <td>Isuru Naveen</td>
+                    <td>Ford</td>
+                    <td>Focus</td>
+                    <td>2023-03-10</td>
+                    <td>100</td>
+                    <td>City Auto Repair</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button>View Details</button>
+                            <button>Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>TXN004</td>
+                    <td>Malith Kariyawasam</td>
+                    <td>Chevrolet</td>
+                    <td>Malibu</td>
+                    <td>2023-04-05</td>
+                    <td>30</td>
+                    <td>Quick Fix Garage</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button>View Details</button>
+                            <button>Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+</div>
 </body>
 
 </html>
