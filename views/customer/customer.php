@@ -222,7 +222,7 @@
             </li>
             <li class="nav-item">
                 <a href="/customer/sparepart/add_sparepart" class="nav-link">
-                    <i class="fas fa-car-side"></i>
+                    <i class="fa fa-compass" aria-hidden="true"></i>
                     <span class="nav-text">Spare Part</span>
                 </a>
             </li>
