@@ -1,5 +1,8 @@
 # database creation
 create database if not exists gearguard character set = 'utf8mb4' collate = 'utf8mb4_general_ci';
+-- select password('gearguard@pa$$w0rd');
+-- # user creation
+-- grant all privileges on gearguard.* to 'ggdbuser' @'%' identified by password '*EC2C67FBA641B44E153E1BCDA7537E40376315A7';
 # select database
 use gearguard;
 # status table
@@ -25,9 +28,9 @@ create or replace table gearguard.gg_vehicle (
         current_user_id INT NULL,
         status_id int not null,
         CONSTRAINT gg_vehicle_pk PRIMARY KEY (`id`),
-        CONSTRAINT gg_vehicle_unique_license_plate UNIQUE KEY (license_plate_no),
         CONSTRAINT gg_vehicle_unique_engine_no UNIQUE KEY (engine_no),
-        CONSTRAINT gg_vehicle_unique_vin UNIQUE KEY (vin)
+        CONSTRAINT gg_vehicle_unique_vin UNIQUE KEY (vin),
+        constraint gg_vehicle_unique_vin_license_plate unique key (vin, license_plate_no)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 create or replace table gearguard.gg_vehicle_model (
         `id` INT auto_increment NOT NULL,
@@ -108,10 +111,11 @@ create or replace table gearguard.gg_garage_service (
         `id` INT auto_increment NOT NULL,
         `type` varchar(100) NOT null,
         `price` double not null,
+        duration int,
+        description text default null,
         `garage_id` INT not null,
         status_id int not null,
-        CONSTRAINT gg_garage_service_pk PRIMARY KEY (`id`),
-        CONSTRAINT gg_garage_service_unique UNIQUE KEY (`type`)
+        CONSTRAINT gg_garage_service_pk PRIMARY KEY (`id`)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 create or replace table gearguard.gg_garage (
         `id` INT auto_increment NOT NULL,
@@ -172,13 +176,15 @@ create or replace table gearguard.gg_vehicle_service_take (
         mechanic_id INT not null,
         begin_timestamp DATETIME NOT NULL,
         end_timestamp DATETIME NOT NULL,
-        duration DATETIME NULL
+        duration DATETIME null,
+        notes text default null
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 create or replace table gearguard.gg_vehicle_service_appointment (
         vehicle_id INT NOT NULL,
         service_id INT NOT NULL,
         `date` DATE NOT NULL,
-        `time` TIME NOT NULL
+        `time` TIME NOT null,
+        notes text default null
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 create or replace TABLE gearguard.gg_service_mechanic_perform (
         service_id INT NOT NULL,
@@ -261,6 +267,8 @@ ADD CONSTRAINT gg_user_owner_gg_user_fk FOREIGN KEY (user_id) REFERENCES geargua
 alter table gearguard.gg_user_owner
 ADD CONSTRAINT gg_user_owner_gg_owner_ownership_type_fk FOREIGN KEY (ownership_status_id) REFERENCES gearguard.gg_owner_ownership_type(`id`);
 ALTER TABLE gearguard.gg_vehicle_assignments
+ADD CONSTRAINT gg_vehicle_assignments_gg_vehicle_FK FOREIGN KEY (vehicle_id) REFERENCES gearguard.gg_vehicle(`id`);
+ALTER TABLE gearguard.gg_vehicle_assignments
 ADD CONSTRAINT gg_vehicle_assignments_gg_user_vehicleuser_fk FOREIGN KEY (user_id) REFERENCES gearguard.gg_user_vehicleuser(user_id);
 ALTER TABLE gearguard.gg_vehicle_assignments
 ADD CONSTRAINT gg_vehicle_assignments_gg_user_owner_fk FOREIGN KEY (owner_id, vehicle_id) REFERENCES gearguard.gg_user_owner(user_id, vehicle_id);
@@ -282,6 +290,10 @@ ALTER TABLE gearguard.gg_garage_mechanic
 ADD CONSTRAINT gg_garage_mechanic_gg_status_FK FOREIGN KEY (status_id) REFERENCES gearguard.gg_status(`id`);
 alter table gearguard.gg_garage_service
 add constraint gg_garage_service_gg_status_fk foreign key (status_id) references gearguard.gg_status(`id`);
+ALTER TABLE gearguard.gg_garage_service
+ADD CONSTRAINT gg_garage_service_gg_garage_FK FOREIGN KEY (garage_id) REFERENCES gearguard.gg_garage(`id`);
+ALTER TABLE gearguard.gg_garage_service
+ADD CONSTRAINT gg_garage_service_unique UNIQUE KEY (garage_id, `type`);
 ALTER TABLE gearguard.gg_service_mechanic_perform
 ADD CONSTRAINT gg_service_mechanic_perform_gg_garage_service_FK FOREIGN KEY (service_id) REFERENCES gearguard.gg_garage_service(`id`);
 ALTER TABLE gearguard.gg_service_mechanic_perform
@@ -355,6 +367,36 @@ SELECT ROW_NUMBER() OVER (
     password,
     source_table
 FROM all_users;
+create or replace view gg_users_owners_view as
+select u.username,
+    u.password,
+    u.first_name,
+    u.last_name,
+    u.id,
+    u.nic,
+    u.address,
+    u.email,
+    u.contact_no,
+    u.status_id,
+    uo.vehicle_id,
+    uo.ownership_status_id,
+    uo.registration_date
+from gg_user u
+    right join gg_user_owner uo on u.id = uo.user_id;
+create or replace view gg_users_vehicleusers_view as
+select u.username,
+    u.password,
+    u.first_name,
+    u.last_name,
+    u.id,
+    u.nic,
+    u.address,
+    u.email,
+    u.contact_no,
+    u.status_id,
+    uv.license_no
+from gg_user u
+    right join gg_user_vehicleuser uv on u.id = uv.user_id;
 # adding data
 insert into gearguard.gg_status (`status`)
 values ('Inactive'),
