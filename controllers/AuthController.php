@@ -97,49 +97,29 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function dashboard(Request $request, Response $response){
-        if (Application::$app->user instanceof User){
-            return $this->render('customer/dashboard', [
-                'title' => 'Customer Dashboard'
-            ]);
-        } else if (Application::$app->user instanceof Garage){
-            return $this->render('garage/dashboard', [
-                'title' => 'Garage Dashboard'
-            ]);
-        }
-        throw new NotFoundException();
+    public function dashboard(){
+        return $this->render('customer/dashboard', [
+            'title' => 'Customer Dashboard'
+        ]);
     }
 
-    public function settings(Request $request, Response $response){
-        if (Application::$app->user instanceof User){
-            return $this->render('customer/setting', [
-                'title' => 'Settings'
-            ]);
-        } else if (Application::$app->user instanceof Garage){
-            return $this->render('garage/setting', [
-                'title' => 'Settings'
-            ]);
-        }
-
-        throw new NotFoundException();
+    public function settings(){
+        return $this->render('customer/setting', [
+            'title' => 'Settings'
+        ]);
     }
 
-    public function newSparepart(Request $request, Response $response){
-        if (Application::$app->user instanceof User){
-            return $this->render('customer/sparepart/newPart', [
-                'title' => 'Add Sparepart'
-            ]);
-        }
-
-        throw new NotFoundException();
+    public function newSparepart(){
+        return $this->render('customer/sparepart/newPart', [
+            'title' => 'Add Sparepart'
+        ]);
     }
 
-    public function viewSparepart(Request $request, Response $response){
-        if (Application::$app->user instanceof User){
-            return $this->render('customer/sparepart/viewPart', [
-                'title' => 'View Spareparts'
-            ]);
-        }
+    public function viewSparepart(){
+        return $this->render('customer/sparepart/viewPart', [
+            'title' => 'View Spareparts'
+        ]);
+    }
 
         throw new NotFoundException();
     }
@@ -187,10 +167,8 @@ class AuthController extends Controller
 
     public function newAppointments(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User) {
-            // TODO: Check for assigned vehicles
-            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
-                $model = new Appointment();
+        if ((Application::$app->user->isVehicleOwner()?? false) && Application::$app->user->getOwnedVehiclesList()) {
+            $model = new Appointment();
 
                 // Fetch garages from the database
                 $garages = $this->getGarages();
@@ -238,9 +216,6 @@ class AuthController extends Controller
             return $this->render('customer/appointment/warrenty', ['name' => 'The GearGuard']);
         }
 
-        throw new NotFoundException();
-    }
-
     private function getVehiclesListForDropDown() : array {
         $vehicles = Application::$app->user->getOwnedVehiclesList();
 
@@ -255,21 +230,8 @@ class AuthController extends Controller
 
     public function addVehicle(Request $request, Response $response)
     {
-        // TODO: Complete
-        if (Application::$app->user instanceof User){
-            return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
-        }
-
-        throw new NotFoundException();
+        return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
     }
-
-        throw new NotFoundException();
-    }
-    public function transferVehicle(Request $request, Response $response)
-    {
-        return $this->render('customer/vehicleTransfer/instruction', ['name' => 'The GearGuard']);
-    }
-
 
 
     private function getGarages()

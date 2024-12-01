@@ -37,14 +37,12 @@ $app->router->get('/customer/dashboard', [AuthController::class, 'dashboard']);
 $app->router->get('/customer/settings', [AuthController::class, 'settings']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
 $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehicle']);
-$app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);
-$app->router->get('/customer/vehicleTransfer/instruction', [AuthController::class, 'transferVehicle']);
+$app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'myAppointments']);
 $app->router->get('/customer/appointment/service_history', [AuthController::class, 'serviceHistory']);
 $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::class, 'sparepartsWarranty']);
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepart']);
 $app->router->get('/customer/sparepart/view_sparepart', [AuthController::class, 'viewSparepart']);
 $app->router->get('/customer/profile/my_profile', [AuthController::class, 'myProfile']);
-
 $app->router->get('/login', [AuthController::class, 'login']);
 $app->router->post('/login', [AuthController::class, 'login']);
 $app->router->get('/register', [AuthController::class, 'register']);

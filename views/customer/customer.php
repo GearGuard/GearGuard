@@ -226,21 +226,12 @@
                     <span class="nav-text">Spare Part</span>
                 </a>
             </li>
-
-            <li class="nav-item">
-                <a href="/customer/vehicleTransfer/instruction" class="nav-link">
-                    <i class="fa fa-exchange" aria-hidden="true"></i>
-                    <span class="nav-text">Transfer Vehicle</span>
-                </a>
-            </li>
-
             <li class="nav-item">
                 <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>
             </li>
-
             <li class="nav-item">
                 <a href="/customer/profile/my_profile" class="nav-link">
                     <i class="fas fa-user-circle"></i>
@@ -298,6 +289,7 @@
         });
 
         document.getElementsByClassName('nav-link active')[0].click();
+
     </script>
 </body>
 
