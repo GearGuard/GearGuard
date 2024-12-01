@@ -5,6 +5,7 @@ User: GearGurd
 
 use app\controllers\AuthController;
 use app\controllers\SiteController;
+use app\controllers\SparepartController;
 use gearguard\phpmvc\Application;
 
 
@@ -29,6 +30,12 @@ $app->router->post('/contact', [SiteController::class, 'contact']);
 $app->router->get('/about', [SiteController::class, 'about']);
 $app->router->get('/common', [SiteController::class, 'common']);
 $app->router->get('/type', [SiteController::class, 'type']);
+$app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']);
+
+$app->router->get('/customer/appointment/appoint', [SiteController::class, 'newAppointments']);
+$app->router->get('/customer/appointment/myappoint', [SiteController::class, 'myAppointments']);
+
+$app->router->get('/customer/vehicle/register', [SiteController::class, 'addVehicle']);
 $app->router->get('/tets', [SiteController::class, 'tets']);
 $app->router->get('/community', [SiteController::class, 'community']);
 
@@ -72,6 +79,34 @@ $app->router->get('/garage/customers/send_message', [AuthController::class, 'sen
 $app->router->get('/garage/customers/search', [AuthController::class, 'searchCustomer']);
 $app->router->get('/garage/mechanic', [AuthController::class, 'manageMechanic']);
 $app->router->get('/appointment/getServices', [SiteController::class, 'getServices']);
+
+$app->router->get('/admin', [SiteController::class, 'admin']);
+$app->router->get('/admin/dashboard', [SiteController::class, 'admin_dashboard']);
+
+$app->router->get('/admin/viewusers', [SiteController::class, 'viewUsers']);
+$app->router->get('/admin/adduser', [SiteController::class, 'addUser']);
+$app->router->get('/admin/edituser', [SiteController::class, 'editUser']);
+
+$app->router->get('/admin/viewservices', [SiteController::class, 'viewServices']);
+$app->router->get('/admin/addservice', [SiteController::class, 'addService']);
+$app->router->get('/admin/editservice', [SiteController::class, 'editService']);
+
+$app->router->get('/admin/viewvehicles', [SiteController::class, 'viewVehiclesByAdmin']);
+$app->router->get('/admin/addvehicle', [SiteController::class, 'addVehicleByAdmin']);
+$app->router->get('/admin/editvehicle', [SiteController::class, 'editVehicleByAdmin']);
+
+$app->router->get('/admin/transaction', [SiteController::class, 'admin_transaction']);
+$app->router->get('/admin/q&a', [SiteController::class, 'questions']);
+
+$app->router->get('/customer/addsparepart', [SiteController::class, 'addSparepart']);
+$app->router->get('/customer/viewsparepart', [SiteController::class, 'viewSparepart']);
+
+//spare pats
+$app->router->post('/sparepart/add', [SparepartController::class, 'addSparePart']);
+$app->router->get('/sparepart/get', [SparepartController::class, 'getSparePart']);
+$app->router->post('/sparepart/delete', [SparepartController::class, 'deleteSparePart']);
+$app->router->post('/sparepart/edit', [SparepartController::class, 'editSparePart']);
+
 $app->router->get('/community/post', [AuthController::class, 'newPost']);
 $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);
 
