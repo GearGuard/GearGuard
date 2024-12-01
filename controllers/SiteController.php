@@ -103,6 +103,10 @@ class SiteController extends Controller
     // Admin transactions section
     public function admin_transaction(Request $request, Response $response)
     {
+        return $this->render('community/allPosts', ['name' => 'The GearGuard']);
+    }
+
+
         $this->setLayout('admin_navbar');
         return $this->render('admin/transaction');
     }
@@ -195,6 +199,7 @@ class SiteController extends Controller
     }
 
     public function tets(Request $request, Response $response)
+
     {
         $model = new GarageService(); 
         $services = []; // Initialize the $services variable

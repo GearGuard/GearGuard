@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Appointment;
+use app\models\GarageService;
 use app\models\LoginFormGarage;
 use app\models\VehicleOwner;
 use gearguard\phpmvc\Controller;
@@ -273,31 +274,24 @@ class AuthController extends Controller
 
     public function transferVehicle(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User) {
-            // TODO: Check for assigned vehicles
+        if (Application::$app->user instanceof User)
             if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
-                $model = new Appointment();
-
-                // Fetch garages from the database
-                $garages = $this->getGarages();
-                $vehicles_list = $this->getVehiclesListForDropDown();
-
-                return $this->render('customer/vehicleTransfer/instruction', [
-                    'model' => $model,
-                    'garages' => $garages,
-                    'vehicles' => $vehicles_list,
+                return $this->render('customer/vehicleTransfer/transferForm', [
+                    'name' => 'The GearGuard',
                 ]);
             } else {
                 return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
             }
-        }
+
+        throw new NotFoundException();
     }
 
-    public function transferVehicleForm(Request $request, Response $response)
+    public function transferInstructions(Request $request, Response $response)
     {
-        return $this->render('customer/vehicleTransfer/transferForm', ['name' => 'The GearGuard']);
+        return $this->render('customer/vehicleTransfer/instruction', [
+            'name' => 'The GearGuard',
+        ]);
     }
-
 
     private function getGarages()
     {
@@ -390,8 +384,11 @@ class AuthController extends Controller
     public function addServices(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            $model = new GarageService();
             return $this->render('garage/services/newService', [
                 'name' => 'The GearGuard',
+                'garage_id' => Application::$app->session->get('user'),
+                'model' => $model
             ]);
         }
 
@@ -401,8 +398,11 @@ class AuthController extends Controller
     public function editServices(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            $model = new GarageService();
             return $this->render('garage/services/editService', [
                 'name' => 'The GearGuard',
+                'garage_id' => Application::$app->session->get('user'),
+                'model' => $model
             ]);
         }
 

@@ -220,8 +220,10 @@
 
 <body>
     <nav class="navMenu">
+
         <a href="/customer/addsparepart" class="active">Add New Spare Part</a>
         <a href="/customer/viewsparepart">View All Spare Parts</a>
+
     </nav>
 
     <div class="spare-part-form">

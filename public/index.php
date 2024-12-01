@@ -30,12 +30,15 @@ $app->router->post('/contact', [SiteController::class, 'contact']);
 $app->router->get('/about', [SiteController::class, 'about']);
 $app->router->get('/common', [SiteController::class, 'common']);
 $app->router->get('/type', [SiteController::class, 'type']);
+
 $app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']);
 
 $app->router->get('/customer/appointment/appoint', [SiteController::class, 'newAppointments']);
 $app->router->get('/customer/appointment/myappoint', [SiteController::class, 'myAppointments']);
 
 $app->router->get('/customer/vehicle/register', [SiteController::class, 'addVehicle']);
+$app->router->get('/community', [SiteController::class, 'community']);
+
 $app->router->get('/tets', [SiteController::class, 'tets']);
 $app->router->get('/community', [SiteController::class, 'community']);
 
@@ -47,8 +50,8 @@ $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehi
 $app->router->get('/customer/vehicle/all', [AuthController::class, 'viewAllVehicle']);
 $app->router->get('/customer/vehicle/service_history', [AuthController::class, 'vehicleServiceHistory']);
 $app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);
-$app->router->get('/customer/vehicleTransfer/instruction', [AuthController::class, 'transferVehicle']);
-$app->router->get('/customer/vehicleTransfer/transferForm', [AuthController::class, 'transferVehicleForm']);
+$app->router->get('/customer/vehicleTransfer/transfer', [AuthController::class, 'transferVehicle']);
+$app->router->get('/customer/vehicleTransfer/instruction', [AuthController::class, 'transferInstructions']);
 $app->router->get('/customer/appointment/service_history', [AuthController::class, 'serviceHistory']);
 $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::class, 'sparepartsWarranty']);
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepart']);
@@ -107,7 +110,9 @@ $app->router->get('/sparepart/get', [SparepartController::class, 'getSparePart']
 $app->router->post('/sparepart/delete', [SparepartController::class, 'deleteSparePart']);
 $app->router->post('/sparepart/edit', [SparepartController::class, 'editSparePart']);
 
+
 $app->router->get('/community/post', [AuthController::class, 'newPost']);
 $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);
+
 
 $app->run();

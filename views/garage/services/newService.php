@@ -242,7 +242,6 @@
         use gearguard\phpmvc\form\TextAreaField;
 
         $form = Form::begin('', "post");
-        // $garage_id = \gearguard\phpmvc\Application::$app->user->id; // Get the logged-in user's ID
         ?>
 
         <input type="hidden" name="garage_id" value="<?php echo htmlspecialchars($garage_id); ?>">
