@@ -24,6 +24,7 @@ class AuthController extends Controller
         $this->registerMiddleware(new AuthMiddleware(['profile']));
         $this->registerMiddleware(new AuthMiddleware(['customer']));
     }
+
     public function login(Request $request, Response $response)
     {
         $loginForm = new LoginForm();
@@ -40,6 +41,7 @@ class AuthController extends Controller
             'model' => $loginForm
         ]);
     }
+
     public function register(Request $request)
     {
         $errors = [];
@@ -62,6 +64,7 @@ class AuthController extends Controller
             'model' => $user
         ]);
     }
+
     public function logOut(Request $request, Response $response)
     {
         Application::$app->logout();
@@ -296,7 +299,6 @@ class AuthController extends Controller
     }
 
 
-
     private function getGarages()
     {
         $sql = "SELECT id, name FROM gg_garage WHERE status_id = 2"; // Assuming 2 is the status for active garages
@@ -458,6 +460,34 @@ class AuthController extends Controller
                 'name' => 'The GearGuard',
             ]);
         }
+
+        throw new NotFoundException();
+    }
+
+    public function viewAllVehicle(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User)
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                return $this->render('customer/vehicle/viewAll', [
+                    'name' => 'The GearGuard',
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
+
+        throw new NotFoundException();
+    }
+
+    public function vehicleServiceHistory(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User)
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                return $this->render('customer/vehicle/serviceHistory', [
+                    'name' => 'The GearGuard',
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
 
         throw new NotFoundException();
     }

@@ -219,9 +219,9 @@
 
 <body>
     <nav class="navMenu">
-        <a href="#">New Vehicle</a>
+        <a href="/customer/appointment/appoint" target="_self">New Vehicle</a>
         <a href="#" class="active">My Vehicle</a>
-        <a href="#">Service History</a>
+        <a href="/customer/vehicle/service_history" target="_self">Service History</a>
     </nav>
     <div class="container">
         <div class="header">

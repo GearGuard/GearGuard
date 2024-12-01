@@ -37,6 +37,8 @@ $app->router->get('/customer/dashboard', [AuthController::class, 'dashboard']);
 $app->router->get('/customer/settings', [AuthController::class, 'settings']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
 $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehicle']);
+$app->router->get('/customer/vehicle/all', [AuthController::class, 'viewAllVehicle']);
+$app->router->get('/customer/vehicle/service_history', [AuthController::class, 'vehicleServiceHistory']);
 $app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);
 $app->router->get('/customer/vehicleTransfer/instruction', [AuthController::class, 'transferVehicle']);
 $app->router->get('/customer/vehicleTransfer/transferForm', [AuthController::class, 'transferVehicleForm']);
