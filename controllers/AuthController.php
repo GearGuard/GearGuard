@@ -178,6 +178,21 @@ class AuthController extends Controller
         }
     }
 
+    public function myAppointments(Request $request, Response $response)
+    {
+        return $this->render('customer/appointment/myAppointment', ['name' => 'The GearGuard']);
+    }
+
+    public function serviceHistory(Request $request, Response $response)
+    {
+        return $this->render('customer/appointment/serviceHistory', ['name' => 'The GearGuard']);
+    }
+
+    public function sparepartsWarranty(Request $request, Response $response)
+    {
+        return $this->render('customer/appointment/warrenty', ['name' => 'The GearGuard']);
+    }
+
     private function getVehiclesListForDropDown() : array {
         $vehicles = Application::$app->user->getOwnedVehiclesList();
 

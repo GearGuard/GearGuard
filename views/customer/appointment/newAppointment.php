@@ -307,9 +307,9 @@ use gearguard\phpmvc\form\DropDownField
 <body>
     <nav class="navMenu">
         <a href="#" class="active">Book Appointment</a>
-        <a href="#">My Appointments</a>
-        <a href="#">Service History</a>
-        <a href="#">Spare Parts Warranty</a>
+        <a href="/customer/appointment/my_appointment" target='_self'>My Appointments</a>
+        <a href="/customer/appointment/service_history" target='_self'>Service History</a>
+        <a href="/customer/appointment/spareparts_warranty" target='_self'>Spare Parts Warranty</a>
     </nav>
     <div class="appointment-form">
         <h2 class="title">Book Your Appointment</h2>

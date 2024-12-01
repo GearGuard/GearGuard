@@ -227,12 +227,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/customer/sparepart/sparenewt" class="nav-link">
-                    <i class="fas fa-car-side"></i>
-                    <span class="nav-text">Spare Part</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>

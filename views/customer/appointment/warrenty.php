@@ -259,9 +259,9 @@ $this->title = 'Spare Part Warranty';
 
 <body>
     <nav class="navMenu">
-        <a href="#">Book Appointment<span class="dot"></span></a>
-        <a href="#">My Appointments<span class="dot"></span></a>
-        <a href="#">Service History<span class="dot"></span></a>
+        <a href="/customer/appointment/appoint"  target='_self'>Book Appointment<span class="dot"></span></a>
+        <a href="/customer/appointment/my_appointment" target='_self'>My Appointments<span class="dot"></span></a>
+        <a href="/customer/appointment/service_history" target='_self'>Service History<span class="dot"></span></a>
         <a href="#" class="active">Spare Parts Warranty<span class="dot"></span></a>
     </nav>
 

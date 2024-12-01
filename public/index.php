@@ -47,4 +47,7 @@ $app->router->post('/garage/login', [AuthController::class, 'garageLogin']);
 $app->router->get('/appointment/getServices', [SiteController::class, 'getServices']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
 $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehicle']);
+$app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'myAppointments']);
+$app->router->get('/customer/appointment/service_history', [AuthController::class, 'serviceHistory']);
+$app->router->get('/customer/appointment/spareparts_warranty', [AuthController::class, 'sparepartsWarranty']);
 $app->run();
