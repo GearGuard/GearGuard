@@ -395,6 +395,26 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function addServicesPost(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $model = GarageService::initialize(
+                $body['type'],
+                $body['price'],
+                $body['duration'],
+                $body['description']
+            );
+            $model->save();
+            return $this->render('garage/services/viewAll', [
+                'name' => 'The GearGuard',
+                'services' => $this->getServicesByGarage()
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
     public function editServices(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
@@ -490,5 +510,10 @@ class AuthController extends Controller
             }
 
         throw new NotFoundException();
+    }
+
+    public function getService(Request $request, Response $response)
+    {
+        
     }
 }

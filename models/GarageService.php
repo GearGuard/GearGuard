@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use Couchbase\InvalidStateException;
+use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
@@ -18,8 +20,22 @@ class GarageService extends UserModel
     public int $duration = 0;
     public string $description = '';
     public int $garage_id = 0;
+    private string $garage_name = '';
     public int $status_id = self::STATUS_INACTIVE;
 
+    public static function initialize(string $type, int $price, int $duration, string $description): GarageService
+    {
+        $object = new GarageService();
+
+        $object->type = $type;
+        $object->price = $price;
+        $object->duration = $duration;
+        $object->description = $description;
+        $object->garage_id = Application::$app->session->get('user');
+        $object->status_id = self::STATUS_ACTIVE;
+
+        return $object;
+    }
 
     public function tableName(): string
     {
@@ -33,7 +49,6 @@ class GarageService extends UserModel
 
     public function save()
     {
-        $this->status_id = self::STATUS_INACTIVE;
         return parent::save();
     }
 
@@ -68,5 +83,30 @@ class GarageService extends UserModel
     public function getDisplayName(): string
     {
         return $this->type;
+    }
+
+    public function getGarageName(): string
+    {
+        if ($this->garage_id === 0) {
+            throw new InvalidStateException('Garage ID is not set');
+        }
+
+        if ($this->garage_name !== '') {
+            return $this->garage_name;
+        }
+
+        $sql = "SELECT name FROM gg_garage WHERE id = :id LIMIT 1";
+        $statement = self::prepare($sql);
+        $statement->bindValue(':id', $this->garage_id);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (empty($result)) {
+            throw new InvalidStateException('Garage not found');
+        } else {
+            $garage_name = $result[0]['name'];
+        }
+
+        return $garage_name;
     }
 }
