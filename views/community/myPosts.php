@@ -15,7 +15,7 @@
         }
 
         body {
-            background: #1e293b;
+            background: #181a20;
             /* Dark background */
             font-family: "Inter", sans-serif;
             color: #e2e8f0;
@@ -38,7 +38,7 @@
         }
 
         .navMenu {
-            background-color: rgba(37, 99, 235, 0.1);
+            background-color: #25272d;
             /* Soft blue background */
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
@@ -90,7 +90,7 @@
         }
 
         .question-card {
-            background: #2d3748;
+            background: #25272d;
             /* Darker card background */
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -281,8 +281,8 @@
 <body>
     <nav class="navMenu">
         <div class="nav-links">
-            <a href="#">Discussions</a>
-            <a href="#">New Post</a>
+            <a href="/community" target="_self">Discussions</a>
+            <a href="/community/post" target="_self">New Post</a>
             <a href="#" class="active">My Posts</a>
         </div>
     </nav>

@@ -169,8 +169,8 @@ $this->title = 'View All Appointments';
 <body>
     <nav class="navMenu">
         <a href="#" class="active">All Appointments<span class="dot"></span></a>
-        <a href="#">Search Appointment<span class="dot"></span></a>
-        <a href="#">Delete Appointment<span class="dot"></span></a>
+        <a href="/garage/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
+        <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
     </nav>
 
     <div class="appointment-table">

@@ -240,7 +240,7 @@
 <body>
     <nav class="navMenu">
         <a href="/customer/vehicleTransfer/instruction">Instruction</a>
-        <a href="/customer/vehicleTransfer/tranferForm" class="active" target='_self'>Transfer Form</a>
+        <a href="/customer/appointment/my_appointment" class="active" target='_self'>Transfer Form</a>
     </nav>
     <div class="upload-container">
         <div class="header">
@@ -292,7 +292,7 @@
                                 Insurance Transfer Doc
                                 <span class="file-name" id="insurance_transfer-name">No file chosen</span>
                             </label>
-                        </div
+                        </div>
                     </div>
                 </div>
 

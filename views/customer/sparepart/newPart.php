@@ -221,7 +221,7 @@
 <body>
     <nav class="navMenu">
         <a href="#" class="active">Add New Spare Part</a>
-        <a href="#">View All Spare Parts</a>
+        <a href="/customer/sparepart/view_sparepart" target="_self">View All Spare Parts</a>
     </nav>
 
     <div class="spare-part-form">
