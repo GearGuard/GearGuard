@@ -242,7 +242,7 @@
             </li>
 
             <li class="nav-item">
-                <a href="/customer/profile/my_profile" class="nav-link">
+                <a href="/customer/my_profile" class="nav-link">
                     <i class="fas fa-user-circle"></i>
                     <span class="nav-text">Profile</span>
                 </a>

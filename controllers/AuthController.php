@@ -75,7 +75,7 @@ class AuthController extends Controller
     public function myProfile(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
-            return $this->render('customer/profile/myProfile', [
+            return $this->render('customer/my_Profile', [
                 'title' => 'My Profile'
             ]);
         } else if (Application::$app->user instanceof Garage) {
