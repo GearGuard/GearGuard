@@ -153,7 +153,7 @@ use gearguard\phpmvc\Application;
                         <?php if (Application::isGuest()): ?>
                             <a href="/login">Login</a>
                         <?php else: ?>
-                            <a href="/customer">Dashboard</a>
+                            <a href="/home">Dashboard</a>
                             <a href="/logout">Logout</a>
                         <?php endif; ?>
                     </div>

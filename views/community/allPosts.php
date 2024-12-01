@@ -286,8 +286,8 @@
     <nav class="navMenu">
         <div class="nav-links">
             <a href="#" class="active">Discussions</a>
-            <a href="#">New Posts</a>
-            <a href="#">My Posts</a>
+            <a href="/community/post" target="_self">New Posts</a>
+            <a href="/community/my_posts" target="_self">My Posts</a>
         </div>
     </nav>
 

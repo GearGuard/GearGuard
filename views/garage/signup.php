@@ -282,7 +282,7 @@
             <button type="submit" class="register-button">Register Garage</button>
             <?php echo \gearguard\phpmvc\form\Form::end() ?>
             <div class="login-link">
-                <a href="/login">Already registered? Sign In</a>
+                <a href="/garage/login">Already registered? Sign In</a>
             </div>
         </div>
     </div>

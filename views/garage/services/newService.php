@@ -229,10 +229,10 @@
 
 <body>
     <nav class="navMenu">
-        <a href="#" class="active">Add New Service</a>
-        <a href="#">Manage Services</a>
-        <a href="#">Service History</a>
-        <a href="#">Dashboard</a>
+            <a href="#" class="active">Add New Service</a>
+            <a href="/garage/services/view" target="_self">All Services</a>
+            <a href="/garage/services/update" target="_self">Edit Services</a>
+            <a href="/garage/services/delete" target="_self">Delete Services</a>
     </nav>
     <div class="service-form">
         <h2 class="title">Add New Garage Service</h2>
