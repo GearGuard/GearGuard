@@ -39,6 +39,7 @@ $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newA
 $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehicle']);
 $app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);
 $app->router->get('/customer/vehicleTransfer/instruction', [AuthController::class, 'transferVehicle']);
+$app->router->get('/customer/vehicleTransfer/transferForm', [AuthController::class, 'transferVehicleForm']);
 $app->router->get('/customer/appointment/service_history', [AuthController::class, 'serviceHistory']);
 $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::class, 'sparepartsWarranty']);
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepart']);
