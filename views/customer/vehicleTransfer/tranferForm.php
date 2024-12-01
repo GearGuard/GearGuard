@@ -188,6 +188,43 @@
             background: var(--hover-bg);
         }
 
+        .navMenu {
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 70%;
+            padding: 1rem;
+            margin: 0 auto 2rem;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .navMenu a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navMenu a.active {
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+
+        .navMenu a:hover {
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+
+
         @media (max-width: 768px) {
             .upload-container {
                 padding: 1.5rem;
@@ -201,6 +238,10 @@
 </head>
 
 <body>
+    <nav class="navMenu">
+        <a href="/customer/vehicleTransfer/instruction">Instruction</a>
+        <a href="/customer/appointment/my_appointment" class="active" target='_self'>Transfer Form</a>
+    </nav>
     <div class="upload-container">
         <div class="header">
             <h1 class="title">

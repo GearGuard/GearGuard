@@ -15,6 +15,7 @@
             --accent-color: #3b82f6;
             --border-color: #334155;
             --hover-color: #1e40af;
+            --background: #181a20;
         }
 
         * {
@@ -25,7 +26,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: var(--bg-primary);
+            background-color: var(--background);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
@@ -34,17 +35,45 @@
             padding: 2rem;
         }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background-color: var(--bg-secondary);
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
+        .navMenu {
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 70%;
+            padding: 1rem;
+            margin: 0 auto 2rem;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
         }
 
+        .navMenu a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navMenu a.active {
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+
+        .navMenu a:hover {
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+
+
         .header {
-            background: var(--bg-primary);
+            background: var(--background);
             color: white;
             padding: 1.5rem;
             text-align: center;
@@ -134,7 +163,7 @@
 
         .search-container {
             padding: 1rem;
-            background-color: var(--bg-primary);
+            background-color: var(--background);
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -163,15 +192,19 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Vehicle Documentation Checklist</h1>
-        </div>
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="Search documents..." id="searchInput">
-        </div>
-        <div class="documentation-list" id="docList"></div>
+    <nav class="navMenu">
+        <a href="/customer/vehicleTransfer/instruction" class="active">Instruction</a>
+        <a href="/customer/appointment/my_appointment" target='_self'>Transfer Form</a>
+    </nav>
+
+    <div class="header">
+        <h1>Vehicle Documentation Checklist</h1>
     </div>
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search documents..." id="searchInput">
+    </div>
+    <div class="documentation-list" id="docList"></div>
+
 
     <script>
         const documents = [{
