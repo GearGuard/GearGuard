@@ -241,10 +241,8 @@
         use gearguard\phpmvc\form\Form;
         use gearguard\phpmvc\form\TextAreaField;
 
-        $form = Form::begin('', "post");
+        $form = Form::begin('/garage/services/add', "post");
         ?>
-
-        <input type="hidden" name="garage_id" value="<?php echo htmlspecialchars($garage_id); ?>">
 
         <div class="form-row">
             <div class="form-column">
