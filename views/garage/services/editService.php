@@ -1,24 +1,10 @@
-<?php
-
-/** @var $model \app\models\Appointment */
-/** @var $garages array */
-/** @var $vehicles array */
-
-use gearguard\phpmvc\form\Form;
-use gearguard\phpmvc\form\TextAreaField;
-use gearguard\phpmvc\form\DateField;
-use gearguard\phpmvc\form\TimeField;
-use gearguard\phpmvc\form\DropDownField
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment - GearGuard</title>
+    <title>Edit Garage Service - GearGuard</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -82,7 +68,7 @@ use gearguard\phpmvc\form\DropDownField
             background: var(--hover-bg);
         }
 
-        .appointment-form {
+        .service-form {
             background: var(--secondary);
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -127,10 +113,7 @@ use gearguard\phpmvc\form\DropDownField
         }
 
         input[type="text"],
-        input[type="email"],
-        input[type="date"],
-        input[type="time"],
-        select,
+        input[type="number"],
         textarea {
             width: 100%;
             padding: 0.75rem;
@@ -142,25 +125,14 @@ use gearguard\phpmvc\form\DropDownField
             transition: all 0.2s ease;
         }
 
-        input[type="date"]::-webkit-calendar-picker-indicator,
-        input[type="time"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-        }
-
         input[type="text"]:hover,
-        input[type="email"]:hover,
-        input[type="date"]:hover,
-        input[type="time"]:hover,
-        select:hover,
+        input[type="number"]:hover,
         textarea:hover {
             border-color: var(--accent);
         }
 
         input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="date"]:focus,
-        input[type="time"]:focus,
-        select:focus,
+        input[type="number"]:focus,
         textarea:focus {
             border-color: var(--accent);
             outline: none;
@@ -172,7 +144,7 @@ use gearguard\phpmvc\form\DropDownField
             color: #c7c7c7;
         }
 
-        .notes {
+        .description {
             height: 120px;
             resize: vertical;
             min-height: 120px;
@@ -186,7 +158,8 @@ use gearguard\phpmvc\form\DropDownField
             margin-top: 2rem;
         }
 
-        .book-button {
+        .edit-button,
+        .search-button {
             background: var(--accent);
             color: var(--text);
             padding: 0.75rem 1.5rem;
@@ -198,7 +171,8 @@ use gearguard\phpmvc\form\DropDownField
             transition: all 0.2s ease;
         }
 
-        .book-button:hover {
+        .edit-button:hover,
+        .search-button:hover {
             background: #1b4ebd;
             transform: translateY(-1px);
         }
@@ -239,7 +213,7 @@ use gearguard\phpmvc\form\DropDownField
                 gap: 0;
             }
 
-            .appointment-form {
+            .service-form {
                 padding: 1rem;
             }
 
@@ -247,103 +221,83 @@ use gearguard\phpmvc\form\DropDownField
                 flex-direction: column-reverse;
             }
 
-            .book-button,
-            .clear-button {
+            .edit-button,
+            .clear-button,
+            .search-button {
                 width: 100%;
             }
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date();
-            const minDate = new Date(today.setDate(today.getDate() + 3));
-            const maxDate = new Date(today.setDate(today.getDate() + 30));
-            const dateInput = document.getElementById('appointment_date');
-            dateInput.min = minDate.toISOString().split('T')[0];
-            dateInput.max = maxDate.toISOString().split('T')[0];
-
-            $('#garage_id').change(function() {
-                var garageId = $(this).val();
-                if (garageId) {
-                    $.ajax({
-                        url: '/appointment/getServices',
-                        type: 'GET',
-                        data: {
-                            garage_id: garageId
-                        },
-                        success: function(response) {
-                            $('#service_id').html(response);
-                        }
-                    });
-                } else {
-                    $('#service_id').html('<option value="">Select Service Type</option>');
-                }
-            });
-        });
-
-        $(document).ready(function() {
-            $('#garage_id').change(function() {
-                var garageId = $(this).val();
-                if (garageId) {
-                    $.ajax({
-                        url: '/appointment/getServices',
-                        type: 'GET',
-                        data: {
-                            garage_id: garageId
-                        },
-                        success: function(response) {
-                            $('#service_id').html(response);
-                        }
-                    });
-                } else {
-                    $('#service_id').html('<option value="">Select Garage first</option>');
-                }
-            });
-        });
-    </script>
 </head>
 
 <body>
     <nav class="navMenu">
-        <a href="#" class="active">Book Appointment</a>
-        <a href="/customer/appointment/my_appointment" target='_self'>My Appointments</a>
-        <a href="/customer/appointment/service_history" target='_self'>Service History</a>
-        <a href="/customer/appointment/spareparts_warranty" target='_self'>Spare Parts Warranty</a>
+        <a href="/garage/services/add" target="_self">Add New Service</a>
+        <a href="/garage/services/view" target="_self">All Services</a>
+        <a href="#" class="active">Edit Services</a>
+        <a href="/garage/services/delete" target="_self">Delete Services</a>
     </nav>
-    <div class="appointment-form">
-        <h2 class="title">Book Your Appointment</h2>
-        <?php $form = Form::begin('', "post") ?>
+    <div class="service-form">
+        <h2 class="title">Edit Garage Service</h2>
+        <?php
+
+        use gearguard\phpmvc\form\Form;
+        use gearguard\phpmvc\form\TextAreaField;
+
+        $form = Form::begin('', "post");
+        ?>
+
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles)?>
+                <?php echo $form->field($model, 'type') ?>
+            </div>
+            <div class="form-column" style="display: flex; align-items: flex-end;">
+                <button type="button" class="search-button" onclick="searchService()">Search</button>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages)?>
+
+        <div id="editForm" style="display: none;">
+            <input type="hidden" name="garage_id" value="<?php echo htmlspecialchars($garage_id); ?>">
+
+            <div class="form-row">
+                <div class="form-column">
+                    <?php echo $form->field($model, 'type') ?>
+                </div>
             </div>
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', [])?>
+            <div class="form-row">
+                <div class="form-column">
+                    <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
+                </div>
+                <div class="form-column">
+                    <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo new TextAreaField($model, 'description'); ?>
+            </div>
+            <div class="button-container">
+                <button type="reset" class="clear-button">Clear</button>
+                <button type="submit" class="edit-button">Update Service</button>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'appointment_date') ?>
-            </div>
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'appointment_time') ?>
-            </div>
-        </div>
-        <div class="form-group">
-            <?php echo new TextAreaField($model, 'notes') ?>
-        </div>
-        <div class="button-container">
-            <button type="reset" class="clear-button">Clear</button>
-            <button type="submit" class="book-button">Book Appointment</button>
-        </div>
-        <?php echo Form::end() ?>
+
+        <?php echo Form::end(); ?>
     </div>
+
+    <script>
+        function searchService() {
+            const searchType = document.querySelector('input[name="search_type"]').value;
+            // Here you would typically make an AJAX call to your backend to fetch the service details
+            // For this example, we'll just show the form and populate it with dummy data
+            document.getElementById('editForm').style.display = 'block';
+
+            // Populate form fields with dummy data (replace this with actual data from your backend)
+            document.querySelector('input[name="type"]').value = searchType;
+            document.querySelector('input[name="price"]').value = '100';
+            document.querySelector('input[name="duration"]').value = '2';
+            document.querySelector('textarea[name="description"]').value = 'This is a sample description for ' + searchType;
+        }
+    </script>
 </body>
 
 </html>

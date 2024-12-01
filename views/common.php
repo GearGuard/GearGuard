@@ -5,6 +5,9 @@
 
 use gearguard\phpmvc\form\Form;
 use gearguard\phpmvc\form\TextAreaField;
+use gearguard\phpmvc\form\DateField;
+use gearguard\phpmvc\form\TimeField;
+use gearguard\phpmvc\form\DropDownField
 
 
 ?>
@@ -314,23 +317,23 @@ use gearguard\phpmvc\form\TextAreaField;
         <?php $form = Form::begin('', "post") ?>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->dropDownList($model, 'vehicle_id', $garages)->renderInput() ?>
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'Vehicle Name', $garages)?>
             </div>
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->dropDownList($model, 'garage_id', $garages)->renderInput() ?>
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages)?>
             </div>
             <div class="form-column">
-                <?php echo $form->dropDownList($model, 'service_id', [])->renderInput() ?>
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', [])?>
             </div>
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->dateField($model, 'appointment_date')->renderInput() ?>
+                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'appointment_date') ?>
             </div>
             <div class="form-column">
-                <?php echo $form->timeField($model, 'appointment_time')->renderInput() ?>
+                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'appointment_time') ?>
             </div>
         </div>
         <div class="form-group">

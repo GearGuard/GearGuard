@@ -1,16 +1,10 @@
-<?php
-
-/** @var $this \gearguard\phpmvc\View */
-$this->title = 'Add Service Details';
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Service Details - GearGuard</title>
+    <title>Edit Spare Part Details - GearGuard</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -101,7 +95,6 @@ $this->title = 'Add Service Details';
             display: block;
             width: 100%;
             margin-top: 1rem;
-
         }
 
         button:hover {
@@ -113,8 +106,7 @@ $this->title = 'Add Service Details';
             transform: translateY(0);
         }
 
-        #vehicleDetails,
-        #serviceForm {
+        #sparePartForm {
             display: none;
         }
 
@@ -124,37 +116,22 @@ $this->title = 'Add Service Details';
             padding: 1rem;
             margin-bottom: 1.5rem;
             border: 1px solid var(--text);
-
         }
 
-        .details-group p {
-            margin-bottom: 0.5rem;
+        #deleteRecord {
+            background: #eb4034;
+            margin-bottom: 1rem;
         }
 
-        fieldset.details-group {
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        legend {
-            color: var(--primary);
-            font-weight: 600;
-            padding: 0 0.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
+        #deleteRecord:hover {
+            background: #c5352b;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Add Vehicle Service Details</h1>
+        <h1>Edit Spare Part Details</h1>
 
         <div class="form-group">
             <label for="username">Username:</label>
@@ -166,30 +143,12 @@ $this->title = 'Add Service Details';
             <input type="text" id="plateNumber" name="plateNumber" required>
         </div>
 
-        <button onclick="loadVehicleDetails()">Load Vehicle Details</button>
+        <button onclick="searchRecord()">Search</button>
 
-        <div id="vehicleDetails" class="details-group">
-            <h2>Vehicle Details</h2>
-            <p><strong>Customer Name:</strong> <span id="customerName"></span></p>
-            <p><strong>Vehicle Model:</strong> <span id="vehicleModel"></span></p>
-            <p><strong>Year Manufactured:</strong> <span id="yearManufactured"></span></p>
-        </div>
+        <form id="sparePartForm">
+            <button type="button" id="deleteRecord" onclick="deleteRecord()">Delete Record</button>
 
-        <form id="serviceForm">
-            <fieldset class="details-group">
-                <legend>Add Service Details</legend>
-                <div class="form-group">
-                    <label for="description">Description:</label>
-                    <input type="text" id="description" name="description" required>
-                </div>
-                <div class="form-group">
-                    <label for="totalCost">Total Cost:</label>
-                    <input type="number" id="totalCost" name="totalCost" required>
-                </div>
-            </fieldset>
-
-            <fieldset class="details-group">
-                <legend>Spare Part</legend>
+            <div class="details-group">
                 <div class="form-group">
                     <label for="serialNumber">Serial Number:</label>
                     <input type="text" id="serialNumber" name="serialNumber">
@@ -218,36 +177,48 @@ $this->title = 'Add Service Details';
                     <label for="expireDate">Expire Date:</label>
                     <input type="date" id="expireDate" name="expireDate">
                 </div>
-            </fieldset>
+            </div>
 
-            <button type="submit">Submit Service Details</button>
+            <button type="submit">Save Record</button>
         </form>
     </div>
 
     <script>
-        function loadVehicleDetails() {
+        function searchRecord() {
             const username = document.getElementById('username').value;
             const plateNumber = document.getElementById('plateNumber').value;
 
             if (username === 'abc' && plateNumber === '123') {
-
+                // Simulating an API call to fetch spare part details
                 setTimeout(() => {
-                    document.getElementById('customerName').textContent = 'John Doe';
-                    document.getElementById('vehicleModel').textContent = 'Toyota Camry';
-                    document.getElementById('yearManufactured').textContent = '2019';
+                    // Populate form fields with mock data
+                    document.getElementById('serialNumber').value = 'SP12345';
+                    document.getElementById('partType').value = 'Brake Pad';
+                    document.getElementById('manufacturer').value = 'BrakeCo';
+                    document.getElementById('price').value = '89.99';
+                    document.getElementById('manufacturedDate').value = '2023-01-15';
+                    document.getElementById('installedDate').value = '2023-06-20';
+                    document.getElementById('expireDate').value = '2025-06-20';
 
-                    document.getElementById('vehicleDetails').style.display = 'block';
-                    document.getElementById('serviceForm').style.display = 'block';
+                    document.getElementById('sparePartForm').style.display = 'block';
                 }, 1000);
             } else {
                 alert('Please enter both username and plate number.');
             }
         }
 
-        document.getElementById('serviceForm').addEventListener('submit', function(e) {
+        function deleteRecord() {
+            if (confirm('Are you sure you want to delete this record?')) {
+                // Here you would typically send a delete request to your server
+                alert('Record deleted successfully!');
+                document.getElementById('sparePartForm').style.display = 'none';
+            }
+        }
+
+        document.getElementById('sparePartForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Here you would typically send the form data to your server
-            alert('Service details submitted successfully!');
+            // Here you would typically send the updated form data to your server
+            alert('Record updated successfully!');
         });
     </script>
 </body>

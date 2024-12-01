@@ -239,8 +239,8 @@
 <body>
     <nav class="navMenu">
         <a href="#" class="active">New Vehicle</a>
-        <a href="#">My Vehicle</a>
-        <a href="#">Service History</a>
+        <a href="/customer/vehicle/all" target="_self">My Vehicle</a>
+        <a href="/customer/vehicle/service_history" target="_self">Service History</a>
     </nav>
 
     <div class="vehicle-form">

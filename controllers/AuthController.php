@@ -2,8 +2,12 @@
 
 namespace app\controllers;
 
+use app\models\Appointment;
+use app\models\GarageService;
 use app\models\LoginFormGarage;
+use app\models\VehicleOwner;
 use gearguard\phpmvc\Controller;
+use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
 use app\models\User;
 use app\models\Garage;
@@ -21,6 +25,7 @@ class AuthController extends Controller
         $this->registerMiddleware(new AuthMiddleware(['profile']));
         $this->registerMiddleware(new AuthMiddleware(['customer']));
     }
+
     public function login(Request $request, Response $response)
     {
         $loginForm = new LoginForm();
@@ -37,6 +42,7 @@ class AuthController extends Controller
             'model' => $loginForm
         ]);
     }
+
     public function register(Request $request)
     {
         $errors = [];
@@ -59,41 +65,94 @@ class AuthController extends Controller
             'model' => $user
         ]);
     }
+
     public function logOut(Request $request, Response $response)
     {
         Application::$app->logout();
         $response->redirect('/');
     }
 
-    public function profile()
+    public function myProfile(Request $request, Response $response)
     {
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/profile/myProfile', [
+                'title' => 'My Profile'
+            ]);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/profile', [
+                'title' => 'Profile'
+            ]);
+        }
 
-        return $this->render('profile');
+        throw new NotFoundException();
     }
 
-    public function customer()
+    public function customer(Request $request, Response $response)
     {
-        return $this->render('customer/customer', [
-            'title' => 'Customer Dashboard'
-        ]);
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/customer', [
+                'title' => 'Customer Dashboard'
+            ]);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/garage', [
+                'title' => 'Garage Dashboard'
+            ]);
+        }
+        throw new NotFoundException();
     }
-    public function customerAppointment()
+
+    public function dashboard(Request $request, Response $response)
     {
-        return $this->render('customer/appointment/myAppointment', [
-            'title' => 'Customer Dashboard'
-        ]);
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/dashboard', [
+                'title' => 'Customer Dashboard'
+            ]);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/dashboard', [
+                'title' => 'Garage Dashboard'
+            ]);
+        }
+        throw new NotFoundException();
     }
 
+    public function settings(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/setting', [
+                'title' => 'Settings'
+            ]);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/setting', [
+                'title' => 'Settings'
+            ]);
+        }
 
+        throw new NotFoundException();
+    }
 
-    // public function appointment()
-    // {
-    //     return Application::$app->view->renderView('customer/appointment', [
-    //         'title' => 'Customer Appointment'
-    //     ]);
-    // }
+    public function newSparepart(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/sparepart/newPart', [
+                'title' => 'Add Sparepart'
+            ]);
+        }
 
-    public function garageSignup(Request $request)
+        throw new NotFoundException();
+    }
+
+    public function viewSparepart(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/sparepart/viewPart', [
+                'title' => 'View Spareparts'
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function garageSignup(Request $request, Response $response)
     {
         $errors = [];
         $garage = new Garage();
@@ -129,31 +188,307 @@ class AuthController extends Controller
         }
 
         $this->setLayout('auth');
-        return $this->render('garage/signin', [
+        return $this->render('login', [
             'model' => $loginForm
         ]);
     }
 
-    //  Not sure about this, i used this for file permission, its kinda working but not sure @PasinduRavimal can you check this
-    public function garage()
+    public function newAppointments(Request $request, Response $response)
     {
-        // Check if the user is logged in
-        if (Application::isGuest()) {
-            // If not logged in, redirect to login page
-            Application::$app->response->redirect('/login');
-            return;
+        if (Application::$app->user instanceof User) {
+            // TODO: Check for assigned vehicles
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                $model = new Appointment();
+
+                // Fetch garages from the database
+                $garages = $this->getGarages();
+                $vehicles_list = $this->getVehiclesListForDropDown();
+
+                return $this->render('customer/appointment/newAppointment', [
+                    'model' => $model,
+                    'garages' => $garages,
+                    'vehicles' => $vehicles_list,
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
         }
 
-        // Check if the logged-in user is a garage
-        if (!Application::$app->user->isGarage()) {
-            // If not a garage, redirect to an appropriate page (e.g., home or error page)
-            Application::$app->response->redirect('/');
-            return;
+        throw new NotFoundException();
+    }
+
+    public function appointments(Request $request, Response $response)
+    {
+        // TODO: Check for vehicles
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/appointment/myAppointment', ['name' => 'The GearGuard']);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/appointment/all', ['name' => 'The GearGuard']);
         }
 
-        // If the user is logged in and is a garage, render the garage dashboard
-        return $this->render('garage/garage', [
-            'title' => 'Garage Dashboard'
+        throw new NotFoundException();
+    }
+
+    public function serviceHistory(Request $request, Response $response)
+    {
+        // TODO: Check for vehicles
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/appointment/serviceHistory', ['name' => 'The GearGuard']);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function sparepartsWarranty(Request $request, Response $response)
+    {
+        // TODO: Complete
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/appointment/warrenty', ['name' => 'The GearGuard']);
+        }
+
+        throw new NotFoundException();
+    }
+
+    private function getVehiclesListForDropDown(): array
+    {
+        $vehicles = Application::$app->user->getOwnedVehiclesList();
+
+        $vehicles_list = [];
+
+        foreach ($vehicles as $vehicle) {
+            $vehicles_list[$vehicle['id']] = $vehicle['license_plate_no'];
+        }
+
+        return $vehicles_list;
+    }
+
+    public function addVehicle(Request $request, Response $response)
+    {
+        // TODO: Complete
+        if (Application::$app->user instanceof User) {
+            return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function transferVehicle(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User)
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                return $this->render('customer/vehicleTransfer/transferForm', [
+                    'name' => 'The GearGuard',
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
+
+        throw new NotFoundException();
+    }
+
+    public function transferInstructions(Request $request, Response $response)
+    {
+        return $this->render('customer/vehicleTransfer/instruction', [
+            'name' => 'The GearGuard',
         ]);
+    }
+
+    private function getGarages()
+    {
+        $sql = "SELECT id, name FROM gg_garage WHERE status_id = 2"; // Assuming 2 is the status for active garages
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    public function getServices(Request $request, Response $response)
+    {
+        $garageId = $request->getBody()['garage_id'];
+        $services = $this->getServicesByGarage();
+
+        $options = '<option value="">Select Service</option>';
+        foreach ($services as $id => $name) {
+            $options .= "<option value=\"{$id}\">{$name}</option>";
+        }
+
+        return $options;
+    }
+
+    private function getServicesByGarage(): array
+    {
+        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', Application::$app->session->get('user'));
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    // end of the newAppointment page in the customer section
+
+    public function viewServices(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/services/viewAll', [
+                'name' => 'The GearGuard',
+                'services' => $this->getServicesByGarage()
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function viewCustomers(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/customer/allCustomers', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function manageMechanic(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/mechanic/manage', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function searchAppointments(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/appointment/search', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function deleteAppointment(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/appointment/delete', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function addServices(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $model = new GarageService();
+            return $this->render('garage/services/newService', [
+                'name' => 'The GearGuard',
+                'garage_id' => Application::$app->session->get('user'),
+                'model' => $model
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function editServices(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $model = new GarageService();
+            return $this->render('garage/services/editService', [
+                'name' => 'The GearGuard',
+                'garage_id' => Application::$app->session->get('user'),
+                'model' => $model
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function deleteServices(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/services/deleteService', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function sendMessages(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/customer/sendMessages', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function searchCustomer(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            return $this->render('garage/customer/searchCustomers', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function newPost(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            return $this->render('community/newPost', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function viewPosts(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            return $this->render('community/myPosts', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function viewAllVehicle(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User)
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                return $this->render('customer/vehicle/viewAll', [
+                    'name' => 'The GearGuard',
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
+
+        throw new NotFoundException();
+    }
+
+    public function vehicleServiceHistory(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User)
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                return $this->render('customer/vehicle/serviceHistory', [
+                    'name' => 'The GearGuard',
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
+
+        throw new NotFoundException();
     }
 }

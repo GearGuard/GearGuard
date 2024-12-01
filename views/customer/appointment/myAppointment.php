@@ -215,10 +215,10 @@ $this->title = 'Appointment';
 
 <body>
     <nav class="navMenu">
-        <a href="#">Book Appointment<span class="dot"></span></a>
+        <a href="/customer/appointment/appoint" target='_self'>Book Appointment<span class="dot"></span></a>
         <a href="#" class="active">My Appointments<span class="dot"></span></a>
-        <a href="#">Service History<span class="dot"></span></a>
-        <a href="#">Spare Parts Warranty<span class="dot"></span></a>
+        <a href="/customer/appointment/service_history" target='_self'>Service History<span class="dot"></span></a>
+        <a href="/customer/appointment/spareparts_warranty" target='_self'>Spare Parts Warranty<span class="dot"></span></a>
     </nav>
 
     <div class="appointment-table">

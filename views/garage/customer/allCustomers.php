@@ -1,20 +1,17 @@
-<?php
-
-/** @var $this \gearguard\phpmvc\View */
-$this->title = 'View All Appointments';
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View All Customers - GearGuard</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
         :root {
             --text: #f5f5f5;
             --background: #181a20;
-            --primary: #C0C0C0FF;
+            --primary: #c7adad;
             --secondary: #25272d;
             --accent: #2463eb;
             --hover-bg: rgba(36, 99, 235, 0.1);
@@ -71,74 +68,46 @@ $this->title = 'View All Appointments';
             background: var(--hover-bg);
         }
 
-        .navMenu .dot {
-            width: 4px;
-            height: 4px;
-            background: var(--accent);
-            border-radius: 50%;
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .navMenu a:hover .dot,
-        .navMenu a.active .dot {
-            opacity: 1;
-        }
-
-        .appointment-table {
+        .customers-container {
             background: var(--secondary);
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             max-width: 1000px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 2rem;
         }
 
         .title {
             color: var(--primary);
             font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             text-align: center;
         }
 
         table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--border);
         }
 
         th {
-            background: var(--secondary);
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 1rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
+            background-color: #33363f;
             color: var(--text);
+            font-weight: 600;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        tr:nth-child(even) {
+            background-color: #25272d;
         }
 
-        tr:hover {
-            background: var(--hover-bg);
-            transition: all 0.2s ease;
-        }
-
-        /* Responsive design */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -154,13 +123,14 @@ $this->title = 'View All Appointments';
                 text-align: center;
             }
 
-            .appointment-table {
+            .customers-container {
                 padding: 1rem;
             }
 
+            table,
             th,
             td {
-                padding: 0.75rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -168,50 +138,56 @@ $this->title = 'View All Appointments';
 
 <body>
     <nav class="navMenu">
-        <a href="#" class="active">All Appointments<span class="dot"></span></a>
-        <a href="/garage/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
-        <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
+        <a href="#" class="active">All Customers</a>
+        <a href="/garage/customers/search" target="_self">Search Customers</a>
+        <a href="/garage/customers/send_message" target="_self">Send Messages</a>
     </nav>
-
-    <div class="appointment-table">
-        <h2 class="title">All Appointments</h2>
-        <table>
+    <div class="customers-container">
+        <h2 class="title">All Customers</h2>
+        <table id="customersTable">
             <thead>
                 <tr>
-                    <th>Vehicle Type</th>
-                    <th>Owner's Name</th>
-                    <th>Contact Number</th>
-                    <th>Number Plate</th>
+                    <th>Name</th>
                     <th>Vehicle Model</th>
-                    <th>Model Year</th>
                     <th>Service Type</th>
-                    <th>Date & Time</th>
+                    <th>Service Date</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>SUV</td>
-                    <td>John Doe</td>
-                    <td>+123456789</td>
-                    <td>XYZ-1234</td>
-                    <td>Toyota Highlander</td>
-                    <td>2022</td>
-                    <td>Oil Change</td>
-                    <td>2024-11-20 10:30 AM</td>
-                </tr>
-                <tr>
-                    <td>Sedan</td>
-                    <td>Jane Smith</td>
-                    <td>+987654321</td>
-                    <td>ABC-5678</td>
-                    <td>Honda Accord</td>
-                    <td>2020</td>
-                    <td>Tire Rotation</td>
-                    <td>2024-11-22 02:00 PM</td>
-                </tr>
+                <!-- Table body will be populated by JavaScript -->
             </tbody>
         </table>
     </div>
+
+    <script>
+        // Dummy data
+        const customers = [
+            ['John Doe', 'Toyota Camry', 'Oil Change', '2023-12-01', 'john@example.com', '123-456-7890'],
+            ['Jane Smith', 'Honda Civic', 'Tire Rotation', '2023-12-02', 'jane@example.com', '987-654-3210'],
+            ['Mike Johnson', 'Ford F-150', 'Brake Service', '2023-12-03', 'mike@example.com', '456-789-0123'],
+            ['Sarah Brown', 'Chevrolet Malibu', 'Engine Tune-up', '2023-12-04', 'sarah@example.com', '789-012-3456'],
+            ['David Wilson', 'Nissan Altima', 'Transmission Service', '2023-12-05', 'david@example.com', '321-654-9870']
+        ];
+
+        // Function to populate the table
+        function populateTable() {
+            const tableBody = document.querySelector('#customersTable tbody');
+            customers.forEach(customer => {
+                const row = document.createElement('tr');
+                customer.forEach(data => {
+                    const cell = document.createElement('td');
+                    cell.textContent = data;
+                    row.appendChild(cell);
+                });
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Call the function to populate the table when the page loads
+        window.onload = populateTable;
+    </script>
 </body>
 
 </html>

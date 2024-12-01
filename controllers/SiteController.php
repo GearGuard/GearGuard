@@ -10,6 +10,7 @@ use gearguard\phpmvc\View;
 use gearguard\phpmvc\Response;
 use app\models\ContactForm;
 use app\models\Appointment;
+use app\models\GarageService;
 
 
 class SiteController extends Controller
@@ -99,25 +100,11 @@ class SiteController extends Controller
         return $this->render('type', $params);
     }
 
-    public function navbar_customer(Request $request, Response $response)
-    {
-        return $this->render('navbar_customer', ['name' => 'The GearGuard']);
-    }
-
-    public function newAppointments(Request $request, Response $response)
-    {
-        return $this->render('customer/appointment/newAppointment', ['name' => 'The GearGuard']);
-    }
-
-    public function addVehicle(Request $request, Response $response)
-    {
-        return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
-    }
-
     public function community(Request $request, Response $response)
     {
         return $this->render('community/allPosts', ['name' => 'The GearGuard']);
     }
+
 
     // Admin section-------------------------------
     public function admin(Request $request, Response $response)
@@ -210,10 +197,15 @@ class SiteController extends Controller
     }
 
     public function tets()
+
+    public function tets(Request $request, Response $response)
+
     {
-        $params = [
-            'name' => "The GearGurd - User Type"
-        ];
-        return $this->render('tets', $params);
+        $model = new GarageService(); 
+        $services = []; // Initialize the $services variable
+        return $this->render('tets', [
+            'model' => $model,
+            'services' => $services
+        ]);
     }
 }

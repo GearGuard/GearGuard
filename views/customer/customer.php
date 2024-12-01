@@ -203,7 +203,7 @@
         </div>
         <ul class="nav-list">
             <li class="nav-item">
-                <a href="dashboard.php" class="nav-link active">
+                <a href="customer/dashboard" class="nav-link active">
                     <i class="fas fa-gauge"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
@@ -221,31 +221,38 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/customer/sparepart/sparenewt" class="nav-link">
-                    <i class="fas fa-car-side"></i>
+                <a href="/customer/sparepart/add_sparepart" class="nav-link">
+                    <i class="fa fa-compass" aria-hidden="true"></i>
                     <span class="nav-text">Spare Part</span>
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a href="/customer/vehicleTransfer/instruction" class="nav-link">
+                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                    <span class="nav-text">Transfer Vehicle</span>
+                </a>
+            </li>
+
             <li class="nav-item">
                 <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>
             </li>
+
             <li class="nav-item">
-                <a href="profile.php" class="nav-link">
+                <a href="/customer/profile/my_profile" class="nav-link">
                     <i class="fas fa-user-circle"></i>
                     <span class="nav-text">Profile</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="settings.php" class="nav-link">
+                <a href="/customer/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
                 </a>
             </li>
-
-            
         </ul>
     </div>
 
@@ -289,6 +296,8 @@
                 }
             });
         });
+
+        document.getElementsByClassName('nav-link active')[0].click();
     </script>
 </body>
 

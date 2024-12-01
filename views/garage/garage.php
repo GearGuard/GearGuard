@@ -203,25 +203,25 @@
         </div>
         <ul class="nav-list">
             <li class="nav-item">
-                <a href="dashboard.php" class="nav-link active">
+                <a href="/garage/dashboard" class="nav-link active">
                     <i class="fas fa-gauge"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/customer/appointment/appoint" class="nav-link">
+                <a href="/garage/appointment/appointments" class="nav-link">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Appointments</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/customer/vehicle/register" class="nav-link">
+                <a href="/garage/services/view" class="nav-link">
                     <i class="fas fa-car-side"></i>
                     <span class="nav-text">Services</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="settings.php" class="nav-link">
+                <a href="/garage/customers/view" class="nav-link">
                     <i class="fa fa-street-view" aria-hidden="true"></i>
                     <span class="nav-text">Customer</span>
                 </a>
@@ -233,26 +233,19 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="profile.php" class="nav-link">
+                <a href="/garage/mechanic" class="nav-link">
                     <i class="fa fa-wrench" aria-hidden="true"></i>
                     <span class="nav-text">Mechanic</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="settings.php" class="nav-link">
-                    <i class="fa fa-file" aria-hidden="true"></i>
-                    <span class="nav-text">Report</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="profile.php" class="nav-link">
+                <a href="/garage/profile" class="nav-link">
                     <i class="fas fa-user-circle"></i>
                     <span class="nav-text">Profile</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="settings.php" class="nav-link">
+                <a href="/garage/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
                 </a>
@@ -302,6 +295,8 @@
                 }
             });
         });
+
+        document.getElementsByClassName('nav-link active')[0].click();
     </script>
 </body>
 
