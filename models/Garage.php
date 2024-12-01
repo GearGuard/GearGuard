@@ -79,5 +79,9 @@ class Garage extends UserModel
 		return $this->name;
 	}
 
+    public function getServiceByType(string $type) : ?GarageService
+    {
+        return GarageService::findOne(['type' => $type, 'garage_id' => $this->id]);
+    }
 	
 }

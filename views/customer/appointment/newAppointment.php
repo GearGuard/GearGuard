@@ -8,7 +8,7 @@ use gearguard\phpmvc\form\Form;
 use gearguard\phpmvc\form\TextAreaField;
 use gearguard\phpmvc\form\DateField;
 use gearguard\phpmvc\form\TimeField;
-use gearguard\phpmvc\form\DropDownField
+use gearguard\phpmvc\form\DropDownField;
 ?>
 
 

@@ -197,7 +197,7 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof User) {
             // TODO: Check for assigned vehicles
-            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 $model = new Appointment();
 
                 // Fetch garages from the database
@@ -255,8 +255,18 @@ class AuthController extends Controller
 
         $vehicles_list = [];
 
-        foreach ($vehicles as $vehicle) {
-            $vehicles_list[$vehicle['id']] = $vehicle['license_plate_no'];
+        if ($vehicles) {
+            foreach ($vehicles as $vehicle) {
+                $vehicles_list[$vehicle['id']] = $vehicle['license_plate_no'];
+            }
+        }
+
+        $vehicles = Application::$app->user->getAccessAvailableVehiclesList();
+
+        if ($vehicles) {
+            foreach ($vehicles as $vehicle) {
+                $vehicles_list[$vehicle['id']] = $vehicle['license_plate_no'];
+            }
         }
 
         return $vehicles_list;
@@ -299,19 +309,6 @@ class AuthController extends Controller
         $statement = Application::$app->db->prepare($sql);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
-    }
-
-    public function getServices(Request $request, Response $response)
-    {
-        $garageId = $request->getBody()['garage_id'];
-        $services = $this->getServicesByGarage();
-
-        $options = '<option value="">Select Service</option>';
-        foreach ($services as $id => $name) {
-            $options .= "<option value=\"{$id}\">{$name}</option>";
-        }
-
-        return $options;
     }
 
     private function getServicesByGarage(): array
@@ -487,7 +484,7 @@ class AuthController extends Controller
     public function viewAllVehicle(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User)
-            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 return $this->render('customer/vehicle/viewAll', [
                     'name' => 'The GearGuard',
                 ]);
@@ -501,7 +498,7 @@ class AuthController extends Controller
     public function vehicleServiceHistory(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User)
-            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 return $this->render('customer/vehicle/serviceHistory', [
                     'name' => 'The GearGuard',
                 ]);
@@ -514,6 +511,9 @@ class AuthController extends Controller
 
     public function getService(Request $request, Response $response)
     {
-        
+        if (Application::$app->user instanceof Garage) {
+            $test = json_encode(Application::$app->user->getServiceByType($request->getBody()['type']));
+            $pause = 1;
+        }
     }
 }
