@@ -10,6 +10,7 @@ use gearguard\phpmvc\View;
 use gearguard\phpmvc\Response;
 use app\models\ContactForm;
 use app\models\Appointment;
+use app\models\GarageService;
 
 class SiteController extends Controller
 {
@@ -103,11 +104,13 @@ class SiteController extends Controller
         return $this->render('community/allPosts', ['name' => 'The GearGuard']);
     }
 
-    public function tets()
+    public function tets(Request $request, Response $response)
     {
-        $params = [
-            'name' => "The GearGurd - User Type"
-        ];
-        return $this->render('tets', $params);
+        $model = new GarageService(); 
+        $services = []; // Initialize the $services variable
+        return $this->render('tets', [
+            'model' => $model,
+            'services' => $services
+        ]);
     }
 }

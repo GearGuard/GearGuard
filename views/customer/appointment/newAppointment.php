@@ -6,8 +6,9 @@
 
 use gearguard\phpmvc\form\Form;
 use gearguard\phpmvc\form\TextAreaField;
-
-
+use gearguard\phpmvc\form\DateField;
+use gearguard\phpmvc\form\TimeField;
+use gearguard\phpmvc\form\DropDownField
 ?>
 
 
@@ -304,45 +305,45 @@ use gearguard\phpmvc\form\TextAreaField;
 </head>
 
 <body>
-<nav class="navMenu">
-    <a href="#" class="active">Book Appointment</a>
-    <a href="#">My Appointments</a>
-    <a href="#">Service History</a>
-    <a href="#">Spare Parts Warranty</a>
-</nav>
-<div class="appointment-form">
-    <h2 class="title">Book Your Appointment</h2>
-    <?php $form = Form::begin('', "post") ?>
-    <div class="form-row">
-        <div class="form-column">
-            <?php echo $form->dropDownList($model, 'vehicle_id', $vehicles)->renderInput() ?>
+    <nav class="navMenu">
+        <a href="#" class="active">Book Appointment</a>
+        <a href="#">My Appointments</a>
+        <a href="#">Service History</a>
+        <a href="#">Spare Parts Warranty</a>
+    </nav>
+    <div class="appointment-form">
+        <h2 class="title">Book Your Appointment</h2>
+        <?php $form = Form::begin('', "post") ?>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles)?>
+            </div>
         </div>
-    </div>
-    <div class="form-row">
-        <div class="form-column">
-            <?php echo $form->dropDownList($model, 'garage_id', $garages)->renderInput() ?>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages)?>
+            </div>
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', [])?>
+            </div>
         </div>
-        <div class="form-column">
-            <?php echo $form->dropDownList($model, 'service_id', [])->renderInput() ?>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'appointment_date') ?>
+            </div>
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'appointment_time') ?>
+            </div>
         </div>
-    </div>
-    <div class="form-row">
-        <div class="form-column">
-            <?php echo $form->dateField($model, 'appointment_date')->renderInput() ?>
+        <div class="form-group">
+            <?php echo new TextAreaField($model, 'notes') ?>
         </div>
-        <div class="form-column">
-            <?php echo $form->timeField($model, 'appointment_time')->renderInput() ?>
+        <div class="button-container">
+            <button type="reset" class="clear-button">Clear</button>
+            <button type="submit" class="book-button">Book Appointment</button>
         </div>
+        <?php echo Form::end() ?>
     </div>
-    <div class="form-group">
-        <?php echo new TextAreaField($model, 'notes') ?>
-    </div>
-    <div class="button-container">
-        <button type="reset" class="clear-button">Clear</button>
-        <button type="submit" class="book-button">Book Appointment</button>
-    </div>
-    <?php echo Form::end() ?>
-</div>
 </body>
 
 </html>
