@@ -45,6 +45,6 @@ class LoginFormGarage extends Model
 			$this->addError('password', 'Password is incorrect');
 			return false;
 		};
-        return 	Application::$app->login($garage);
+		return 	Application::$app->login($garage);
 	}
 }
