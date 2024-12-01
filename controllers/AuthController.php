@@ -275,7 +275,7 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof User)
             if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
-                return $this->render('customer/vehicleTransfer/tranferForm', [
+                return $this->render('customer/vehicleTransfer/transferForm', [
                     'name' => 'The GearGuard',
                 ]);
             } else {
