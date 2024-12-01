@@ -238,12 +238,12 @@
                     <span class="nav-text">Mechanic</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="settings.php" class="nav-link">
                     <i class="fa fa-file" aria-hidden="true"></i>
                     <span class="nav-text">Report</span>
                 </a>
-            </li>
+            </li> -->
 
             <li class="nav-item">
                 <a href="profile.php" class="nav-link">
