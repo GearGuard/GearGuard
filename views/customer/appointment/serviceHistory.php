@@ -5,6 +5,16 @@
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #c7adad;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,16 +22,16 @@
         }
 
         body {
-            background: #f8fafc;
+            background: var(--background);
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: var(--text);
             line-height: 1.6;
             padding: 10px;
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             display: flex;
             justify-content: center;
@@ -35,7 +45,7 @@
         }
 
         .navMenu a {
-            color: #64748b;
+            color: var(--primary);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
@@ -46,19 +56,19 @@
         }
 
         .navMenu a.active {
-            color: #2563eb;
-            background: #eff6ff;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu a:hover {
-            color: #2563eb;
-            background: #f8fafc;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu .dot {
             width: 4px;
             height: 4px;
-            background: #2563eb;
+            background: var(--accent);
             border-radius: 50%;
             position: absolute;
             bottom: 4px;
@@ -74,31 +84,32 @@
         }
 
         .service-history {
-            background: white;
+            background: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             max-width: 1000px;
             margin: 0 auto;
             padding: 1.5rem;
         }
 
         .title {
-            color: #1e293b;
+            color: var(--text);
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
         }
 
         .service-card {
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 1rem;
             transition: all 0.2s ease;
+            background-color: var(--background);
         }
 
         .service-card:hover {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
         }
 
@@ -108,17 +119,17 @@
             align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border);
         }
 
         .service-type {
             font-weight: 600;
-            color: #1e293b;
+            color: var(--text);
             font-size: 1.1rem;
         }
 
         .service-date {
-            color: #64748b;
+            color: var(--primary);
             font-size: 0.9rem;
         }
 
@@ -137,27 +148,28 @@
 
         .detail-label {
             font-size: 0.875rem;
-            color: #64748b;
+            color: var(--primary);
             font-weight: 500;
         }
 
         .detail-value {
-            color: #334155;
+            color: var(--text);
             font-weight: 500;
         }
 
         .service-description {
-            background: #f8fafc;
+            background: var(--secondary);
             padding: 1rem;
             border-radius: 6px;
             margin-bottom: 1rem;
             text-align: justify;
+            color: var(--text);
         }
 
         .bill-amount {
             text-align: right;
             font-weight: 600;
-            color: #1e293b;
+            color: var(--text);
             font-size: 1.1rem;
         }
 

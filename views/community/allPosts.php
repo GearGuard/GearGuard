@@ -8,6 +8,16 @@
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #c7adad;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,38 +25,35 @@
         }
 
         body {
-            background: #f8fafc;
+            background: var(--background);
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: var(--text);
             line-height: 1.6;
             padding: 20px;
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            width: 90%;
+            width: 70%;
             padding: 1rem;
             margin: 0 auto 2rem;
             position: sticky;
             top: 20px;
             z-index: 100;
-            width: 65%;
-            justify-content: center;
         }
 
         .nav-links {
             display: flex;
             gap: 1rem;
-
         }
 
         .navMenu a {
-            color: #64748b;
+            color: var(--primary);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
@@ -56,19 +63,13 @@
         }
 
         .navMenu a.active {
-            color: #2563eb;
-            background: #eff6ff;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
-        .new-post-button {
-            background: #2563eb;
-            color: white !important;
-            padding: 0.75rem 1.5rem;
-
-        }
-
-        .new-post-button:hover {
-            background: #1d4ed8;
+        .navMenu a:hover {
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .main-container {
@@ -77,9 +78,9 @@
         }
 
         .forum-section {
-            background: white;
+            background: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -90,7 +91,7 @@
             align-items: center;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border);
             justify-content: center;
             align-items: center;
         }
@@ -98,12 +99,11 @@
         .section-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1e293b;
-
+            color: var(--primary);
         }
 
         .post {
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border);
             padding: 1.5rem 0;
         }
 
@@ -119,7 +119,7 @@
         }
 
         .post-title {
-            color: #031947FF;
+            color: var(--primary);
             font-size: 1.125rem;
             font-weight: 600;
             text-decoration: none;
@@ -127,16 +127,16 @@
         }
 
         .post-title:hover {
-            color: #002685FF;
+            color: var(--accent);
         }
 
         .post-meta {
             font-size: 0.875rem;
-            color: #64748b;
+            color: var(--primary);
         }
 
         .post-content {
-            color: #475569;
+            color: var(--text);
             margin-bottom: 1rem;
             text-align: justify;
         }
@@ -147,30 +147,34 @@
         }
 
         .action-button {
-            background: #f1f5f9;
-            color: #475569;
+            background: var(--accent);
+            color: var(--text);
             border: none;
             padding: 0.5rem 1rem;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.875rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .action-button:hover {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: #1b4ebd;
+            transform: translateY(-1px);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
         }
 
         .answers-container {
             margin-left: 2rem;
             margin-top: 1rem;
             padding-left: 1rem;
-            border-left: 2px solid #e2e8f0;
+            border-left: 2px solid var(--border);
         }
 
         .answer {
-            background: #f8fafc;
+            background: var(--secondary);
             border-radius: 8px;
             padding: 1rem;
             margin-bottom: 1rem;
@@ -185,7 +189,7 @@
             width: 100%;
             min-height: 100px;
             padding: 0.75rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
             margin-bottom: 1rem;
             font-family: inherit;
@@ -193,7 +197,7 @@
         }
 
         .submit-answer {
-            background: #2563eb;
+            background: var(--accent);
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -218,7 +222,7 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--secondary);
             width: 90%;
             max-width: 600px;
             margin: 50px auto;
@@ -231,6 +235,7 @@
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
+            color: var(--primary);
         }
 
         .modal-form input,
@@ -238,7 +243,7 @@
             width: 100%;
             padding: 0.75rem;
             margin-bottom: 1rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
             font-family: inherit;
         }
@@ -284,7 +289,6 @@
             <a href="#">New Posts</a>
             <a href="#">My Posts</a>
         </div>
-        <!-- <a href="#" class="new-post-button" onclick="showNewPostModal()">New Discussion</a> -->
     </nav>
 
     <div class="main-container">
@@ -329,129 +333,82 @@
             },
             {
                 id: 2,
-                title: "Best resources for learning web development in 2024",
-                content: "I'm looking to start learning web development. What resources would you recommend for a complete beginner?",
-                author: "NewbieDev",
+                title: "How do you stay motivated during tough coding challenges?",
+                content: "Sometimes it can be tough to keep going when solving a difficult problem. What are your strategies for staying focused and motivated?",
+                author: "DevLife",
                 timestamp: "5 hours ago",
-                answers: []
+                answers: [{
+                    author: "CoderQueen",
+                    content: "I usually take short breaks and come back with a fresh perspective.",
+                    timestamp: "3 hours ago"
+                }]
             }
         ];
 
-        // Function to create post HTML
-        function createPostHTML(post) {
-            return `
-                <div class="post" data-post-id="${post.id}">
-                    <div class="post-header">
-                        <h3 class="post-title" onclick="toggleAnswers(${post.id})">${post.title}</h3>
-                        <span class="post-meta">Posted by ${post.author} · ${post.timestamp}</span>
-                    </div>
-                    <p class="post-content">${post.content}</p>
-                    <div class="post-actions">
-                        <button class="action-button" onclick="toggleAnswerForm(${post.id})">Post Answer</button>
-                    </div>
-                    <div class="answers-container" id="answers-${post.id}" style="display: none;">
-                        <div class="answers-list">
-                            ${post.answers.map(answer => createAnswerHTML(answer)).join('')}
-                        </div>
-                        <form class="answer-form" id="answer-form-${post.id}">
-                            <textarea class="answer-input" placeholder="Write your answer..." required></textarea>
-                            <button type="submit" class="submit-answer">Submit Answer</button>
-                        </form>
-                    </div>
-                </div>
-            `;
-        }
+        // Function to render posts
+        function renderPosts() {
+            const postsContainer = document.getElementById('posts-container');
+            postsContainer.innerHTML = '';
 
-        // Function to create answer HTML
-        function createAnswerHTML(answer) {
-            return `
-                <div class="answer">
-                    <div class="post-meta">
-                        ${answer.author} · ${answer.timestamp}
+            posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.classList.add('post');
+                postDiv.innerHTML = `
+                    <div class="post-header">
+                        <a href="#" class="post-title">${post.title}</a>
+                        <div class="post-meta">${post.timestamp} by ${post.author}</div>
                     </div>
-                    <p class="post-content">${answer.content}</p>
-                </div>
-            `;
+                    <div class="post-content">${post.content}</div>
+                    <div class="post-actions">
+                        <button class="action-button" onclick="toggleAnswers(${post.id})">Show Answers</button>
+                    </div>
+                    <div class="answers-container" id="answers-${post.id}">
+                        ${post.answers.map(answer => `
+                            <div class="answer">
+                                <div class="post-meta">${answer.timestamp} by ${answer.author}</div>
+                                <p>${answer.content}</p>
+                            </div>`).join('')}
+                    </div>
+                `;
+                postsContainer.appendChild(postDiv);
+            });
         }
 
         // Function to toggle answers visibility
         function toggleAnswers(postId) {
             const answersContainer = document.getElementById(`answers-${postId}`);
-            answersContainer.style.display = answersContainer.style.display === 'none' ? 'block' : 'none';
+            answersContainer.style.display = answersContainer.style.display === 'block' ? 'none' : 'block';
         }
 
-        // Function to toggle answer form
-        function toggleAnswerForm(postId) {
-            const answersContainer = document.getElementById(`answers-${postId}`);
-            const answerForm = document.getElementById(`answer-form-${postId}`);
-
-            answersContainer.style.display = 'block';
-            answerForm.style.display = answerForm.style.display === 'none' ? 'block' : 'none';
-        }
-
-        // Modal functions
+        // Function to show new post modal
         function showNewPostModal() {
             document.getElementById('newPostModal').style.display = 'block';
         }
 
+        // Function to hide new post modal
         function hideNewPostModal() {
             document.getElementById('newPostModal').style.display = 'none';
-        }
-
-        // Initialize page
-        function renderPosts() {
-            const postsContainer = document.getElementById('posts-container');
-            postsContainer.innerHTML = posts.map(createPostHTML).join('');
-
-            // Add submit handlers for answer forms
-            posts.forEach(post => {
-                const form = document.getElementById(`answer-form-${post.id}`);
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const textarea = form.querySelector('textarea');
-                    const newAnswer = {
-                        author: "CurrentUser", // In a real app, this would come from user session
-                        content: textarea.value,
-                        timestamp: "Just now"
-                    };
-                    post.answers.push(newAnswer);
-                    renderPosts();
-                });
-            });
         }
 
         // Handle new post submission
         document.getElementById('newPostForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const title = this.querySelector('input').value;
-            const content = this.querySelector('textarea').value;
-
-            const newPost = {
+            const title = e.target[0].value;
+            const content = e.target[1].value;
+            posts.push({
                 id: posts.length + 1,
-                title: title,
-                content: content,
-                author: "CurrentUser", // In a real app, this would come from user session
+                title,
+                content,
+                author: "NewUser",
                 timestamp: "Just now",
                 answers: []
-            };
-
-            posts.unshift(newPost);
+            });
             renderPosts();
             hideNewPostModal();
-            this.reset();
         });
 
-        // Initialize
-        window.onload = function() {
-            renderPosts();
-
-            // Close modal when clicking outside
-            window.onclick = function(event) {
-                if (event.target === document.getElementById('newPostModal')) {
-                    hideNewPostModal();
-                }
-            };
-        };
+        // Initial render
+        renderPosts();
     </script>
 </body>
 

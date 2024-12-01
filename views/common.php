@@ -1,9 +1,34 @@
+<?php
+
+/** @var $model \app\models\Appointment */
+/** @var $garages array */
+
+use gearguard\phpmvc\form\Form;
+use gearguard\phpmvc\form\TextAreaField;
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - GearGuard</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #c7adad;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
 
         * {
             margin: 0;
@@ -12,21 +37,21 @@
         }
 
         body {
-            background: #f8fafc;
+            background: var(--background);
             font-family: "Inter", sans-serif;
-            color: #334155;
+            color: var(--text);
             line-height: 1.6;
-            padding: 10px;
+            padding: 20px;
         }
 
         .navMenu {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 67.5%;
+            width: 70%;
             padding: 1rem;
             margin: 0 auto 2rem;
             position: sticky;
@@ -35,7 +60,7 @@
         }
 
         .navMenu a {
-            color: #64748b;
+            color: var(--primary);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
@@ -43,30 +68,29 @@
             border-radius: 8px;
             transition: all 0.3s ease;
             position: relative;
-            white-space: nowrap;
         }
 
         .navMenu a.active {
-            color: #2563eb;
-            background: #eff6ff;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .navMenu a:hover {
-            color: #2563eb;
-            background: #f8fafc;
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         .appointment-form {
-            background: white;
+            background: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             max-width: 1000px;
             margin: 0 auto;
             padding: 2rem;
         }
 
         .title {
-            color: #1e293b;
+            color: var(--primary);
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 2rem;
@@ -91,7 +115,7 @@
             display: block;
             font-size: 0.875rem;
             font-weight: 500;
-            color: #475569;
+            color: var(--text);
             margin-bottom: 0.5rem;
         }
 
@@ -103,39 +127,47 @@
         input[type="text"],
         input[type="email"],
         input[type="date"],
+        input[type="time"],
         select,
         textarea {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            background-color: #fff;
-            color: #1e293b;
+            background-color: #33363f;
+            color: var(--text);
             font-size: 0.95rem;
             transition: all 0.2s ease;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
         }
 
         input[type="text"]:hover,
         input[type="email"]:hover,
         input[type="date"]:hover,
+        input[type="time"]:hover,
         select:hover,
         textarea:hover {
-            border-color: #94a3b8;
+            border-color: var(--accent);
         }
 
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="date"]:focus,
+        input[type="time"]:focus,
         select:focus,
         textarea:focus {
-            border-color: #2563eb;
+            border-color: var(--accent);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
         }
 
         input::placeholder,
         textarea::placeholder {
-            color: #94a3b8;
+            color: #c7c7c7;
         }
 
         .notes {
@@ -153,8 +185,8 @@
         }
 
         .book-button {
-            background: #2563eb;
-            color: white;
+            background: var(--accent);
+            color: var(--text);
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             border: none;
@@ -165,20 +197,16 @@
         }
 
         .book-button:hover {
-            background: #1d4ed8;
+            background: #1b4ebd;
             transform: translateY(-1px);
         }
 
-        .book-button:active {
-            transform: translateY(0);
-        }
-
         .clear-button {
-            background: #f1f5f9;
-            color: #475569;
+            background: var(--secondary);
+            color: var(--text);
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border);
             font-size: 0.95rem;
             font-weight: 500;
             cursor: pointer;
@@ -186,32 +214,9 @@
         }
 
         .clear-button:hover {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: var(--hover-bg);
         }
 
-        /* Time slots styling */
-        .time-slot {
-            padding: 0.5rem;
-            margin: 0.25rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .time-slot:hover {
-            background: #eff6ff;
-            border-color: #2563eb;
-        }
-
-        .time-slot.selected {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-        }
-
-        /* Responsive design */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -219,7 +224,7 @@
 
             .navMenu {
                 flex-direction: column;
-                padding: 0.5rem;
+                gap: 0.5rem;
             }
 
             .navMenu a {
@@ -246,6 +251,55 @@
             }
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const minDate = new Date(today.setDate(today.getDate() + 3));
+            const maxDate = new Date(today.setDate(today.getDate() + 30));
+            const dateInput = document.getElementById('appointment_date');
+            dateInput.min = minDate.toISOString().split('T')[0];
+            dateInput.max = maxDate.toISOString().split('T')[0];
+
+            $('#garage_id').change(function() {
+                var garageId = $(this).val();
+                if (garageId) {
+                    $.ajax({
+                        url: '/appointment/getServices',
+                        type: 'GET',
+                        data: {
+                            garage_id: garageId
+                        },
+                        success: function(response) {
+                            $('#service_id').html(response);
+                        }
+                    });
+                } else {
+                    $('#service_id').html('<option value="">Select Service Type</option>');
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            $('#garage_id').change(function() {
+                var garageId = $(this).val();
+                if (garageId) {
+                    $.ajax({
+                        url: '/appointment/getServices',
+                        type: 'GET',
+                        data: {
+                            garage_id: garageId
+                        },
+                        success: function(response) {
+                            $('#service_id').html(response);
+                        }
+                    });
+                } else {
+                    $('#service_id').html('<option value="">Select Garage first</option>');
+                }
+            });
+        });
+    </script>
 </head>
 
 <body>
@@ -255,136 +309,39 @@
         <a href="#">Service History</a>
         <a href="#">Spare Parts Warranty</a>
     </nav>
-
     <div class="appointment-form">
         <h2 class="title">Book Your Appointment</h2>
-
-        <form action="/submit-appointment" method="POST">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="fname">First Name<span class="required-dot">*</span></label>
-                        <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="lname">Last Name<span class="required-dot">*</span></label>
-                        <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
-                    </div>
-                </div>
+        <?php $form = Form::begin('', "post") ?>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->dropDownList($model, 'vehicle_id', $garages)->renderInput() ?>
             </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="email">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" required placeholder="Enter your email">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="phone">Contact Number<span class="required-dot">*</span></label>
-                        <input type="text" id="phone" name="phone" required placeholder="Enter your phone number">
-                    </div>
-                </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->dropDownList($model, 'garage_id', $garages)->renderInput() ?>
             </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
-                        <select id="vehicle-type" name="vehicle_type" required>
-                            <option value="">Select Vehicle Type</option>
-                            <option value="car">Car</option>
-                            <option value="motorcycle">Motorcycle</option>
-                            <option value="truck">Truck</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="service-type">Service Type<span class="required-dot">*</span></label>
-                        <select id="service-type" name="service_type" required>
-                            <option value="">Select Service Type</option>
-                            <option value="oil_change">Oil Change</option>
-                            <option value="tire_rotation">Tire Rotation</option>
-                            <option value="brake_service">Brake Service</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-column">
+                <?php echo $form->dropDownList($model, 'service_id', [])->renderInput() ?>
             </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="garage">Garage<span class="required-dot">*</span></label>
-                        <select id="garage" name="garage" required>
-                            <option value="">Select a Garage</option>
-                            <option value="G1">G1</option>
-                            <option value="G2">G2</option>
-                            <option value="G3">G3</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="date">Date<span class="required-dot">*</span></label>
-                        <input type="date" id="date" name="date" required min="" onchange="updateTimeOptions()">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="time">Time<span class="required-dot">*</span></label>
-                        <select id="time" name="time" required></select>
-                    </div>
-                </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->dateField($model, 'appointment_date')->renderInput() ?>
             </div>
-
-            <div class="form-group">
-                <label for="notes">Additional Notes</label>
-                <textarea id="notes" class="notes" name="notes" placeholder="Enter any additional notes or special requests here"></textarea>
+            <div class="form-column">
+                <?php echo $form->timeField($model, 'appointment_time')->renderInput() ?>
             </div>
-
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear Form</button>
-                <button type="submit" class="book-button">Book Appointment</button>
-            </div>
-        </form>
+        </div>
+        <div class="form-group">
+            <?php echo new TextAreaField($model, 'notes') ?>
+        </div>
+        <div class="button-container">
+            <button type="reset" class="clear-button">Clear</button>
+            <button type="submit" class="book-button">Book Appointment</button>
+        </div>
+        <?php echo Form::end() ?>
     </div>
-
-    <script>
-        function setMinDate() {
-            const today = new Date();
-            today.setDate(today.getDate() + 5);
-            const minDate = today.toISOString().split('T')[0];
-            document.getElementById('date').setAttribute('min', minDate);
-        }
-
-        function updateTimeOptions() {
-            const timeSelect = document.getElementById('time');
-            timeSelect.innerHTML = '<option value="">Select Time</option>';
-
-            const availableTimes = [
-                "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-                "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
-                "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
-                "18:00"
-            ];
-
-            availableTimes.forEach(time => {
-                const option = document.createElement('option');
-                option.value = time;
-                option.textContent = time;
-                timeSelect.appendChild(option);
-            });
-        }
-
-        window.onload = function() {
-            setMinDate();
-            updateTimeOptions();
-        };
-    </script>
 </body>
 
 </html>
