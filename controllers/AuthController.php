@@ -263,8 +263,6 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-        throw new NotFoundException();
-    }
     public function transferVehicle(Request $request, Response $response)
     {
         return $this->render('customer/vehicleTransfer/instruction', ['name' => 'The GearGuard']);
