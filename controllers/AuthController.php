@@ -24,6 +24,7 @@ class AuthController extends Controller
         $this->registerMiddleware(new AuthMiddleware(['profile']));
         $this->registerMiddleware(new AuthMiddleware(['customer']));
     }
+
     public function login(Request $request, Response $response)
     {
         $loginForm = new LoginForm();
@@ -40,6 +41,7 @@ class AuthController extends Controller
             'model' => $loginForm
         ]);
     }
+
     public function register(Request $request)
     {
         $errors = [];
@@ -62,6 +64,7 @@ class AuthController extends Controller
             'model' => $user
         ]);
     }
+
     public function logOut(Request $request, Response $response)
     {
         Application::$app->logout();
@@ -70,11 +73,11 @@ class AuthController extends Controller
 
     public function myProfile(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User){
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/profile/myProfile', [
                 'title' => 'My Profile'
             ]);
-        } else if (Application::$app->user instanceof Garage){
+        } else if (Application::$app->user instanceof Garage) {
             return $this->render('garage/profile', [
                 'title' => 'Profile'
             ]);
@@ -85,11 +88,11 @@ class AuthController extends Controller
 
     public function customer(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User){
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/customer', [
                 'title' => 'Customer Dashboard'
             ]);
-        } else if (Application::$app->user instanceof Garage){
+        } else if (Application::$app->user instanceof Garage) {
             return $this->render('garage/garage', [
                 'title' => 'Garage Dashboard'
             ]);
@@ -97,12 +100,13 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function dashboard(Request $request, Response $response){
-        if (Application::$app->user instanceof User){
+    public function dashboard(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/dashboard', [
                 'title' => 'Customer Dashboard'
             ]);
-        } else if (Application::$app->user instanceof Garage){
+        } else if (Application::$app->user instanceof Garage) {
             return $this->render('garage/dashboard', [
                 'title' => 'Garage Dashboard'
             ]);
@@ -110,12 +114,13 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function settings(Request $request, Response $response){
-        if (Application::$app->user instanceof User){
+    public function settings(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/setting', [
                 'title' => 'Settings'
             ]);
-        } else if (Application::$app->user instanceof Garage){
+        } else if (Application::$app->user instanceof Garage) {
             return $this->render('garage/setting', [
                 'title' => 'Settings'
             ]);
@@ -124,8 +129,9 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function newSparepart(Request $request, Response $response){
-        if (Application::$app->user instanceof User){
+    public function newSparepart(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/sparepart/newPart', [
                 'title' => 'Add Sparepart'
             ]);
@@ -134,8 +140,9 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function viewSparepart(Request $request, Response $response){
-        if (Application::$app->user instanceof User){
+    public function viewSparepart(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/sparepart/viewPart', [
                 'title' => 'View Spareparts'
             ]);
@@ -212,9 +219,9 @@ class AuthController extends Controller
     public function appointments(Request $request, Response $response)
     {
         // TODO: Check for vehicles
-        if (Application::$app->user instanceof User){
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/appointment/myAppointment', ['name' => 'The GearGuard']);
-        } else if (Application::$app->user instanceof Garage){
+        } else if (Application::$app->user instanceof Garage) {
             return $this->render('garage/appointment/all', ['name' => 'The GearGuard']);
         }
 
@@ -224,7 +231,7 @@ class AuthController extends Controller
     public function serviceHistory(Request $request, Response $response)
     {
         // TODO: Check for vehicles
-        if (Application::$app->user instanceof User){
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/appointment/serviceHistory', ['name' => 'The GearGuard']);
         }
 
@@ -234,14 +241,15 @@ class AuthController extends Controller
     public function sparepartsWarranty(Request $request, Response $response)
     {
         // TODO: Complete
-        if (Application::$app->user instanceof User){
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/appointment/warrenty', ['name' => 'The GearGuard']);
         }
 
         throw new NotFoundException();
     }
 
-    private function getVehiclesListForDropDown() : array {
+    private function getVehiclesListForDropDown(): array
+    {
         $vehicles = Application::$app->user->getOwnedVehiclesList();
 
         $vehicles_list = [];
@@ -256,7 +264,7 @@ class AuthController extends Controller
     public function addVehicle(Request $request, Response $response)
     {
         // TODO: Complete
-        if (Application::$app->user instanceof User){
+        if (Application::$app->user instanceof User) {
             return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
         }
 
@@ -267,7 +275,6 @@ class AuthController extends Controller
     {
         return $this->render('customer/vehicleTransfer/instruction', ['name' => 'The GearGuard']);
     }
-
 
 
     private function getGarages()
@@ -291,7 +298,7 @@ class AuthController extends Controller
         return $options;
     }
 
-    private function getServicesByGarage() : array
+    private function getServicesByGarage(): array
     {
         $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id";
         $statement = Application::$app->db->prepare($sql);
@@ -304,7 +311,7 @@ class AuthController extends Controller
 
     public function viewServices(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
                 'services' => $this->getServicesByGarage()
@@ -316,7 +323,7 @@ class AuthController extends Controller
 
     public function viewCustomers(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/customer/allCustomers', [
                 'name' => 'The GearGuard',
             ]);
@@ -327,7 +334,7 @@ class AuthController extends Controller
 
     public function manageMechanic(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/mechanic/manage', [
                 'name' => 'The GearGuard',
             ]);
@@ -338,7 +345,7 @@ class AuthController extends Controller
 
     public function searchAppointments(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/appointment/search', [
                 'name' => 'The GearGuard',
             ]);
@@ -349,7 +356,7 @@ class AuthController extends Controller
 
     public function deleteAppointment(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/appointment/delete', [
                 'name' => 'The GearGuard',
             ]);
@@ -360,7 +367,7 @@ class AuthController extends Controller
 
     public function addServices(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/services/newService', [
                 'name' => 'The GearGuard',
             ]);
@@ -371,7 +378,7 @@ class AuthController extends Controller
 
     public function editServices(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/services/editService', [
                 'name' => 'The GearGuard',
             ]);
@@ -382,7 +389,7 @@ class AuthController extends Controller
 
     public function deleteServices(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/services/deleteService', [
                 'name' => 'The GearGuard',
             ]);
@@ -393,7 +400,7 @@ class AuthController extends Controller
 
     public function sendMessages(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/customer/sendMessages', [
                 'name' => 'The GearGuard',
             ]);
@@ -404,7 +411,7 @@ class AuthController extends Controller
 
     public function searchCustomer(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof Garage) {
             return $this->render('garage/customer/searchCustomers', [
                 'name' => 'The GearGuard',
             ]);
@@ -415,7 +422,7 @@ class AuthController extends Controller
 
     public function newPost(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
             return $this->render('community/newPost', [
                 'name' => 'The GearGuard',
             ]);
@@ -426,11 +433,39 @@ class AuthController extends Controller
 
     public function viewPosts(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage){
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
             return $this->render('community/myPosts', [
                 'name' => 'The GearGuard',
             ]);
         }
+
+        throw new NotFoundException();
+    }
+
+    public function viewAllVehicle(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User)
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                return $this->render('customer/vehicle/viewAll', [
+                    'name' => 'The GearGuard',
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
+
+        throw new NotFoundException();
+    }
+
+    public function vehicleServiceHistory(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User)
+            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+                return $this->render('customer/vehicle/serviceHistory', [
+                    'name' => 'The GearGuard',
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
 
         throw new NotFoundException();
     }

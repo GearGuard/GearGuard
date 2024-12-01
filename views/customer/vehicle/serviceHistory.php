@@ -180,8 +180,8 @@
 
 <body>
     <nav class="navMenu">
-        <a href="#">New Vehicle<span class="dot"></span></a>
-        <a href="#">My Vehicle<span class="dot"></span></a>
+        <a href="/customer/appointment/appoint" target="_self">New Vehicle<span class="dot"></span></a>
+        <a href="/customer/vehicle/all" target="_self">My Vehicle<span class="dot"></span></a>
         <a href="#" class="active">Service History<span class="dot"></span></a>
     </nav>
     <div class="container">
