@@ -8,7 +8,8 @@ $currentRoute = Application::$app->request->getPath();
 // Function to check if user is on the /customer route
 function isOnCustomerRoute($route)
 {
-    return $route === '/customer' || strpos($route, '/customer/') === 0  || strpos($route, '/community') === 0;
+    return $route === '/customer' || strpos($route, '/customer/') === 0  || strpos($route, '/community') === 0
+        || $route === '/garage' || strpos($route, '/garage/') === 0 || $route === '/home';
 }
 
 // Determine if the navbar should be hidden
@@ -167,7 +168,7 @@ $hideNavbar = isOnCustomerRoute($currentRoute);
                     <?php if (Application::isGuest()): ?>
                         <a href="/login">Login</a>
                     <?php else: ?>
-                        <a href="/customer">Dashboard</a>
+                        <a href="/home">Dashboard</a>
                         <a href="/logout">Logout</a>
                     <?php endif; ?>
                 </div>

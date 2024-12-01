@@ -194,9 +194,9 @@
 <body>
     <nav class="navMenu">
         <div class="nav-links">
-            <a href="#">Discussion</a>
+            <a href="/community" target="_self">Discussion</a>
             <a href="#" class="active">New Posts</a>
-            <a href="#">My Posts</a>
+            <a href="/community/my_posts" target="_self">My Posts</a>
         </div>
     </nav>
 
