@@ -8,7 +8,7 @@ use gearguard\phpmvc\Request;
 
 class Appointment extends DbModel
 {
-    public int $user_id = 0;
+    public int $vehicle_id = 0;
     public int $garage_id = 0;
     public int $service_id = 0;
     public string $appointment_date = '';
@@ -33,7 +33,7 @@ class Appointment extends DbModel
     public function rules(): array
     {
         return [
-            'user_id' => [self::RULE_REQUIRED],
+            'vehicle_id' => [self::RULE_REQUIRED],
             'garage_id' => [self::RULE_REQUIRED],
             'service_id' => [self::RULE_REQUIRED],
             'appointment_date' => [self::RULE_REQUIRED],
@@ -44,6 +44,7 @@ class Appointment extends DbModel
     public function labels(): array
     {
         return [
+            'vehicle_id' => 'Vehicle',
             'garage_id' => 'Garage',
             'service_id' => 'Service Type',
             'appointment_date' => 'Appointment Date',
@@ -54,7 +55,6 @@ class Appointment extends DbModel
 
     public function save()
     {
-        $this->user_id = Application::$app->user->id; // Assuming you have a way to get the logged-in user's ID
         return parent::save();
     }
 
@@ -90,19 +90,16 @@ class Appointment extends DbModel
 
     public function newAppointment(Request $request)
     {
-        $appointment = new Appointment();
-
         if ($request->isPost()) {
-            $appointment->loadData($request->getBody());
-            $appointment->user_id = Application::$app->user->id; // Set the user_id
-            if ($appointment->validate() && $appointment->save()) {
+            $this->loadData($request->getBody());
+            if ($this->validate() && $this->save()) {
                 return Application::$app->response->redirect('/appointment/success');
             }
         }
 
         $garages = $this->getGarages();
         return Application::$app->view->renderView('newAppointment', [
-            'model' => $appointment,
+            'model' => $this,
             'garages' => $garages
         ]);
     }

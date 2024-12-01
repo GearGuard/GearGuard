@@ -1,10 +1,24 @@
 <?php
-$this->title = 'Customer Appointment';
+
+/** @var $model \app\models\Appointment */
+/** @var $garages array */
+/** @var $vehicles array */
+
+use gearguard\phpmvc\form\Form;
+use gearguard\phpmvc\form\TextAreaField;
+use gearguard\phpmvc\form\DateField;
+use gearguard\phpmvc\form\TimeField;
+use gearguard\phpmvc\form\DropDownField
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - GearGuard</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -115,6 +129,7 @@ $this->title = 'Customer Appointment';
         input[type="text"],
         input[type="email"],
         input[type="date"],
+        input[type="time"],
         select,
         textarea {
             width: 100%;
@@ -127,9 +142,15 @@ $this->title = 'Customer Appointment';
             transition: all 0.2s ease;
         }
 
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
         input[type="text"]:hover,
         input[type="email"]:hover,
         input[type="date"]:hover,
+        input[type="time"]:hover,
         select:hover,
         textarea:hover {
             border-color: var(--accent);
@@ -138,6 +159,7 @@ $this->title = 'Customer Appointment';
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="date"]:focus,
+        input[type="time"]:focus,
         select:focus,
         textarea:focus {
             border-color: var(--accent);
@@ -231,84 +253,96 @@ $this->title = 'Customer Appointment';
             }
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const minDate = new Date(today.setDate(today.getDate() + 3));
+            const maxDate = new Date(today.setDate(today.getDate() + 30));
+            const dateInput = document.getElementById('appointment_date');
+            dateInput.min = minDate.toISOString().split('T')[0];
+            dateInput.max = maxDate.toISOString().split('T')[0];
+
+            $('#garage_id').change(function() {
+                var garageId = $(this).val();
+                if (garageId) {
+                    $.ajax({
+                        url: '/appointment/getServices',
+                        type: 'GET',
+                        data: {
+                            garage_id: garageId
+                        },
+                        success: function(response) {
+                            $('#service_id').html(response);
+                        }
+                    });
+                } else {
+                    $('#service_id').html('<option value="">Select Service Type</option>');
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            $('#garage_id').change(function() {
+                var garageId = $(this).val();
+                if (garageId) {
+                    $.ajax({
+                        url: '/appointment/getServices',
+                        type: 'GET',
+                        data: {
+                            garage_id: garageId
+                        },
+                        success: function(response) {
+                            $('#service_id').html(response);
+                        }
+                    });
+                } else {
+                    $('#service_id').html('<option value="">Select Garage first</option>');
+                }
+            });
+        });
+    </script>
 </head>
 
 <body>
     <nav class="navMenu">
         <a href="#" class="active">Book Appointment</a>
-        <a href="#">My Appointments</a>
-        <a href="#">Service History</a>
-        <a href="#">Spare Parts Warranty</a>
+        <a href="/customer/appointment/my_appointment" target='_self'>My Appointments</a>
+        <a href="/customer/appointment/service_history" target='_self'>Service History</a>
+        <a href="/customer/appointment/spareparts_warranty" target='_self'>Spare Parts Warranty</a>
     </nav>
-
     <div class="appointment-form">
         <h2 class="title">Book Your Appointment</h2>
-        <form action="/submit-appointment" method="POST">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="fname">First Name<span class="required-dot">*</span></label>
-                        <input type="text" id="fname" name="fname" required placeholder="Enter your first name">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="lname">Last Name<span class="required-dot">*</span></label>
-                        <input type="text" id="lname" name="lname" required placeholder="Enter your last name">
-                    </div>
-                </div>
+        <?php $form = Form::begin('', "post") ?>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles)?>
             </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="email">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" required placeholder="Enter your email">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="phone">Contact Number<span class="required-dot">*</span></label>
-                        <input type="text" id="phone" name="phone" required placeholder="Enter your phone number">
-                    </div>
-                </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages)?>
             </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
-                        <select id="vehicle-type" name="vehicle_type" required>
-                            <option value="" disabled selected>Select Vehicle Type</option>
-                            <option value="car">Car</option>
-                            <option value="motorcycle">Motorcycle</option>
-                            <option value="truck">Truck</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="service-type">Service Type<span class="required-dot">*</span></label>
-                        <select id="service-type" name="service_type" required>
-                            <option value="" disabled selected>Select Service Type</option>
-                            <option value="oil_change">Oil Change</option>
-                            <option value="tire_rotation">Tire Rotation</option>
-                            <option value="general_checkup">General Checkup</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', [])?>
             </div>
-
-            <div class="form-group">
-                <label for="notes">Additional Notes</label>
-                <textarea id="notes" name="notes" class="notes" placeholder="Enter any additional details"></textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'appointment_date') ?>
             </div>
-
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="book-button">Book Appointment</button>
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'appointment_time') ?>
             </div>
-        </form>
+        </div>
+        <div class="form-group">
+            <?php echo new TextAreaField($model, 'notes') ?>
+        </div>
+        <div class="button-container">
+            <button type="reset" class="clear-button">Clear</button>
+            <button type="submit" class="book-button">Book Appointment</button>
+        </div>
+        <?php echo Form::end() ?>
     </div>
 </body>
 
