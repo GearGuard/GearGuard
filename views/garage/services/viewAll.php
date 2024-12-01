@@ -168,8 +168,8 @@
 
             <?php foreach ($services as $service): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($service->type); ?></td>
-                    <td>$<?php echo htmlspecialchars($service->price); ?></td>
+                    <td><?php echo htmlspecialchars($service['type']); ?></td>
+                    <td>$<?php echo htmlspecialchars($service['price']); ?></td>
                     <td><button onclick='viewDetails(<?php echo json_encode($service); ?>)' class="view-more-button">View More</button></td>
                 </tr>
             <?php endforeach; ?>
