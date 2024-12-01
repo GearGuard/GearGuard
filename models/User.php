@@ -135,7 +135,7 @@ class User extends UserModel
 
     public function getAccessAvailableVehiclesList() : array
     {
-        $sql = "SELECT * FROM gg_vehicle WHERE id = (SELECT vehicle_id FROM gg_vehicle_assignments WHERE user_id = :user_id OR owner_id = :user_id)";
+        $sql = "SELECT * FROM gg_vehicle WHERE id in (select distinct vehicle_id FROM gg_vehicle_assignments WHERE user_id = :user_id OR owner_id = :user_id)";
         $statement = Application::$app->db->prepare($sql);
         $statement->bindValue(':user_id', Application::$app->session->get('user'));
         $statement->execute();
