@@ -196,7 +196,7 @@ class SiteController extends Controller
         return $this->render('customer/sparepart/viewPart');
     }
 
-    public function tets()
+
 
     public function tets(Request $request, Response $response)
 
