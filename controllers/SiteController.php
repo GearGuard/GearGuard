@@ -171,25 +171,16 @@ class SiteController extends Controller
         return $this->render('admin/vehicles/editvehicle');
     }
 
-    // Admin transactions section
-    public function admin_transaction(Request $request, Response $response)
-    {
-        $this->setLayout('admin_navbar');
-        return $this->render('admin/transaction');
-    }
-
-    public function admin_dashboard(Request $request, Response $response)
-    {
-        $this->setLayout('admin_navbar');
-        return $this->render('admin/dashboard');
-    }
-
     public function questions(Request $request, Response $response)
     {
         $this->setLayout('admin_navbar');
         return $this->render('admin/q&a');
     }
 
+    public function community(Request $request, Response $response)
+    {
+        return $this->render('community/allPosts', ['name' => 'The GearGuard']);
+    }
 
     //Add spare parts
     public function addSparepart(Request $request, Response $response)
