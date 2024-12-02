@@ -29,6 +29,7 @@ $app->router->post('/contact', [SiteController::class, 'contact']);
 $app->router->get('/about', [SiteController::class, 'about']);
 $app->router->get('/common', [SiteController::class, 'common']);
 $app->router->get('/type', [SiteController::class, 'type']);
+$app->router->get('/typelogin', [SiteController::class, 'typelogin']);
 $app->router->get('/tets', [SiteController::class, 'tets']);
 $app->router->get('/community', [SiteController::class, 'community']);
 

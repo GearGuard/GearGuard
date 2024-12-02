@@ -99,6 +99,15 @@ class SiteController extends Controller
         return $this->render('type', $params);
     }
 
+
+    public function typelogin()
+    {
+        $params = [
+            'name' => "The GearGurd - User Type"
+        ];
+        return $this->render('typelogin', $params);
+    }
+
     public function community(Request $request, Response $response)
     {
         return $this->render('community/allPosts', ['name' => 'The GearGuard']);
@@ -106,7 +115,7 @@ class SiteController extends Controller
 
     public function tets(Request $request, Response $response)
     {
-        $model = new GarageService(); 
+        $model = new GarageService();
         $services = []; // Initialize the $services variable
         return $this->render('tets', [
             'model' => $model,

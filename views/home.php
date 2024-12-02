@@ -536,7 +536,7 @@
                 <div class="hero-content fade-in">
                     <h1>Expert Maintenance Team</h1>
                     <p>Certified technicians with years of experience dedicated to keeping your vehicle in top condition.</p>
-                    <a href="/login" class="cta-button">Book Appointment</a>
+                    <a href="typelogin" class="cta-button">Book Appointment</a>
                 </div>
             </div>
         </div>
