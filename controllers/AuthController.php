@@ -592,4 +592,50 @@ class AuthController extends Controller
 
         throw new NotFoundException();
     }
+
+    //spare parts
+    public function mechanicDashboard(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            return $this->render('/mechanic/dashboard', [
+                'title' => 'My Profile'
+            ]);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('/mechanic/dashboard', [
+                'title' => 'Profile'
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function mechanicProfile(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            return $this->render('/mechanic/profile_form', [
+                'title' => 'My Profile'
+            ]);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('/mechanic/profile_form', [
+                'title' => 'Profile'
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function mechanicProfileUpdate(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            return $this->render('/mechanic/profile_update', [
+                'title' => 'My Profile'
+            ]);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('/mechanic/profile_update', [
+                'title' => 'Profile'
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
 }

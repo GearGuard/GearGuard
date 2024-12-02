@@ -119,4 +119,16 @@ $app->router->get('/community/post', [AuthController::class, 'newPost']);
 $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);
 
 
+//mechanic
+$app->router->get('/mechanic/dashboard', [AuthController::class, 'mechanicDashboard']);
+$app->router->get('/mechanic/profile_form', [AuthController::class, 'mechanicProfile']);
+$app->router->get('/mechanic/profile_update', [AuthController::class, 'mechanicProfileUpdate']);
+$app->router->get('/mechanic/services', [AuthController::class, 'mechanicservices']);
+$app->router->get('/mechanic/service_history', [AuthController::class, 'mechanicServiceHistory']);
+$app->router->get('/mechanic/spareparts', [AuthController::class, 'mechanicSparePart']);
+$app->router->get('/mechanic/messages', [AuthController::class, 'mechanicMessages']);
+$app->router->get('/mechanic/sidebar', [AuthController::class, 'mechanicSideBar']);
+
+
+
 $app->run();
