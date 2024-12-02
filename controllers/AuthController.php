@@ -592,4 +592,24 @@ class AuthController extends Controller
 
         throw new NotFoundException();
     }
+
+    public function newAppointmentsPost(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            $body = $request->getBody();
+            $model = Appointment::initialize(
+                $body['service_id'],
+                $body['vehicle_id'],
+                $body['appointment_date'],
+                $body['appointment_time'],
+                $body['notes']
+            );
+            $model->save();
+            return $this->render('/customer/appointment/my_appointment', [
+                'name' => 'The GearGuard',
+
+            ]);
+        }
+        throw new NotFoundException();
+    }
 }

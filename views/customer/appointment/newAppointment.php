@@ -313,7 +313,7 @@ use gearguard\phpmvc\form\DropDownField;
     </nav>
     <div class="appointment-form">
         <h2 class="title">Book Your Appointment</h2>
-        <?php $form = Form::begin('', "post") ?>
+        <?php $form = Form::begin('/customer/appointment/appoint', "post") ?>
         <div class="form-row">
             <div class="form-column">
                 <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles)?>

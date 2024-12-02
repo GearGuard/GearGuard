@@ -11,9 +11,10 @@ class Appointment extends DbModel
     public int $vehicle_id = 0;
     public int $garage_id = 0;
     public int $service_id = 0;
-    public string $appointment_date = '';
-    public string $appointment_time = '';
+    public  $appointment_date ;
+    public  $appointment_time ;
     public string $notes = '';
+    public int $status_id = 1;
 
     public function tableName(): string
     {
@@ -22,7 +23,7 @@ class Appointment extends DbModel
 
     public function attributes(): array
     {
-        return ['vehicle_id', 'service_id', 'date', 'time', 'notes'];
+        return ['vehicle_id', 'service_id', 'date', 'time', 'notes', 'status_id'];
     }
 
     public function primaryKey(): string
@@ -50,6 +51,7 @@ class Appointment extends DbModel
             'appointment_date' => 'Appointment Date',
             'appointment_time' => 'Appointment Time',
             'notes' => 'Additional Notes',
+            'status_id' => 'Status'
         ];
     }
 
@@ -103,4 +105,17 @@ class Appointment extends DbModel
             'garages' => $garages
         ]);
     }
+
+    public static function initialize(int $service_id, int $vehicle_id,  $date,  $time, string $note): Appointment
+    {
+        $object = new Appointment();
+        $object->service_id = $service_id;
+        $object->vehicle_id = $vehicle_id;
+        $object->appointment_date = $date;
+        $object->appointment_time = $time;
+        $object->notes = $note;
+        $object->status_id = 2;
+        return $object;
+    }
+
 }
