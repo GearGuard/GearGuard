@@ -67,8 +67,9 @@ $app->router->get('/garage/services/view', [AuthController::class, 'viewServices
 $app->router->get('/garage/services/add', [AuthController::class, 'addServices']);
 $app->router->post('/garage/services/add', [AuthController::class, 'addServicesPost']);
 $app->router->get('/garage/services/update', [AuthController::class, 'editServices']);
+$app->router->post('/garage/services/update', [AuthController::class, 'updateService']);
 $app->router->get('/garage/services/delete', [AuthController::class, 'deleteServices']);
-$app->router->post('/garage/services/getService', [AuthController::class, 'getService']);
+$app->router->get('/garage/services/search', [AuthController::class, 'getService']);
 $app->router->get('/garage/customers/view', [AuthController::class, 'viewCustomers']);
 $app->router->get('/garage/customers/send_message', [AuthController::class, 'sendMessages']);
 $app->router->get('/garage/customers/search', [AuthController::class, 'searchCustomer']);

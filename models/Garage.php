@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
@@ -81,7 +82,34 @@ class Garage extends UserModel
 
     public function getServiceByType(string $type) : ?GarageService
     {
-        return GarageService::findOne(['type' => $type, 'garage_id' => $this->id]);
+        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND type = :type AND status_id = 2 LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->bindValue(':type', $type);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if (!$result) {
+            return null;
+        }
+        $result = $result[0];
+        $service = GarageService::getGarageService($result['id'], $result['type'], $result['price'], $result['duration'], $result['status_id'], $result['description']);
+        return $service;
+    }
+
+    public function getServiceByID(int $sid) : ?GarageService
+    {
+        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND id = :id AND status_id = 2 LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->bindValue(':id', $sid);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if (!$result) {
+            return null;
+        }
+        $result = $result[0];
+        $service = GarageService::getGarageService($result['id'], $result['type'], $result['price'], $result['duration'], $result['status_id'], $result['description']);
+        return $service;
     }
 	
 }

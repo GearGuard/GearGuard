@@ -542,8 +542,29 @@ class AuthController extends Controller
     public function getService(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
-            $test = json_encode(Application::$app->user->getServiceByType($request->getBody()['type']));
-            $pause = 1;
+            $data = Application::$app->user->getServiceByType(htmlspecialchars($_GET['searchQuery']));
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($data);
         }
+    }
+
+    public function updateService(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $id = htmlspecialchars($body['id']);
+            $type = htmlspecialchars($body['type']);
+            $price = htmlspecialchars($body['price']);
+            $duration = htmlspecialchars($body['duration']);
+            $description = htmlspecialchars($body['description']);
+            Application::$app->user->getServiceByID((int) $id)->update();
+
+            return $this->render('garage/services/viewAll', [
+                'name' => 'The GearGuard',
+                'services' => $this->getServicesByGarage()
+            ]);
+        }
+
+        throw new NotFoundException();
     }
 }
