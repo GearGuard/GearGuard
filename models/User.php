@@ -143,5 +143,16 @@ class User extends UserModel
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    public function getAppointmentsList() : array
+    {
+        $sql = "SELECT vsa.*, gs.garage_id, gv.license_plate_no, g.name AS garage_name, gs.type AS service_type FROM gg_vehicle_service_appointment vsa LEFT JOIN gg_garage_service gs ON vsa.service_id = gs.id LEFT JOIN gg_garage g ON gs.garage_id = g.id LEFT JOIN gg_vehicle gv ON vsa.vehicle_id = gv.id WHERE vsa.vehicle_id IN (SELECT DISTINCT vehicle_id FROM gg_vehicle_assignments WHERE user_id = :user_id OR owner_id = :user_id)";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':user_id', Application::$app->session->get('user'));
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+    }
+
 
 }

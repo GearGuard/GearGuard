@@ -233,7 +233,11 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof User) {
             if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
-                return $this->render('customer/appointment/myAppointment', ['name' => 'The GearGuard']);
+                $model = Application::$app->user->getAppointmentsList();
+                return $this->render('customer/appointment/myAppointment', [
+                    'name' => 'The GearGuard',
+                    'appointments' => $model,
+                ]);
             }
             else
                 return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
@@ -607,7 +611,7 @@ class AuthController extends Controller
                 $body['notes']
             );
             $model->save();
-            return $this->render('customer/appointment/my_appointment', [
+            return $this->render('customer/appointment/myAppointment', [
                 'name' => 'The GearGuard',
 
             ]);
