@@ -228,83 +228,94 @@
             }
         }
     </style>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-    <nav class="navMenu">
-        <a href="/garage/services/add" target="_self">Add New Service</a>
-        <a href="/garage/services/view" target="_self">All Services</a>
-        <a href="#" class="active">Edit Services</a>
-        <a href="/garage/services/delete" target="_self">Delete Services</a>
-    </nav>
-    <div class="service-form">
-        <h2 class="title">Edit Garage Service</h2>
-        <?php
+<nav class="navMenu">
+    <a href="/garage/services/add" target="_self">Add New Service</a>
+    <a href="/garage/services/view" target="_self">All Services</a>
+    <a href="#" class="active">Edit Services</a>
+    <a href="/garage/services/delete" target="_self">Delete Services</a>
+</nav>
+<div class="service-form">
+    <h2 class="title">Edit Garage Service</h2>
+    <?php
 
-        use gearguard\phpmvc\form\Form;
-        use gearguard\phpmvc\form\TextAreaField;
+    use gearguard\phpmvc\form\Form;
+    use gearguard\phpmvc\form\TextAreaField;
 
-        $form = Form::begin('', "post");
-        ?>
+    $form = Form::begin('', "post");
+    ?>
+
+    <div class="form-row">
+        <div class="form-column">
+            <input type="text" name="search_type" placeholder="Please enter the type of the service"/>
+        </div>
+        <div class="form-column" style="display: flex; align-items: flex-end;">
+            <button type="button" class="search-button" onclick="searchService()">Search</button>
+        </div>
+    </div>
+
+    <div id="editForm" style="display: none;">
+        <input type="hidden" name="id" value="">
 
         <div class="form-row">
             <div class="form-column">
-                <input type="text" name="search_type" placeholder="Please enter the type of the service"/>
-            </div>
-            <div class="form-column" style="display: flex; align-items: flex-end;">
-                <button type="button" class="search-button" onclick="searchService()">Search</button>
+                <?php echo $form->field($model, 'type') ?>
             </div>
         </div>
-
-        <div id="editForm" style="display: none;">
-            <input type="hidden" name="garage_id" value="<?php echo htmlspecialchars($garage_id); ?>">
-
-            <div class="form-row">
-                <div class="form-column">
-                    <?php echo $form->field($model, 'type') ?>
-                </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
             </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
-                </div>
-                <div class="form-column">
-                    <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
-                </div>
-            </div>
-            <div class="form-group">
-                <?php echo new TextAreaField($model, 'description'); ?>
-            </div>
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="edit-button">Update Service</button>
+            <div class="form-column">
+                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
             </div>
         </div>
-
-        <?php echo Form::end(); ?>
+        <div class="form-group">
+            <?php echo new TextAreaField($model, 'description'); ?>
+        </div>
+        <div class="button-container">
+            <button type="reset" class="clear-button">Clear</button>
+            <button type="submit" class="edit-button">Update Service</button>
+        </div>
     </div>
 
-    <script>
-        function searchService() {
-            const searchType = document.querySelector('input[name="search_type"]').value;
+    <?php echo Form::end(); ?>
+</div>
 
-            if (!searchType) {
-                alert('Please enter the type of the service');
-                return;
-            }
+<script>
+    function searchService() {
+        const searchType = document.querySelector('input[name="search_type"]').value;
 
-            // Show the edit form
-
-            document.getElementById('editForm').style.display = 'block';
-
-            // Populate form fields with dummy data (replace this with actual data from your backend)
-            document.querySelector('input[name="type"]').value = searchType;
-            document.querySelector('input[name="price"]').value = '100';
-            document.querySelector('input[name="duration"]').value = '2';
-            document.querySelector('textarea[name="description"]').value = 'This is a sample description for ' + searchType;
+        if (!searchType) {
+            alert('Please enter the type of the service');
+            return;
         }
-    </script>
+
+        $.ajax({
+            url: '/garage/services/search',
+            type: 'GET',
+            data: {
+                searchQuery: searchType
+            },
+            success: function (response) {
+                    document.getElementById('editForm').style.display = 'block';
+
+                    // Populate form fields with dummy data (replace this with actual data from your backend)
+                    document.querySelector('input[name="id"]').value = response.id;
+                    document.querySelector('input[name="type"]').value = response.type;
+                    document.querySelector('input[name="price"]').value = response.price;
+                    document.querySelector('input[name="duration"]').value = response.duration;
+                    document.querySelector('textarea[name="description"]').value = response.description;
+            },
+            error: function (xhr, status, error) {
+                console.log('Error:', error);
+            }
+        });
+    }
+</script>
 </body>
 
 </html>
