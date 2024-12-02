@@ -228,6 +228,7 @@
             }
         }
     </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -293,15 +294,7 @@
                 return;
             }
 
-            fetch('/garage/services/getService', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            type: searchType
-                        })
-                    });
+            // Show the edit form
 
             document.getElementById('editForm').style.display = 'block';
 
