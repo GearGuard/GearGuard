@@ -11,8 +11,10 @@ class Appointment extends DbModel
     public int $vehicle_id = 0;
     public int $garage_id = 0;
     public int $service_id = 0;
-    public  $appointment_date ;
-    public  $appointment_time ;
+
+    public $date;
+
+    public $time;
     public string $notes = '';
     public int $status_id = 1;
 
@@ -111,8 +113,8 @@ class Appointment extends DbModel
         $object = new Appointment();
         $object->service_id = $service_id;
         $object->vehicle_id = $vehicle_id;
-        $object->appointment_date = $date;
-        $object->appointment_time = $time;
+        $object->date = $date;
+        $object->time = $time;
         $object->notes = $note;
         $object->status_id = 2;
         return $object;

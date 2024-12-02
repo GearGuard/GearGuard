@@ -142,4 +142,6 @@ class User extends UserModel
 
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+
 }

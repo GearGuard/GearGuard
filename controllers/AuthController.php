@@ -196,7 +196,6 @@ class AuthController extends Controller
     public function newAppointments(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
-            // TODO: Check for assigned vehicles
             if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 $model = new Appointment();
 
@@ -232,9 +231,12 @@ class AuthController extends Controller
 
     public function appointments(Request $request, Response $response)
     {
-        // TODO: Check for vehicles
         if (Application::$app->user instanceof User) {
-            return $this->render('customer/appointment/myAppointment', ['name' => 'The GearGuard']);
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
+                return $this->render('customer/appointment/myAppointment', ['name' => 'The GearGuard']);
+            }
+            else
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
         } else if (Application::$app->user instanceof Garage) {
             return $this->render('garage/appointment/all', ['name' => 'The GearGuard']);
         }
@@ -600,12 +602,12 @@ class AuthController extends Controller
             $model = Appointment::initialize(
                 $body['service_id'],
                 $body['vehicle_id'],
-                $body['appointment_date'],
-                $body['appointment_time'],
+                $body['date'],
+                $body['time'],
                 $body['notes']
             );
             $model->save();
-            return $this->render('/customer/appointment/my_appointment', [
+            return $this->render('customer/appointment/my_appointment', [
                 'name' => 'The GearGuard',
 
             ]);
