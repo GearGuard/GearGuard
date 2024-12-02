@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\db\Database;
 use gearguard\phpmvc\db\DbModel;
@@ -22,7 +23,7 @@ class User extends UserModel
 	public string $username = '';
 	public int $status = self::STATUS_INACTIVE;
 	public string $password = '';
-	public int $status_id = self::STATUS_INACTIVE;
+	public int $status_id = self::STATUS_ACTIVE;
 	public string $passwordConfirm = '';
 
     private VehicleOwner $vehicleOwner;
@@ -44,7 +45,7 @@ class User extends UserModel
 
 	public function save()
 	{
-		$this->status = self::STATUS_INACTIVE;
+		$this->status = self::STATUS_ACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
 		return parent::save();
 	}
@@ -66,7 +67,7 @@ class User extends UserModel
 
 	public function attributes(): array
 	{
-		return ['first_name', 'last_name', 'email', 'nic', 'address', 'username', 'password', 'status', 'contact_no', 'status_id'];
+		return ['first_name', 'last_name', 'email', 'nic', 'address', 'username', 'password', 'contact_no', 'status_id'];
 	}
 
 	public function labels(): array
@@ -130,5 +131,15 @@ class User extends UserModel
     public function getOwnedVehiclesList() : array
     {
         return $this->vehicleOwner->getOwnedVehiclesList()?? [];
+    }
+
+    public function getAccessAvailableVehiclesList() : array
+    {
+        $sql = "SELECT * FROM gg_vehicle WHERE id in (select distinct vehicle_id FROM gg_vehicle_assignments WHERE user_id = :user_id OR owner_id = :user_id)";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':user_id', Application::$app->session->get('user'));
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

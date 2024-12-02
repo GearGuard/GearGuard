@@ -77,8 +77,10 @@ $app->router->get('/garage/services/view', [AuthController::class, 'viewServices
 $app->router->get('/garage/services/add', [AuthController::class, 'addServices']);
 $app->router->post('/garage/services/add', [AuthController::class, 'addServicesPost']);
 $app->router->get('/garage/services/update', [AuthController::class, 'editServices']);
+$app->router->post('/garage/services/update', [AuthController::class, 'updateService']);
 $app->router->get('/garage/services/delete', [AuthController::class, 'deleteServices']);
-$app->router->get('/garage/services/getService', [AuthController::class, 'getService']);
+$app->router->post('/garage/services/delete', [AuthController::class, 'markServiceDeleted']);
+$app->router->get('/garage/services/search', [AuthController::class, 'getService']);
 $app->router->get('/garage/customers/view', [AuthController::class, 'viewCustomers']);
 $app->router->get('/garage/customers/send_message', [AuthController::class, 'sendMessages']);
 $app->router->get('/garage/customers/search', [AuthController::class, 'searchCustomer']);
@@ -112,6 +114,7 @@ $app->router->get('/sparepart/get', [SparepartController::class, 'getSparePart']
 $app->router->post('/sparepart/delete', [SparepartController::class, 'deleteSparePart']);
 $app->router->post('/sparepart/edit', [SparepartController::class, 'editSparePart']);
 
+$app->router->get('/appointment/getServices', [AuthController::class, 'getGarageServices']);
 $app->router->get('/community/post', [AuthController::class, 'newPost']);
 $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);
 

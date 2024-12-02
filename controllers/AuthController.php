@@ -197,7 +197,7 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof User) {
             // TODO: Check for assigned vehicles
-            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 $model = new Appointment();
 
                 // Fetch garages from the database
@@ -215,6 +215,19 @@ class AuthController extends Controller
         }
 
         throw new NotFoundException();
+    }
+
+    public function getGarageServices(Request $request)
+    {
+        $garageId = $request->getBody()['garage_id'];
+        $services = $this->getServicesByGarageForDropdown($garageId);
+
+        $options = '<option value="">Select Service</option>';
+        foreach ($services as $id => $name) {
+            $options .= "<option value=\"{$id}\">{$name}</option>";
+        }
+
+        return $options;
     }
 
     public function appointments(Request $request, Response $response)
@@ -255,8 +268,18 @@ class AuthController extends Controller
 
         $vehicles_list = [];
 
-        foreach ($vehicles as $vehicle) {
-            $vehicles_list[$vehicle['id']] = $vehicle['license_plate_no'];
+        if ($vehicles) {
+            foreach ($vehicles as $vehicle) {
+                $vehicles_list[$vehicle['id']] = $vehicle['license_plate_no'];
+            }
+        }
+
+        $vehicles = Application::$app->user->getAccessAvailableVehiclesList();
+
+        if ($vehicles) {
+            foreach ($vehicles as $vehicle) {
+                $vehicles_list[$vehicle['id']] = $vehicle['license_plate_no'];
+            }
         }
 
         return $vehicles_list;
@@ -301,26 +324,30 @@ class AuthController extends Controller
         return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 
-    public function getServices(Request $request, Response $response)
+    private function getServicesByGarage($garage_id = 0): array
     {
-        $garageId = $request->getBody()['garage_id'];
-        $services = $this->getServicesByGarage();
-
-        $options = '<option value="">Select Service</option>';
-        foreach ($services as $id => $name) {
-            $options .= "<option value=\"{$id}\">{$name}</option>";
+        if ($garage_id === 0) {
+            $garage_id = Application::$app->session->get('user');
         }
 
-        return $options;
-    }
-
-    private function getServicesByGarage(): array
-    {
-        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id";
+        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2";
         $statement = Application::$app->db->prepare($sql);
-        $statement->bindValue(':garage_id', Application::$app->session->get('user'));
+        $statement->bindValue(':garage_id', $garage_id);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    private function getServicesByGarageForDropDown($garage_id = 0): array
+    {
+        if ($garage_id === 0) {
+            $garage_id = Application::$app->session->get('user');
+        }
+
+        $sql = "SELECT id, type FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $garage_id);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 
     // end of the newAppointment page in the customer section
@@ -487,7 +514,7 @@ class AuthController extends Controller
     public function viewAllVehicle(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User)
-            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 return $this->render('customer/vehicle/viewAll', [
                     'name' => 'The GearGuard',
                 ]);
@@ -501,7 +528,7 @@ class AuthController extends Controller
     public function vehicleServiceHistory(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User)
-            if ((Application::$app->user->isVehicleOwner() ?? false) && Application::$app->user->getOwnedVehiclesList()) {
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 return $this->render('customer/vehicle/serviceHistory', [
                     'name' => 'The GearGuard',
                 ]);
@@ -514,6 +541,55 @@ class AuthController extends Controller
 
     public function getService(Request $request, Response $response)
     {
-        
+        if (Application::$app->user instanceof Garage) {
+            $data = Application::$app->user->getServiceByType(htmlspecialchars($_GET['searchQuery']));
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($data);
+        }
+    }
+
+    public function updateService(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $id = htmlspecialchars($body['id']);
+            $type = htmlspecialchars($body['type']);
+            $price = htmlspecialchars($body['price']);
+            $duration = htmlspecialchars($body['duration']);
+            $description = htmlspecialchars($body['description']);
+            $toUpdate = [
+                'type' => $type,
+                'price' => $price,
+                'duration' => $duration,
+                'description' => $description
+            ];
+            Application::$app->user->getServiceByID((int) $id)->update($toUpdate);
+
+            return $this->render('garage/services/viewAll', [
+                'name' => 'The GearGuard',
+                'services' => $this->getServicesByGarage()
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function markServiceDeleted(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $id = htmlspecialchars($body['serviceID']);
+            $toUpdate = [
+                'status_id' => 3
+            ];
+            Application::$app->user->getServiceByID((int) $id)->update($toUpdate);
+
+            return $this->render('garage/services/viewAll', [
+                'name' => 'The GearGuard',
+                'services' => $this->getServicesByGarage()
+            ]);
+        }
+
+        throw new NotFoundException();
     }
 }

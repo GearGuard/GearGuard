@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
@@ -16,7 +17,7 @@ class Garage extends UserModel
 	public string $username = '';
 	public string $name = '';
 	public string $email = '';
-	public int $status_id = self::STATUS_INACTIVE;
+	public int $status_id = self::STATUS_ACTIVE;
 	public string $password = '';
 	public string $passwordConfirm = '';
 	public string $address = '';
@@ -36,7 +37,7 @@ class Garage extends UserModel
 
 	public function save()
 	{
-		$this->status_id = self::STATUS_INACTIVE;
+		$this->status_id = self::STATUS_ACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
 		return parent::save();
 	}
@@ -79,5 +80,36 @@ class Garage extends UserModel
 		return $this->name;
 	}
 
+    public function getServiceByType(string $type) : ?GarageService
+    {
+        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND type = :type AND status_id = 2 LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->bindValue(':type', $type);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if (!$result) {
+            return null;
+        }
+        $result = $result[0];
+        $service = GarageService::getGarageService($result['id'], $result['type'], $result['price'], $result['duration'], $result['status_id'], $result['description']);
+        return $service;
+    }
+
+    public function getServiceByID(int $sid) : ?GarageService
+    {
+        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND id = :id AND status_id = 2 LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->bindValue(':id', $sid);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if (!$result) {
+            return null;
+        }
+        $result = $result[0];
+        $service = GarageService::getGarageService($result['id'], $result['type'], $result['price'], $result['duration'], $result['status_id'], $result['description']);
+        return $service;
+    }
 	
 }

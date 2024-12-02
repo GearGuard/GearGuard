@@ -238,6 +238,7 @@
             }
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -273,6 +274,8 @@
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <p>Are you sure you want to delete this service?</p>
+            <br>
+            <i>If there are any appointments associated with this service, they will not be deleted.</i>
             <div class="modal-buttons">
                 <button type="button" class="search-button" onclick="closeModal()">Cancel</button>
                 <button type="button" class="delete-button" onclick="deleteService()">Delete</button>
@@ -281,17 +284,35 @@
     </div>
 
     <script>
+        var serviceId;
         function searchService() {
-            const searchType = document.getElementById('search_type').value;
-            // Here you would typically make an AJAX call to your backend to fetch the service details
-            // For this example, we'll just show dummy data
-            document.getElementById('serviceDetails').style.display = 'block';
+            const searchType = document.querySelector('input[name="search_type"]').value;
 
-            // Populate service details with dummy data (replace this with actual data from your backend)
-            document.getElementById('serviceType').textContent = searchType;
-            document.getElementById('serviceDescription').textContent = 'This is a sample description for ' + searchType;
-            document.getElementById('serviceDuration').textContent = '2';
-            document.getElementById('servicePrice').textContent = '100';
+            if (!searchType) {
+                alert('Please enter the type of the service');
+                return;
+            }
+
+            $.ajax({
+                url: '/garage/services/search',
+                type: 'GET',
+                data: {
+                    searchQuery: searchType
+                },
+                success: function (response) {
+                    document.getElementById('serviceDetails').style.display = 'block';
+
+                    // Populate form fields with dummy data (replace this with actual data from your backend)
+                    serviceId = response.id;
+                    document.getElementById('serviceType').textContent = response.type;
+                    document.getElementById('serviceDescription').textContent = response.description;
+                    document.getElementById('serviceDuration').textContent = response.duration;
+                    document.getElementById('servicePrice').textContent = response.price;
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error:', error);
+                }
+            });
         }
 
         function showDeleteConfirmation() {
@@ -303,12 +324,25 @@
         }
 
         function deleteService() {
-            // Here you would typically make an AJAX call to your backend to delete the service
-            // For this example, we'll just show an alert
-            alert('Service deleted successfully!');
-            closeModal();
-            document.getElementById('serviceDetails').style.display = 'none';
-            document.getElementById('search_type').value = '';
+            $.ajax({
+                url: '/garage/services/delete',
+                type: 'POST',
+                data: {
+                    serviceID: serviceId
+                },
+                success: function (response) {
+                    alert('Service deleted successfully. But if there are any appointments associated with this service, they will not be deleted.');
+                    closeModal();
+                    document.getElementById('serviceDetails').style.display = 'none';
+                    document.getElementById('search_type').value = '';
+                },
+                error: function (xhr, status, error) {
+                    alert('We could not delete the service!');
+                    closeModal();
+                    document.getElementById('serviceDetails').style.display = 'none';
+                    document.getElementById('search_type').value = '';
+                }
+            });
         }
     </script>
 </body>

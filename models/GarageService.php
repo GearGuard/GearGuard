@@ -37,6 +37,21 @@ class GarageService extends UserModel
         return $object;
     }
 
+    public static function getGarageService(int $id, string $type, int $price, int $duration, int $status, string $description): GarageService
+    {
+        $object = new GarageService();
+
+        $object->id = $id;
+        $object->type = $type;
+        $object->price = $price;
+        $object->duration = $duration;
+        $object->description = $description;
+        $object->garage_id = Application::$app->session->get('user');
+        $object->status_id = $status;
+
+        return $object;
+    }
+
     public function tableName(): string
     {
         return 'gg_garage_service';
