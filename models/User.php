@@ -23,7 +23,7 @@ class User extends UserModel
 	public string $username = '';
 	public int $status = self::STATUS_INACTIVE;
 	public string $password = '';
-	public int $status_id = self::STATUS_INACTIVE;
+	public int $status_id = self::STATUS_ACTIVE;
 	public string $passwordConfirm = '';
 
     private VehicleOwner $vehicleOwner;
@@ -45,7 +45,7 @@ class User extends UserModel
 
 	public function save()
 	{
-		$this->status = self::STATUS_INACTIVE;
+		$this->status = self::STATUS_ACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
 		return parent::save();
 	}

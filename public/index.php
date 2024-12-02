@@ -73,7 +73,7 @@ $app->router->get('/garage/customers/view', [AuthController::class, 'viewCustome
 $app->router->get('/garage/customers/send_message', [AuthController::class, 'sendMessages']);
 $app->router->get('/garage/customers/search', [AuthController::class, 'searchCustomer']);
 $app->router->get('/garage/mechanic', [AuthController::class, 'manageMechanic']);
-$app->router->get('/appointment/getServices', [SiteController::class, 'getServices']);
+$app->router->get('/appointment/getServices', [AuthController::class, 'getGarageServices']);
 $app->router->get('/community/post', [AuthController::class, 'newPost']);
 $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);
 

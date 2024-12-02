@@ -217,6 +217,19 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function getGarageServices(Request $request)
+    {
+        $garageId = $request->getBody()['garage_id'];
+        $services = $this->getServicesByGarageForDropdown($garageId);
+
+        $options = '<option value="">Select Service</option>';
+        foreach ($services as $id => $name) {
+            $options .= "<option value=\"{$id}\">{$name}</option>";
+        }
+
+        return $options;
+    }
+
     public function appointments(Request $request, Response $response)
     {
         // TODO: Check for vehicles
@@ -311,13 +324,30 @@ class AuthController extends Controller
         return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 
-    private function getServicesByGarage(): array
+    private function getServicesByGarage($garage_id = 0): array
     {
-        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id";
+        if ($garage_id === 0) {
+            $garage_id = Application::$app->session->get('user');
+        }
+
+        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2";
         $statement = Application::$app->db->prepare($sql);
-        $statement->bindValue(':garage_id', Application::$app->session->get('user'));
+        $statement->bindValue(':garage_id', $garage_id);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    private function getServicesByGarageForDropDown($garage_id = 0): array
+    {
+        if ($garage_id === 0) {
+            $garage_id = Application::$app->session->get('user');
+        }
+
+        $sql = "SELECT id, type FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $garage_id);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 
     // end of the newAppointment page in the customer section

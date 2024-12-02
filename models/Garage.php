@@ -16,7 +16,7 @@ class Garage extends UserModel
 	public string $username = '';
 	public string $name = '';
 	public string $email = '';
-	public int $status_id = self::STATUS_INACTIVE;
+	public int $status_id = self::STATUS_ACTIVE;
 	public string $password = '';
 	public string $passwordConfirm = '';
 	public string $address = '';
@@ -36,7 +36,7 @@ class Garage extends UserModel
 
 	public function save()
 	{
-		$this->status_id = self::STATUS_INACTIVE;
+		$this->status_id = self::STATUS_ACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
 		return parent::save();
 	}
