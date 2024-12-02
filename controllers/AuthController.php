@@ -557,7 +557,32 @@ class AuthController extends Controller
             $price = htmlspecialchars($body['price']);
             $duration = htmlspecialchars($body['duration']);
             $description = htmlspecialchars($body['description']);
-            Application::$app->user->getServiceByID((int) $id)->update();
+            $toUpdate = [
+                'type' => $type,
+                'price' => $price,
+                'duration' => $duration,
+                'description' => $description
+            ];
+            Application::$app->user->getServiceByID((int) $id)->update($toUpdate);
+
+            return $this->render('garage/services/viewAll', [
+                'name' => 'The GearGuard',
+                'services' => $this->getServicesByGarage()
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function markServiceDeleted(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $id = htmlspecialchars($body['serviceID']);
+            $toUpdate = [
+                'status_id' => 3
+            ];
+            Application::$app->user->getServiceByID((int) $id)->update($toUpdate);
 
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
