@@ -233,24 +233,17 @@ $this->title = 'Appointment';
                 </tr>
             </thead>
             <tbody>
+            <?php foreach ($appointments as $appoint): ?>
                 <tr>
-                    <td>Oil Change</td>
-                    <td>G1</td>
-                    <td>2024-11-20</td>
+                    <td><?php echo htmlspecialchars($appoint['service_type']); ?></td>
+                    <td><?php echo htmlspecialchars($appoint['garage_name']); ?></td>
+                    <td><?php echo htmlspecialchars($appoint['date']); ?></td>
                     <td class="button-container">
-                        <button class="action-button" onclick="viewAppointment(1)">View More</button>
-                        <button class="action-button" onclick="editAppointment(1)">Edit Reservation</button>
-                    </td>
+                    <button class="action-button" onclick="viewAppointment(<?php echo htmlspecialchars($appoint['id']); ?>)">View More</button>
+                    <button class="action-button" onclick="editAppointment(<?php echo htmlspecialchars($appoint['id']); ?>)">Edit Reservation</button>
+                    <td>
                 </tr>
-                <tr>
-                    <td>Tire Rotation</td>
-                    <td>G2</td>
-                    <td>2024-11-22</td>
-                    <td class="button-container">
-                        <button class="action-button" onclick="viewAppointment(2)">View More</button>
-                        <button class="action-button" onclick="editAppointment(2)">Edit Reservation</button>
-                    </td>
-                </tr>
+            <?php endforeach;?>
             </tbody>
         </table>
     </div>
