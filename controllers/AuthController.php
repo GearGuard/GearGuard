@@ -75,7 +75,7 @@ class AuthController extends Controller
     public function myProfile(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
-            return $this->render('customer/profile/myProfile', [
+            return $this->render('customer/my_Profile', [
                 'title' => 'My Profile'
             ]);
         } else if (Application::$app->user instanceof Garage) {
@@ -196,7 +196,6 @@ class AuthController extends Controller
     public function newAppointments(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
-            // TODO: Check for assigned vehicles
             if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 $model = new Appointment();
 
@@ -232,9 +231,16 @@ class AuthController extends Controller
 
     public function appointments(Request $request, Response $response)
     {
-        // TODO: Check for vehicles
         if (Application::$app->user instanceof User) {
-            return $this->render('customer/appointment/myAppointment', ['name' => 'The GearGuard']);
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
+                $model = Application::$app->user->getAppointmentsList();
+                return $this->render('customer/appointment/myAppointment', [
+                    'name' => 'The GearGuard',
+                    'appointments' => $model,
+                ]);
+            }
+            else
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
         } else if (Application::$app->user instanceof Garage) {
             return $this->render('garage/appointment/all', ['name' => 'The GearGuard']);
         }
@@ -590,6 +596,26 @@ class AuthController extends Controller
             ]);
         }
 
+        throw new NotFoundException();
+    }
+
+    public function newAppointmentsPost(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            $body = $request->getBody();
+            $model = Appointment::initialize(
+                $body['service_id'],
+                $body['vehicle_id'],
+                $body['date'],
+                $body['time'],
+                $body['notes']
+            );
+            $model->save();
+            return $this->render('customer/appointment/myAppointment', [
+                'name' => 'The GearGuard',
+
+            ]);
+        }
         throw new NotFoundException();
     }
 

@@ -259,7 +259,7 @@ use gearguard\phpmvc\form\DropDownField;
             const today = new Date();
             const minDate = new Date(today.setDate(today.getDate() + 3));
             const maxDate = new Date(today.setDate(today.getDate() + 30));
-            const dateInput = document.getElementById('appointment_date');
+            const dateInput = document.getElementById('date');
             dateInput.min = minDate.toISOString().split('T')[0];
             dateInput.max = maxDate.toISOString().split('T')[0];
 
@@ -313,7 +313,7 @@ use gearguard\phpmvc\form\DropDownField;
     </nav>
     <div class="appointment-form">
         <h2 class="title">Book Your Appointment</h2>
-        <?php $form = Form::begin('', "post") ?>
+        <?php $form = Form::begin('/customer/appointment/appoint', "post") ?>
         <div class="form-row">
             <div class="form-column">
                 <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles)?>
@@ -329,10 +329,10 @@ use gearguard\phpmvc\form\DropDownField;
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'appointment_date') ?>
+                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'date') ?>
             </div>
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'appointment_time') ?>
+                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'time') ?>
             </div>
         </div>
         <div class="form-group">
