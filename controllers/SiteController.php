@@ -208,4 +208,72 @@ class SiteController extends Controller
             'services' => $services
         ]);
     }
+
+
+
+//mechanic
+public function mechanicDashboard(Request $request, Response $response)
+{
+    $params = [
+        'name' => "The GearGurd"
+    ];
+    return $this->render('mechanic/dashboard', $params);
+}
+
+public function mechanicProfile(Request $request, Response $response)
+{
+    $params = [
+        'name' => "The GearGurd"
+    ];
+    return $this->render('mechanic/profile_form', $params);
+}
+
+public function mechanicProfileUpdate(Request $request, Response $response)
+    {
+        $params = [
+            'name' => "The GearGurd"
+        ];
+        return $this->render('mechanic/profile_update', $params);
+    }
+
+    public function mechanicservices(Request $request, Response $response)
+    {
+        $params = [
+            'name' => "The GearGurd"
+        ];
+        return $this->render('mechanic/services', $params);
+    } 
+
+    public function mechanicServiceHistory(Request $request, Response $response)
+    {
+        $params = [
+            'name' => "The GearGurd"
+        ];
+        return $this->render('mechanic/service_history', $params);
+    }
+
+    public function mechanicSparePart(Request $request, Response $response)
+    {
+        $params = [
+            'name' => "The GearGurd"
+        ];
+        return $this->render('mechanic/spareparts', $params);
+    }
+
+    public function mechanicMessages(Request $request, Response $response)
+    {
+        $params = [
+            'name' => "The GearGurd"
+        ];
+        return $this->render('mechanic/messages', $params);
+    }
+
+    public function mechanicSideBar(Request $request, Response $response)
+    {
+        $params = [
+            'name' => "The GearGurd"
+        ];
+        return $this->render('mechanic/sidebar', $params);
+    }
+
 }

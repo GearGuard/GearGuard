@@ -202,37 +202,37 @@
     </div> 
     <ul class="nav-list"> 
         <li class="nav-item"> 
-            <a href="dashboard.php" class="nav-link active"> 
+            <a href="dashboard" class="nav-link active"> 
                 <i class="fas fa-gauge"></i> 
                 <span class="nav-text">Dashboard</span> 
             </a> 
         </li> 
         <li class="nav-item"> 
-            <a href="profile_form.php" class="nav-link"> 
+            <a href="profile_form" class="nav-link"> 
                 <i class="fas fa-user-circle"></i> 
                 <span class="nav-text">Profile</span> 
             </a> 
         </li> 
         <li class="nav-item"> 
-            <a href="services.php" class="nav-link"> 
+            <a href="services" class="nav-link"> 
                 <i class="fas fa-wrench"></i> 
                 <span class="nav-text">Service</span> 
             </a> 
         </li> 
         <li class="nav-item"> 
-            <a href="service_history.php" class="nav-link"> 
+            <a href="service_history" class="nav-link"> 
                 <i class="fas fa-history"></i> 
                 <span class="nav-text">History</span> 
             </a> 
         </li> 
        <li class="nav-item"> 
-    <a href="spareparts.php" class="nav-link"> 
+    <a href="spareparts" class="nav-link"> 
         <i class="fas fa-screwdriver-wrench"></i> 
         <span class="nav-text">Spareparts</span> 
     </a> 
 </li>
         <li class="nav-item"> 
-            <a href="messages.php" class="nav-link"> 
+            <a href="messages" class="nav-link"> 
                 <i class="fas fa-envelope"></i> 
                 <span class="nav-text">Messages</span> 
             </a> 

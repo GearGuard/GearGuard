@@ -594,20 +594,7 @@ class AuthController extends Controller
     }
 
     //mechanic
-    public function mechanicDashboard(Request $request, Response $response)
-    {
-        if (Application::$app->user instanceof User) {
-            return $this->render('/mechanic/dashboard', [
-                'title' => 'Dashboard'
-            ]);
-        } else if (Application::$app->user instanceof Garage) {
-            return $this->render('/mechanic/dashboard', [
-                'title' => 'Dashboard'
-            ]);
-        }
-
-        throw new NotFoundException();
-    }
+   
 
     public function mechanicProfile(Request $request, Response $response)
     {
