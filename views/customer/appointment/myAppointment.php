@@ -1,9 +1,6 @@
 <?php
 
-/** @var $this \gearguard\phpmvc\View */
-$this->title = 'Appointment';
-?>
-
+/** @var $this \gearguard\phpmvc\View */ $this->title = 'Appointment'; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -165,7 +162,6 @@ $this->title = 'Appointment';
             transform: translateY(0);
         }
 
-        /* View button styling */
         .action-button[onclick^="viewAppointment"] {
             background: var(--secondary);
             color: var(--accent);
@@ -177,7 +173,92 @@ $this->title = 'Appointment';
             border-color: var(--accent);
         }
 
-        /* Responsive design */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            color: var(--text);
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .modal-form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--text);
+        }
+
+        .modal-textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--text);
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-button {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .modal-button:hover {
+            background: #1b4ebd;
+        }
+
+        .modal-button.cancel {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+        }
+
+        .modal-button.cancel:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -220,7 +301,6 @@ $this->title = 'Appointment';
         <a href="/customer/appointment/service_history" target='_self'>Service History<span class="dot"></span></a>
         <a href="/customer/appointment/spareparts_warranty" target='_self'>Spare Parts Warranty<span class="dot"></span></a>
     </nav>
-
     <div class="appointment-table">
         <h2 class="title">Upcoming Scheduled Appointments</h2>
         <table>
@@ -233,28 +313,95 @@ $this->title = 'Appointment';
                 </tr>
             </thead>
             <tbody>
-            <?php foreach ($appointments as $appoint): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($appoint['service_type']); ?></td>
-                    <td><?php echo htmlspecialchars($appoint['garage_name']); ?></td>
-                    <td><?php echo htmlspecialchars($appoint['date']); ?></td>
-                    <td class="button-container">
-                    <button class="action-button" onclick="viewAppointment(<?php echo htmlspecialchars($appoint['id']); ?>)">View More</button>
-                    <button class="action-button" onclick="editAppointment(<?php echo htmlspecialchars($appoint['id']); ?>)">Edit Reservation</button>
-                    <td>
-                </tr>
-            <?php endforeach;?>
+                <?php foreach ($appointments as $appoint): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($appoint['service_type']); ?></td>
+                        <td><?php echo htmlspecialchars($appoint['garage_name']); ?></td>
+                        <td><?php echo htmlspecialchars($appoint['date']); ?></td>
+                        <td class="button-container">
+                            <button class="action-button" onclick='viewAppointment(<?php echo htmlspecialchars(json_encode($appoint)); ?>)'>View More</button>
+                            <button class="action-button" onclick='editAppointment(<?php echo htmlspecialchars(json_encode($appoint)); ?>)'>Edit Reservation</button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-
     <script>
-        function viewAppointment(id) {
-            alert('Viewing appointment ID ' + id);
+        function viewAppointment(appointment) {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+
+            content.innerHTML = `
+                <h2 class="modal-title">${appointment.service_type}</h2>
+                <p><strong>Garage:</strong> ${appointment.garage_name}</p>
+                <p><strong>Date:</strong> ${appointment.date}</p>
+                <p><strong>Time:</strong> ${appointment.time || 'Not specified'}</p>
+                <p><strong>Vehicle:</strong> ${appointment.vehicle_model || 'Not specified'}</p>
+                <p><strong>Status:</strong> ${appointment.status || 'Not specified'}</p>
+                <button class="modal-button" onclick='this.closest(".modal").remove()'>Close</button>
+            `;
+
+            modal.appendChild(content);
+            document.body.appendChild(modal);
         }
 
-        function editAppointment(id) {
-            alert('Editing appointment ID ' + id);
+        function editAppointment(appointment) {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+
+            content.innerHTML = `
+                <h2 class="modal-title">Edit Appointment</h2>
+                <form id="editAppointmentForm">
+                    <input type="hidden" name="id" value="${appointment.id}">
+                    <div class="modal-form-group">
+                        <label class="modal-label" for="date">Date:</label>
+                        <input class="modal-input" type="date" id="date" name="date" value="${appointment.date}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label class="modal-label" for="time">Time:</label>
+                        <input class="modal-input" type="time" id="time" name="time" value="${appointment.time}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label class="modal-label" for="notes">Notes:</label>
+                        <textarea class="modal-textarea" id="notes" name="notes">${appointment.notes || ''}</textarea>
+                    </div>
+                    <button type="submit" class="modal-button">Save Changes</button>
+                    <button type="button" class="modal-button cancel" onclick='this.closest(".modal").remove()'>Cancel</button>
+                </form>
+            `;
+
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+
+            document.getElementById('editAppointmentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                fetch('/customer/appointment/update', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('Appointment updated successfully');
+                            modal.remove();
+                            location.reload();
+                        } else {
+                            alert('Failed to update appointment');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to update appointment');
+                    });
+            });
         }
     </script>
 </body>
