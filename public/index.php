@@ -5,6 +5,7 @@ User: GearGurd
 
 use app\controllers\AuthController;
 use app\controllers\SiteController;
+use app\controllers\AdminController;
 use gearguard\phpmvc\Application;
 
 
@@ -80,5 +81,20 @@ $app->router->get('/garage/mechanic', [AuthController::class, 'manageMechanic'])
 $app->router->get('/appointment/getServices', [AuthController::class, 'getGarageServices']);
 $app->router->get('/community/post', [AuthController::class, 'newPost']);
 $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);
+
+$app->router->get('/admin', [AdminController::class, 'admin']);
+$app->router->get('/admin/dashboard', [AdminController::class, 'admin_dashboard']);
+$app->router->get('/admin/viewusers', [AdminController::class, 'viewUsers']);
+$app->router->get('/admin/adduser', [AdminController::class, 'addUser']);
+$app->router->get('/admin/edituser', [AdminController::class, 'editUser']);
+$app->router->get('/admin/viewservices', [AdminController::class, 'viewServices']);
+$app->router->get('/admin/addservice', [AdminController::class, 'addService']);
+$app->router->get('/admin/editservice', [AdminController::class, 'editService']);
+$app->router->get('/admin/viewvehicles', [AdminController::class, 'viewVehiclesByAdmin']);
+$app->router->get('/admin/addvehicle', [AdminController::class, 'addVehicleByAdmin']);
+$app->router->get('/admin/editvehicle', [AdminController::class, 'editVehicleByAdmin']);
+$app->router->get('/admin/transaction', [AdminController::class, 'admin_transaction']);
+$app->router->get('/admin/q&a', [AdminController::class, 'questions']);
+
 
 $app->run();
