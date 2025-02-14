@@ -111,5 +111,14 @@ class Garage extends UserModel
         $service = GarageService::getGarageService($result['id'], $result['type'], $result['price'], $result['duration'], $result['status_id'], $result['description']);
         return $service;
     }
+
+    public function getServices() : array
+    {
+        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
 	
 }

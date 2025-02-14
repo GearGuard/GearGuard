@@ -124,4 +124,12 @@ class GarageService extends UserModel
 
         return $garage_name;
     }
+
+    public function update($data)
+    {
+        if (is_null($data))
+            return false;
+
+        return parent::update($data);
+    }
 }

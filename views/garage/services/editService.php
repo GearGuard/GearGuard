@@ -253,7 +253,7 @@
             <input type="text" name="search_type" placeholder="Please enter the type of the service"/>
         </div>
         <div class="form-column" style="display: flex; align-items: flex-end;">
-            <button type="button" class="search-button" onclick="searchService()">Search</button>
+            <button type="button" class="search-button" onclick="searchService()" autofocus>Search</button>
         </div>
     </div>
 
@@ -278,7 +278,7 @@
         </div>
         <div class="button-container">
             <button type="reset" class="clear-button">Clear</button>
-            <button type="submit" class="edit-button">Update Service</button>
+            <button id="updateButton" type="submit" class="edit-button" disabled>Update Service</button>
         </div>
     </div>
 
@@ -301,17 +301,24 @@
                 searchQuery: searchType
             },
             success: function (response) {
-                    document.getElementById('editForm').style.display = 'block';
+                if (response == null) {
+                    document.getElementById('updateButton').classList.add('disabled');
+                    document.getElementById('editForm').style.display = 'none';
+                    alert('Service not found!');
+                    return;
+                }
 
-                    // Populate form fields with dummy data (replace this with actual data from your backend)
-                    document.querySelector('input[name="id"]').value = response.id;
-                    document.querySelector('input[name="type"]').value = response.type;
-                    document.querySelector('input[name="price"]').value = response.price;
-                    document.querySelector('input[name="duration"]').value = response.duration;
-                    document.querySelector('textarea[name="description"]').value = response.description;
+                document.getElementById('editForm').style.display = 'block';
+                document.getElementById('updateButton').classList.remove('disabled');
+                document.querySelector('input[name="id"]').value = response.id;
+                document.querySelector('input[name="type"]').value = response.type;
+                document.querySelector('input[name="price"]').value = response.price;
+                document.querySelector('input[name="duration"]').value = response.duration;
+                document.querySelector('textarea[name="description"]').value = response.description;
             },
             error: function (xhr, status, error) {
                 console.log('Error:', error);
+                document.getElementById('editForm').style.display = 'hidden';
             }
         });
     }

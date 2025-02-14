@@ -31,7 +31,7 @@ class GarageController extends Controller
         if (Application::$app->user instanceof Garage) {
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
-                'services' => $this->getServicesByGarage()
+                'services' => Application::$app->user->getServices(),
             ]);
         }
 
@@ -109,7 +109,7 @@ class GarageController extends Controller
             $model->save();
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
-                'services' => $this->getServicesByGarage()
+                'services' => Application::$app->user->getServices(),
             ]);
         }
 
@@ -191,7 +191,7 @@ class GarageController extends Controller
 
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
-                'services' => $this->getServicesByGarage()
+                'services' => Application::$app->user->getServices(),
             ]);
         }
 
@@ -210,24 +210,11 @@ class GarageController extends Controller
 
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
-                'services' => $this->getServicesByGarage()
+                'services' => Application::$app->user->getServices(),
             ]);
         }
 
         throw new NotFoundException();
-    }
-
-    private function getServicesByGarage($garage_id = 0): array
-    {
-        if ($garage_id === 0) {
-            $garage_id = Application::$app->session->get('user');
-        }
-
-        $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2";
-        $statement = Application::$app->db->prepare($sql);
-        $statement->bindValue(':garage_id', $garage_id);
-        $statement->execute();
-        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
 }

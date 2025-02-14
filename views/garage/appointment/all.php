@@ -202,16 +202,6 @@ $this->title = 'View All Appointments';
                     <td><?php echo htmlspecialchars($appointment->notes); ?></td>
                 </tr>
             <?php endforeach; ?>
-                <tr>
-                    <td>Sedan</td>
-                    <td>Jane Smith</td>
-                    <td>+987654321</td>
-                    <td>ABC-5678</td>
-                    <td>Honda Accord</td>
-                    <td>2020</td>
-                    <td>Tire Rotation</td>
-                    <td>2024-11-22 02:00 PM</td>
-                </tr>
             </tbody>
         </table>
     </div>
