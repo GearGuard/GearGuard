@@ -278,7 +278,7 @@
         </div>
         <div class="button-container">
             <button type="reset" class="clear-button">Clear</button>
-            <button id="updateButton" type="submit" class="edit-button" disabled>Update Service</button>
+            <button id="updateButton" type="submit" class="edit-button">Update Service</button>
         </div>
     </div>
 
@@ -302,14 +302,14 @@
             },
             success: function (response) {
                 if (response == null) {
-                    document.getElementById('updateButton').classList.add('disabled');
+                    document.getElementById('updateButton').setAttribute('disabled', true);
                     document.getElementById('editForm').style.display = 'none';
                     alert('Service not found!');
                     return;
                 }
 
                 document.getElementById('editForm').style.display = 'block';
-                document.getElementById('updateButton').classList.remove('disabled');
+                document.getElementById('updateButton').removeAttribute('disabled');
                 document.querySelector('input[name="id"]').value = response.id;
                 document.querySelector('input[name="type"]').value = response.type;
                 document.querySelector('input[name="price"]').value = response.price;
@@ -318,7 +318,7 @@
             },
             error: function (xhr, status, error) {
                 console.log('Error:', error);
-                document.getElementById('editForm').style.display = 'hidden';
+                document.getElementById('editForm').style.display = 'none';
             }
         });
     }
