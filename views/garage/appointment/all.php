@@ -182,10 +182,10 @@ $this->title = 'View All Appointments';
                     <th>Client's Name</th>
                     <th>Contact Number</th>
                     <th>Number Plate</th>
-                    <th>Vehicle Model</th>
                     <th>Service Type</th>
                     <th>Date & Time</th>
-                    <th>Notes</th>
+                    <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -195,15 +195,45 @@ $this->title = 'View All Appointments';
                     <td><?php echo htmlspecialchars($appointment['first_name'] . " " . $appointment['last_name']); ?></td>
                     <td><?php echo htmlspecialchars($appointment['contact_no']); ?></td>
                     <td><?php echo htmlspecialchars($appointment['license_plate_no']); ?></td>
-                    <td><?php echo htmlspecialchars($appointment['vehicle_model']); ?></td>
                     <td><?php echo htmlspecialchars($appointment['service_type']); ?></td>
                     <td><?php echo htmlspecialchars($appointment['date'] . " " . $appointment['time']); ?></td>
-                    <td><?php echo htmlspecialchars($appointment['notes']); ?></td>
+                    <td><button onclick='viewDetails(<?php echo json_encode($appointment); ?>)' class="view-more-button">View More</button></td>
+                    <td><button class="view-more-button">Accept</button></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+
+    <script>
+        function viewDetails(appointment) {
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '1000';
+
+            const content = document.createElement('div');
+            content.style.backgroundColor = '#25272d';
+            content.style.padding = '20px';
+            content.style.borderRadius = '8px';
+            content.style.color = '#f5f5f5';
+
+            content.innerHTML = `<h2>${appointment.license_plate_no}</h2>
+                             <p>Vehicle Mode: $${appointment.vehicle_model}</p>
+                             <p>Notes: ${appointment.notes} hours</p>
+                             <button onclick='this.parentElement.parentElement.remove()' style='padding: 10px; background: var(--accent); color: var(--text); border: none; border-radius: 5px; cursor: pointer;'>Close</button>`;
+
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+    </script>
 </body>
 
 </html>
