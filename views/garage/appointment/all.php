@@ -1,7 +1,6 @@
 <?php
 
 /** @var $this \gearguard\phpmvc\View */
-/** @var $appointment \app\models\GarageAppointment */
 $this->title = 'View All Appointments';
 ?>
 
@@ -180,7 +179,7 @@ $this->title = 'View All Appointments';
             <thead>
                 <tr>
                     <th>Vehicle Type</th>
-                    <th>Owner's Name</th>
+                    <th>Client's Name</th>
                     <th>Contact Number</th>
                     <th>Number Plate</th>
                     <th>Vehicle Model</th>
@@ -192,14 +191,14 @@ $this->title = 'View All Appointments';
             <tbody>
             <?php foreach ($appointments as $appointment): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($appointment->vehicleType); ?></td>
-                    <td><?php echo htmlspecialchars($appointment->ownerName); ?></td>
-                    <td><?php echo htmlspecialchars($appointment->contactNo); ?></td>
-                    <td><?php echo htmlspecialchars($appointment->numberPlate); ?></td>
-                    <td><?php echo htmlspecialchars($appointment->vehicleModel); ?></td>
-                    <td><?php echo htmlspecialchars($appointment->serviceType); ?></td>
-                    <td><?php echo htmlspecialchars($appointment->dateAndTime); ?></td>
-                    <td><?php echo htmlspecialchars($appointment->notes); ?></td>
+                    <td><?php echo htmlspecialchars($appointment['vehicle_type']); ?></td>
+                    <td><?php echo htmlspecialchars($appointment['first_name'] . " " . $appointment['last_name']); ?></td>
+                    <td><?php echo htmlspecialchars($appointment['contact_no']); ?></td>
+                    <td><?php echo htmlspecialchars($appointment['license_plate_no']); ?></td>
+                    <td><?php echo htmlspecialchars($appointment['vehicle_model']); ?></td>
+                    <td><?php echo htmlspecialchars($appointment['service_type']); ?></td>
+                    <td><?php echo htmlspecialchars($appointment['date'] . " " . $appointment['time']); ?></td>
+                    <td><?php echo htmlspecialchars($appointment['notes']); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

@@ -120,5 +120,15 @@ class Garage extends UserModel
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function getAllAppointments() : array
+    {
+        $sql = "select gvsa.*, coalesce (gv.current_user_id, guo.user_id) as current_user_id, gv.license_plate_no, ggs.`id` as service_id, ggs.`type` as service_type, gu.`id` as user_id, gu.first_name, gu.last_name, gu.contact_no, gvt.`type` as vehicle_type, gvm.model as vehicle_model  from gearguard.gg_vehicle_service_appointment gvsa left join gearguard.gg_vehicle gv on gvsa.vehicle_id = gv.`id` left join gearguard.gg_garage_service ggs on gvsa.service_id = ggs.`id` left join gearguard.gg_user_owner guo on gvsa.vehicle_id = guo.vehicle_id right join gearguard.gg_user gu on gu.`id` = coalesce (gv.current_user_id, guo.user_id) left join gearguard.gg_vehicle_type gvt on gv.vehicle_type_id = gvt.`id`  left join gearguard.gg_vehicle_model gvm on gv.model_id = gvm.`id`  where gvsa.service_id in (select ggs2.`id` from gearguard.gg_garage_service ggs2 where ggs2.garage_id = :garageID);";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garageID', $this->id);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+    }
 	
 }

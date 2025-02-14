@@ -247,7 +247,7 @@ class AuthController extends Controller
                 return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
-            $model = array(new GarageAppointment());
+            $model = Application::$app->user->getAllAppointments();
             return $this->render('garage/appointment/all', [
                 'name' => 'The GearGuard',
                 'appointments' => $model,
