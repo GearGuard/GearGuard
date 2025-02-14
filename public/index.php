@@ -6,6 +6,7 @@ User: GearGurd
 use app\controllers\AuthController;
 use app\controllers\SiteController;
 use app\controllers\AdminController;
+use app\controllers\GarageController;
 use gearguard\phpmvc\Application;
 
 
@@ -48,35 +49,38 @@ $app->router->get('/customer/appointment/service_history', [AuthController::clas
 $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::class, 'sparepartsWarranty']);
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepart']);
 $app->router->get('/customer/sparepart/view_sparepart', [AuthController::class, 'viewSparepart']);
-$app->router->get('/customer/my_profile', [AuthController::class, 'myProfile']);
+$app->router->get('/customer/profile', [AuthController::class, 'myProfile']);
 
 $app->router->get('/login', [AuthController::class, 'login']);
 $app->router->post('/login', [AuthController::class, 'login']);
 $app->router->get('/register', [AuthController::class, 'register']);
 $app->router->post('/register', [AuthController::class, 'register']);
 $app->router->get('/logout', [AuthController::class, 'logout']);
+
 $app->router->get('/garage/register', [AuthController::class, 'garageSignup']);
 $app->router->post('/garage/register', [AuthController::class, 'garageSignup']);
 $app->router->get('/garage/login', [AuthController::class, 'garageLogin']);
 $app->router->post('/garage/login', [AuthController::class, 'garageLogin']);
-$app->router->get('/garage/dashboard', [AuthController::class, 'dashboard']);
-$app->router->get('/garage/profile', [AuthController::class, 'myProfile']);
-$app->router->get('/garage/settings', [AuthController::class, 'settings']);
-$app->router->get('/garage/appointment/appointments', [AuthController::class, 'appointments']);
-$app->router->get('/garage/appointment/search', [AuthController::class, 'searchAppointments']);
-$app->router->get('/garage/appointment/delete', [AuthController::class, 'deleteAppointment']);
-$app->router->get('/garage/services/view', [AuthController::class, 'viewServices']);
-$app->router->get('/garage/services/add', [AuthController::class, 'addServices']);
-$app->router->post('/garage/services/add', [AuthController::class, 'addServicesPost']);
-$app->router->get('/garage/services/update', [AuthController::class, 'editServices']);
-$app->router->post('/garage/services/update', [AuthController::class, 'updateService']);
-$app->router->get('/garage/services/delete', [AuthController::class, 'deleteServices']);
-$app->router->post('/garage/services/delete', [AuthController::class, 'markServiceDeleted']);
-$app->router->get('/garage/services/search', [AuthController::class, 'getService']);
-$app->router->get('/garage/customers/view', [AuthController::class, 'viewCustomers']);
-$app->router->get('/garage/customers/send_message', [AuthController::class, 'sendMessages']);
-$app->router->get('/garage/customers/search', [AuthController::class, 'searchCustomer']);
-$app->router->get('/garage/mechanic', [AuthController::class, 'manageMechanic']);
+$app->router->get('/dashboard', [AuthController::class, 'dashboard']);
+$app->router->get('/profile', [AuthController::class, 'myProfile']);
+$app->router->get('/settings', [AuthController::class, 'settings']);
+$app->router->get('/appointment/appointments', [AuthController::class, 'appointments']);
+
+$app->router->get('/appointment/search', [GarageController::class, 'searchAppointments']);
+$app->router->get('/appointment/delete', [GarageController::class, 'deleteAppointment']);
+$app->router->get('/services/view', [GarageController::class, 'viewServices']);
+$app->router->get('/services/add', [GarageController::class, 'addServices']);
+$app->router->post('/services/add', [GarageController::class, 'addServicesPost']);
+$app->router->get('/services/update', [GarageController::class, 'editServices']);
+$app->router->post('/services/update', [GarageController::class, 'updateService']);
+$app->router->get('/services/delete', [GarageController::class, 'deleteServices']);
+$app->router->post('/services/delete', [GarageController::class, 'markServiceDeleted']);
+$app->router->get('/services/search', [GarageController::class, 'getService']);
+$app->router->get('/customers/view', [GarageController::class, 'viewCustomers']);
+$app->router->get('/customers/send_message', [GarageController::class, 'sendMessages']);
+$app->router->get('/customers/search', [GarageController::class, 'searchCustomer']);
+$app->router->get('/mechanic', [GarageController::class, 'manageMechanic']);
+
 $app->router->get('/appointment/getServices', [AuthController::class, 'getGarageServices']);
 $app->router->get('/community/post', [AuthController::class, 'newPost']);
 $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);

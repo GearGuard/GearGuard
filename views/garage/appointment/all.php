@@ -1,6 +1,7 @@
 <?php
 
 /** @var $this \gearguard\phpmvc\View */
+/** @var $appointment \app\models\GarageAppointment */
 $this->title = 'View All Appointments';
 ?>
 
@@ -169,8 +170,8 @@ $this->title = 'View All Appointments';
 <body>
     <nav class="navMenu">
         <a href="#" class="active">All Appointments<span class="dot"></span></a>
-        <a href="/garage/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
-        <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
+        <a href="/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
+        <a href="/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
     </nav>
 
     <div class="appointment-table">
@@ -183,22 +184,24 @@ $this->title = 'View All Appointments';
                     <th>Contact Number</th>
                     <th>Number Plate</th>
                     <th>Vehicle Model</th>
-                    <th>Model Year</th>
                     <th>Service Type</th>
                     <th>Date & Time</th>
+                    <th>Notes</th>
                 </tr>
             </thead>
             <tbody>
+            <?php foreach ($appointments as $appointment): ?>
                 <tr>
-                    <td>SUV</td>
-                    <td>John Doe</td>
-                    <td>+123456789</td>
-                    <td>XYZ-1234</td>
-                    <td>Toyota Highlander</td>
-                    <td>2022</td>
-                    <td>Oil Change</td>
-                    <td>2024-11-20 10:30 AM</td>
+                    <td><?php echo htmlspecialchars($appointment->vehicleType); ?></td>
+                    <td><?php echo htmlspecialchars($appointment->ownerName); ?></td>
+                    <td><?php echo htmlspecialchars($appointment->contactNo); ?></td>
+                    <td><?php echo htmlspecialchars($appointment->numberPlate); ?></td>
+                    <td><?php echo htmlspecialchars($appointment->vehicleModel); ?></td>
+                    <td><?php echo htmlspecialchars($appointment->serviceType); ?></td>
+                    <td><?php echo htmlspecialchars($appointment->dateAndTime); ?></td>
+                    <td><?php echo htmlspecialchars($appointment->notes); ?></td>
                 </tr>
+            <?php endforeach; ?>
                 <tr>
                     <td>Sedan</td>
                     <td>Jane Smith</td>
