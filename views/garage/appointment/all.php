@@ -226,7 +226,7 @@ $this->title = 'View All Appointments';
             content.style.color = '#f5f5f5';
 
             content.innerHTML = `<h2>${appointment.license_plate_no}</h2>
-                             <p>Vehicle Mode: $${appointment.vehicle_model}</p>
+                             <p>Vehicle Mode: ${appointment.vehicle_model}</p>
                              <p>Notes: ${appointment.notes} hours</p>
                              <button onclick='this.parentElement.parentElement.remove()' style='padding: 10px; background: var(--accent); color: var(--text); border: none; border-radius: 5px; cursor: pointer;'>Close</button>`;
 
