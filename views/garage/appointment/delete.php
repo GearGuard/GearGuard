@@ -208,8 +208,8 @@ $this->title = 'Search Appointments';
 
 <body>
     <nav class="navMenu">
-        <a href="/garage/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
-        <a href="/garage/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
+        <a href="/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
+        <a href="/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
         <a href="#" class="active">Delete Appointment<span class="dot"></span></a>
     </nav>
 

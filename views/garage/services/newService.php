@@ -230,9 +230,9 @@
 <body>
     <nav class="navMenu">
             <a href="#" class="active">Add New Service</a>
-            <a href="/garage/services/view" target="_self">All Services</a>
-            <a href="/garage/services/update" target="_self">Edit Services</a>
-            <a href="/garage/services/delete" target="_self">Delete Services</a>
+            <a href="/services/view" target="_self">All Services</a>
+            <a href="/services/update" target="_self">Edit Services</a>
+            <a href="/services/delete" target="_self">Delete Services</a>
     </nav>
     <div class="service-form">
         <h2 class="title">Add New Garage Service</h2>
@@ -241,7 +241,7 @@
         use gearguard\phpmvc\form\Form;
         use gearguard\phpmvc\form\TextAreaField;
 
-        $form = Form::begin('/garage/services/add', "post");
+        $form = Form::begin('/services/add', "post");
         ?>
 
         <div class="form-row">

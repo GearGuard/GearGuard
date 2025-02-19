@@ -243,9 +243,9 @@
 
 <body>
     <nav class="navMenu">
-        <a href="/garage/services/add" target="_self">Add New Service</a>
-        <a href="/garage/services/view" target="_self">All Services</a>
-        <a href="/garage/services/update" target="_self">Edit Services</a>
+        <a href="/services/add" target="_self">Add New Service</a>
+        <a href="/services/view" target="_self">All Services</a>
+        <a href="/services/update" target="_self">Edit Services</a>
         <a href="#" class="active">Delete Services</a>
     </nav>
     <div class="service-form">
@@ -294,7 +294,7 @@
             }
 
             $.ajax({
-                url: '/garage/services/search',
+                url: '/services/search',
                 type: 'GET',
                 data: {
                     searchQuery: searchType
@@ -325,7 +325,7 @@
 
         function deleteService() {
             $.ajax({
-                url: '/garage/services/delete',
+                url: '/services/delete',
                 type: 'POST',
                 data: {
                     serviceID: serviceId
