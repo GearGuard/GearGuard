@@ -1,7 +1,6 @@
 <?php
 
 namespace app\controllers;
-
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Request;
