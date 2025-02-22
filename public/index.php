@@ -67,6 +67,7 @@ $app->router->get('/settings', [AuthController::class, 'settings']);
 $app->router->get('/appointment/appointments', [AuthController::class, 'appointments']);
 
 $app->router->get('/appointment/search', [GarageController::class, 'searchAppointments']);
+$app->router->get('/appointment/filtered', [GarageController::class, 'filteredAppointments']);
 $app->router->get('/appointment/delete', [GarageController::class, 'deleteAppointment']);
 $app->router->get('/services/view', [GarageController::class, 'viewServices']);
 $app->router->get('/services/add', [GarageController::class, 'addServices']);
