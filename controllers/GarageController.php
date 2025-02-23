@@ -10,6 +10,7 @@ use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\middlewares\ExtendedMiddleware;
 use app\models\Garage;
+use http\Exception\InvalidArgumentException;
 
 class GarageController extends Controller
 {
@@ -166,6 +167,8 @@ class GarageController extends Controller
     public function getService(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            if (!isset($_GET['searchQuery']))
+                echo '';
             $data = Application::$app->user->getServiceByType(htmlspecialchars($_GET['searchQuery']));
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode($data);
@@ -176,6 +179,8 @@ class GarageController extends Controller
     {
         if (Application::$app->user instanceof Garage) {
             $body = $request->getBody();
+            if (!isset($body['id']) || !isset($body['type']) || !isset($body['price']) || !isset($body['duration']) || !isset($body['description']))
+                throw new InvalidArgumentException();
             $id = htmlspecialchars($body['id']);
             $type = htmlspecialchars($body['type']);
             $price = htmlspecialchars($body['price']);
@@ -202,7 +207,10 @@ class GarageController extends Controller
     {
         if (Application::$app->user instanceof Garage) {
             $body = $request->getBody();
-            $id = htmlspecialchars($body['serviceID']);
+            $id = $body['serviceID'] ?? '';
+            if (is_int($id))
+                throw new InvalidArgumentException();
+            $id = htmlspecialchars($id);
             $toUpdate = [
                 'status_id' => 3
             ];
@@ -215,6 +223,15 @@ class GarageController extends Controller
         }
 
         throw new NotFoundException();
+    }
+
+    public function filteredAppointments(Request $request, Response $response)
+    {
+        $body = $request->getBody();
+        $filter = $body['filter'] ?? $filter = '';
+        $filter = htmlspecialchars($filter);
+        header('Content-Type: application/json; charset=utf-8');
+        return json_encode(Application::$app->user->getAllAppointmentsFiltered($filter,$filter, $filter, $filter));
     }
 
 }

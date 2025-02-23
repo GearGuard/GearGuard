@@ -214,7 +214,7 @@ $this->title = 'Search Appointments';
     </nav>
 
     <div class="search-container">
-        <h2 class="search-title">Search Appointments</h2>
+        <h2 class="search-title">Delete Appointments</h2>
         <form id="searchForm" onsubmit="return handleSearch()">
             <input type="text" id="searchInput" class="search-input" placeholder="Enter Customer Name, Number Plate, or Contact Number" />
             <button type="submit" class="search-button">Search</button>

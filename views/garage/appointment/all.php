@@ -198,7 +198,9 @@ $this->title = 'View All Appointments';
                     <td><?php echo htmlspecialchars($appointment['service_type']); ?></td>
                     <td><?php echo htmlspecialchars($appointment['date'] . " " . $appointment['time']); ?></td>
                     <td><button onclick='viewDetails(<?php echo json_encode($appointment); ?>)' class="view-more-button">View More</button></td>
-                    <td><button class="view-more-button">Accept</button></td>
+                    <?php if ($appointment['status_id'] == 1): ?>
+                        <td><button class="view-more-button">Accept</button><button class="view-more-button">Reject</button></td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
             </tbody>
