@@ -65,6 +65,7 @@ $app->router->get('/dashboard', [AuthController::class, 'dashboard']);
 $app->router->get('/profile', [AuthController::class, 'myProfile']);
 $app->router->get('/settings', [AuthController::class, 'settings']);
 $app->router->get('/appointment/appointments', [AuthController::class, 'appointments']);
+$app->router->post('/appointment/update-status', [AuthController::class, 'updateAppointmentStatus']);
 
 $app->router->get('/appointment/search', [GarageController::class, 'searchAppointments']);
 $app->router->get('/appointment/filtered', [GarageController::class, 'filteredAppointments']);
@@ -81,6 +82,7 @@ $app->router->get('/customers/view', [GarageController::class, 'viewCustomers'])
 $app->router->get('/customers/send_message', [GarageController::class, 'sendMessages']);
 $app->router->get('/customers/search', [GarageController::class, 'searchCustomer']);
 $app->router->get('/mechanic', [GarageController::class, 'manageMechanic']);
+
 
 $app->router->get('/appointment/getServices', [AuthController::class, 'getGarageServices']);
 $app->router->get('/community/post', [AuthController::class, 'newPost']);

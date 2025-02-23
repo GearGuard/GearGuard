@@ -4,10 +4,12 @@ namespace app\models;
 
 use gearguard\phpmvc\db\DbModel;
 use gearguard\phpmvc\Application;
+use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
 
 class Appointment extends DbModel
 {
+    public int $id;
     public int $vehicle_id = 0;
     public int $garage_id = 0;
     public int $service_id = 0;
@@ -117,6 +119,30 @@ class Appointment extends DbModel
         $object->time = $time;
         $object->notes = $note;
         $object->status_id = 2;
+        return $object;
+    }
+
+    public static function getAppointmentByID(int $id): Appointment
+    {
+        $sql = "SELECT * FROM gg_vehicle_service_appointment WHERE id = :id LIMIT 1";
+        $statement = self::prepare($sql);
+        $statement->bindValue(':id', $id);
+        $statement->execute();
+        $result = $statement->fetchObject();
+        if (!$result) {
+            throw new NotFoundException('Appointment not found');
+        }
+        return $result;
+    }
+
+    public static function getAppointment(int $id, int $vehicle_id, int $service_id, $date, $time, string $note) {
+        $object = new Appointment();
+        $object->id = $id;
+        $object->vehicle_id = $vehicle_id;
+        $object->service_id = $service_id;
+        $object->date = $date;
+        $object->time = $time;
+        $object->notes = $note;
         return $object;
     }
 

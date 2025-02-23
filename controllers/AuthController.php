@@ -261,6 +261,24 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function updateAppointmentStatus(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $appointment_id = $body['appointment_id'] ?? '';
+            $status = $body['status'] ?? '';
+            $model = Appointment::getAppointmentByID(htmlspecialchars($appointment_id));
+            $model->update(
+                ['status_id' => $model->status_id]
+            );
+            return $this->render('garage/appointment/all', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
     public function serviceHistory(Request $request, Response $response)
     {
         // TODO: Check for vehicles
