@@ -14,7 +14,8 @@ use http\Exception\InvalidArgumentException;
 
 class GarageController extends Controller
 {
-    public static function isGarage() : bool {
+    public static function isGarage(): bool
+    {
         if (Application::$app->user instanceof Garage && Application::$app->session->get('isGarage')) {
             return true;
         }
@@ -225,4 +226,12 @@ class GarageController extends Controller
         throw new NotFoundException();
     }
 
+    public function filteredAppointments(Request $request, Response $response)
+    {
+        $body = $request->getBody();
+        $filter = $body['filter'] ?? $filter = '';
+        $filter = htmlspecialchars($filter);
+        header('Content-Type: application/json; charset=utf-8');
+        return json_encode(Application::$app->user->getAllAppointmentsFiltered($filter, $filter, $filter, $filter));
+    }
 }
