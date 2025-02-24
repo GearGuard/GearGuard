@@ -198,7 +198,9 @@ $this->title = 'View All Appointments';
                     <td><?php echo htmlspecialchars($appointment['service_type']); ?></td>
                     <td><?php echo htmlspecialchars($appointment['date'] . " " . $appointment['time']); ?></td>
                     <td><button onclick='viewDetails(<?php echo json_encode($appointment); ?>)' class="view-more-button">View More</button></td>
-                    <td><button class="view-more-button">Accept</button></td>
+                    <?php if ($appointment['status_id'] == 1): ?>
+                        <td><button class="view-more-button" onclick="handleAcceptance(<?php echo htmlspecialchars($appointment['id']);?>, 2)">Accept</button><button class="view-more-button">Reject</button></td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -233,6 +235,26 @@ $this->title = 'View All Appointments';
             modal.appendChild(content);
             document.body.appendChild(modal);
         }
+
+        async function handleAcceptance(appointment_id, status_id) {
+            const response = await fetch(`/appointment/update-status/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    appointment_id: appointment_id,
+                    status_id: status_id
+                })
+            });
+
+            if (response.ok) {
+                alert('Appointment status updated successfully.');
+            } else {
+                alert('Failed to update appointment status.');
+            }
+        }
+
     </script>
 </body>
 

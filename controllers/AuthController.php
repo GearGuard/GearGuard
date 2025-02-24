@@ -222,6 +222,10 @@ class AuthController extends Controller
 
     public function getGarageServices(Request $request)
     {
+        $body = $request->getBody();
+        if (!isset($body['garage_id'])){
+            throw new NotFoundException();
+        }
         $garageId = $request->getBody()['garage_id'];
         $services = $this->getServicesByGarageForDropdown($garageId);
 
@@ -251,6 +255,24 @@ class AuthController extends Controller
             return $this->render('garage/appointment/all', [
                 'name' => 'The GearGuard',
                 'appointments' => $model,
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function updateAppointmentStatus(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $appointment_id = $body['appointment_id'] ?? '';
+            $status = $body['status'] ?? '';
+            $model = Appointment::getAppointmentByID(htmlspecialchars($appointment_id));
+            $model->update(
+                ['status_id' => $model->status_id]
+            );
+            return $this->render('garage/appointment/all', [
+                'name' => 'The GearGuard',
             ]);
         }
 
@@ -333,7 +355,7 @@ class AuthController extends Controller
 
     private function getGarages()
     {
-        $sql = "SELECT id, name FROM gg_garage WHERE status_id = 2"; // Assuming 2 is the status for active garages
+        $sql = "SELECT id, name FROM gg_garage WHERE status_id = 2";
         $statement = Application::$app->db->prepare($sql);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
@@ -341,8 +363,8 @@ class AuthController extends Controller
 
     private function getServicesByGarageForDropDown($garage_id = 0): array
     {
-        if ($garage_id === 0) {
-            $garage_id = Application::$app->session->get('user');
+        if ($garage_id == 0) {
+            return [];
         }
 
         $sql = "SELECT id, type FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2";
@@ -408,12 +430,17 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof User) {
             $body = $request->getBody();
+            $service_id = $body['service_id'] ?? '';
+            $vehicle_id = $body['vehicle_id'] ?? '';
+            $date = $body['date'] ?? '';
+            $time = $body['time'] ?? '';
+            $notes = $body['notes'] ?? '';
             $model = Appointment::initialize(
-                $body['service_id'],
-                $body['vehicle_id'],
-                $body['date'],
-                $body['time'],
-                $body['notes']
+                htmlspecialchars($service_id),
+                htmlspecialchars($vehicle_id),
+                htmlspecialchars($date),
+                htmlspecialchars($time),
+                htmlspecialchars($notes)
             );
             $model->save();
             return $this->render('customer/appointment/myAppointment', [

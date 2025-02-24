@@ -204,111 +204,133 @@ $this->title = 'Search Appointments';
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
-    <nav class="navMenu">
-        <a href="/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
-        <a href="#" class="active">Search Appointment<span class="dot"></span></a>
-        <a href="/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
-    </nav>
+<nav class="navMenu">
+    <a href="/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
+    <a href="#" class="active">Search Appointment<span class="dot"></span></a>
+    <a href="/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
+</nav>
 
-    <div class="search-container">
-        <h2 class="search-title">Search Appointments</h2>
-        <form id="searchForm" onsubmit="return handleSearch()">
-            <input type="text" id="searchInput" class="search-input" placeholder="Enter Customer Name, Number Plate, or Contact Number" />
-            <button type="submit" class="search-button">Search</button>
-        </form>
-    </div>
+<div class="search-container">
+    <h2 class="search-title">Search Appointments</h2>
+    <form id="searchForm" onsubmit="return handleSearch()">
+        <input type="text" id="searchInput" class="search-input"
+               placeholder="Enter Customer Name, Number Plate, or Contact Number"/>
+        <button type="submit" class="search-button">Search</button>
+    </form>
+</div>
 
-    <div class="results-container" id="resultsContainer" style="display: none;">
-        <table class="results-table">
-            <thead>
-                <tr>
-                    <th>Vehicle Type</th>
-                    <th>Owner's Name</th>
-                    <th>Contact Number</th>
-                    <th>Number Plate</th>
-                    <th>Vehicle Model</th>
-                    <th>Model Year</th>
-                    <th>Service Type</th>
-                    <th>Date & Time</th>
-                </tr>
-            </thead>
-            <tbody id="resultsBody">
-                <!-- Results will be injected dynamically -->
-            </tbody>
-        </table>
-        <p class="no-results" id="noResultsMessage" style="display: none;">No results found.</p>
-    </div>
+<div class="results-container" id="resultsContainer" style="display: none;">
+    <table class="results-table">
+        <thead>
+        <tr>
+            <th>Vehicle Type</th>
+            <th>Client's Name</th>
+            <th>Contact Number</th>
+            <th>Number Plate</th>
+            <th>Service Type</th>
+            <th>Date & Time</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="resultsBody">
+        <!-- Results will be injected dynamically -->
+        </tbody>
+    </table>
+    <p class="no-results" id="noResultsMessage" style="display: none;">No results found.</p>
+</div>
 
-    <script>
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            const resultsContainer = document.getElementById('resultsContainer');
-            const resultsBody = document.getElementById('resultsBody');
-            const noResultsMessage = document.getElementById('noResultsMessage');
+<script>
+    function handleSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsBody = document.getElementById('resultsBody');
+        const noResultsMessage = document.getElementById('noResultsMessage');
 
-            if (query === '') {
-                alert('Please enter a search term.');
-                return false;
-            }
-
-            // Dummy data for demonstration
-            const data = [{
-                    type: 'SUV',
-                    name: 'John Doe',
-                    contact: '+123456789',
-                    plate: 'XYZ-1234',
-                    model: 'Toyota Highlander',
-                    year: 2022,
-                    service: 'Oil Change',
-                    datetime: '2024-11-20 10:30 AM'
-                },
-                {
-                    type: 'Sedan',
-                    name: 'Jane Smith',
-                    contact: '+987654321',
-                    plate: 'ABC-5678',
-                    model: 'Honda Accord',
-                    year: 2020,
-                    service: 'Tire Rotation',
-                    datetime: '2024-11-22 02:00 PM'
-                }
-            ];
-
-            // Filter results
-            const filteredResults = data.filter(item =>
-                item.name.toLowerCase().includes(query.toLowerCase()) ||
-                item.plate.toLowerCase().includes(query.toLowerCase()) ||
-                item.contact.includes(query)
-            );
-
-            resultsBody.innerHTML = '';
-            if (filteredResults.length > 0) {
-                filteredResults.forEach(item => {
-                    resultsBody.innerHTML += `
-                        <tr>
-                            <td>${item.type}</td>
-                            <td>${item.name}</td>
-                            <td>${item.contact}</td>
-                            <td>${item.plate}</td>
-                            <td>${item.model}</td>
-                            <td>${item.year}</td>
-                            <td>${item.service}</td>
-                            <td>${item.datetime}</td>
-                        </tr>
-                    `;
-                });
-                noResultsMessage.style.display = 'none';
-            } else {
-                noResultsMessage.style.display = 'block';
-            }
-
-            resultsContainer.style.display = 'block';
+        if (query === '') {
+            alert('Please enter a search term.');
             return false;
         }
-    </script>
+
+        $.ajax({
+            url: '/appointment/filtered',
+            type: 'GET',
+            data: {
+                filter: query
+            },
+            success: function (response) {
+                let data = response;
+
+                resultsBody.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        let tablerow = `<tr>
+                            <td>${item.vehicle_type}</td>
+                            <td>${item.first_name} ${item.last_name}</td>
+                            <td>${item.contact_no}</td>
+                            <td>${item.license_plate_no}</td>
+                            <td>${item.service_type}</td>
+                            <td>${item.date} ${item.time}</td>
+                            <td><button onclick='viewDetails(${item})' class="view-more-button">View More</button></td>`;
+
+                        if (item.status_id === 1) {
+                            tablerow += `<td><button class="view-more-button">Accept</button><button class="view-more-button">Reject</button></td>`;
+                        }
+
+                        tablerow += `</tr>`;
+
+                        resultsBody.innerHTML += tablerow;
+                    });
+                    resultsContainer.style.display = 'block';
+                    noResultsMessage.style.display = 'none';
+                } else {
+                    noResultsMessage.style.display = 'block';
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('Error:', error);
+                noResultsMessage.style.display = 'block';
+            }
+        });
+
+        // Filter results
+        /*const filteredResults = data.filter(item =>
+            item.name.toLowerCase().includes(query.toLowerCase()) ||
+            item.plate.toLowerCase().includes(query.toLowerCase()) ||
+            item.contact.includes(query)
+        );
+
+        noResultsMessage.style.display = 'none';
+
+        resultsBody.innerHTML = '';
+        if (data.length > 0) {
+            data.forEach(item => {
+                resultsBody.innerHTML += `
+                        <tr>
+                            <td>${item.vehicle_type}</td>
+                            <td>${item.first_name} ${item.last_name}</td>
+                            <td>${item.contact_no}</td>
+                            <td>${item.license_plate_no}</td>
+                            <td>${item.vehicle_model}</td>
+                            <td>${item.date} ${item.time}</td>
+                            <td><button onclick='viewDetails(${item})' class="view-more-button">View More</button></td>
+                            <td><button class="view-more-button">Accept</button></td>
+                        </tr>
+                    `;
+            });
+            noResultsMessage.style.display = 'none';
+        } else {
+            noResultsMessage.style.display = 'block';
+        }
+
+        resultsContainer.style.display = 'block';*/
+        return false;
+    }
+</script>
 </body>
 
 </html>
