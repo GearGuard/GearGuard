@@ -217,8 +217,26 @@ $this->title = 'Search Appointments';
 <div class="search-container">
     <h2 class="search-title">Search Appointments</h2>
     <form id="searchForm" onsubmit="return handleSearch()">
-        <input type="text" id="searchInput" class="search-input"
-               placeholder="Enter Customer Name, Number Plate, or Contact Number"/>
+        <input type="text" id="firstname" class="search-input"
+               placeholder="Enter First Name"/>
+		<input name="textfield" type="text" class="search-input" id="lastname" placeholder="Enter Last Name">
+		<input name="textfield" type="text" class="search-input" id="numberplate" placeholder="Enter Number Plate">
+		<input name="tel" type="tel" class="search-input" id="contact" placeholder="Enter Contact Number">
+		<input name="date" type="date" class="search-input" id="date" placeholder="Enter Date">
+		<select name="select" class="search-input" id="condition">
+            <option value="">Select a condition for date</option>
+			<option value="before">Before</option>
+			<option value="after">After</option>
+			<option value="on">On</option>
+			<option value="on or before">On or Before</option>
+			<option value="on or after">On or After</option>
+		</select>
+		<select name="select" class="search-input" id="status">
+            <option value="">Select a status</option>
+			<option value="accepted">Accepted</option>
+			<option value="rejected">Rejected</option>
+			<option value="pending">Pending</option>
+		</select>
         <button type="submit" class="search-button">Search</button>
     </form>
 </div>
@@ -246,21 +264,28 @@ $this->title = 'Search Appointments';
 
 <script>
     function handleSearch() {
-        const query = document.getElementById('searchInput').value.trim();
+        const firstname = document.getElementById('firstname').value.trim();
+		const lastname = document.getElementById('lastname').value.trim();
+		const numberplate = document.getElementById('numberplate').value.trim();
+		const contact = document.getElementById('contact').value.trim();
+		const date = document.getElementById('date').value.trim();
+		const condition = document.getElementById('condition').value.trim();
+        const status = document.getElementById('status').value.trim();
         const resultsContainer = document.getElementById('resultsContainer');
         const resultsBody = document.getElementById('resultsBody');
         const noResultsMessage = document.getElementById('noResultsMessage');
-
-        if (query === '') {
-            alert('Please enter a search term.');
-            return false;
-        }
 
         $.ajax({
             url: '/appointment/filtered',
             type: 'GET',
             data: {
-                filter: query
+                firstname: firstname,
+                lastname: lastname,
+                numberplate: numberplate,
+                contact: contact,
+                date: date,
+                condition: condition,
+                status: status,
             },
             success: function (response) {
                 let data = response;

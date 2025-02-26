@@ -132,15 +132,63 @@ class Garage extends UserModel
 
     }
 
-    public function getAllAppointmentsFiltered(string $firstName, string $lastName, string $numberPlate, string $contactNo): array
+    public function getAppointmentByID(int $id): ?Appointment
     {
-        $sql = "select gvsa.*, coalesce (gv.current_user_id, guo.user_id) as current_user_id, gv.license_plate_no, ggs.`id` as service_id, ggs.`type` as service_type, gu.`id` as user_id, gu.first_name, gu.last_name, gu.contact_no, gvt.`type` as vehicle_type, gvm.model as vehicle_model  from gearguard.gg_vehicle_service_appointment gvsa left join gearguard.gg_vehicle gv on gvsa.vehicle_id = gv.`id` left join gearguard.gg_garage_service ggs on gvsa.service_id = ggs.`id` left join gearguard.gg_user_owner guo on gvsa.vehicle_id = guo.vehicle_id right join gearguard.gg_user gu on gu.`id` = coalesce (gv.current_user_id, guo.user_id) left join gearguard.gg_vehicle_type gvt on gv.vehicle_type_id = gvt.`id`  left join gearguard.gg_vehicle_model gvm on gv.model_id = gvm.`id`  where gvsa.service_id in (select ggs2.`id` from gearguard.gg_garage_service ggs2 where ggs2.garage_id = :garageID) and (gu.first_name like concat('%', :first_name, '%') or gu.last_name like concat('%', :last_name, '%') or gv.license_plate_no like concat('%', :number_plate, '%') or gu.contact_no like concat('%', :contact_no, '%')) order by gvsa.`date` desc, gvsa.`time`;";
+        $sql = "SELECT * FROM gg_vehicle_service_appointment gvsa WHERE gvsa.id = :id and gvsa.service_id in (select ggs.id from gearguard.gg_garage_service ggs where ggs.garage_id = :garage_id) LIMIT 1";
+        $statement = self::prepare($sql);
+        $statement->bindValue(':id', $id);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->execute();
+        $object = $statement->fetchObject();
+
+        $appointment = Appointment::getAppointment($object->id, $object->service_id, $object->vehicle_id, $object->date, $object->time, $object->notes, $object->status_id);
+        return $appointment;
+    }
+
+    public function getAllAppointmentsFiltered(string $firstName, string $lastName, string $numberPlate, string $contactNo, string $date, string $condition, string $status): array
+    {
+        switch (strtolower($condition)) {
+            case 'before':
+                $operator = '<';
+                break;
+            case 'after':
+                $operator = '>';
+                break;
+            case 'on':
+                $operator = '=';
+                break;
+            case 'on or before':
+                $operator = '<=';
+                break;
+            case 'on or after':
+                $operator = '>=';
+                break;
+            default:
+                $operator = '=';
+        }
+
+        switch (strtolower($status)) {
+            case 'pending':
+                $status_id = 1;
+                break;
+            case 'accepted':
+                $status_id = 2;
+                break;
+            case 'rejected':
+                $status_id = 3;
+                break;
+            default:
+                $status_id = 2;
+        }
+        $sql = "select gvsa.*, coalesce (gv.current_user_id, guo.user_id) as current_user_id, gv.license_plate_no, ggs.`id` as service_id, ggs.`type` as service_type, gu.`id` as user_id, gu.first_name, gu.last_name, gu.contact_no, gvt.`type` as vehicle_type, gvm.model as vehicle_model  from gearguard.gg_vehicle_service_appointment gvsa left join gearguard.gg_vehicle gv on gvsa.vehicle_id = gv.`id` left join gearguard.gg_garage_service ggs on gvsa.service_id = ggs.`id` left join gearguard.gg_user_owner guo on gvsa.vehicle_id = guo.vehicle_id right join gearguard.gg_user gu on gu.`id` = coalesce (gv.current_user_id, guo.user_id) left join gearguard.gg_vehicle_type gvt on gv.vehicle_type_id = gvt.`id`  left join gearguard.gg_vehicle_model gvm on gv.model_id = gvm.`id`  where gvsa.service_id in (select ggs2.`id` from gearguard.gg_garage_service ggs2 where ggs2.garage_id = :garageID) and (gu.first_name like :first_name and gu.last_name like :last_name and gv.license_plate_no like :number_plate and gu.contact_no like :contact_no and gvsa.`date` $operator :date and gvsa.`status_id` = :status_id) order by gvsa.`date` desc, gvsa.`time`;";
         $statement = Application::$app->db->prepare($sql);
-        $statement->bindValue(':garageID', $this->id);
+        $statement->bindValue(':garageID', $this->id, \PDO::PARAM_INT);
         $statement->bindValue(':first_name', $firstName);
         $statement->bindValue(':last_name', $lastName);
         $statement->bindValue(':number_plate', $numberPlate);
         $statement->bindValue(':contact_no', $contactNo);
+        $statement->bindValue(':date', $date);
+        $statement->bindValue(':status_id', $status_id, \PDO::PARAM_INT);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }

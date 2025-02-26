@@ -105,6 +105,16 @@ $this->title = 'View All Appointments';
             margin-bottom: 1.5rem;
             text-align: center;
         }
+		
+		.SearchBar {
+			text-align: center;
+			margin-bottom: 1rem;
+			font-size: 1.2rem;
+		}
+		
+		#searchBox {
+			width: 20rem;
+		}
 
         table {
             width: 100%;
@@ -164,6 +174,7 @@ $this->title = 'View All Appointments';
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -172,9 +183,12 @@ $this->title = 'View All Appointments';
         <a href="/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
         <a href="/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
     </nav>
-
+	<div class="SearchBar">
+    	<label for="textfield">Search:</label>
+    	<input type="text" name="textfield" id="searchBox" onKeyUp="search()">
+	</div>
     <div class="appointment-table">
-        <h2 class="title">All Appointments</h2>
+      <h2 class="title">All Appointments</h2>
         <table>
             <thead>
                 <tr>
@@ -199,7 +213,11 @@ $this->title = 'View All Appointments';
                     <td><?php echo htmlspecialchars($appointment['date'] . " " . $appointment['time']); ?></td>
                     <td><button onclick='viewDetails(<?php echo json_encode($appointment); ?>)' class="view-more-button">View More</button></td>
                     <?php if ($appointment['status_id'] == 1): ?>
-                        <td><button class="view-more-button" onclick="handleAcceptance(<?php echo htmlspecialchars($appointment['id']);?>, 2)">Accept</button><button class="view-more-button">Reject</button></td>
+                        <td><button class="view-more-button" onclick="handleAcceptance(<?php echo htmlspecialchars($appointment['id']);?>, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(<?php echo htmlspecialchars($appointment['id']);?>, 3)">Reject</button></td>
+                    <?php elseif ($appointment['status_id'] == 2): ?>
+                        <td>Accepted</td>
+                    <?php else: ?>
+                        <td>Rejected</td>
                     <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
@@ -229,30 +247,53 @@ $this->title = 'View All Appointments';
 
             content.innerHTML = `<h2>${appointment.license_plate_no}</h2>
                              <p>Vehicle Mode: ${appointment.vehicle_model}</p>
-                             <p>Notes: ${appointment.notes} hours</p>
+                             <p>Notes: ${appointment.notes}</p>
                              <button onclick='this.parentElement.parentElement.remove()' style='padding: 10px; background: var(--accent); color: var(--text); border: none; border-radius: 5px; cursor: pointer;'>Close</button>`;
 
             modal.appendChild(content);
             document.body.appendChild(modal);
         }
+		
+		function search() {
+			$searchq = document.getElementById("searchBox").value.trim();
+			$nodes = document.querySelectorAll("tbody tr");
+			
+			if ($searchq == "") {
+				$nodes.forEach(n => {
+					n.hidden = false;
+				});
+			}
+			
+			$nodes.forEach(n => {
+				if (!n.innerHTML.includes($searchq)){
+					n.hidden = true;
+				} else {
+					n.hidden = false;
+				}
+			});
+		}
 
         async function handleAcceptance(appointment_id, status_id) {
-            const response = await fetch(`/appointment/update-status/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+            $.ajax({
+                url: '/appointment/update_status',
+                type: 'POST',
+                data: {
                     appointment_id: appointment_id,
                     status_id: status_id
-                })
-            });
-
-            if (response.ok) {
-                alert('Appointment status updated successfully.');
-            } else {
-                alert('Failed to update appointment status.');
-            }
+                },
+                success: function (response) {
+                    if (response === 'success') {
+                        alert('Appointment status updated successfully.');
+                        location.reload();
+                    } else {
+                        alert('An error occurred. Please try again later.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error:', error);
+                    alert('An error occurred. Please try again later.');
+                }
+            })
         }
 
     </script>

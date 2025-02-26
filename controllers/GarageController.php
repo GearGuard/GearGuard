@@ -228,10 +228,15 @@ class GarageController extends Controller
     public function filteredAppointments(Request $request, Response $response)
     {
         $body = $request->getBody();
-        $filter = $body['filter'] ?? $filter = '';
-        $filter = htmlspecialchars($filter);
+        $firstname = htmlspecialchars($body['firstname']) ? '%'.htmlspecialchars($body['firstname']).'%' : '%';
+        $lastname = htmlspecialchars($body['lastname']) ? '%'.htmlspecialchars($body['lastname']).'%' : '%';
+        $numberplate = htmlspecialchars($body['numberplate']) ? '%'.htmlspecialchars($body['numberplate']).'%' : '%';
+        $contact = htmlspecialchars($body['contact']) ? '%'.htmlspecialchars($body['contact']).'%' : '%';
+        $date = htmlspecialchars($body['date']) ? htmlspecialchars($body['date']) : date("Y-m-d");
+        $condition = htmlspecialchars($body['condition']) ? htmlspecialchars($body['condition']) : 'on or before';
+        $status = htmlspecialchars($body['status']) ? htmlspecialchars($body['status']) : 'pending';
         header('Content-Type: application/json; charset=utf-8');
-        return json_encode(Application::$app->user->getAllAppointmentsFiltered($filter,$filter, $filter, $filter));
+        return json_encode(Application::$app->user->getAllAppointmentsFiltered($firstname, $lastname, $numberplate, $contact, $date, $condition, $status));
     }
 
 }
