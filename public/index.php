@@ -7,7 +7,8 @@ use app\controllers\AuthController;
 use app\controllers\SiteController;
 use app\controllers\AdminController;
 use app\controllers\GarageController;
-use gearguard\phpmvc\Application;
+	use app\controllers\VehicleController;
+	use gearguard\phpmvc\Application;
 
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -41,7 +42,10 @@ $app->router->get('/customer/settings', [AuthController::class, 'settings']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
 $app->router->post('/customer/appointment/appoint', [AuthController::class, 'newAppointmentsPost']);
 $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehicle']);
+$app->router->post('/customer/vehicle/register', [VehicleController::class, 'addVehiclePost']);
 $app->router->get('/customer/vehicle/all', [AuthController::class, 'viewAllVehicle']);
+$app->router->get('/customer/vehicle/all', [VehicleController::class, 'viewAllVehicle']);
+
 $app->router->get('/customer/vehicle/service_history', [AuthController::class, 'vehicleServiceHistory']);
 $app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);
 $app->router->get('/customer/vehicleTransfer/transfer', [AuthController::class, 'transferVehicle']);
