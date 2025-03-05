@@ -401,19 +401,19 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function viewAllVehicle(Request $request, Response $response)
-    {
-        if (Application::$app->user instanceof User)
-            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
-                return $this->render('customer/vehicle/viewAll', [
-                    'name' => 'The GearGuard',
-                ]);
-            } else {
-                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
-            }
-
-        throw new NotFoundException();
-    }
+//    public function viewAllVehicle(Request $request, Response $response)
+//    {
+//        if (Application::$app->user instanceof User)
+//            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
+//                return $this->render('customer/vehicle/viewAll', [
+//                    'name' => 'The GearGuard',
+//                ]);
+//            } else {
+//                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+//            }
+//
+//        throw new NotFoundException();
+//    }
 
     public function vehicleServiceHistory(Request $request, Response $response)
     {
