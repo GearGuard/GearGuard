@@ -122,19 +122,6 @@ class Appointment extends DbModel
         return $object;
     }
 
-    public static function getAppointmentByID(int $id): Appointment
-    {
-        $sql = "SELECT * FROM gg_vehicle_service_appointment WHERE id = :id LIMIT 1";
-        $statement = self::prepare($sql);
-        $statement->bindValue(':id', $id);
-        $statement->execute();
-        $result = $statement->fetchObject();
-        if (!$result) {
-            throw new NotFoundException('Appointment not found');
-        }
-        return $result;
-    }
-
     public static function getAppointment(int $id, int $vehicle_id, int $service_id, $date, $time, string $note) {
         $object = new Appointment();
         $object->id = $id;
