@@ -7,6 +7,7 @@ use app\controllers\AuthController;
 use app\controllers\SiteController;
 use app\controllers\AdminController;
 use app\controllers\GarageController;
+	use app\controllers\SparePartController;
 	use app\controllers\VehicleController;
 	use gearguard\phpmvc\Application;
 
@@ -46,14 +47,20 @@ $app->router->post('/customer/vehicle/register', [VehicleController::class, 'add
 //$app->router->get('/customer/vehicle/all', [AuthController::class, 'viewAllVehicle']);
 $app->router->get('/customer/vehicle/all', [VehicleController::class, 'viewAllVehicle']);
 
+
 $app->router->get('/customer/vehicle/service_history', [AuthController::class, 'vehicleServiceHistory']);
 $app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);
 $app->router->get('/customer/vehicleTransfer/transfer', [AuthController::class, 'transferVehicle']);
 $app->router->get('/customer/vehicleTransfer/instruction', [AuthController::class, 'transferInstructions']);
 $app->router->get('/customer/appointment/service_history', [AuthController::class, 'serviceHistory']);
 $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::class, 'sparepartsWarranty']);
+
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepart']);
+$app->router->post('/customer/sparepart/add_sparepart', [SparePartController::class, 'addSparePart']);
+
+//$app->router->post('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepartPost']);
 $app->router->get('/customer/sparepart/view_sparepart', [AuthController::class, 'viewSparepart']);
+
 $app->router->get('/customer/profile', [AuthController::class, 'myProfile']);
 
 $app->router->get('/login', [AuthController::class, 'login']);

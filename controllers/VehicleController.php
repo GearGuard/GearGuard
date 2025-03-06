@@ -87,7 +87,6 @@ class VehicleController extends Controller
 			} else {
 				return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
 			}
-
 		throw new NotFoundException();
 	}
 }
