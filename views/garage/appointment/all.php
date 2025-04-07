@@ -189,7 +189,7 @@ $this->title = 'View All Appointments';
 	</div>
     <div class="appointment-table">
       <h2 class="title">All Appointments</h2>
-        <table>
+        <table id="appointmentTable">
             <thead>
                 <tr>
                     <th>Vehicle Type</th>
@@ -203,29 +203,19 @@ $this->title = 'View All Appointments';
                 </tr>
             </thead>
             <tbody>
-            <?php foreach ($appointments as $appointment): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($appointment['vehicle_type']); ?></td>
-                    <td><?php echo htmlspecialchars($appointment['first_name'] . " " . $appointment['last_name']); ?></td>
-                    <td><?php echo htmlspecialchars($appointment['contact_no']); ?></td>
-                    <td><?php echo htmlspecialchars($appointment['license_plate_no']); ?></td>
-                    <td><?php echo htmlspecialchars($appointment['service_type']); ?></td>
-                    <td><?php echo htmlspecialchars($appointment['date'] . " " . $appointment['time']); ?></td>
-                    <td><button onclick='viewDetails(<?php echo json_encode($appointment); ?>)' class="view-more-button">View More</button></td>
-                    <?php if ($appointment['status_id'] == 1): ?>
-                        <td><button class="view-more-button" onclick="handleAcceptance(<?php echo htmlspecialchars($appointment['id']);?>, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(<?php echo htmlspecialchars($appointment['id']);?>, 3)">Reject</button></td>
-                    <?php elseif ($appointment['status_id'] == 2): ?>
-                        <td>Accepted</td>
-                    <?php else: ?>
-                        <td>Rejected</td>
-                    <?php endif; ?>
-                </tr>
-            <?php endforeach; ?>
+
             </tbody>
         </table>
+        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
     </div>
 
     <script>
+        let page = 1;
+        let isLoading = false;
+        let hasMoreData = true;
+        const limit = 25;
+        const loader = document.getElementById('loader');
+
         function viewDetails(appointment) {
             const modal = document.createElement('div');
             modal.style.position = 'fixed';
@@ -273,6 +263,61 @@ $this->title = 'View All Appointments';
 			});
 		}
 
+        async function fetchAppointments() {
+            if (isLoading || !hasMoreData) return;
+
+            isLoading = true;
+            loader.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`/api/garage/getAppointments?page=${page}`);
+                const result = await response.json();
+
+                appendRows(result);
+
+                if (result.length < limit) {
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else {
+                    page++;
+                }
+            } catch (error) {
+                console.error('Error fetching appointments:', error);
+            } finally {
+                isLoading = false;
+            }
+
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function appendRows(data) {
+            const tableBody = document.querySelector('#appointmentTable tbody');
+            data.forEach(appointment => {
+                content = `
+                          <tr>
+                              <td>${appointment.vehicle_type}</td>
+                              <td>${appointment.first_name} ${appointment.last_name}</td>
+                              <td>${appointment.contact_no}</td>
+                              <td>${appointment.license_plate_no}</td>
+                              <td>${appointment.service_type}</td>
+                              <td>${appointment.date} ${appointment.time}</td>
+                              <td><button onclick='viewDetails(${JSON.stringify(appointment)})' class="view-more-button">View More</button></td>
+                          `;
+
+                if (appointment.status_id == 1) {
+                    content += `<td><button class="view-more-button" onclick="handleAcceptance(${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(${appointment.id}, 3)">Reject</button></td>`;
+                } else if (appointment.status_id == 2) {
+                    content += `<td>Accepted</td>`;
+                } else {
+                    content += `<td>Rejected</td>`;
+                }
+
+                row = document.createElement('tr');
+                row.innerHTML = content;
+                tableBody.appendChild(row);
+            });
+        }
+
         async function handleAcceptance(appointment_id, status_id) {
             $.ajax({
                 url: '/appointment/update_status',
@@ -295,6 +340,17 @@ $this->title = 'View All Appointments';
                 }
             })
         }
+
+        function handleScroll() {
+            const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+            if (scrollTop + clientHeight >= scrollHeight - 5) {
+                fetchAppointments();
+            }
+        }
+
+        fetchAppointments();
+
+        window.addEventListener('scroll', handleScroll);
 
     </script>
 </body>

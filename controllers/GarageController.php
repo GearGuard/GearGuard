@@ -10,7 +10,6 @@ use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\middlewares\ExtendedMiddleware;
 use app\models\Garage;
-use http\Exception\InvalidArgumentException;
 
 class GarageController extends Controller
 {
@@ -29,14 +28,19 @@ class GarageController extends Controller
 
     public function viewServices(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage) {
-            return $this->render('garage/services/viewAll', [
-                'name' => 'The GearGuard',
-                'services' => Application::$app->user->getServices(),
-            ]);
-        }
+        return $this->render('garage/services/viewAll', [
+            'name' => 'The GearGuard',
+        ]);
+    }
 
-        throw new NotFoundException();
+    public function getServices(Request $request, Response $response)
+    {
+        $body = $request->getBody();
+        $page = $body['page'] ?? 1;
+        if(!is_numeric($page)) throw new NotFoundException();
+        $page = htmlspecialchars($page);
+        header('Content-Type: application/json; charset=utf-8');
+        return json_encode(Application::$app->user->getServices((int)$page));
     }
 
     public function viewCustomers(Request $request, Response $response)
@@ -59,6 +63,16 @@ class GarageController extends Controller
         }
 
         throw new NotFoundException();
+    }
+
+    public function getAppointments(Request $request, Response $response)
+    {
+        $body = $request->getBody();
+        $page = $body['page'] ?? 1;
+        if(!is_numeric($page)) throw new NotFoundException();
+        $page = htmlspecialchars($page);
+        header('Content-Type: application/json; charset=utf-8');
+        return json_encode(Application::$app->user->getAllAppointments((int)$page));
     }
 
     public function searchAppointments(Request $request, Response $response)
@@ -110,7 +124,6 @@ class GarageController extends Controller
             $model->save();
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
-                'services' => Application::$app->user->getServices(),
             ]);
         }
 
@@ -180,7 +193,7 @@ class GarageController extends Controller
         if (Application::$app->user instanceof Garage) {
             $body = $request->getBody();
             if (!isset($body['id']) || !isset($body['type']) || !isset($body['price']) || !isset($body['duration']) || !isset($body['description']))
-                throw new InvalidArgumentException();
+                throw new NotFoundException();
             $id = htmlspecialchars($body['id']);
             $type = htmlspecialchars($body['type']);
             $price = htmlspecialchars($body['price']);
@@ -196,7 +209,6 @@ class GarageController extends Controller
 
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
-                'services' => Application::$app->user->getServices(),
             ]);
         }
 
@@ -208,8 +220,8 @@ class GarageController extends Controller
         if (Application::$app->user instanceof Garage) {
             $body = $request->getBody();
             $id = $body['serviceID'] ?? '';
-            if (is_int($id))
-                throw new InvalidArgumentException();
+            if (!is_numeric($id))
+                throw new NotFoundException();
             $id = htmlspecialchars($id);
             $toUpdate = [
                 'status_id' => 3
@@ -218,7 +230,6 @@ class GarageController extends Controller
 
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
-                'services' => Application::$app->user->getServices(),
             ]);
         }
 
@@ -228,15 +239,28 @@ class GarageController extends Controller
     public function filteredAppointments(Request $request, Response $response)
     {
         $body = $request->getBody();
-        $firstname = htmlspecialchars($body['firstname']) ? '%'.htmlspecialchars($body['firstname']).'%' : '%';
-        $lastname = htmlspecialchars($body['lastname']) ? '%'.htmlspecialchars($body['lastname']).'%' : '%';
-        $numberplate = htmlspecialchars($body['numberplate']) ? '%'.htmlspecialchars($body['numberplate']).'%' : '%';
-        $contact = htmlspecialchars($body['contact']) ? '%'.htmlspecialchars($body['contact']).'%' : '%';
-        $date = htmlspecialchars($body['date']) ? htmlspecialchars($body['date']) : date("Y-m-d");
-        $condition = htmlspecialchars($body['condition']) ? htmlspecialchars($body['condition']) : 'on or before';
-        $status = htmlspecialchars($body['status']) ? htmlspecialchars($body['status']) : 'pending';
+        $firstname = htmlspecialchars(isset($body['firstname']) ? '%'.htmlspecialchars($body['firstname']).'%' : '%');
+        $lastname = htmlspecialchars(isset($body['lastname']) ? '%'.htmlspecialchars($body['lastname']).'%' : '%');
+        $numberplate = htmlspecialchars(isset($body['numberplate']) ? '%'.htmlspecialchars($body['numberplate']).'%' : '%');
+        $contact = htmlspecialchars(isset($body['contact']) ? '%'.htmlspecialchars($body['contact']).'%' : '%');
+        $date = htmlspecialchars((isset($body['date']) && !$body['date'] == '') ? htmlspecialchars($body['date']) : date("Y-m-d"));
+        $condition = htmlspecialchars((isset($body['condition'])  && !$body['condition'] == '') ? htmlspecialchars($body['condition']) : 'on or before');
+        $status = htmlspecialchars((isset($body['status'])  && !$body['status'] == '') ? htmlspecialchars($body['status']) : 'pending');
+        $page = $body['page'] ?? 1;
+        if(!is_numeric($page)) throw new NotFoundException();
+        $page = htmlspecialchars($page);
         header('Content-Type: application/json; charset=utf-8');
-        return json_encode(Application::$app->user->getAllAppointmentsFiltered($firstname, $lastname, $numberplate, $contact, $date, $condition, $status));
+        return json_encode(Application::$app->user->getAllAppointmentsFiltered($firstname, $lastname, $numberplate, $contact, $date, $condition, $status, (int)$page));
+    }
+
+    public function getCustomers(Request $request, Response $response)
+    {
+        $body = $request->getBody();
+        $page = $body['page'] ?? 1;
+        if(!is_numeric($page)) throw new NotFoundException();
+        $page = htmlspecialchars($page);
+        header('Content-Type: application/json; charset=utf-8');
+        return json_encode(Application::$app->user->getAllCustomerDetails((int)$page));
     }
 
 }

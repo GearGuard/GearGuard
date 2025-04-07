@@ -159,24 +159,80 @@
     </nav>
     <div class="services-container">
         <h2 class="title">All Garage Services</h2>
-        <table>
-            <tr>
-                <th>Service Type</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-
-            <?php foreach ($services as $service): ?>
+        <table id="servicesTable">
+            <thead>
                 <tr>
-                    <td><?php echo htmlspecialchars($service['type']); ?></td>
-                    <td>$<?php echo htmlspecialchars($service['price']); ?></td>
-                    <td><button onclick='viewDetails(<?php echo json_encode($service); ?>)' class="view-more-button">View More</button></td>
+                    <th>Service Type</th>
+                    <th>Price</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endforeach; ?>
+            </thead>
+            <tbody>
+                <!-- Rows will be appended here dynamically -->
+            </tbody>
         </table>
+        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
     </div>
 
     <script>
+        let page = 1;
+        let isLoading = false;
+        let hasMoreData = true;
+        const limit = 25;
+        const loader = document.getElementById('loader');
+
+        async function fetchServices() {
+            if (isLoading || !hasMoreData) return;
+
+            isLoading = true;
+            loader.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`/api/garage/getServices?page=${page}`);
+                const result = await response.json();
+
+                appendRows(result);
+
+                if (result.length < limit) {
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else {
+                    page++;
+                }
+            } catch (error) {
+                console.error('Error fetching services:', error);
+            } finally {
+                isLoading = false;
+            }
+
+            document.getElementById('loader').style.display = 'none';
+        }
+
+    function appendRows(data) {
+        const tableBody = document.querySelector('#servicesTable tbody');
+        data.forEach(service => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                            <td>${service.type}</td>
+                            <td>${service.price}</td>
+                            <td><button onclick='viewDetails(${JSON.stringify(service)})' class="view-more-button">View More</button></td>
+
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function handleScroll() {
+        const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 5) {
+            fetchServices();
+        }
+    }
+
+    fetchServices();
+
+    window.addEventListener('scroll', handleScroll);
+
         function viewDetails(service) {
             const modal = document.createElement('div');
             modal.style.position = 'fixed';

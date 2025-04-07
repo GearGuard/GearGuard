@@ -147,46 +147,80 @@
         <table id="customersTable">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Vehicle Model</th>
-                    <th>Service Type</th>
-                    <th>Service Date</th>
-                    <th>Email</th>
+                    <th>Fist Name</th>
+                    <th>Last Name</th>
                     <th>Phone Number</th>
+                    <th>Email</th>
+                    <th>Address</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Table body will be populated by JavaScript -->
             </tbody>
         </table>
+        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
     </div>
 
     <script>
-        // Dummy data
-        const customers = [
-            ['John Doe', 'Toyota Camry', 'Oil Change', '2023-12-01', 'john@example.com', '123-456-7890'],
-            ['Jane Smith', 'Honda Civic', 'Tire Rotation', '2023-12-02', 'jane@example.com', '987-654-3210'],
-            ['Mike Johnson', 'Ford F-150', 'Brake Service', '2023-12-03', 'mike@example.com', '456-789-0123'],
-            ['Sarah Brown', 'Chevrolet Malibu', 'Engine Tune-up', '2023-12-04', 'sarah@example.com', '789-012-3456'],
-            ['David Wilson', 'Nissan Altima', 'Transmission Service', '2023-12-05', 'david@example.com', '321-654-9870']
-        ];
+        let page = 1;
+        let isLoading = false;
+        let hasMoreData = true;
+        const limit = 25;
+        const loader = document.getElementById('loader');
 
-        // Function to populate the table
-        function populateTable() {
-            const tableBody = document.querySelector('#customersTable tbody');
-            customers.forEach(customer => {
-                const row = document.createElement('tr');
-                customer.forEach(data => {
-                    const cell = document.createElement('td');
-                    cell.textContent = data;
-                    row.appendChild(cell);
-                });
-                tableBody.appendChild(row);
-            });
+        async function fetchCustomers() {
+            if (isLoading || !hasMoreData) return;
+
+            isLoading = true;
+            loader.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`/api/garage/getCustomers?page=${page}`);
+                const result = await response.json();
+
+                appendRows(result);
+
+                if (result.length < limit) {
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else {
+                    page++;
+                }
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+            } finally {
+                isLoading = false;
+            }
+
+            document.getElementById('loader').style.display = 'none';
         }
 
-        // Call the function to populate the table when the page loads
-        window.onload = populateTable;
+    function appendRows(data) {
+        const tableBody = document.querySelector('#customersTable tbody');
+        data.forEach(customer => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${customer.first_name}</td>
+                <td>${customer.last_name}</td>
+                <td>${customer.contact_no}</td>
+                <td>${customer.email}</td>
+                <td>${customer.address}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function handleScroll() {
+        const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 5) {
+            fetchCustomers();
+        }
+    }
+
+    fetchCustomers();
+
+    window.addEventListener('scroll', handleScroll);
+
     </script>
 </body>
 
