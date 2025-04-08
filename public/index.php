@@ -105,6 +105,7 @@ $app->router->get('/api/garage/getCustomers', [GarageController::class, 'getCust
 $app->router->get('/api/garage/getAppointments', [GarageController::class, 'getAppointments']);
 $app->router->get('/api/garage/getAppointmentsFiltered', [GarageController::class, 'filteredAppointments']);
 $app->router->get('/api/garage/getServices', [GarageController::class, 'getServices']);
+$app->router->get('/api/garage/getCustomerVehicles', [GarageController::class, 'getCustomerVehicles']);
 
 
 $app->run();

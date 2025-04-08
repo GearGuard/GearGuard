@@ -164,7 +164,7 @@
                 <tr>
                     <th>Service Type</th>
                     <th>Price</th>
-                    <th>Actions</th>
+                    <th>Description</th>
                 </tr>
             </thead>
             <tbody>
@@ -212,10 +212,20 @@
         const tableBody = document.querySelector('#servicesTable tbody');
         data.forEach(service => {
             const row = document.createElement('tr');
+            row.addEventListener('click', () => {
+                viewDetails(service);
+            });
+            row.style.cursor = "pointer";
+            row.onmouseover = function () {
+                this.style.backgroundColor = "#33363f";
+            };
+            row.onmouseout = function () {
+                this.style.backgroundColor = "";
+            };
             row.innerHTML = `
                             <td>${service.type}</td>
                             <td>${service.price}</td>
-                            <td><button onclick='viewDetails(${JSON.stringify(service)})' class="view-more-button">View More</button></td>
+                            <td>${service.description}</td>
 
             `;
             tableBody.appendChild(row);

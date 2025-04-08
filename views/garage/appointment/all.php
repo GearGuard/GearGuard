@@ -294,14 +294,12 @@ $this->title = 'View All Appointments';
             const tableBody = document.querySelector('#appointmentTable tbody');
             data.forEach(appointment => {
                 content = `
-                          <tr>
                               <td>${appointment.vehicle_type}</td>
                               <td>${appointment.first_name} ${appointment.last_name}</td>
                               <td>${appointment.contact_no}</td>
                               <td>${appointment.license_plate_no}</td>
                               <td>${appointment.service_type}</td>
                               <td>${appointment.date} ${appointment.time}</td>
-                              <td><button onclick='viewDetails(${JSON.stringify(appointment)})' class="view-more-button">View More</button></td>
                           `;
 
                 if (appointment.status_id == 1) {
@@ -313,6 +311,16 @@ $this->title = 'View All Appointments';
                 }
 
                 row = document.createElement('tr');
+                row.addEventListener('click', () => {
+                    viewDetails(appointment);
+                });
+                row.style.cursor = "pointer";
+                row.onmouseover = function () {
+                    this.style.backgroundColor = "#33363f";
+                };
+                row.onmouseout = function () {
+                    this.style.backgroundColor = "";
+                };
                 row.innerHTML = content;
                 tableBody.appendChild(row);
             });

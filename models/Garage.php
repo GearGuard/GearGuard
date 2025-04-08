@@ -199,20 +199,34 @@ class Garage extends UserModel
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function getAllCustomerVehicleDetails() : array {
-        $sql = "with garage_services as (select ggs.`id` from gearguard.gg_garage_service ggs where ggs.garage_id = :garage_id), relevant_vehicles as (select gvsa.vehicle_id from gearguard.gg_vehicle_service_appointment gvsa where gvsa.service_id in (select id from garage_services) union select gvst.vehicle_id from gearguard.gg_vehicle_service_take gvst where service_id in (select id from garage_services)) select gv.* from gearguard.gg_vehicle gv join relevant_vehicles rv on gv.id = rv.vehicle_id;";
+    public function getCustomerVehicleDetails(int $customerID) : array {
+        $sql = "with garage_services as (select ggs.`id` from gearguard.gg_garage_service ggs where ggs.garage_id = :garage_id), relevant_vehicles as (select gvsa.vehicle_id from gearguard.gg_vehicle_service_appointment gvsa where gvsa.service_id in (select id from garage_services) union select gvst.vehicle_id from gearguard.gg_vehicle_service_take gvst where service_id in (select id from garage_services)) select gv.license_plate_no, gvt.`type`, gvm.model, gv.year_manufactured from gearguard.gg_vehicle gv right join relevant_vehicles rv on gv.id = rv.vehicle_id left join gearguard.gg_vehicle_model gvm on gv.model_id = gvm.`id` left join gearguard.gg_vehicle_type gvt on gv.vehicle_type_id = gvt.`id` left join gearguard.gg_user_owner guo on gv.`id` = guo.vehicle_id where gv.current_user_id = :user_id or guo.user_id = :user_id order by gv.id;";
         $statement = Application::$app->db->prepare($sql);
         $statement->bindValue(':garage_id', $this->id, \PDO::PARAM_INT);
+        $statement->bindValue(':user_id', $customerID, \PDO::PARAM_INT);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getAllCustomerDetails(int $page) : array {
-        $sql = "SELECT gu.id, gu.first_name, gu.last_name, gu.contact_no, gu.email, gu.address FROM gearguard.gg_user gu JOIN gearguard.gg_vehicle gv ON gu.id = gv.current_user_id WHERE gv.id IN (SELECT gvsa.vehicle_id FROM gearguard.gg_vehicle_service_appointment gvsa JOIN gearguard.gg_garage_service ggs ON gvsa.service_id = ggs.id WHERE ggs.garage_id = :garage_id UNION SELECT gvst.vehicle_id FROM gearguard.gg_vehicle_service_take gvst JOIN gearguard.gg_garage_service ggs ON gvst.service_id = ggs.id WHERE ggs.garage_id = :garage_id) order by gu.id limit 25 offset :offset;";
+        $sql = "SELECT gu.id, gu.first_name, gu.last_name, gu.contact_no, gu.email, gu.address FROM gearguard.gg_user gu left JOIN gearguard.gg_vehicle gv ON gu.id = coalesce(gv.current_user_id, (select guo.user_id from gearguard.gg_user_owner guo where guo.vehicle_id = gv.`id`)) WHERE gv.id IN (SELECT gvsa.vehicle_id FROM gearguard.gg_vehicle_service_appointment gvsa right JOIN gearguard.gg_garage_service ggs ON gvsa.service_id = ggs.id WHERE ggs.garage_id = :garage_id UNION SELECT gvst.vehicle_id FROM gearguard.gg_vehicle_service_take gvst right JOIN gearguard.gg_garage_service ggs ON gvst.service_id = ggs.id WHERE ggs.garage_id = :garage_id) order by gu.id limit 25 offset :offset;";
         $statement = Application::$app->db->prepare($sql);
         $statement->bindValue(':garage_id', $this->id, \PDO::PARAM_INT);
         $offset = ($page - 1) * 25;
         $statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getCustomersFiltered($first_name, $last_name, $email, int $page) : array {
+        $sql = "SELECT gu.id, gu.first_name, gu.last_name, gu.contact_no, gu.email, gu.address FROM gearguard.gg_user gu left JOIN gearguard.gg_vehicle gv ON gu.id = coalesce(gv.current_user_id, (select guo.user_id from gearguard.gg_user_owner guo where guo.vehicle_id = gv.`id`)) WHERE gv.id IN (SELECT gvsa.vehicle_id FROM gearguard.gg_vehicle_service_appointment gvsa right JOIN gearguard.gg_garage_service ggs ON gvsa.service_id = ggs.id WHERE ggs.garage_id = :garage_id UNION SELECT gvst.vehicle_id FROM gearguard.gg_vehicle_service_take gvst right JOIN gearguard.gg_garage_service ggs ON gvst.service_id = ggs.id WHERE ggs.garage_id = :garage_id) and gu.first_name like :firstName and gu.last_name like :last_name and gu.email like :email order by gu.id limit 25 offset :offset;";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $this->id, \PDO::PARAM_INT);
+        $offset = ($page - 1) * 25;
+        $statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $statement->bindValue(':firstName', $first_name);
+        $statement->bindValue(':last_name', $last_name);
+        $statement->bindValue(':email', $email);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }

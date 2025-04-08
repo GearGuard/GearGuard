@@ -300,7 +300,13 @@
                     searchQuery: searchType
                 },
                 success: function (response) {
-                    document.getElementById('serviceDetails').style.display = 'block';
+                    serviceDetails = document.getElementById('serviceDetails');
+                    if (response == null) {
+                        serviceDetails.style.display = 'none';
+                        alert('No service found!');
+                        return;
+                    }
+                    serviceDetails.style.display = 'block';
 
                     // Populate form fields with dummy data (replace this with actual data from your backend)
                     serviceId = response.id;

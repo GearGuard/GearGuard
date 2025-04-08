@@ -321,14 +321,13 @@ $this->title = 'Search Appointments';
                         page++;
                     }
                     data.forEach(item => {
-                        let tablerow = `<tr>
+                        let tablerow = `<tr onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
                             <td>${item.vehicle_type}</td>
                             <td>${item.first_name} ${item.last_name}</td>
                             <td>${item.contact_no}</td>
                             <td>${item.license_plate_no}</td>
                             <td>${item.service_type}</td>
-                            <td>${item.date} ${item.time}</td>
-                            <td><button onclick='viewDetails(${JSON.stringify(item)})' class="view-more-button">View More</button></td>`;
+                            <td>${item.date} ${item.time}</td>`;
 
                         if (item.status_id === 1) {
                             tablerow += `<td><button class="view-more-button">Accept</button><button class="view-more-button">Reject</button></td>`;
@@ -384,6 +383,14 @@ $this->title = 'Search Appointments';
 
         resultsContainer.style.display = 'block';*/
         return false;
+    }
+
+    function addBackground(element) {
+        element.style.backgroundColor = '#33363f';
+    }
+
+    function removeBackground(element) {
+        element.style.backgroundColor = '';
     }
 
     function viewDetails(appointment) {

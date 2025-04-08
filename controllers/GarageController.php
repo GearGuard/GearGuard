@@ -259,8 +259,24 @@ class GarageController extends Controller
         $page = $body['page'] ?? 1;
         if(!is_numeric($page)) throw new NotFoundException();
         $page = htmlspecialchars($page);
+        $firstname = htmlspecialchars(isset($body['firstname']) ? '%'.htmlspecialchars($body['firstname']).'%' : '%');
+        $lastname = htmlspecialchars(isset($body['lastname']) ? '%'.htmlspecialchars($body['lastname']).'%' : '%');
+        $email = htmlspecialchars(isset($body['email']) ? '%'.htmlspecialchars($body['email']).'%' : '%');
         header('Content-Type: application/json; charset=utf-8');
+        if (isset($body['firstname']) || isset($body['lastname']) || isset($body['email'])) {
+            return json_encode(Application::$app->user->getCustomersFiltered($firstname, $lastname, $email, (int)$page));
+        }
         return json_encode(Application::$app->user->getAllCustomerDetails((int)$page));
+    }
+
+    public function getCustomerVehicles(Request $request, Response $response)
+    {
+        $body = $request->getBody();
+        $customerID = $body['customerID'] ?? '';
+        if (!is_numeric($customerID)) throw new NotFoundException();
+        $customerID = htmlspecialchars($customerID);
+        header('Content-Type: application/json; charset=utf-8');
+        return json_encode(Application::$app->user->getCustomerVehicleDetails((int)$customerID));
     }
 
 }
