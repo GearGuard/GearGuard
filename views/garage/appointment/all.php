@@ -116,6 +116,13 @@ $this->title = 'View All Appointments';
 			width: 20rem;
 		}
 
+        .no-results {
+            color: var(--primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
         table {
             width: 100%;
             border-collapse: separate;
@@ -206,7 +213,7 @@ $this->title = 'View All Appointments';
 
             </tbody>
         </table>
-        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
+        <p id="loader" class="no-results">Loading...</p>
     </div>
 
     <script>
@@ -276,6 +283,11 @@ $this->title = 'View All Appointments';
                 appendRows(result);
 
                 if (result.length < limit) {
+                    loader.textContent = '--- End of Appointments Table ---';
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else if (result.length === 0 && loadedResults === 0) {
+                    loader.textContent = 'No Appointments found.';
                     hasMoreData = false;
                     window.removeEventListener('scroll', handleScroll);
                 } else {
@@ -286,8 +298,6 @@ $this->title = 'View All Appointments';
             } finally {
                 isLoading = false;
             }
-
-            document.getElementById('loader').style.display = 'none';
         }
 
         function appendRows(data) {

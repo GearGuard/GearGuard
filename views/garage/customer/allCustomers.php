@@ -114,6 +114,13 @@
             text-align: center;
         }
 
+        .no-results {
+            color: var(--primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -187,7 +194,7 @@
                 <!-- Table body will be populated by JavaScript -->
             </tbody>
         </table>
-        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
+        <p id="loader" class="no-results">Loading...</p>
     </div>
 
     <div id="vehicleListModal" class="modal">
@@ -200,6 +207,7 @@
         let page = 1;
         let isLoading = false;
         let hasMoreData = true;
+        let loadedResults = 0;
         const limit = 25;
         const loader = document.getElementById('loader');
 
@@ -216,6 +224,11 @@
                 appendRows(result);
 
                 if (result.length < limit) {
+                    loader.textContent = '--- End of Customers Table ---';
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else if (result.length === 0 && loadedResults === 0) {
+                    loader.textContent = 'No customers found.';
                     hasMoreData = false;
                     window.removeEventListener('scroll', handleScroll);
                 } else {
@@ -223,11 +236,10 @@
                 }
             } catch (error) {
                 console.error('Error fetching customers:', error);
+                loader.textContent = 'Error loading customers. Please try again.';
             } finally {
                 isLoading = false;
             }
-
-            document.getElementById('loader').style.display = 'none';
         }
 
     function appendRows(data) {
@@ -252,6 +264,7 @@
                 <td>${customer.address}</td>
             `;
             tableBody.appendChild(row);
+            loadedResults++;
         });
     }
 

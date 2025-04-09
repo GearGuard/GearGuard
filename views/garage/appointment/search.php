@@ -259,14 +259,14 @@ $this->title = 'Search Appointments';
         <!-- Results will be injected dynamically -->
         </tbody>
     </table>
-    <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
-    <p class="no-results" id="noResultsMessage" style="display: none;">No results found.</p>
+    <p class="no-results" id="loader" style="display: none;">No results found.</p>
 </div>
 
 <script>
     let page = 1;
     let isLoading = false;
     let hasMoreData = true;
+    let loadedResults = 0;
     const limit = 25;
     const loader = document.getElementById('loader');
 
@@ -274,6 +274,7 @@ $this->title = 'Search Appointments';
         page = 1;
         isLoading = false;
         hasMoreData = true;
+        loadedResults = 0;
     }
 
     document.querySelectorAll('#searchForm input, #searchForm select').forEach(a => addEventListener("input", (event) => resetVariables()));
@@ -313,10 +314,14 @@ $this->title = 'Search Appointments';
                 let data = response;
 
                 resultsBody.innerHTML = '';
-                if (data.length > 0) {
-                    if (data.length < limit) {
+                    if (data.length === 0 && loadedResults === 0) {
+                        loader.textContent = 'No appointments found.';
                         hasMoreData = false;
                         window.removeEventListener('scroll', handleScroll);
+                    } else if (data.length < limit) {
+                       loader.textContent = '--- End of Search Results ---';
+                       hasMoreData = false;
+                       window.removeEventListener('scroll', handleScroll);
                     } else {
                         page++;
                     }
@@ -336,18 +341,12 @@ $this->title = 'Search Appointments';
                         tablerow += `</tr>`;
 
                         resultsBody.innerHTML += tablerow;
+                        loadedResults++;
                     });
                     resultsContainer.style.display = 'block';
-                    noResultsMessage.style.display = 'none';
-                    loader.style.display = 'none';
-                } else {
-                    noResultsMessage.style.display = 'block';
-                }
             },
             error: function (xhr, status, error) {
                 console.log('Error:', error);
-                noResultsMessage.style.display = 'block';
-                loader.style.display = 'none';
             }
         });
 

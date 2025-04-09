@@ -122,6 +122,13 @@
             background-color: #1b4ebd;
         }
 
+        .no-results {
+            color: var(--primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -171,7 +178,7 @@
                 <!-- Rows will be appended here dynamically -->
             </tbody>
         </table>
-        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
+        <p id="loader" class="no-results">Loading...</p>
     </div>
 
     <script>
@@ -194,6 +201,11 @@
                 appendRows(result);
 
                 if (result.length < limit) {
+                    loader.textContent = '--- End of Services Table ---';
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else if (result.length === 0 && loadedResults === 0) {
+                    loader.textContent = 'No Services found.';
                     hasMoreData = false;
                     window.removeEventListener('scroll', handleScroll);
                 } else {
@@ -204,8 +216,6 @@
             } finally {
                 isLoading = false;
             }
-
-            document.getElementById('loader').style.display = 'none';
         }
 
     function appendRows(data) {
