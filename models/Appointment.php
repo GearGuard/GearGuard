@@ -66,8 +66,7 @@ class Appointment extends DbModel
     public function validate($valueUpdates = [], $validateVehicleID = true, $validateGarageID = true, $validateServiceID = true, $validateAppointmentDateAndTime = true, $validateInternals = false) : bool
     {
         if ($validateInternals && ($this->status_id < 1 || $this->status_id > 3)) {
-            $this->errors[] = "Status ID must be between 1 and 3.";
-            return false;
+            $this->addError('status_id', 'Status ID must be between 1 and 3.');
         }
 
         if (Application::$app->user instanceof User) {
@@ -77,16 +76,13 @@ class Appointment extends DbModel
             }
 
             if ($validateVehicleID && (!in_array($this->vehicle_id, array_column(Application::$app->user->getAccessAvailableVehiclesList(), 'id')) || !in_array($this->vehicle_id, array_column(Application::$app->user->getOwnedVehiclesList(), 'id')))){
-                $this->errors[] = "You don't own or have access to this vehicle.";
-                return false;
+                $this->addError('vehicle_id', 'You don\'t own or have access to this vehicle.');
             }
             if ($validateGarageID && (!Garage::verifyGarageExistance($this->garage_id))) {
-                $this->errors[] = "The garage could not be found.";
-                return false;
+                $this->addError('garage_id', 'The garage could not be found.');
             }
             if ($validateServiceID && (!GarageService::verifyServiceExistance($this->garage_id, $this->service_id))) {
-                $this->errors[] = "The service could not be found.";
-                return false;
+                $this->addError('service_id', 'The service could not be found.');
             }
             if ($validateAppointmentDateAndTime) {
                 try {
@@ -95,29 +91,46 @@ class Appointment extends DbModel
 
                     if ($apDateTime < new \DateTime()){
                         $this->errors[] = "Appointment date and time should not be in the past.";
-                        return false;
+                        $this->addError('date', 'Appointment date and time should not be in the past.');
+                        $this->addError('time', 'Appointment date and time should not be in the past.');
                     }
                 } catch (\Exception $ex) {
                     throw new \Exception("Sorry, we could not verify date and time of the appointment. Please contact an administrator.");
                 }
             }
             if ((isset($this->id) && $this->id < 0)) {
-                $this->errors[] = "Internal Error: Please contact an administrator.";
-                return false;
+                $this->addError('id', 'Internal Error: Please contact an administrator.');
             }
 
-            return true;
+            if (empty($this->errors)) {
+                return true;
+            }
+
+            return false;
         }
 
         if (Application::$app->user instanceof Garage) {
             if (count($valueUpdates) == 1 && in_array("status_id", $valueUpdates)) {
                 if ((isset($this->id) && $this->id < 0)) {
-                    $this->errors[] = "Internal Error: Please contact an administrator.";
-                    return false;
+                    $this->addError('id', 'Internal Error: Please contact an administrator.');
+                }
+                if ($this->status_id < 1 || $this->status_id > 3) {
+                    $this->addError('status_id', 'Status ID must be between 1 and 3.');
                 }
 
+                if (empty($this->errors)) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            $this->addError('id', 'Internal Error: Please contact an administrator.');
+
+            if (empty($this->errors)) {
                 return true;
             }
+
             return false;
         }
 

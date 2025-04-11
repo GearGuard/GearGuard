@@ -69,31 +69,29 @@ class GarageService extends UserModel
                 $this->{$key} = $value;
         }
         if ($validateType && !$this->type) {
-            $this->errors[] = "Type can not be empty.";
-            return false;
+            $this->addError('type', 'Type can not be empty.');
         }
         if ($validatePrice && $this->price <= 0) {
-            $this->errors[] = "Price can not be less than or equal to zero.";
-            return false;
+            $this->addError('price', 'Price can not be less than or equal to zero.');
         }
         if ($validateDuration && $this->duration <= 0) {
-            $this->errors[] = "Duration can not be less than or equal to zero.";
-            return false;
+            $this->addError('duration', 'Duration can not be less than or equal to zero.');
         }
         if ($validateInternals && !(Garage::verifyGarageExistance($this->garage_id))) {
-            $this->errors[] = "Garage could not be found.";
-            return false;
+            $this->addError('garage_id', 'Garage could not be found.');
         }
         if ($validateInternals && (($this->status_id > 3) || $this->status_id <= 0)) {
-            $this->errors[] = "Status ID must be between one and three.";
-            return false;
+            $this->addError('status_id', 'Status ID must be between one and three.');
         }
         if (isset($this->id) && !(GarageService::verifyServiceExistance($this->garage_id, $this->id))) {
-            $this->errors[] = "Internal Error: Please contact administrators.";
-            return false;
+            $this->addError('id', 'Internal Error: Please contact administrators.');
         }
 
-        return true;
+        if (empty($this->errors)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function save()
@@ -181,7 +179,7 @@ class GarageService extends UserModel
         $sql = "SELECT ggs.id FROM gearguard.gg_garage_service ggs WHERE ggs.garage_id = :garage_id AND ggs.id = :service_id";
         $statement = Application::$app->db->prepare($sql);
         $statement->bindValue(':garage_id', $garageID, \PDO::PARAM_INT);
-        $statement->bindValue(':serviceID', $serviceID, \PDO::PARAM_INT);
+        $statement->bindValue(':service_id', $serviceID, \PDO::PARAM_INT);
         $statement->execute();
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
         if (count($result) > 0)
