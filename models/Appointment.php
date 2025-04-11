@@ -90,7 +90,6 @@ class Appointment extends DbModel
                     $apDateTime = new \DateTime($dateandtime);
 
                     if ($apDateTime < new \DateTime()){
-                        $this->errors[] = "Appointment date and time should not be in the past.";
                         $this->addError('date', 'Appointment date and time should not be in the past.');
                         $this->addError('time', 'Appointment date and time should not be in the past.');
                     }

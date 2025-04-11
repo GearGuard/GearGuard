@@ -100,7 +100,7 @@ class GarageService extends UserModel
             return false;
         }
         if (!$this->validate())
-            throw new \Exception($this->errors[0]);
+            throw new \Exception(array_values($this->errors)[0][0]);
 
         return parent::save();
     }
@@ -169,7 +169,7 @@ class GarageService extends UserModel
             return false;
 
         if (!$overrideValidations && !$this->validate($data, $validateInternals = true))
-            throw new \Exception($this->errors[0]);
+            throw new \Exception(array_values($this->errors)[0][0]);
 
         return parent::update($data);
     }

@@ -127,7 +127,7 @@ class GarageController extends Controller
             } catch (\Exception $ex) {
                 return $this->render('garage/services/newService', [
                     'name' => 'The GearGuard',
-                    'error' => $model->errors[0] ?? '',
+                    'error' => array_values($model->errors)[0][0] ?? '',
                     'model' => $model,
                     'garage_id' => Application::$app->session->get('user'),
                 ]);
@@ -226,7 +226,7 @@ class GarageController extends Controller
             } catch (\Exception $ex) {
                 return $this->render('garage/services/editService', [
                     'name' => 'The GearGuard',
-                    'error' => $model->errors[0] ?? '',
+                    'error' => array_values($model->errors)[0][0] ?? '',
                     'model' => new GarageService(),
                     'garage_id' => Application::$app->session->get('user'),
                 ]);

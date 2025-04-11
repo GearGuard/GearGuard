@@ -116,6 +116,12 @@
             width: 100%;
         }
 
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
         .mobile-menu-btn {
             display: none;
             /* Adjust this for mobile responsiveness */

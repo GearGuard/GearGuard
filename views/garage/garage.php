@@ -143,6 +143,33 @@
             text-align: center;
         }
 
+        .nav-link-logout {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--primary);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link-logout:hover {
+            background-color: var(--hover-bg);
+            color: var(--accent);
+        }
+
+        .nav-link-logout.active {
+            background-color: var(--hover-bg);
+            color: var(--accent);
+        }
+
+        .nav-link-logout i {
+            width: 24px;
+            margin-right: 10px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
         .sidebar.collapsed .nav-link i {
             margin-right: 0;
         }
@@ -251,7 +278,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href= "/logout" class="nav-link">
+                <a href= "/logout" class="nav-link-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="nav-text">Sign out</span>
                 </a>
