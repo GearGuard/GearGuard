@@ -211,7 +211,7 @@ $this->title = 'Search Appointments';
 <nav class="navMenu">
     <a href="/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
     <a href="#" class="active">Search Appointment<span class="dot"></span></a>
-    <a href="/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
+    <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
 </nav>
 
 <div class="search-container">
@@ -335,7 +335,7 @@ $this->title = 'Search Appointments';
                             <td>${item.date} ${item.time}</td>`;
 
                         if (item.status_id === 1) {
-                            tablerow += `<td><button class="view-more-button">Accept</button><button class="view-more-button">Reject</button></td>`;
+                            tablerow += `<td><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 3)">Reject</button></td>`;
                         }
 
                         tablerow += `</tr>`;
@@ -344,6 +344,7 @@ $this->title = 'Search Appointments';
                         loadedResults++;
                     });
                     resultsContainer.style.display = 'block';
+                    resultsContainer.scrollIntoView();
             },
             error: function (xhr, status, error) {
                 console.log('Error:', error);
@@ -418,6 +419,30 @@ $this->title = 'Search Appointments';
 
         modal.appendChild(content);
         document.body.appendChild(modal);
+    }
+
+    async function handleAcceptance(event, appointment_id, status_id) {
+        event.stopPropagation();
+        $.ajax({
+            url: '/appointment/update_status',
+            type: 'POST',
+            data: {
+                appointment_id: appointment_id,
+                status_id: status_id
+            },
+            success: function (response) {
+                if (response === 'success') {
+                    alert('Appointment status updated successfully.');
+                    location.reload();
+                } else {
+                    alert('An error occurred. Please try again later.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('Error:', error);
+                alert('An error occurred. Please try again later.');
+            }
+        })
     }
 
     function handleScroll() {

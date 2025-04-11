@@ -97,7 +97,7 @@ class Garage extends UserModel
         return $service;
     }
 
-    public function getServiceByID(int $sid): ?GarageService
+    public function getServiceByID(int $sid): GarageService
     {
         $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND id = :id AND status_id = 2 LIMIT 1";
         $statement = Application::$app->db->prepare($sql);
@@ -106,7 +106,7 @@ class Garage extends UserModel
         $statement->execute();
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
         if (!$result) {
-            return null;
+            return GarageService::getGarageService(-1, '', 0, 0, 0, '');
         }
         $result = $result[0];
         $service = GarageService::getGarageService($result['id'], $result['type'], $result['price'], $result['duration'], $result['status_id'], $result['description']);
@@ -136,7 +136,7 @@ class Garage extends UserModel
 
     }
 
-    public function getAppointmentByID(int $id): ?Appointment
+    public function getAppointmentByID(int $id): Appointment
     {
         $sql = "SELECT * FROM gg_vehicle_service_appointment gvsa WHERE gvsa.id = :id and gvsa.service_id in (select ggs.id from gearguard.gg_garage_service ggs where ggs.garage_id = :garage_id) LIMIT 1";
         $statement = self::prepare($sql);
@@ -145,8 +145,10 @@ class Garage extends UserModel
         $statement->execute();
         $object = $statement->fetchObject();
 
-        $appointment = Appointment::getAppointment($object->id, $object->service_id, $object->vehicle_id, $object->date, $object->time, $object->notes, $object->status_id);
-        return $appointment;
+        if (!$object)
+            return Appointment::getAppointment(-1, -1, -1, null, null, null);
+
+        return Appointment::getAppointment($object->id, $object->service_id, $object->vehicle_id, $object->date, $object->time, $object->notes, $object->status_id);
     }
 
     public function getAllAppointmentsFiltered(string $firstName, string $lastName, string $numberPlate, string $contactNo, string $date, string $condition, string $status, int $page): array
@@ -229,6 +231,18 @@ class Garage extends UserModel
         $statement->bindValue(':email', $email);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public static function verifyGarageExistance(int $garageID) : bool {
+        $sql = "SELECT gg.id FROM gearguard.gg_garage gg WHERE gg.id = :garage_id LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $garageID, \PDO::PARAM_INT);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if (count($result) > 0)
+            return true;
+
+        return false;
     }
 	
 }

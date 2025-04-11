@@ -215,13 +215,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/services/view" class="nav-link">
+                <a href="/garage/services/view" class="nav-link">
                     <i class="fas fa-car-side"></i>
                     <span class="nav-text">Services</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/customers/view" class="nav-link">
+                <a href="/garage/customers/view" class="nav-link">
                     <i class="fa fa-street-view" aria-hidden="true"></i>
                     <span class="nav-text">Customer</span>
                 </a>
@@ -248,6 +248,12 @@
                 <a href="/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href= "/logout" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="nav-text">Sign out</span>
                 </a>
             </li>
 

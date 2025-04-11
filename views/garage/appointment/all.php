@@ -187,8 +187,8 @@ $this->title = 'View All Appointments';
 <body>
     <nav class="navMenu">
         <a href="#" class="active">All Appointments<span class="dot"></span></a>
-        <a href="/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
-        <a href="/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
+        <a href="/garage/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
+        <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
     </nav>
 	<div class="SearchBar">
     	<label for="textfield">Search:</label>
@@ -313,7 +313,7 @@ $this->title = 'View All Appointments';
                           `;
 
                 if (appointment.status_id == 1) {
-                    content += `<td><button class="view-more-button" onclick="handleAcceptance(${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(${appointment.id}, 3)">Reject</button></td>`;
+                    content += `<td><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 3)">Reject</button></td>`;
                 } else if (appointment.status_id == 2) {
                     content += `<td>Accepted</td>`;
                 } else {
@@ -336,7 +336,8 @@ $this->title = 'View All Appointments';
             });
         }
 
-        async function handleAcceptance(appointment_id, status_id) {
+        async function handleAcceptance(event, appointment_id, status_id) {
+            event.stopPropagation();
             $.ajax({
                 url: '/appointment/update_status',
                 type: 'POST',

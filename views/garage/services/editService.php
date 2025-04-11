@@ -233,10 +233,10 @@
 
 <body>
 <nav class="navMenu">
-    <a href="/services/add" target="_self">Add New Service</a>
-    <a href="/services/view" target="_self">All Services</a>
+    <a href="/garage/services/add" target="_self">Add New Service</a>
+    <a href="/garage/services/view" target="_self">All Services</a>
     <a href="#" class="active">Edit Services</a>
-    <a href="/services/delete" target="_self">Delete Services</a>
+    <a href="/garage/services/delete" target="_self">Delete Services</a>
 </nav>
 <div class="service-form">
     <h2 class="title">Edit Garage Service</h2>
@@ -256,21 +256,30 @@
             <button type="button" class="search-button" onclick="searchService()" autofocus>Search</button>
         </div>
     </div>
+    <?php if (isset($error)) {
+        echo '<span id="errors" style="color: #ef4444;text-align: center;display: inline-block;width: 100%;">';
+        echo $error;
+        echo '</span><script>document.getElementById("errors").scrollIntoView()</script>';
+    } ?>
 
     <div id="editForm" style="display: none;">
         <input type="hidden" name="id" value="">
 
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field($model, 'type') ?>
+                <?php $this->fieldType = $form->field($model, 'type') ?>
+                <?php $this->fieldType->required(); echo $this->fieldType; ?>
             </div>
+
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
+                <?php $form->priceField = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
+                <?php $form->priceField->min(0.01)->required(true)->step(0.01); echo $form->priceField ?>
             </div>
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
+                <?php $form->durationField = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
+                <?php $form->durationField->min(0.1)->required(true)->step(0.1); echo $form->durationField ?>
             </div>
         </div>
         <div class="form-group">
@@ -278,7 +287,7 @@
         </div>
         <div class="button-container">
             <button type="reset" class="clear-button">Clear</button>
-            <button id="updateButton" type="submit" class="edit-button">Update Service</button>
+            <button id="updateButton" type="submit" class="edit-button" disabled="disabled">Update Service</button>
         </div>
     </div>
 
@@ -295,7 +304,7 @@
         }
 
         $.ajax({
-            url: '/services/search',
+            url: '/garage/services/search',
             type: 'GET',
             data: {
                 searchQuery: searchType
@@ -315,10 +324,13 @@
                 document.querySelector('input[name="price"]').value = response.price;
                 document.querySelector('input[name="duration"]').value = response.duration;
                 document.querySelector('textarea[name="description"]').value = response.description;
+
+                document.querySelector('#updateButton').removeAttribute('disabled');
             },
             error: function (xhr, status, error) {
                 console.log('Error:', error);
                 document.getElementById('editForm').style.display = 'none';
+                document.getElementById('updateButton').setAttribute('disabled', true);
             }
         });
     }

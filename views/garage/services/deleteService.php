@@ -243,9 +243,9 @@
 
 <body>
     <nav class="navMenu">
-        <a href="/services/add" target="_self">Add New Service</a>
-        <a href="/services/view" target="_self">All Services</a>
-        <a href="/services/update" target="_self">Edit Services</a>
+        <a href="/garage/services/add" target="_self">Add New Service</a>
+        <a href="/garage/services/view" target="_self">All Services</a>
+        <a href="/garage/services/update" target="_self">Edit Services</a>
         <a href="#" class="active">Delete Services</a>
     </nav>
     <div class="service-form">
@@ -276,6 +276,7 @@
             <p>Are you sure you want to delete this service?</p>
             <br>
             <i>If there are any appointments associated with this service, they will not be deleted.</i>
+            <span style="color: var(--accent); font-size: 0.8rem;">(This action cannot be undone)</span>
             <div class="modal-buttons">
                 <button type="button" class="search-button" onclick="closeModal()">Cancel</button>
                 <button type="button" class="delete-button" onclick="deleteService()">Delete</button>
@@ -294,7 +295,7 @@
             }
 
             $.ajax({
-                url: '/services/search',
+                url: '/garage/services/search',
                 type: 'GET',
                 data: {
                     searchQuery: searchType
@@ -331,7 +332,7 @@
 
         function deleteService() {
             $.ajax({
-                url: '/services/delete',
+                url: '/garage/services/delete',
                 type: 'POST',
                 data: {
                     serviceID: serviceId

@@ -263,16 +263,20 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof Garage) {
             $body = $request->getBody();
-            $appointment_id = $body['appointment_id'] ?? '';
+            $appointmentID = $body['appointment_id'] ?? '';
             $status = $body['status_id'] ?? '';
-            $model = Application::$app->user->getAppointmentByID(htmlspecialchars($appointment_id));
+            if (!is_numeric($appointmentID) || !is_numeric($status))
+                throw new NotFoundException();
+
+            $model = Application::$app->user->getAppointmentByID((int) $appointmentID);
 
             if (!$model) {
                 throw new NotFoundException();
             }
 
             $model->update(
-                ['status_id' => $status]
+                ['status_id' => $status],
+                true
             );
             return 'success';
         }

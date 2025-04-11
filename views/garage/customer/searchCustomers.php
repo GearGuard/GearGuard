@@ -239,9 +239,9 @@
 
 <body>
     <nav class="navMenu">
-        <a href="/customers/view" target="_self">All Customers</a>
+        <a href="/garage/customers/view" target="_self">All Customers</a>
         <a href="#" class="active">Search Customers</a>
-        <a href="/customers/send_message" target="_self">Send Messages</a>
+        <a href="/garage/customers/send_message" target="_self">Send Messages</a>
     </nav>
     <div class="container">
         <div class="search-container">
@@ -320,6 +320,8 @@
                 } else {
                     page++;
                 }
+
+                document.querySelector('.results-container').scrollIntoView();
 
             } catch (error) {
                 console.error('Error fetching customers:', error);

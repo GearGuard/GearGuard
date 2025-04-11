@@ -47,6 +47,7 @@ class User extends UserModel
 	{
 		$this->status = self::STATUS_ACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
+        parent::validate();
 		return parent::save();
 	}
 

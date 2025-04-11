@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Appointment;
 use app\models\GarageService;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
@@ -117,11 +118,20 @@ class GarageController extends Controller
             $body = $request->getBody();
             $model = GarageService::initialize(
                 $body['type'],
-                $body['price'],
-                $body['duration'],
+                (is_numeric($body['price'])) ? $body['price'] : -1,
+                (is_numeric($body['duration'])) ? $body['duration'] : -1,
                 $body['description']
             );
-            $model->save();
+            try {
+                $model->save();
+            } catch (\Exception $ex) {
+                return $this->render('garage/services/newService', [
+                    'name' => 'The GearGuard',
+                    'error' => $model->errors[0] ?? '',
+                    'model' => $model,
+                    'garage_id' => Application::$app->session->get('user'),
+                ]);
+            }
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
             ]);
@@ -195,17 +205,32 @@ class GarageController extends Controller
             if (!isset($body['id']) || !isset($body['type']) || !isset($body['price']) || !isset($body['duration']) || !isset($body['description']))
                 throw new NotFoundException();
             $id = htmlspecialchars($body['id']);
+
             $type = htmlspecialchars($body['type']);
             $price = htmlspecialchars($body['price']);
             $duration = htmlspecialchars($body['duration']);
             $description = htmlspecialchars($body['description']);
+
+            if (!is_numeric($id) || !is_numeric($duration) || !is_numeric($price))
+                throw new NotFoundException();
+
             $toUpdate = [
                 'type' => $type,
                 'price' => $price,
                 'duration' => $duration,
                 'description' => $description
             ];
-            Application::$app->user->getServiceByID((int) $id)->update($toUpdate);
+            $model = Application::$app->user->getServiceByID((int)$id);
+            try {
+                $model->update($toUpdate);
+            } catch (\Exception $ex) {
+                return $this->render('garage/services/editService', [
+                    'name' => 'The GearGuard',
+                    'error' => $model->errors[0] ?? '',
+                    'model' => new GarageService(),
+                    'garage_id' => Application::$app->session->get('user'),
+                ]);
+            }
 
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
@@ -224,9 +249,9 @@ class GarageController extends Controller
                 throw new NotFoundException();
             $id = htmlspecialchars($id);
             $toUpdate = [
-                'status_id' => 3
+                'status_id' => GarageService::STATUS_DELETED
             ];
-            Application::$app->user->getServiceByID((int) $id)->update($toUpdate);
+            Application::$app->user->getServiceByID((int) $id)->update($toUpdate, true);
 
             return $this->render('garage/services/viewAll', [
                 'name' => 'The GearGuard',
