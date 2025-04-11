@@ -342,12 +342,14 @@
                     closeModal();
                     document.getElementById('serviceDetails').style.display = 'none';
                     document.getElementById('search_type').value = '';
+                    serviceId = null;
                 },
                 error: function (xhr, status, error) {
                     alert('We could not delete the service!');
                     closeModal();
                     document.getElementById('serviceDetails').style.display = 'none';
                     document.getElementById('search_type').value = '';
+                    serviceId = null;
                 }
             });
         }

@@ -29,7 +29,10 @@ class AuthController extends Controller
     {
         $loginForm = new LoginForm();
         if ($request->isPost()) {
-            $loginForm->loadData($request->getBody());
+            $data = array_map(function ($value) {
+                return htmlspecialchars($value);
+            }, $request->getBody());
+            $loginForm->loadData($data);
             if ($loginForm->validate() && $loginForm->login()) {
                 Application::$app->response->redirect('/');
                 return;
@@ -47,7 +50,10 @@ class AuthController extends Controller
         $errors = [];
         $user = new User();
         if ($request->isPost()) {
-            $user->loadData($request->getBody());
+            $data = array_map(function ($value) {
+                return htmlspecialchars($value);
+            }, $request->getBody());
+            $user->loadData($data);
 
 
             if ($user->validate() && $user->save()) {
@@ -70,7 +76,10 @@ class AuthController extends Controller
         $errors = [];
         $garage = new Garage();
         if ($request->isPost()) {
-            $garage->loadData($request->getBody());
+            $data = array_map(function ($value) {
+                return htmlspecialchars($value);
+            }, $request->getBody());
+            $garage->loadData($data);
 
 
             if ($garage->validate() && $garage->save()) {
@@ -93,7 +102,11 @@ class AuthController extends Controller
     {
         $loginForm = new LoginFormGarage();
         if ($request->isPost()) {
-            $loginForm->loadData($request->getBody());
+            $data = array_map(function ($value) {
+                return htmlspecialchars($value);
+            }, $request->getBody());
+
+            $loginForm->loadData($data);
             if ($loginForm->validate() && $loginForm->login()) {
                 Application::$app->session->set('isGarage', true);
                 Application::$app->response->redirect('/');
@@ -121,8 +134,10 @@ class AuthController extends Controller
             ]);
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
+            $model = Garage::with(Application::$app->user);
             return $this->render('garage/profile', [
-                'title' => 'Profile'
+                'title' => 'Profile',
+                'model' => $model,
             ]);
         }
 

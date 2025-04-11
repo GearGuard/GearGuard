@@ -5,10 +5,8 @@ namespace app\models;
 use Couchbase\InvalidStateException;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
-use gearguard\phpmvc\DbModel;
-use gearguard\phpmvc\UserModel;
 
-class GarageService extends UserModel
+class GarageService extends Model
 {
     const STATUS_INACTIVE = 1;
     const STATUS_ACTIVE = 2;
@@ -96,7 +94,7 @@ class GarageService extends UserModel
 
     public function save()
     {
-        if ($this->garage_id === -1) {
+        if ($this->garage_id < 0) {
             return false;
         }
         if (!$this->validate())
@@ -165,7 +163,7 @@ class GarageService extends UserModel
 
     public function update($data, bool $overrideValidations = false)
     {
-        if (is_null($data) || $this->garage_id === -1)
+        if (is_null($data) || $this->garage_id < 0)
             return false;
 
         if (!$overrideValidations && !$this->validate($data, $validateInternals = true))

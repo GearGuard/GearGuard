@@ -227,6 +227,7 @@
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -236,46 +237,33 @@
                 <h1>Garage Profile</h1>
                 <p>View and edit your garage details</p>
             </div>
+            <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post', 'garageProfileForm') ?>
             <form id="garageProfileForm" novalidate>
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label for="name" class="form-label">Garage Name<span class="required-dot">*</span></label>
-                        <input type="text" id="name" name="name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registration_no" class="form-label">Business Registration Number<span class="required-dot">*</span></label>
-                        <input type="text" id="registration_no" name="registration_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" class="form-input" required>
+                    <?php
+                    echo $this->garage_name = $form->field($model, 'name')->required();
+                    echo $this->brn = $form->field($model, 'registration_no')->required();
+                    echo $this->email = $form->field($model, 'email')->required()->type(\gearguard\phpmvc\form\FieldTypes::TYPE_EMAIL);
+                    $this->address = new \gearguard\phpmvc\form\TextAreaField($model, 'address');
+                    echo $this->address->required()->rows(3)->placeholder('Enter the address');
+                    $this->description = new \gearguard\phpmvc\form\TextAreaField($model, 'description');
+                    echo $this->description->rows(4);
+                    echo $this->tel = $form->field($model, 'contact_no')->required()->type(\gearguard\phpmvc\form\FieldTypes::TYPE_TEL);
+                    ?>
+                    <script>
+                        document.querySelectorAll('.form-group textarea').forEach(e => e.parentElement.classList.add('full-width'))
+                        address = document.getElementById('address');
+                        address.classList.add('form-textarea');
+                        description = document.getElementById('description');
+                        description.classList.add('form-textarea');
+                    </script>
+
+                    <div class="form-group" style="grid-column: 3/4;">
+                        <button class="edit-button" style="background-color: #ef4444;">Change username and password</button>
                     </div>
 
-                    <div class="form-group full-width">
-                        <label for="address" class="form-label">Address<span class="required-dot">*</span></label>
-                        <textarea id="address" name="address" class="form-textarea" rows="3" required></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="description" class="form-label">Description<span class="required-dot">*</span></label>
-                        <textarea id="description" name="description" class="form-textarea" rows="4" required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="contact_no" class="form-label">Contact Number<span class="required-dot">*</span></label>
-                        <input type="tel" id="contact_no" name="contact_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="username" class="form-label">Username<span class="required-dot">*</span></label>
-                        <input type="text" id="username" name="username" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password" class="form-label">Password<span class="required-dot">*</span></label>
-                        <input type="password" id="password" name="password" class="form-input" required>
-                    </div>
                 </div>
-                <button type="submit" class="edit-button">Save Changes</button>
+                <button class="edit-button">Save Changes</button>
             </form>
         </div>
     </div>
@@ -299,26 +287,6 @@
             const confirmButton = document.getElementById('confirmButton');
             const cancelButton = document.getElementById('cancelButton');
 
-            // Pre-load data (replace with actual data fetching logic)
-            const garageData = {
-                name: "AutoFix Garage",
-                registration_no: "BRN123456",
-                email: "info@autofixgarage.com",
-                contact_no: "+1234567890",
-                address: "123 Main St, Anytown, AT 12345\nSuite 200\nParking available at rear",
-                description: "AutoFix Garage is a full-service auto repair shop in Anytown, offering a variety of services to keep your vehicle running smoothly.\n\nWe specialize in comprehensive vehicle maintenance and repair.",
-                username: "autofix_admin",
-                password: "autofix123"
-            };
-
-            // Populate form fields with pre-loaded data
-            Object.keys(garageData).forEach(key => {
-                const field = document.getElementById(key);
-                if (field) {
-                    field.value = garageData[key];
-                }
-            });
-
             // Prevent default form submission and show modal
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -333,13 +301,28 @@
             });
 
             // Confirm button clicks
-            confirmButton.addEventListener('click', function() {
+            confirmButton.addEventListener('click', async function(event) {
+                event.stopPropagation();
                 // Collect form data
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
 
-                // Here you would typically send this data to your server
-                console.log('Updated profile data:', data);
+                $.ajax({
+                    url: '/garage/profile/update',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Profile updated successfully!');
+                        } else {
+                            alert('Error updating profile: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred: ' + error);
+                    }
+                });
 
                 // Close the modal
                 confirmationModal.style.display = 'none';

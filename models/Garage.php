@@ -23,7 +23,7 @@ class Garage extends UserModel
     public string $address = '';
     public string $contact_no = '';
     public string $registration_no = '';
-
+    public ?string $description = null;
 
     public function tableName(): string
     {
@@ -39,7 +39,25 @@ class Garage extends UserModel
     {
         $this->status_id = self::STATUS_ACTIVE;
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+        if (!$this->validate())
+            throw new \Exception(array_values($this->errors)[0][0]);
+
         return parent::save();
+    }
+
+    public function update($data, bool $overrideValidations = false)
+    {
+        if (is_null($data))
+            return false;
+
+        if (isset($data->password) && $this->password != $data->password) {
+            $this->password = password_hash($data->password, PASSWORD_DEFAULT);
+        }
+
+        if (!$overrideValidations && !$this->validate())
+            throw new \Exception(array_values($this->errors)[0][0]);
+
+        return parent::update($data);
     }
 
     public function rules(): array
@@ -58,7 +76,7 @@ class Garage extends UserModel
 
     public function attributes(): array
     {
-        return ['username', 'password', 'name', 'address', 'email', 'contact_no', 'registration_no', 'status_id'];
+        return ['username', 'password', 'name', 'address', 'email', 'contact_no', 'registration_no', 'status_id', 'description'];
     }
 
     public function labels(): array
@@ -69,16 +87,29 @@ class Garage extends UserModel
             'name' => 'Name',
             'address' => 'Address',
             'email' => 'Email',
-            'contact_no' => 'Contact No',
-            'registration_no' => 'Registration No',
+            'contact_no' => 'Contact Number',
+            'registration_no' => 'Business Registration Number',
             'status_id' => 'Status',
             'passwordConfirm' => 'Confirm Password',
+            'description' => 'Description',
         ];
     }
 
     public function getDisplayName(): string
     {
         return $this->name;
+    }
+
+    public static function with(UserModel $model) : Garage
+    {
+        if (!$model instanceof Garage) {
+            throw new \Exception('Invalid model type passed.');
+        }
+
+        $garage = new Garage();
+        $garage->loadData($model);
+
+        return $garage;
     }
 
     public function getServiceByType(string $type): ?GarageService

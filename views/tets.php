@@ -4,18 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GearGuard - Vehicle Transfer Upload</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Garage Profile - GearGuard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-
         :root {
-            --text: #f5f5f5;
+            --text: #FFFFFFFF;
             --background: #181a20;
             --primary: #c7adad;
             --secondary: #25272d;
             --accent: #2463eb;
-            --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
         }
 
@@ -26,421 +23,344 @@
         }
 
         body {
-            background: var(--background);
             font-family: "Inter", sans-serif;
+            background-color: var(--background);
             color: var(--text);
-            line-height: 1.6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 1rem;
         }
 
-        .upload-container {
-            background: var(--secondary);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        .profile-wrapper {
             width: 100%;
             max-width: 1200px;
-            padding: 2.5rem;
-            animation: fadeIn 0.5s ease-out;
+            background-color: var(--secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
+        .profile-form {
+            padding: 3rem;
+            background-color: var(--background);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            border-top: 2px solid var(--accent);
+        }
+
+        .form-title {
+            text-align: center;
             margin-bottom: 2rem;
         }
 
-        .title {
-            color: var(--primary);
-            font-size: 1.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .title i {
-            color: var(--accent);
-        }
-
-        .file-upload-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .section-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .section-title {
-            grid-column: 1 / -1;
-            color: var(--accent);
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 2.5rem;
-            width: 100%;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-label {
-            background: var(--background);
-            border: 2px dashed var(--border);
+        .form-title h1 {
+            font-size: 2.2rem;
             color: var(--text);
-            padding: 2rem;
-            text-align: center;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .file-label i {
-            font-size: 2rem;
-            color: var(--accent);
             margin-bottom: 0.5rem;
         }
 
-        .file-label:hover {
-            border-color: var(--accent);
-            background: var(--hover-bg);
+        .form-title p {
+            color: var(--text);
+            opacity: 0.7;
         }
 
-        .file-name {
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
             color: var(--primary);
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
+            font-weight: 500;
         }
 
-        .button-group {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
+        .required-dot {
+            color: #ef4444;
+            margin-left: 4px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background-color: #33363f;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            resize: vertical;
+        }
+
+        .form-input:hover,
+        .form-textarea:hover {
+            border-color: var(--accent);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
+        }
+
+        .form-input.is-invalid,
+        .form-textarea.is-invalid {
+            border-color: #ef4444;
+        }
+
+        .form-input[type="password"] {
+            letter-spacing: 0.2em;
+        }
+
+        .invalid-feedback {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .edit-button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--accent);
+            color: var(--text);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
             margin-top: 2rem;
         }
 
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-submit {
-            background: var(--accent);
-            color: var(--text);
-            border: none;
-        }
-
-        .btn-submit:hover {
-            background: #1b4ebd;
+        .edit-button:hover {
+            background-color: #1b4ebd;
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-reset {
-            background: transparent;
-            border: 2px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-reset:hover {
-            background: var(--hover-bg);
-        }
-
-        .navMenu {
-            background-color: var(--secondary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            display: flex;
+        /* Confirmation Modal Styles */
+        .confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
             justify-content: center;
             align-items: center;
-            width: 70%;
-            padding: 1rem;
-            margin: 0 auto 2rem;
-            position: sticky;
-            top: 20px;
-            z-index: 100;
+            z-index: 1000;
         }
 
-        .navMenu a {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            padding: 0.75rem 1.25rem;
+        .modal-content {
+            background-color: var(--secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
             border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
             transition: all 0.3s ease;
-            position: relative;
         }
 
-        .navMenu a.active {
-            color: var(--accent);
-            background: var(--hover-bg);
+        .modal-btn-confirm {
+            background-color: var(--accent);
+            color: var(--text);
         }
 
-        .navMenu a:hover {
-            color: var(--accent);
-            background: var(--hover-bg);
+        .modal-btn-confirm:hover {
+            background-color: #1b4ebd;
         }
 
+        .modal-btn-cancel {
+            background-color: var(--border);
+            color: var(--text);
+        }
+
+        .modal-btn-cancel:hover {
+            background-color: #4a4e57;
+        }
+
+        @media (max-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
 
         @media (max-width: 768px) {
-            .upload-container {
-                padding: 1.5rem;
+            .form-grid {
+                grid-template-columns: 1fr;
             }
 
-            .section-wrapper {
-                grid-template-columns: 1fr;
+            .full-width {
+                grid-column: span 1;
             }
         }
     </style>
 </head>
 
 <body>
-    <nav class="navMenu">
-        <a href="/customer/vehicleTransfer/instruction">Instruction</a>
-        <a href="/customer/vehicleTransfer/tranferForm" class="active" target='_self'>Transfer Form</a>
-    </nav>
-    <div class="upload-container">
-        <div class="header">
-            <h1 class="title">
-                <i class="fas fa-car-alt"></i>
-                Vehicle Transfer Upload
-            </h1>
+    <div class="profile-wrapper">
+        <div class="profile-form">
+            <div class="form-title">
+                <h1>Garage Profile</h1>
+                <p>View and edit your garage details</p>
+            </div>
+            <form id="garageProfileForm" novalidate>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name" class="form-label">Garage Name<span class="required-dot">*</span></label>
+                        <input type="text" id="name" name="name" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registration_no" class="form-label">Business Registration Number<span class="required-dot">*</span></label>
+                        <input type="text" id="registration_no" name="registration_no" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email<span class="required-dot">*</span></label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="address" class="form-label">Address<span class="required-dot">*</span></label>
+                        <textarea id="address" name="address" class="form-textarea" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description" class="form-label">Description<span class="required-dot">*</span></label>
+                        <textarea id="description" name="description" class="form-textarea" rows="4" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact_no" class="form-label">Contact Number<span class="required-dot">*</span></label>
+                        <input type="tel" id="contact_no" name="contact_no" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username<span class="required-dot">*</span></label>
+                        <input type="text" id="username" name="username" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password<span class="required-dot">*</span></label>
+                        <input type="password" id="password" name="password" class="form-input" required>
+                    </div>
+                </div>
+                <button type="submit" class="edit-button">Save Changes</button>
+            </form>
         </div>
+    </div>
 
-        <form enctype="multipart/form-data">
-            <div class="file-upload-section">
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Vehicle Documentation</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="digicard" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="digicard" class="file-label">
-                                <i class="fas fa-file-invoice"></i>
-                                Registration Certificate
-                                <span class="file-name" id="digicard-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="revenue_license" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="revenue_license" class="file-label">
-                                <i class="fas fa-file-alt"></i>
-                                Revenue License
-                                <span class="file-name" id="revenue_license-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Vehicle Insurance</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="insurance_certificate" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="insurance_certificate" class="file-label">
-                                <i class="fas fa-shield-alt"></i>
-                                Insurance Certificate
-                                <span class="file-name" id="insurance_certificate-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="insurance_transfer" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="insurance_transfer" class="file-label">
-                                <i class="fas fa-exchange-alt"></i>
-                                Insurance Transfer Doc
-                                <span class="file-name" id="insurance_transfer-name">No file chosen</span>
-                            </label>
-                        </div
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Transfer Forms</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="mta6" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="mta6" class="file-label">
-                                <i class="fas fa-file-signature"></i>
-                                MTA 6 Transfer Form
-                                <span class="file-name" id="mta6-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="mta8" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="mta8" class="file-label">
-                                <i class="fas fa-file-contract"></i>
-                                MTA 8 Notification Form
-                                <span class="file-name" id="mta8-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Identification Documents</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="seller_nic" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="seller_nic" class="file-label">
-                                <i class="fas fa-id-card"></i>
-                                Seller's NIC
-                                <span class="file-name" id="seller_nic-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="buyer_nic" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="buyer_nic" class="file-label">
-                                <i class="fas fa-id-badge"></i>
-                                Buyer's NIC
-                                <span class="file-name" id="buyer_nic-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Transaction Proof</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="sale_agreement" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="sale_agreement" class="file-label">
-                                <i class="fas fa-file-contract"></i>
-                                Bill of Sale
-                                <span class="file-name" id="sale_agreement-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="transaction_proof" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="transaction_proof" class="file-label">
-                                <i class="fas fa-receipt"></i>
-                                Payment Proof
-                                <span class="file-name" id="transaction_proof-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Vehicle Condition</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="emission_test" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="emission_test" class="file-label">
-                                <i class="fas fa-wind"></i>
-                                Emission Test Certificate
-                                <span class="file-name" id="emission_test-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="vehicle_condition" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="vehicle_condition" class="file-label">
-                                <i class="fas fa-car"></i>
-                                Vehicle Condition Report
-                                <span class="file-name" id="vehicle_condition-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Financial Documents</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="loan_clearance" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="loan_clearance" class="file-label">
-                                <i class="fas fa-money-check-alt"></i>
-                                Loan Clearance Letter
-                                <span class="file-name" id="loan_clearance-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="additional_financial" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="additional_financial" class="file-label">
-                                <i class="fas fa-file-invoice-dollar"></i>
-                                Additional Financial Docs
-                                <span class="file-name" id="additional_financial-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Additional Documents</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="vehicle_manual" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="vehicle_manual" class="file-label">
-                                <i class="fas fa-book"></i>
-                                Vehicle Manual
-                                <span class="file-name" id="vehicle_manual-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="service_records" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="service_records" class="file-label">
-                                <i class="fas fa-history"></i>
-                                Service Records
-                                <span class="file-name" id="service_records-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="modal-content">
+            <h2>Confirm Changes</h2>
+            <p>Are you sure you want to save the changes to your garage profile?</p>
+            <div class="modal-buttons">
+                <button id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
             </div>
-
-            <div class="button-group">
-                <button type="reset" class="btn btn-reset">
-                    <i class="fas fa-undo"></i>
-                    Reset
-                </button>
-                <button type="submit" class="btn btn-submit">
-                    <i class="fas fa-upload"></i>
-                    Upload Documents
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 
     <script>
-        document.querySelectorAll('.file-input').forEach
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('garageProfileForm');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const confirmButton = document.getElementById('confirmButton');
+            const cancelButton = document.getElementById('cancelButton');
+
+            // Pre-load data (replace with actual data fetching logic)
+            const garageData = {
+                name: "AutoFix Garage",
+                registration_no: "BRN123456",
+                email: "info@autofixgarage.com",
+                contact_no: "+1234567890",
+                address: "123 Main St, Anytown, AT 12345\nSuite 200\nParking available at rear",
+                description: "AutoFix Garage is a full-service auto repair shop in Anytown, offering a variety of services to keep your vehicle running smoothly.\n\nWe specialize in comprehensive vehicle maintenance and repair.",
+                username: "autofix_admin",
+                password: "autofix123"
+            };
+
+            // Populate form fields with pre-loaded data
+            Object.keys(garageData).forEach(key => {
+                const field = document.getElementById(key);
+                if (field) {
+                    field.value = garageData[key];
+                }
+            });
+
+            // Prevent default form submission and show modal
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Validate form before showing modal
+                if (this.checkValidity()) {
+                    confirmationModal.style.display = 'flex';
+                } else {
+                    this.classList.add('was-validated');
+                    this.reportValidity();
+                }
+            });
+
+            // Confirm button clicks
+            confirmButton.addEventListener('click', function() {
+                // Collect form data
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                // Here you would typically send this data to your server
+                console.log('Updated profile data:', data);
+
+                // Close the modal
+                confirmationModal.style.display = 'none';
+
+                // Show success message
+                alert('Profile updated successfully!');
+            });
+
+            // Cancel button closes the modal
+            cancelButton.addEventListener('click', function() {
+                confirmationModal.style.display = 'none';
+            });
+
+            // Close modal if clicking outside of it
+            confirmationModal.addEventListener('click', function(e) {
+                if (e.target === confirmationModal) {
+                    confirmationModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

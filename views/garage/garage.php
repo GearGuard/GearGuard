@@ -181,7 +181,6 @@
         /* Main Content */
         .main-content {
             margin-left: 260px;
-            padding: 30px;
             flex-grow: 1;
             width: calc(100vw - 260px);
             transition: all 0.3s ease;

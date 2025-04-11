@@ -326,7 +326,7 @@ $this->title = 'Search Appointments';
                         page++;
                     }
                     data.forEach(item => {
-                        let tablerow = `<tr onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
+                        let tablerow = `<tr id='table-row-id-${item.id}' onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
                             <td>${item.vehicle_type}</td>
                             <td>${item.first_name} ${item.last_name}</td>
                             <td>${item.contact_no}</td>
@@ -335,7 +335,7 @@ $this->title = 'Search Appointments';
                             <td>${item.date} ${item.time}</td>`;
 
                         if (item.status_id === 1) {
-                            tablerow += `<td><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 3)">Reject</button></td>`;
+                            tablerow += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 3)">Reject</button></td>`;
                         }
 
                         tablerow += `</tr>`;
@@ -433,7 +433,7 @@ $this->title = 'Search Appointments';
             success: function (response) {
                 if (response === 'success') {
                     alert('Appointment status updated successfully.');
-                    location.reload();
+                    document.querySelector('#table-row-id-' + appointment_id + '>#status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
                 } else {
                     alert('An error occurred. Please try again later.');
                 }

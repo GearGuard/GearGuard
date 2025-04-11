@@ -240,6 +240,20 @@ class GarageController extends Controller
         throw new NotFoundException();
     }
 
+    public function updateProfile(Request $request, Response $response)
+    {
+        $body = array_map(function ($value) {
+            return htmlspecialchars($value);
+        }, $request->getBody());
+        $firstname = htmlspecialchars($body['firstname'] ?? '');
+        $lastname = htmlspecialchars($body['lastname'] ?? '');
+        $email = htmlspecialchars($body['email'] ?? '');
+        $phone = htmlspecialchars($body['phone'] ?? '');
+        $address = htmlspecialchars($body['address'] ?? '');
+        $garageID = Application::$app->session->get('user');
+
+    }
+
     public function markServiceDeleted(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {

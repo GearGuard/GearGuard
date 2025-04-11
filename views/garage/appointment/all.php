@@ -313,7 +313,7 @@ $this->title = 'View All Appointments';
                           `;
 
                 if (appointment.status_id == 1) {
-                    content += `<td><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 3)">Reject</button></td>`;
+                    content += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 3)">Reject</button></td>`;
                 } else if (appointment.status_id == 2) {
                     content += `<td>Accepted</td>`;
                 } else {
@@ -324,6 +324,7 @@ $this->title = 'View All Appointments';
                 row.addEventListener('click', () => {
                     viewDetails(appointment);
                 });
+                row.id = 'table-row-id-' + appointment.id;
                 row.style.cursor = "pointer";
                 row.onmouseover = function () {
                     this.style.backgroundColor = "#33363f";
@@ -348,7 +349,7 @@ $this->title = 'View All Appointments';
                 success: function (response) {
                     if (response === 'success') {
                         alert('Appointment status updated successfully.');
-                        location.reload();
+                        document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
                     } else {
                         alert('An error occurred. Please try again later.');
                     }

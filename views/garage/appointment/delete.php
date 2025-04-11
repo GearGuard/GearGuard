@@ -329,6 +329,7 @@ $this->title = 'Search Appointments';
                 isLoading = false;
                 hasMoreData = true;
                 loadedResults = 0;
+                appointmentID = -1;
             }
 
             document.querySelectorAll('#searchForm input, #searchForm select').forEach(a => addEventListener("input", (event) => resetVariables()));
@@ -379,7 +380,7 @@ $this->title = 'Search Appointments';
                                 page++;
                             }
                             data.forEach(item => {
-                                let tablerow = `<tr onclick='confirmAppointmentDeletion(${item.id})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
+                                let tablerow = `<tr id='table-row-id-${item.id}' onclick='confirmAppointmentDeletion(${item.id})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
                                     <td>${item.vehicle_type}</td>
                                     <td>${item.first_name} ${item.last_name}</td>
                                     <td>${item.contact_no}</td>
@@ -476,9 +477,9 @@ $this->title = 'Search Appointments';
                     success: function (response) {
                         if (response === 'success') {
                             alert('Appointment deleted successfully.');
+                            document.getElementById(`table-row-id-${appointmentID}`).remove();
                             closeModal();
                             resetVariables();
-                            handleSearch();
                         } else {
                             alert('An error occurred. Please try again later.');
                         }
@@ -487,9 +488,9 @@ $this->title = 'Search Appointments';
                         console.error('Error deleting appointment:', error);
                         alert('We could not delete the service!');
                         closeModal();
+                        appointmentID = -1;
                     }
                 });
-                appointmentID = -1;
             }
     </script>
 </body>
