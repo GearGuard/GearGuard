@@ -256,10 +256,11 @@
                         address.classList.add('form-textarea');
                         description = document.getElementById('description');
                         description.classList.add('form-textarea');
+                        document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
                     </script>
 
                     <div class="form-group">
-                        <button class="edit-button" style="background-color: #ef4444;">Change password</button>
+                        <button type="button" id="btnShowChangePassword" class="edit-button" style="background-color: #ef4444;">Change password</button>
                     </div>
 
                 </div>
@@ -280,12 +281,82 @@
         </div>
     </div>
 
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="confirmation-modal">
+        <div class="modal-content">
+            <h2>Change Password</h2>
+            <div class="form-group">
+                <label for="password" class="form-label">Current Password<span class="required-dot">*</span></label>
+                <input type="password" id="currentPassword" name="password" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">New Password<span class="required-dot">*</span></label>
+                <input type="password" id="newPassword" name="password" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Confirm Password<span class="required-dot">*</span></label>
+                <input type="password" id="confirmPassword" name="password" class="form-input" required>
+            </div>
+            <div class="modal-buttons">
+                <button id="btnConfirmPassword" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button id="btnCancelPassword" class="modal-btn modal-btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('garageProfileForm');
             const confirmationModal = document.getElementById('confirmationModal');
+            const changePasswordModal = document.getElementById('changePasswordModal');
             const confirmButton = document.getElementById('confirmButton');
             const cancelButton = document.getElementById('cancelButton');
+            const btnShowChangePassword = document.getElementById('btnShowChangePassword');
+            const btnConfirmPassword = document.getElementById('btnConfirmPassword');
+            const btnCancelPassword = document.getElementById('btnCancelPassword');
+
+            btnShowChangePassword.addEventListener('click', function() {
+                changePasswordModal.style.display = 'flex';
+            });
+
+            btnConfirmPassword.addEventListener('click', function() {
+               const currentPassword = document.getElementById('currentPassword');
+               const newPassword = document.getElementById('newPassword');
+               const confirmPassword = document.getElementById('confirmPassword');
+
+               if (newPassword.value !== confirmPassword.value) {
+                   alert('New password and confirmation do not match.');
+                   return;
+               }
+
+               $.ajax({
+                   url: '/garage/profile/update',
+                   type: 'POST',
+                   data: {
+                       currentPassword: currentPassword.value,
+                       password: newPassword.value,
+                       passwordConfirm: confirmPassword.value,
+                   },
+                   success: function(response) {
+                       if (response.success) {
+                           alert('Password updated successfully!');
+                           changePasswordModal.style.display = 'none';
+                           currentPassword.value = '';
+                           newPassword.value = '';
+                           confirmPassword.value = '';
+                       } else {
+                           alert('Error updating password: ' + response.message);
+                       }
+                   },
+                   error: function(xhr, status, error) {
+                       alert('An error occurred: ' + xhr.error);
+                   }
+               });
+            });
+
+            btnCancelPassword.addEventListener('click', function() {
+                changePasswordModal.style.display = 'none';
+            });
 
             // Prevent default form submission and show modal
             form.addEventListener('submit', function(e) {
@@ -301,7 +372,7 @@
             });
 
             // Confirm button clicks
-            confirmButton.addEventListener('click', async function(event) {
+            confirmButton.addEventListener('click', function(event) {
                 event.stopPropagation();
                 // Collect form data
                 const formData = new FormData(form);

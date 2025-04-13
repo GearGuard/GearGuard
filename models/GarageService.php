@@ -166,13 +166,21 @@ class GarageService extends DbModel
 
     public function update($data, bool $overrideValidations = false)
     {
+        $attributeList = $this->attributes();
+        $updateData = [];
         if (is_null($data) || $this->garage_id < 0)
             return false;
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $attributeList)) {
+                $updateData[$key] = $value;
+            }
+        }
 
         if (!$overrideValidations && !$this->validate($data, validateInternals : true))
             throw new \Exception(array_values($this->errors)[0][0], 400);
 
-        return parent::update($data);
+        return parent::update($updateData);
     }
 
     public static function verifyServiceExistance(int $garageID, int $serviceID) : bool

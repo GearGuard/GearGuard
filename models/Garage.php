@@ -48,31 +48,44 @@ class Garage extends UserModel
 
     public function update($toUpdate, bool $overrideValidations = false)
     {
-        $data = Garage::with(Application::$app->user);
-        $data->loadData($toUpdate);
-
         $shouldValidatePassword = false;
         $shouldValidateUsername = false;
-        if (is_null($data))
+        $updateData = [];
+        $attributeList = $this->attributes();
+        if (empty($toUpdate))
             return false;
 
-        if (isset($data->password) && $this->password != $data->password) {
+        foreach ($toUpdate as $key => $value) {
+            if (in_array($key, $attributeList)) {
+                $updateData[$key] = $value;
+            }
+        }
+
+        if (isset($toUpdate['password']) && $this->password != $toUpdate['password']) {
+            if (empty($toUpdate['currentPassword'])) {
+                throw new \Exception("Current password is required.", 400);
+            } elseif (!password_verify($toUpdate['currentPassword'], $this->password)) {
+                throw new \Exception("Invalid password.", 400);
+            }
             $shouldValidatePassword = true;
         }
 
-        if (isset($data->username) && $this->username != $data->username) {
+        if (isset($toUpdate['username']) && $this->username != $toUpdate['username']) {
             $shouldValidateUsername = true;
         }
 
-        if (!$overrideValidations && !$this->validate($data, validateUsername: $shouldValidateUsername, validatePassword: $shouldValidatePassword, useFrameworkValidations : false)) {
-            throw new \Exception(array_values($this->errors)[0][0], 400);
+        $data = Garage::with(Application::$app->user);
+        $data->loadData($updateData);
+
+        if (!$overrideValidations && !$data->validate($toUpdate, validateUsername: $shouldValidateUsername, validatePassword: $shouldValidatePassword, useFrameworkValidations : false)) {
+            throw new \Exception(array_values($data->errors)[0][0], 400);
         }
 
-        if (isset($data->password) && $this->password != $data->password) {
-            $this->password = password_hash($data->password, PASSWORD_DEFAULT);
+        if ($shouldValidatePassword) {
+            $updateData['password'] = password_hash($data->password, PASSWORD_DEFAULT);
         }
 
-        return parent::update($toUpdate);
+        return parent::update($updateData);
     }
 
     public function rules(): array
