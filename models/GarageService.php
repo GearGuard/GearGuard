@@ -4,9 +4,9 @@ namespace app\models;
 
 use Couchbase\InvalidStateException;
 use gearguard\phpmvc\Application;
-use gearguard\phpmvc\Model;
+use gearguard\phpmvc\db\DbModel;
 
-class GarageService extends Model
+class GarageService extends DbModel
 {
     const STATUS_INACTIVE = 1;
     const STATUS_ACTIVE = 2;
@@ -60,6 +60,9 @@ class GarageService extends Model
         return 'id';
     }
 
+    /**
+     * <em>Note: This method fills the model with the data given in the $valueUpdates array.</em>
+     */
     public function validate($valueUpdates = [], bool $validateType = true, bool $validatePrice = true, bool $validateDuration = true, bool $validateInternals = false ) : bool
     {
         if (isset($valueUpdates)){
@@ -98,7 +101,7 @@ class GarageService extends Model
             return false;
         }
         if (!$this->validate())
-            throw new \Exception(array_values($this->errors)[0][0]);
+            throw new \Exception(array_values($this->errors)[0][0], 400);
 
         return parent::save();
     }
@@ -166,8 +169,8 @@ class GarageService extends Model
         if (is_null($data) || $this->garage_id < 0)
             return false;
 
-        if (!$overrideValidations && !$this->validate($data, $validateInternals = true))
-            throw new \Exception(array_values($this->errors)[0][0]);
+        if (!$overrideValidations && !$this->validate($data, validateInternals : true))
+            throw new \Exception(array_values($this->errors)[0][0], 400);
 
         return parent::update($data);
     }

@@ -29,9 +29,7 @@ class AuthController extends Controller
     {
         $loginForm = new LoginForm();
         if ($request->isPost()) {
-            $data = array_map(function ($value) {
-                return htmlspecialchars($value);
-            }, $request->getBody());
+            $data = array_map(function($value){return $value;}, $request->getBody());
             $loginForm->loadData($data);
             if ($loginForm->validate() && $loginForm->login()) {
                 Application::$app->response->redirect('/');
@@ -50,11 +48,8 @@ class AuthController extends Controller
         $errors = [];
         $user = new User();
         if ($request->isPost()) {
-            $data = array_map(function ($value) {
-                return htmlspecialchars($value);
-            }, $request->getBody());
+            $data = $request->getBody();
             $user->loadData($data);
-
 
             if ($user->validate() && $user->save()) {
                 Application::$app->session->setFlash('success', 'Thanks for Registering');
@@ -76,9 +71,7 @@ class AuthController extends Controller
         $errors = [];
         $garage = new Garage();
         if ($request->isPost()) {
-            $data = array_map(function ($value) {
-                return htmlspecialchars($value);
-            }, $request->getBody());
+            $data = $request->getBody();
             $garage->loadData($data);
 
 
@@ -102,9 +95,7 @@ class AuthController extends Controller
     {
         $loginForm = new LoginFormGarage();
         if ($request->isPost()) {
-            $data = array_map(function ($value) {
-                return htmlspecialchars($value);
-            }, $request->getBody());
+            $data = $request->getBody();
 
             $loginForm->loadData($data);
             if ($loginForm->validate() && $loginForm->login()) {
@@ -456,11 +447,11 @@ class AuthController extends Controller
             $time = $body['time'] ?? '';
             $notes = $body['notes'] ?? '';
             $model = Appointment::initialize(
-                htmlspecialchars($service_id),
-                htmlspecialchars($vehicle_id),
-                htmlspecialchars($date),
-                htmlspecialchars($time),
-                htmlspecialchars($notes)
+                ($service_id),
+                ($vehicle_id),
+                ($date),
+                ($time),
+                ($notes)
             );
             $model->save();
             return $this->render('customer/appointment/myAppointment', [

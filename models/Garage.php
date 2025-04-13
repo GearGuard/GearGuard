@@ -6,6 +6,7 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
+use app\utilities\EscapeAttributes;
 
 class Garage extends UserModel
 {
@@ -40,33 +41,47 @@ class Garage extends UserModel
         $this->status_id = self::STATUS_ACTIVE;
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
         if (!$this->validate())
-            throw new \Exception(array_values($this->errors)[0][0]);
+            throw new \Exception(array_values($this->errors)[0][0], 400);
 
         return parent::save();
     }
 
-    public function update($data, bool $overrideValidations = false)
+    public function update($toUpdate, bool $overrideValidations = false)
     {
+        $data = Garage::with(Application::$app->user);
+        $data->loadData($toUpdate);
+
+        $shouldValidatePassword = false;
+        $shouldValidateUsername = false;
         if (is_null($data))
             return false;
+
+        if (isset($data->password) && $this->password != $data->password) {
+            $shouldValidatePassword = true;
+        }
+
+        if (isset($data->username) && $this->username != $data->username) {
+            $shouldValidateUsername = true;
+        }
+
+        if (!$overrideValidations && !$this->validate($data, validateUsername: $shouldValidateUsername, validatePassword: $shouldValidatePassword, useFrameworkValidations : false)) {
+            throw new \Exception(array_values($this->errors)[0][0], 400);
+        }
 
         if (isset($data->password) && $this->password != $data->password) {
             $this->password = password_hash($data->password, PASSWORD_DEFAULT);
         }
 
-        if (!$overrideValidations && !$this->validate())
-            throw new \Exception(array_values($this->errors)[0][0]);
-
-        return parent::update($data);
+        return parent::update($toUpdate);
     }
 
     public function rules(): array
     {
         return [
             'username' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 3], [self::RULE_MAX, 'max' => 30], [self::RULE_UNIQUE, 'class' => self::class]],
-            'name' => [self::RULE_REQUIRED],
+            'name' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 3], [self::RULE_MAX, 'max' => 100]],
             'email' => [self::RULE_REQUIRED, self::RULE_EMAIL,],
-            'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 24]],
+            'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 72]],
             'passwordConfirm' => [self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']],
             'address' => [self::RULE_REQUIRED],
             'contact_no' => [self::RULE_REQUIRED],
@@ -98,6 +113,113 @@ class Garage extends UserModel
     public function getDisplayName(): string
     {
         return $this->name;
+    }
+
+    /** This method should <b>never</b> be called directly on the logged-in User model without setting $useFrameworkValidations to true.
+     * Instead, create a new model and use {@code Garage::with($model)} to create a new Garage model with the data from the User model.
+     * <br><br>
+     * <em>Note: This method fills up the model it is called on with $valueUpdates parameter values if it is set.<em>
+     */
+    public function validate($valueUpdates = [], $validateUsername = true, $validatePassword = true, $validateName = true, $validateAddress = true, $validateEmail = true, $validateContactNo = true, $validateBRN = true, $validateInternals = true, $useFrameworkValidations = true): bool
+    {
+        if ($useFrameworkValidations) {
+            return parent::validate();
+        }
+
+        if (isset($valueUpdates)) {
+            foreach($valueUpdates as $key => $value) {
+                $this->{$key} = $value;
+            }
+        }
+
+        if ($validateUsername) {
+            if (empty($this->username)) {
+                $this->addError('username', 'Username can not be empty.');
+            } elseif (strlen($this->username) < 3 || strlen($this->username) > 30) {
+                $this->addError('username', 'Username must be between 3 and 30 characters.');
+            } elseif (Garage::isUsernameAvailable($this->username)) {
+                $this->addError('username', 'Username already exists.');
+            }
+        }
+        if ($validatePassword) {
+            if (empty($this->password)) {
+                $this->addError('password', 'Password can not be empty.');
+            } elseif (strlen($this->password) < 8 || strlen($this->password) > 72) {
+                $this->addError('password', 'Password must be between 8 and 72 characters.');
+            } elseif ($this->password != $this->passwordConfirm) {
+                $this->addError('passwordConfirm', 'Password and Confirm Password do not match.');
+            }
+        }
+        if ($validateName) {
+            if (empty($this->name)) {
+                $this->addError('name', 'Name can not be empty.');
+            } elseif (strlen($this->name) < 3 || strlen($this->name) > 100) {
+                $this->addError('name', 'Name must be between 3 and 100 characters.');
+            }
+        }
+        if ($validateAddress) {
+            if (empty($this->address)) {
+                $this->addError('address', 'Address can not be empty.');
+            }
+        }
+        if ($validateEmail) {
+            if (empty($this->email)) {
+                $this->addError('email', 'Email can not be empty.');
+            } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+                $this->addError('email', 'Email is not valid.');
+            }
+        }
+        if ($validateContactNo) {
+            $contactTemp = str_replace(' ', '', $this->contact_no);
+            $contactTemp = str_replace('-', '', $contactTemp);
+            $contactTemp = str_replace('+', '', $contactTemp);
+            $contactTemp = str_replace('(', '', $contactTemp);
+            $contactTemp = str_replace(')', '', $contactTemp);
+
+            if (empty($this->contact_no)) {
+                $this->addError('contact_no', 'Contact Number can not be empty.');
+            } elseif (!preg_match('/^\d{7,20}$/', $contactTemp)) {
+                $this->addError('contact_no', 'Contact Number is not valid.');
+            }
+        }
+        if ($validateBRN) {
+            $brnTemp = str_replace(' ', '', $this->registration_no);
+            $brnTemp = str_replace('-', '', $brnTemp);
+            if (empty($this->registration_no)) {
+                $this->addError('registration_no', 'Business Registration Number can not be empty.');
+            } elseif (!preg_match('/^[0-9A-Za-z]{8,30}$/', $brnTemp)) {
+                $this->addError('registration_no', 'Business Registration Number is not valid.');
+            }
+        }
+        if ($validateInternals) {
+            if (isset($this->id) && $this->id < 0 && !Garage::verifyGarageExistance($this->id)) {
+                $this->addError('id', 'Internal Error: Please contact administrators.');
+            }
+            if ($this->status_id < 1 || $this->status_id > 3) {
+                $this->addError('status_id', 'Status ID must be between one and three.');
+            }
+        }
+
+        if (empty($this->errors)) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public static function isUsernameAvailable(string $username) : bool
+    {
+        $sql = "SELECT * FROM gearguard.gg_garage gg WHERE gg.username = :username LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':username', $username);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_NUM);
+        if (count($result) > 0) {
+            return false;
+        }
+
+        return true;
     }
 
     public static function with(UserModel $model) : Garage

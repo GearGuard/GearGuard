@@ -238,7 +238,6 @@
                 <p>View and edit your garage details</p>
             </div>
             <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post', 'garageProfileForm') ?>
-            <form id="garageProfileForm" novalidate>
                 <div class="form-grid">
                     <?php
                     echo $this->garage_name = $form->field($model, 'name')->required();
@@ -249,6 +248,7 @@
                     $this->description = new \gearguard\phpmvc\form\TextAreaField($model, 'description');
                     echo $this->description->rows(4);
                     echo $this->tel = $form->field($model, 'contact_no')->required()->type(\gearguard\phpmvc\form\FieldTypes::TYPE_TEL);
+                    echo $this->username = $form->field($model, 'username')->required();
                     ?>
                     <script>
                         document.querySelectorAll('.form-group textarea').forEach(e => e.parentElement.classList.add('full-width'))
@@ -258,8 +258,8 @@
                         description.classList.add('form-textarea');
                     </script>
 
-                    <div class="form-group" style="grid-column: 3/4;">
-                        <button class="edit-button" style="background-color: #ef4444;">Change username and password</button>
+                    <div class="form-group">
+                        <button class="edit-button" style="background-color: #ef4444;">Change password</button>
                     </div>
 
                 </div>
@@ -305,13 +305,16 @@
                 event.stopPropagation();
                 // Collect form data
                 const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
+                const data = {};
+
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
 
                 $.ajax({
                     url: '/garage/profile/update',
                     type: 'POST',
-                    data: JSON.stringify(data),
-                    contentType: 'application/json',
+                    data: data,
                     success: function(response) {
                         if (response.success) {
                             alert('Profile updated successfully!');
@@ -320,15 +323,12 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        alert('An error occurred: ' + error);
+                        alert('An error occurred: ' + xhr.error);
                     }
                 });
 
                 // Close the modal
                 confirmationModal.style.display = 'none';
-
-                // Show success message
-                alert('Profile updated successfully!');
             });
 
             // Cancel button closes the modal

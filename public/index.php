@@ -81,7 +81,7 @@ $app->router->get('/garage/services/search', [GarageController::class, 'getServi
 $app->router->get('/garage/customers/view', [GarageController::class, 'viewCustomers']);
 $app->router->get('/garage/customers/send_message', [GarageController::class, 'sendMessages']);
 $app->router->get('/garage/customers/search', [GarageController::class, 'searchCustomer']);
-$app->router->post('garage/profile/update', [GarageController::class, 'updateProfile']);
+$app->router->post('/garage/profile/update', [GarageController::class, 'updateProfile']);
 $app->router->get('/mechanic', [GarageController::class, 'manageMechanic']);
 
 

@@ -11,6 +11,7 @@ use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\middlewares\ExtendedMiddleware;
 use app\models\Garage;
+use app\utilities\EscapeAttributes;
 
 class GarageController extends Controller
 {
@@ -39,7 +40,6 @@ class GarageController extends Controller
         $body = $request->getBody();
         $page = $body['page'] ?? 1;
         if(!is_numeric($page)) throw new NotFoundException();
-        $page = htmlspecialchars($page);
         header('Content-Type: application/json; charset=utf-8');
         return json_encode(Application::$app->user->getServices((int)$page));
     }
@@ -71,7 +71,6 @@ class GarageController extends Controller
         $body = $request->getBody();
         $page = $body['page'] ?? 1;
         if(!is_numeric($page)) throw new NotFoundException();
-        $page = htmlspecialchars($page);
         header('Content-Type: application/json; charset=utf-8');
         return json_encode(Application::$app->user->getAllAppointments((int)$page));
     }
@@ -192,7 +191,7 @@ class GarageController extends Controller
         if (Application::$app->user instanceof Garage) {
             if (!isset($_GET['searchQuery']))
                 echo '';
-            $data = Application::$app->user->getServiceByType(htmlspecialchars($_GET['searchQuery']));
+            $data = Application::$app->user->getServiceByType($_GET['searchQuery']);
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode($data);
         }
@@ -204,12 +203,11 @@ class GarageController extends Controller
             $body = $request->getBody();
             if (!isset($body['id']) || !isset($body['type']) || !isset($body['price']) || !isset($body['duration']) || !isset($body['description']))
                 throw new NotFoundException();
-            $id = htmlspecialchars($body['id']);
-
-            $type = htmlspecialchars($body['type']);
-            $price = htmlspecialchars($body['price']);
-            $duration = htmlspecialchars($body['duration']);
-            $description = htmlspecialchars($body['description']);
+            $id = $body['id'];
+            $type = ($body['type']);
+            $price = ($body['price']);
+            $duration = ($body['duration']);
+            $description = ($body['description']);
 
             if (!is_numeric($id) || !is_numeric($duration) || !is_numeric($price))
                 throw new NotFoundException();
@@ -242,15 +240,22 @@ class GarageController extends Controller
 
     public function updateProfile(Request $request, Response $response)
     {
-        $body = array_map(function ($value) {
-            return htmlspecialchars($value);
-        }, $request->getBody());
-        $firstname = htmlspecialchars($body['firstname'] ?? '');
-        $lastname = htmlspecialchars($body['lastname'] ?? '');
-        $email = htmlspecialchars($body['email'] ?? '');
-        $phone = htmlspecialchars($body['phone'] ?? '');
-        $address = htmlspecialchars($body['address'] ?? '');
-        $garageID = Application::$app->session->get('user');
+
+        $body = $request->getBody();
+        try {
+            Application::$app->user->update($body);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+            ]);
+        } catch (\Exception $ex) {
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $ex->getMessage(),
+            ]);
+        }
 
     }
 
@@ -261,7 +266,6 @@ class GarageController extends Controller
             $id = $body['serviceID'] ?? '';
             if (!is_numeric($id))
                 throw new NotFoundException();
-            $id = htmlspecialchars($id);
             $toUpdate = [
                 'status_id' => GarageService::STATUS_DELETED
             ];
@@ -278,16 +282,15 @@ class GarageController extends Controller
     public function filteredAppointments(Request $request, Response $response)
     {
         $body = $request->getBody();
-        $firstname = htmlspecialchars(isset($body['firstname']) ? '%'.htmlspecialchars($body['firstname']).'%' : '%');
-        $lastname = htmlspecialchars(isset($body['lastname']) ? '%'.htmlspecialchars($body['lastname']).'%' : '%');
-        $numberplate = htmlspecialchars(isset($body['numberplate']) ? '%'.htmlspecialchars($body['numberplate']).'%' : '%');
-        $contact = htmlspecialchars(isset($body['contact']) ? '%'.htmlspecialchars($body['contact']).'%' : '%');
-        $date = htmlspecialchars((isset($body['date']) && !$body['date'] == '') ? htmlspecialchars($body['date']) : date("Y-m-d"));
-        $condition = htmlspecialchars((isset($body['condition'])  && !$body['condition'] == '') ? htmlspecialchars($body['condition']) : 'on or before');
-        $status = htmlspecialchars((isset($body['status'])  && !$body['status'] == '') ? htmlspecialchars($body['status']) : 'pending');
+        $firstname = (isset($body['firstname']) ? '%'.($body['firstname']).'%' : '%');
+        $lastname = (isset($body['lastname']) ? '%'.($body['lastname']).'%' : '%');
+        $numberplate = (isset($body['numberplate']) ? '%'.($body['numberplate']).'%' : '%');
+        $contact = (isset($body['contact']) ? '%'.($body['contact']).'%' : '%');
+        $date = ((isset($body['date']) && !$body['date'] == '') ? ($body['date']) : date("Y-m-d"));
+        $condition = ((isset($body['condition'])  && !$body['condition'] == '') ? ($body['condition']) : 'on or before');
+        $status = ((isset($body['status'])  && !$body['status'] == '') ? ($body['status']) : 'pending');
         $page = $body['page'] ?? 1;
         if(!is_numeric($page)) throw new NotFoundException();
-        $page = htmlspecialchars($page);
         header('Content-Type: application/json; charset=utf-8');
         return json_encode(Application::$app->user->getAllAppointmentsFiltered($firstname, $lastname, $numberplate, $contact, $date, $condition, $status, (int)$page));
     }
@@ -297,10 +300,9 @@ class GarageController extends Controller
         $body = $request->getBody();
         $page = $body['page'] ?? 1;
         if(!is_numeric($page)) throw new NotFoundException();
-        $page = htmlspecialchars($page);
-        $firstname = htmlspecialchars(isset($body['firstname']) ? '%'.htmlspecialchars($body['firstname']).'%' : '%');
-        $lastname = htmlspecialchars(isset($body['lastname']) ? '%'.htmlspecialchars($body['lastname']).'%' : '%');
-        $email = htmlspecialchars(isset($body['email']) ? '%'.htmlspecialchars($body['email']).'%' : '%');
+        $firstname = (isset($body['firstname']) ? '%'.($body['firstname']).'%' : '%');
+        $lastname = (isset($body['lastname']) ? '%'.($body['lastname']).'%' : '%');
+        $email = (isset($body['email']) ? '%'.($body['email']).'%' : '%');
         header('Content-Type: application/json; charset=utf-8');
         if (isset($body['firstname']) || isset($body['lastname']) || isset($body['email'])) {
             return json_encode(Application::$app->user->getCustomersFiltered($firstname, $lastname, $email, (int)$page));
@@ -313,9 +315,7 @@ class GarageController extends Controller
         $body = $request->getBody();
         $customerID = $body['customerID'] ?? '';
         if (!is_numeric($customerID)) throw new NotFoundException();
-        $customerID = htmlspecialchars($customerID);
         header('Content-Type: application/json; charset=utf-8');
         return json_encode(Application::$app->user->getCustomerVehicleDetails((int)$customerID));
     }
-
 }
