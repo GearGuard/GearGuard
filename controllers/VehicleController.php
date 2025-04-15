@@ -79,14 +79,29 @@ class VehicleController extends Controller
 	}
 	public function viewAllVehicle(Request $request, Response $response)
 	{
-		if (Application::$app->user instanceof User)
-			if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
-				return $this->render('customer/vehicle/viewAll', [
-					'name' => 'The GearGuard',
-				]);
-			} else {
-				return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
-			}
+		if (Application::$app->user instanceof User) {
+			$vehicles = Application::$app->user->getOwnedVehiclesList();
+			return $this->render('customer/vehicle/viewAll', [
+				'name' => 'The GearGuard',
+				'vehicles' => $vehicles
+			]);
+		}
 		throw new NotFoundException();
 	}
+	
+	// In VehicleOwner.php
+	public function getOwnedVehiclesList()
+	{
+		// Assuming a database query like this
+		$stmt = Application::$app->db->prepare('
+        SELECT * FROM vehicles
+        WHERE current_user_id = :userId
+    ');
+		$stmt->bindValue(':userId', $this->id); // Make sure this is the correct ID
+		$stmt->execute();
+		
+		// Return as objects
+		return $stmt->fetchAll(\PDO::FETCH_OBJ);
+	}
+	
 }

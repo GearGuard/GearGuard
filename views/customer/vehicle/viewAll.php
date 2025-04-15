@@ -216,137 +216,77 @@
         }
     </style>
 </head>
-
 <body>
-    <nav class="navMenu">
-        <a href="/customer/appointment/appoint" target="_self">New Vehicle</a>
-        <a href="#" class="active">My Vehicle</a>
-        <a href="/customer/vehicle/service_history" target="_self">Service History</a>
-    </nav>
-    <div class="container">
-        <div class="header">
-            <h1 class="title">My Vehicles</h1>
-            <a href="/new-vehicle" class="add-vehicle-btn">+ Add New Vehicle</a>
-        </div>
-        <div class="vehicles-grid" id="vehiclesGrid">
-            <!-- Vehicle cards will be populated here -->
-            <div class="vehicle-card">
-                <div class="vehicle-header">
-                    <div>
-                        <h2 class="vehicle-title">Toyota Camry</h2>
-                        <p class="vehicle-nickname">Daily Commuter</p>
-                    </div>
-                </div>
-                <div class="vehicle-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Year:</span>
-                        <span class="detail-value">2020</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Plate Number:</span>
-                        <span class="detail-value">ABC-1234</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">NIC:</span>
-                        <span class="detail-value">123456789V</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bought Date:</span>
-                        <span class="detail-value">2020-06-15</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Fuel Type:</span>
-                        <span class="detail-value">Petrol</span>
-                    </div>
-                </div>
-                <div class="vehicle-actions">
-                    <button class="action-button edit-btn" onclick="editVehicle(1)">Edit</button>
-                    <button class="action-button delete-btn" onclick="deleteVehicle(1)">Delete</button>
-                </div>
-            </div>
-
-            <div class="vehicle-card">
-                <div class="vehicle-header">
-                    <div>
-                        <h2 class="vehicle-title">Honda CBR</h2>
-                        <p class="vehicle-nickname">Weekend Rider</p>
-                    </div>
-                </div>
-                <div class="vehicle-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Year:</span>
-                        <span class="detail-value">2021</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Plate Number:</span>
-                        <span class="detail-value">XYZ-5678</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">NIC:</span>
-                        <span class="detail-value">987654321V</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bought Date:</span>
-                        <span class="detail-value">2021-03-10</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Fuel Type:</span>
-                        <span class="detail-value">Petrol</span>
-                    </div>
-                </div>
-                <div class="vehicle-actions">
-                    <button class="action-button edit-btn" onclick="editVehicle(2)">Edit</button>
-                    <button class="action-button delete-btn" onclick="deleteVehicle(2)">Delete</button>
-                </div>
-            </div>
-
-            <!-- Example of a third vehicle -->
-            <div class="vehicle-card">
-                <div class="vehicle-header">
-                    <div>
-                        <h2 class="vehicle-title">Ford F-150</h2>
-                        <p class="vehicle-nickname">Workhorse</p>
-                    </div>
-                </div>
-                <div class="vehicle-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Year:</span>
-                        <span class="detail-value">2019</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Plate Number:</span>
-                        <span class="detail-value">LMN-91011</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">NIC:</span>
-                        <span class="detail-value">123987456V</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Bought Date:</span>
-                        <span class="detail-value">2019-08-22</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Fuel Type:</span>
-                        <span class="detail-value">Diesel</span>
-                    </div>
-                </div>
-                <!-- Vehicle actions -->
-                <div class='vehicle-actions'>
-                    <button class='action-button edit-btn' onclick='editVehicle(3)'>Edit</button>
-                    <button class='action-button delete-btn' onclick='deleteVehicle(3)'>Delete</button>
-                </div>
-            </div>
-        </div>
+<nav class='navMenu'>
+    <a href='/customer/vehicle/register' target='_self'>New Vehicle</a>
+    <a href='#' class='active'>My Vehicle</a>
+    <a href='/customer/vehicle/service_history' target='_self'>Service History</a>
+</nav>
+<div class='container'>
+    <div class='header'>
+        <h1 class='title'>My Vehicles</h1>
+        <a href='/new-vehicle' class='add-vehicle-btn'>+ Add New Vehicle</a>
     </div>
-    <script>
-        function editVehicle(id) {
-            alert(`Edit vehicle with ID: ${id}`);
-        }
+    <div class='vehicles-grid' id='vehiclesGrid'>
+		<?php if (!empty($vehicles)): ?>
+			<?php foreach ($vehicles as $vehicle): ?>
+                <div class="vehicle-card">
+                    <div class="vehicle-header">
+                        <div>
+                            <h2 class="vehicle-title"><?= htmlspecialchars($vehicle->model_name ?? 'Unknown Model') ?></h2>
+                            <p class="vehicle-nickname"><?= htmlspecialchars($vehicle->nickname ?? '') ?></p>
+                        </div>
+                    </div>
+                    <div class="vehicle-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Year:</span>
+                            <span class="detail-value"><?= htmlspecialchars($vehicle->year_manufactured ?? '-') ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Plate Number:</span>
+                            <span class="detail-value"><?= htmlspecialchars($vehicle->license_plate_no ?? '-') ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">NIC:</span>
+                            <span class="detail-value"><?= htmlspecialchars($vehicle->nic ?? '-') ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Bought Date:</span>
+                            <span class="detail-value"><?= htmlspecialchars($vehicle->bought_date ?? '-') ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Fuel Type:</span>
+                            <span class="detail-value"><?= htmlspecialchars($vehicle->fuel_type ?? '-') ?></span>
+                        </div>
+                    </div>
+                    <div class="vehicle-actions">
+                        <button class="action-button edit-btn" onclick="editVehicle(<?= $vehicle->id ?>)">Edit</button>
+                        <button class="action-button delete-btn" onclick="deleteVehicle(<?= $vehicle->id ?>)">Delete
+                        </button>
+                    </div>
+                </div>
+			<?php endforeach; ?>
+		<?php else: ?>
+            <div class="no-vehicles">
+                <p class="no-vehicles-text">You have no vehicles registered yet.</p>
+                <a href="/new-vehicle" class="add-vehicle-btn">+ Add New Vehicle</a>
+            </div>
+		<?php endif; ?>
+    </div>
+</div>
+<script>
+    function editVehicle(id) {
+        // Redirect or open modal for editing
+        window.location.href = '/customer/vehicle/edit?id=' + id;
+    }
 
-        function deleteVehicle(id) {
-            alert(`Delete vehicle with ID: ${id}`);
+    function deleteVehicle(id) {
+        if (confirm('Are you sure you want to delete this vehicle?')) {
+            // Implement AJAX or redirect for deletion
+            window.location.href = '/customer/vehicle/delete?id=' + id;
         }
-    </script>
+    }
+</script>
 </body>
-
+</html>
 </html>

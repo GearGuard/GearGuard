@@ -276,7 +276,7 @@
         <div class="form-column">
             <div class="form-group">
                 <label for="year_manufactured">Manufactured Year<span class="required-dot">*</span></label>
-                <select id="year_manufactured" name="yeyear_manufactured" required>
+                <select id="year_manufactured" name="year_manufactured" required>
                     <option value="">Select Year</option>
 					<?php for ($i = date('Y'); $i >= 1980; $i--) { ?>
                         <option value="<?= $i ?>"><?= $i ?></option>
@@ -379,16 +379,17 @@
         </div>
     </div>
 
-    <div class="form-actions">
-        <button type="submit">Register Vehicle</button>
-    </div>
+<!--    <div class="form-actions">-->
+<!--        <button type="submit">Register Vehicle</button>-->
+<!--    </div>-->
 	
-	<?php Form::end(); ?>
+
 </div>
 
 <div class="button-container">
     <button type="reset" class="clear-button">Clear</button>
     <button type="submit" class="submit-button">Register Vehicle</button>
+	<?php Form::end(); ?>
 </div>
 <?php echo Form::end() ?>
 </div>
