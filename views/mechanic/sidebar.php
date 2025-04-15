@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -208,17 +208,17 @@
             </a> 
         </li> 
         <li class="nav-item"> 
-            <a href="profile_form" class="nav-link"> 
+            <a href="profile" class="nav-link"> 
                 <i class="fas fa-user-circle"></i> 
                 <span class="nav-text">Profile</span> 
             </a> 
         </li> 
         <li class="nav-item"> 
-            <a href="services" class="nav-link"> 
-                <i class="fas fa-wrench"></i> 
-                <span class="nav-text">Service</span> 
-            </a> 
-        </li> 
+    <a href="/mechanic/services/viewService" class="nav-link"> 
+       <i class="fas fa-cogs"></i>
+        <span class="nav-text">Services</span> 
+    </a> 
+</li>
         <li class="nav-item"> 
             <a href="service_history" class="nav-link"> 
                 <i class="fas fa-history"></i> 
@@ -229,6 +229,12 @@
     <a href="spareparts" class="nav-link"> 
         <i class="fas fa-screwdriver-wrench"></i> 
         <span class="nav-text">Spareparts</span> 
+    </a> 
+</li>
+<li class="nav-item"> 
+    <a href="/community" class="nav-link"> 
+        <i class="fas fa-users"></i> 
+        <span class="nav-text">Community</span> 
     </a> 
 </li>
         <li class="nav-item"> 
@@ -248,9 +254,8 @@
     </div>
     
 
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
-    <iframe id="content-iframe" location="relative" src="dashboard.php" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
+    <iframe id="content-iframe" location="relative" src="dashboard.php" style="border: transparent; scroll-behavior: auto; width: 100%; height: 100vh;"></iframe>
 </div>
     <script>
         const toggleBtn = document.getElementById('toggleBtn');
@@ -268,28 +273,37 @@
             }
         });
 
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', async function(e) {
-                e.preventDefault();
+        
 
-                const href = link.getAttribute('href');
+       document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', async function(e) {
+        e.preventDefault();
 
-                try {
-                    document.getElementById("content-iframe").setAttribute("src", href);
+        const href = link.getAttribute('href');
 
-                    document.querySelectorAll('.nav-link').forEach(lnk => lnk.classList.remove('active'));
+        try {
+            document.getElementById("content-iframe").setAttribute("src", href);
 
-                    link.classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(lnk => lnk.classList.remove('active'));
 
-                } catch (error) {
-                    console.error('There was a problem with the fetch operation:', error);
-                    mainContent.innerHTML = '<p>There was an error loading the content. Please try again later.</p>';
-                }
-            });
-        });
+            link.classList.add('active');
+
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+            mainContent.innerHTML = '<p>There was an error loading the content. Please try again later.</p>';
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dashboardLink = document.querySelector('.nav-link[href="dashboard"]');
+    if (dashboardLink) {
+        dashboardLink.click();
+    }
+});
     </script>
 
     
 </body>
 
-</html>
+</html> -->

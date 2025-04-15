@@ -121,14 +121,29 @@ $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);
 
 
 //mechanic
-$app->router->get('/mechanic/dashboard', [SiteController::class, 'mechanicDashboard']);
-$app->router->get('/mechanic/profile_form', [SiteController::class, 'mechanicProfile']);
+
+// $app->router->get('/mechanic', [SiteController::class, 'mechanic']);
+$app->router->get('/home', [AuthController::class, 'customer']);
+$app->router->get('/mechanic/register', [AuthController::class, 'mechanicSignup']);
+$app->router->post('/mechanic/register', [AuthController::class, 'mechanicSignup']);
+$app->router->get('/mechanic/login', [AuthController::class, 'mechanicLogin']);
+$app->router->post('/mechanic/login', [AuthController::class, 'mechanicLogin']);
+$app->router->get('/mechanic/dashboard', [AuthController::class, 'dashboard']);
+$app->router->get('/mechanic/services/viewService', [SiteController::class, 'viewServicesByMechanic']);
+$app->router->get('/mechanic/services/addService', [AuthController::class, 'mechanicAddServices']);
+$app->router->post('/mechanic/services/addService', [AuthController::class, 'MechanicAddServicesPost']);
+$app->router->get('/mechanic/services/editService', [SiteController::class, 'editServices']);
+$app->router->post('/mechanic/services/editService', [SiteController::class, 'editServices']);
+$app->router->get('/mechanic/services/deleteService', [SiteController::class, 'deleteServices']);
+$app->router->post('/mechanic/services/deleteService', [SiteController::class, 'markServiceDeleted']);
+$app->router->get('/mechanic/services/search', [AuthController::class, 'getService']);
+$app->router->get('/mechanic/profile', [SiteController::class, 'mechanicProfile']);
 $app->router->get('/mechanic/profile_update', [SiteController::class, 'mechanicProfileUpdate']);
 $app->router->get('/mechanic/services', [SiteController::class, 'mechanicservices']);
 $app->router->get('/mechanic/service_history', [SiteController::class, 'mechanicServiceHistory']);
 $app->router->get('/mechanic/spareparts', [SiteController::class, 'mechanicSparePart']);
 $app->router->get('/mechanic/messages', [SiteController::class, 'mechanicMessages']);
-$app->router->get('/mechanic/sidebar', [SiteController::class, 'mechanicSideBar']);
+// $app->router->get('/mechanic/sidebar', [AuthController::class, 'mechanicSideBar']);
 
 
 

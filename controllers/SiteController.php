@@ -220,13 +220,79 @@ public function mechanicDashboard(Request $request, Response $response)
     return $this->render('mechanic/dashboard', $params);
 }
 
+public function mechanicSidebar(Request $request, Response $response)
+{
+    $params = [
+        'name' => "The GearGurd"
+    ];
+    return $this->render('mechanic/sidebar', $params);
+}
+
+public function viewServicesByMechanic(Request $request, Response $response)
+{
+    $params = [
+        'name' => "The GearGurd"
+    ];
+    return $this->render('mechanic/services/viewService', $params);
+}
+// private function getServicesListByMechanic()
+// {
+//     $sql = "SELECT id, type FROM gg_garage_service WHERE status_id = 1 AND mechanic_id = :mechanic_id";
+//     $statement = Application::$app->db->prepare($sql);
+//     $statement->bindValue(':mechanic_id', Application::$app->session->get('mechanic_id'));
+//     $statement->execute();
+//     return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+// }
+
+public function addServices(Request $request, Response $response)
+{
+    $params = [
+        'name' => "The GearGurd"
+    ];
+    return $this->render('mechanic/services/addService', $params);
+}
+
+public function addServicesPost(Request $request, Response $response)
+{
+    $params = [
+        'name' => "The GearGurd"
+    ];
+    return $this->render('mechanic/services/addService', $params);
+}
+
+public function editServices(Request $request, Response $response)
+{
+    $params = [
+        'name' => "The GearGurd"
+    ];
+    return $this->render('mechanic/services/editService', $params);
+}
+
+public function deleteServices(Request $request, Response $response)
+{
+    $params = [
+        'name' => "The GearGurd"
+    ];
+    return $this->render('mechanic/services/deleteService', $params);
+}
+
 public function mechanicProfile(Request $request, Response $response)
 {
     $params = [
         'name' => "The GearGurd"
     ];
-    return $this->render('mechanic/profile_form', $params);
+    return $this->render('mechanic/profile', $params);
 }
+
+
+private function getServicesList()
+{
+    $sql = "SELECT id, type FROM gg_garage_service WHERE status_id = 1";
+    $statement = Application::$app->db->prepare($sql);
+    $statement->execute();
+    return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+}
+
 
 public function mechanicProfileUpdate(Request $request, Response $response)
     {
@@ -236,23 +302,27 @@ public function mechanicProfileUpdate(Request $request, Response $response)
         return $this->render('mechanic/profile_update', $params);
     }
 
-    public function mechanicservices(Request $request, Response $response)
-    {
-        $params = [
-            'name' => "The GearGurd"
-        ];
-        return $this->render('mechanic/services', $params);
-    } 
+    
 
-    public function mechanicServiceHistory(Request $request, Response $response)
-    {
-        $params = [
-            'name' => "The GearGurd"
-        ];
-        return $this->render('mechanic/service_history', $params);
-    }
 
-    public function mechanicSparePart(Request $request, Response $response)
+
+    // public function mechanicservices(Request $request, Response $response)
+    // {
+    //     $params = [
+    //         'name' => "The GearGurd"
+    //     ];
+    //     return $this->render('mechanic/services', $params);
+    // } 
+
+    // public function mechanicServiceHistory(Request $request, Response $response)
+    // {
+    //     $params = [
+    //         'name' => "The GearGurd"
+    //     ];
+    //     return $this->render('mechanic/service_history', $params);
+    // }
+
+public function mechanicSparePart(Request $request, Response $response)
     {
         $params = [
             'name' => "The GearGurd"
@@ -268,12 +338,30 @@ public function mechanicProfileUpdate(Request $request, Response $response)
         return $this->render('mechanic/messages', $params);
     }
 
-    public function mechanicSideBar(Request $request, Response $response)
+    public function mechanicAddServices(Request $request, Response $response)
     {
-        $params = [
-            'name' => "The GearGurd"
-        ];
-        return $this->render('mechanic/sidebar', $params);
+        $this->setLayout('mechanic_navbar');
+        $service = new GarageService();
+        return $this->render('mechanic/services/addService', [
+            'model' => $service
+        ]);
     }
 
+    public function mechanicAddServicesPost(Request $request, Response $response)
+    {
+        $this->setLayout('mechanic_navbar');
+        $service = new GarageService();
+        $service->loadData($request->getBody());
+        $service->garage_id = Application::$app->session->get('user');
+        $service->status_id = GarageService::STATUS_ACTIVE;
+
+        if ($service->validate() && $service->save()) {
+            Application::$app->session->setFlash('success', 'Service added successfully');
+            return $response->redirect('/mechanic/services');
+        }
+
+        return $this->render('mechanic/services/addService', [
+            'model' => $service
+        ]);
+    }
 }
