@@ -259,10 +259,25 @@ $this->title = 'Search Appointments';
         <!-- Results will be injected dynamically -->
         </tbody>
     </table>
+    <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
     <p class="no-results" id="noResultsMessage" style="display: none;">No results found.</p>
 </div>
 
 <script>
+    let page = 1;
+    let isLoading = false;
+    let hasMoreData = true;
+    const limit = 25;
+    const loader = document.getElementById('loader');
+
+    function resetVariables() {
+        page = 1;
+        isLoading = false;
+        hasMoreData = true;
+    }
+
+    document.querySelectorAll('#searchForm input, #searchForm select').forEach(a => addEventListener("input", (event) => resetVariables()));
+
     function handleSearch() {
         const firstname = document.getElementById('firstname').value.trim();
 		const lastname = document.getElementById('lastname').value.trim();
@@ -275,8 +290,14 @@ $this->title = 'Search Appointments';
         const resultsBody = document.getElementById('resultsBody');
         const noResultsMessage = document.getElementById('noResultsMessage');
 
+        if (isLoading || !hasMoreData) return false;
+
+        isLoading = true;
+        loader.textContent = 'Loading...';
+        loader.style.display = 'block';
+
         $.ajax({
-            url: '/appointment/filtered',
+            url: '/api/garage/getAppointmentsFiltered',
             type: 'GET',
             data: {
                 firstname: firstname,
@@ -286,21 +307,27 @@ $this->title = 'Search Appointments';
                 date: date,
                 condition: condition,
                 status: status,
+                page: page,
             },
             success: function (response) {
                 let data = response;
 
                 resultsBody.innerHTML = '';
                 if (data.length > 0) {
+                    if (data.length < limit) {
+                        hasMoreData = false;
+                        window.removeEventListener('scroll', handleScroll);
+                    } else {
+                        page++;
+                    }
                     data.forEach(item => {
-                        let tablerow = `<tr>
+                        let tablerow = `<tr onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
                             <td>${item.vehicle_type}</td>
                             <td>${item.first_name} ${item.last_name}</td>
                             <td>${item.contact_no}</td>
                             <td>${item.license_plate_no}</td>
                             <td>${item.service_type}</td>
-                            <td>${item.date} ${item.time}</td>
-                            <td><button onclick='viewDetails(${item})' class="view-more-button">View More</button></td>`;
+                            <td>${item.date} ${item.time}</td>`;
 
                         if (item.status_id === 1) {
                             tablerow += `<td><button class="view-more-button">Accept</button><button class="view-more-button">Reject</button></td>`;
@@ -312,6 +339,7 @@ $this->title = 'Search Appointments';
                     });
                     resultsContainer.style.display = 'block';
                     noResultsMessage.style.display = 'none';
+                    loader.style.display = 'none';
                 } else {
                     noResultsMessage.style.display = 'block';
                 }
@@ -319,6 +347,7 @@ $this->title = 'Search Appointments';
             error: function (xhr, status, error) {
                 console.log('Error:', error);
                 noResultsMessage.style.display = 'block';
+                loader.style.display = 'none';
             }
         });
 
@@ -355,6 +384,52 @@ $this->title = 'Search Appointments';
         resultsContainer.style.display = 'block';*/
         return false;
     }
+
+    function addBackground(element) {
+        element.style.backgroundColor = '#33363f';
+    }
+
+    function removeBackground(element) {
+        element.style.backgroundColor = '';
+    }
+
+    function viewDetails(appointment) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
+
+        const content = document.createElement('div');
+        content.style.backgroundColor = '#25272d';
+        content.style.padding = '20px';
+        content.style.borderRadius = '8px';
+        content.style.color = '#f5f5f5';
+
+        content.innerHTML = `<h2>${appointment.license_plate_no}</h2>
+                         <p>Vehicle Mode: ${appointment.vehicle_model}</p>
+                         <p>Notes: ${appointment.notes}</p>
+                         <button onclick='this.parentElement.parentElement.remove()' style='padding: 10px; background: var(--accent); color: var(--text); border: none; border-radius: 5px; cursor: pointer;'>Close</button>`;
+
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+    }
+
+    function handleScroll() {
+        const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 5 && page < 0) {
+            handleSearch();
+        }
+    }
+
+    window.addEventListener('scroll', handleScroll);
+
 </script>
 </body>
 

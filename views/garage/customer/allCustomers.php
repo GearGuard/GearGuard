@@ -77,6 +77,35 @@
             padding: 2rem;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: var(--secondary);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 80%;
+            max-width: 60%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
         .title {
             color: var(--primary);
             font-size: 1.5rem;
@@ -147,46 +176,148 @@
         <table id="customersTable">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Vehicle Model</th>
-                    <th>Service Type</th>
-                    <th>Service Date</th>
-                    <th>Email</th>
+                    <th>Fist Name</th>
+                    <th>Last Name</th>
                     <th>Phone Number</th>
+                    <th>Email</th>
+                    <th>Address</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Table body will be populated by JavaScript -->
             </tbody>
         </table>
+        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
+    </div>
+
+    <div id="vehicleListModal" class="modal">
+        <div id="modal-content" class="modal-content">
+            <!-- Modal data will be loaded by JavaScript -->
+        </div>
     </div>
 
     <script>
-        // Dummy data
-        const customers = [
-            ['John Doe', 'Toyota Camry', 'Oil Change', '2023-12-01', 'john@example.com', '123-456-7890'],
-            ['Jane Smith', 'Honda Civic', 'Tire Rotation', '2023-12-02', 'jane@example.com', '987-654-3210'],
-            ['Mike Johnson', 'Ford F-150', 'Brake Service', '2023-12-03', 'mike@example.com', '456-789-0123'],
-            ['Sarah Brown', 'Chevrolet Malibu', 'Engine Tune-up', '2023-12-04', 'sarah@example.com', '789-012-3456'],
-            ['David Wilson', 'Nissan Altima', 'Transmission Service', '2023-12-05', 'david@example.com', '321-654-9870']
-        ];
+        let page = 1;
+        let isLoading = false;
+        let hasMoreData = true;
+        const limit = 25;
+        const loader = document.getElementById('loader');
 
-        // Function to populate the table
-        function populateTable() {
-            const tableBody = document.querySelector('#customersTable tbody');
-            customers.forEach(customer => {
-                const row = document.createElement('tr');
-                customer.forEach(data => {
-                    const cell = document.createElement('td');
-                    cell.textContent = data;
-                    row.appendChild(cell);
-                });
-                tableBody.appendChild(row);
-            });
+        async function fetchCustomers() {
+            if (isLoading || !hasMoreData) return;
+
+            isLoading = true;
+            loader.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`/api/garage/getCustomers?page=${page}`);
+                const result = await response.json();
+
+                appendRows(result);
+
+                if (result.length < limit) {
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else {
+                    page++;
+                }
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+            } finally {
+                isLoading = false;
+            }
+
+            document.getElementById('loader').style.display = 'none';
         }
 
-        // Call the function to populate the table when the page loads
-        window.onload = populateTable;
+    function appendRows(data) {
+        const tableBody = document.querySelector('#customersTable tbody');
+        data.forEach(customer => {
+            const row = document.createElement('tr');
+            row.addEventListener('click', () => {
+                showVehicleDetails(customer);
+            });
+            row.style.cursor = "pointer";
+            row.onmouseover = function () {
+                this.style.backgroundColor = "#33363f";
+            };
+            row.onmouseout = function () {
+                this.style.backgroundColor = "";
+            };
+            row.innerHTML = `
+                <td>${customer.first_name}</td>
+                <td>${customer.last_name}</td>
+                <td>${customer.contact_no}</td>
+                <td>${customer.email}</td>
+                <td>${customer.address}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function handleScroll() {
+        const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 5) {
+            fetchCustomers();
+        }
+    }
+
+    fetchCustomers();
+
+    window.addEventListener('scroll', handleScroll);
+
+    function showVehicleDetails(customer) {
+        modal = document.getElementById('modal-content');
+        modal.innerHTML = `<i>Give us a second, we are getting vehicle info.</i>
+                          <div class="modal-buttons">
+                              <button type="button" class="search-button" onclick="closeVehicleDetailsModal()">Cancel</button>
+                          </div>`;
+        openVehicleDetailsModal(customer);
+        fetchVehicleDetails(customer);
+    }
+
+    async function fetchVehicleDetails(customer) {
+        try {
+            const response = await fetch(`/api/garage/getCustomerVehicles?customerID=${customer.id}`);
+            const vehicles = await response.json();
+
+            if (vehicles.length === 0) {
+                document.getElementById('modal-content').innerHTML = `<p>No vehicles found for this customer.</p>
+                                <div class="modal-buttons">
+                                    <button type="button" class="search-button" onclick="closeVehicleDetailsModal()">Close</button>
+                                </div>`;
+                return;
+            }
+
+            let vehicleList = `<h3>Vehicle list of ${customer.first_name} ${customer.last_name}:</h3><table><thead>
+                <tr>
+                    <th>License Plate No</th>
+                    <th>Vehicle Type</th>
+                    <th>Model</th>
+                    <th>Year Manufactured</th>
+                </tr></thead><tbody>`;
+            vehicles.forEach(vehicle => {
+                vehicleList += `<tr><td>${vehicle.license_plate_no}</td><td>${vehicle.type}</td><td>${vehicle.model}</td><td>${vehicle.year_manufactured}</td></tr>`;
+            });
+            vehicleList += '</tbody></table>';
+
+            document.getElementById('modal-content').innerHTML = vehicleList + `
+                <div class="modal-buttons">
+                    <button type="button" class="search-button" onclick="closeVehicleDetailsModal()">Close</button>
+                </div>`;
+        } catch (error) {
+            console.error('Error fetching vehicle details:', error);
+        }
+    }
+
+    function openVehicleDetailsModal(vehicleId) {
+        document.getElementById('vehicleListModal').style.display = 'block';
+    }
+
+    function closeVehicleDetailsModal() {
+        document.getElementById('vehicleListModal').style.display = 'none';
+    }
+
     </script>
 </body>
 

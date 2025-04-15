@@ -80,7 +80,6 @@ $app->router->get('/appointment/appointments', [AuthController::class, 'appointm
 $app->router->post('/appointment/update_status', [AuthController::class, 'updateAppointmentStatus']);
 
 $app->router->get('/appointment/search', [GarageController::class, 'searchAppointments']);
-$app->router->get('/appointment/filtered', [GarageController::class, 'filteredAppointments']);
 $app->router->get('/appointment/delete', [GarageController::class, 'deleteAppointment']);
 $app->router->get('/services/view', [GarageController::class, 'viewServices']);
 $app->router->get('/services/add', [GarageController::class, 'addServices']);
@@ -113,6 +112,12 @@ $app->router->get('/admin/addvehicle', [AdminController::class, 'addVehicleByAdm
 $app->router->get('/admin/editvehicle', [AdminController::class, 'editVehicleByAdmin']);
 $app->router->get('/admin/transaction', [AdminController::class, 'admin_transaction']);
 $app->router->get('/admin/q&a', [AdminController::class, 'questions']);
+
+$app->router->get('/api/garage/getCustomers', [GarageController::class, 'getCustomers']);
+$app->router->get('/api/garage/getAppointments', [GarageController::class, 'getAppointments']);
+$app->router->get('/api/garage/getAppointmentsFiltered', [GarageController::class, 'filteredAppointments']);
+$app->router->get('/api/garage/getServices', [GarageController::class, 'getServices']);
+$app->router->get('/api/garage/getCustomerVehicles', [GarageController::class, 'getCustomerVehicles']);
 
 
 $app->run();
