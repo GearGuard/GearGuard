@@ -146,6 +146,8 @@ class AuthController extends Controller
             return $this->render('garage/garage', [
                 'title' => 'Garage Dashboard'
             ]);
+        } elseif (Application::$app->user instanceof Admin) {
+
         }
         throw new NotFoundException();
     }

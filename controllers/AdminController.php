@@ -2,16 +2,22 @@
 
 namespace app\controllers;
 
+use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\middlewares\ExtendedMiddleware;
+use app\models\User;
 
 class AdminController extends Controller
 {
     public static function isAdmin() : bool {
-        return true;
+        if (Application::$app->user instanceof User)
+            return (bool)Application::$app->user->isAdmin();
+
+        return false;
     }
+
     public function __construct()
     {
         $this->registerMiddleware(new ExtendedMiddleware([], self::isAdmin()));

@@ -14,6 +14,7 @@ class User extends UserModel
 	const STATUS_ACTIVE = 2;
 	const STATUS_DELETED = 3;
 
+    public int $id;
 	public string $first_name = '';
 	public string $last_name = '';
 	public string $email = '';
@@ -27,6 +28,7 @@ class User extends UserModel
 	public string $passwordConfirm = '';
 
     private VehicleOwner $vehicleOwner;
+    private ?Admin $admin = null;
 
     public function __construct()
     {
@@ -90,6 +92,12 @@ class User extends UserModel
 	{
 		return $this->first_name . ' ' . $this->last_name;
 	}
+
+    public function isAdmin(): bool
+    {
+        $this->admin = Admin::getInstance();
+        return $this->admin !== null;
+    }
 
 	public function getUserType(): string
 	{

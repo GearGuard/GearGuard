@@ -21,7 +21,7 @@ class GarageService extends DbModel
     private string $garage_name = '';
     public int $status_id = self::STATUS_INACTIVE;
 
-    public static function initialize(string $type, float $price, float $duration, string $description): GarageService
+    public static function initialize(string $type, float $price, float $duration, string $description, int $garage_id = -1): GarageService
     {
         $object = new GarageService();
 
@@ -29,13 +29,13 @@ class GarageService extends DbModel
         $object->price = $price;
         $object->duration = $duration;
         $object->description = $description;
-        $object->garage_id = Application::$app->session->get('user');
+        $object->garage_id = ($garage_id < 0 ? Application::$app->session->get('user') : $garage_id);
         $object->status_id = self::STATUS_ACTIVE;
 
         return $object;
     }
 
-    public static function getGarageService(int $id, string $type, float $price, float $duration, int $status, string $description): GarageService
+    public static function getGarageService(int $id, string $type, float $price, float $duration, int $status, string $description, int $garage_id = -1): GarageService
     {
         $object = new GarageService();
 
@@ -44,7 +44,7 @@ class GarageService extends DbModel
         $object->price = $price;
         $object->duration = $duration;
         $object->description = $description;
-        $object->garage_id = Application::$app->session->get('user');
+        $object->garage_id = ($garage_id < 0 ? Application::$app->session->get('user') : $garage_id);
         $object->status_id = $status;
 
         return $object;
