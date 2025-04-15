@@ -68,5 +68,10 @@
 			}
 			throw new NotFoundException();
 		}
+		
+		public function viewSparePart(Request $request, Response $response){
+			$spareparts = SparePart::findAll();
+			return $this->render('view_sparepart', ['spareparts' => $spareparts]);
+		}
 	}
 ?>
