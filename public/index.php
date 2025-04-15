@@ -137,7 +137,7 @@ $app->router->post('/mechanic/services/editService', [SiteController::class, 'ed
 $app->router->get('/mechanic/services/deleteService', [SiteController::class, 'deleteServices']);
 $app->router->post('/mechanic/services/deleteService', [SiteController::class, 'markServiceDeleted']);
 $app->router->get('/mechanic/services/search', [AuthController::class, 'getService']);
-$app->router->get('/mechanic/profile', [SiteController::class, 'mechanicProfile']);
+$app->router->get('/mechanic/profile', [AuthController::class, 'myProfile']);
 $app->router->get('/mechanic/profile_update', [SiteController::class, 'mechanicProfileUpdate']);
 $app->router->get('/mechanic/services', [SiteController::class, 'mechanicservices']);
 $app->router->get('/mechanic/service_history', [SiteController::class, 'mechanicServiceHistory']);

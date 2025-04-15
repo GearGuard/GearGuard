@@ -84,6 +84,10 @@ class AuthController extends Controller
             return $this->render('garage/profile', [
                 'title' => 'Profile'
             ]);
+        } else if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/profile', [
+                'title' => 'Profile'
+            ]);
         }
 
         throw new NotFoundException();
@@ -679,49 +683,6 @@ class AuthController extends Controller
             'model' => $loginForm
         ]);
     }
-
-    public function mechanicProfile(Request $request, Response $response)
-    {
-        if (Application::$app->user instanceof User) {
-            return $this->render('/mechanic/profile_form', [
-                'title' => 'My Profile'
-            ]);
-        } else if (Application::$app->user instanceof Garage) {
-            return $this->render('/mechanic/profile_form', [
-                'title' => 'My Profile'
-            ]);
-        }
-
-        throw new NotFoundException();
-    }
-
-    public function mechanicProfileUpdate(Request $request, Response $response)
-    {
-        if (Application::$app->user instanceof User) {
-            return $this->render('/mechanic/profile_update', [
-                'title' => 'Profile'
-            ]);
-        } else if (Application::$app->user instanceof Garage) {
-            return $this->render('/mechanic/profile_update', [
-                'title' => 'Profile'
-            ]);
-        }
-
-        throw new NotFoundException();
-    }
-
-   public function viewServicesByMechanic(Request $request, Response $response)
-{
-    if (Application::$app->user instanceof Mechanic) {
-        $garageId = Application::$app->user->getGarageId();
-        return $this->render('/services/viewService', [
-            'name' => 'The GearGuard',
-            'services' => $this->getServicesByGarage($garageId)
-        ]);
-    }
-
-    throw new NotFoundException();
-}
 
     public function mechanicAddServices(Request $request, Response $response)
     {

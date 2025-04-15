@@ -6,18 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Mechanic - GearGuard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --text: #f5f5f5;
+            --text: #FFFFFFFF;
             --background: #181a20;
             --primary: #c7adad;
             --secondary: #25272d;
             --accent: #2463eb;
-            --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
-            --edit-color: #10B981;
-            --delete-color: #EF4444;
         }
 
         * {
@@ -27,308 +23,274 @@
         }
 
         body {
-            background: var(--background);
             font-family: "Inter", sans-serif;
+            background-color: var(--background);
             color: var(--text);
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        .navMenu {
-            background-color: var(--secondary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 70%;
+            min-height: 100vh;
             padding: 1rem;
-            margin: 0 auto 2rem;
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            gap: 15px;
         }
 
-        .navMenu a {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            padding: 0.75rem 1.25rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+        .profile-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            background-color: var(--secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .navMenu a.active {
-            color: var(--accent);
-            background: var(--hover-bg);
-        }
-
-        .navMenu a:hover {
-            color: var(--accent);
-            background: var(--hover-bg);
-        }
-
-        .manage-form {
-            background: var(--secondary);
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .title {
-            color: var(--primary);
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .search-section {
-            margin-bottom: 2rem;
-        }
-
-        .form-row {
+        .profile-form {
+            padding: 3rem;
+            background-color: var(--background);
             display: flex;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            flex-direction: column;
+            justify-content: center;
+            border-top: 2px solid var(--accent);
         }
 
-        .form-column {
-            flex: 1;
+        .form-title {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
+        .form-title h1 {
+            font-size: 2.2rem;
             color: var(--text);
             margin-bottom: 0.5rem;
         }
 
-        .required-dot {
-            color: #ef4444;
-            margin-left: 0.25rem;
+        .form-title p {
+            color: var(--text);
+            opacity: 0.7;
         }
 
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="date"] {
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .required-dot {
+            color: #ef4444;
+            margin-left: 4px;
+        }
+
+        .form-input,
+        .form-textarea {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
-            border-radius: 8px;
             background-color: #33363f;
+            border-radius: 8px;
             color: var(--text);
             font-size: 0.95rem;
             transition: all 0.2s ease;
+            resize: vertical;
         }
 
-        input:hover {
+        .form-input:hover,
+        .form-textarea:hover {
             border-color: var(--accent);
         }
 
-        input:focus {
+        .form-input:focus,
+        .form-textarea:focus {
             border-color: var(--accent);
             outline: none;
             box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
         }
 
-        input::placeholder {
-            color: #c7c7c7;
+        .form-input.is-invalid,
+        .form-textarea.is-invalid {
+            border-color: #ef4444;
         }
 
-        .button-container {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 2rem;
+        .form-input[type="password"] {
+            letter-spacing: 0.2em;
         }
 
-        .search-button,
-        .edit-button,
-        .delete-button,
-        .clear-button {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .invalid-feedback {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: block;
         }
 
-        .search-button {
-            background: var(--accent);
-            color: var(--text);
+        .full-width {
+            grid-column: 1 / -1;
         }
 
         .edit-button {
-            background: var(--edit-color);
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--accent);
             color: var(--text);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
         }
 
-        .delete-button {
-            background: var(--delete-color);
-            color: var(--text);
+        .edit-button:hover {
+            background-color: #1b4ebd;
+            transform: translateY(-2px);
         }
 
-        .clear-button {
-            background: var(--secondary);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .search-button:hover,
-        .edit-button:hover,
-        .delete-button:hover,
-        .clear-button:hover {
-            transform: translateY(-1px);
-            opacity: 0.9;
-        }
-
-        .popup-overlay {
-            display: none;
+        /* Confirmation Modal Styles */
+        .confirmation-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
             z-index: 1000;
         }
 
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .modal-content {
             background-color: var(--secondary);
             padding: 2rem;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1001;
+            text-align: center;
             max-width: 400px;
             width: 90%;
         }
 
-        .popup-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .popup-message {
-            margin-bottom: 1.5rem;
-        }
-
-        .popup-buttons {
+        .modal-buttons {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             gap: 1rem;
+            margin-top: 1.5rem;
         }
 
-        .popup-button {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
             border: none;
-            font-size: 0.9rem;
-            font-weight: 500;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        .popup-button-confirm {
+        .modal-btn-confirm {
             background-color: var(--accent);
             color: var(--text);
         }
 
-        .popup-button-cancel {
-            background-color: var(--delete-color);
+        .modal-btn-confirm:hover {
+            background-color: #1b4ebd;
+        }
+
+        .modal-btn-cancel {
+            background-color: var(--border);
             color: var(--text);
         }
 
-        .popup-button:hover {
-            opacity: 0.9;
+        .modal-btn-cancel:hover {
+            background-color: #4a4e57;
+        }
+
+        @media (max-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
+            .form-grid {
+                grid-template-columns: 1fr;
             }
 
-            .button-container {
-                flex-direction: column;
-            }
-
-            .search-button,
-            .edit-button,
-            .delete-button,
-            .clear-button {
-                width: 100%;
+            .full-width {
+                grid-column: span 1;
             }
         }
     </style>
 </head>
 
 <body>
-    
-    <div class="manage-form">
-        <h2 class="title">Mechanic Profile</h2>
-       
-        <form id="mechanicForm">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="first_name">First Name<span class="required-dot">*</span></label> <input type="text" id="first_name" name="first_name" required placeholder="Enter first name"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="last_name">Last Name<span class="required-dot">*</span></label> <input type="text" id="last_name" name="last_name" required placeholder="Enter last name"> </div>
-                </div>
+    <div class="profile-wrapper">
+        <div class="profile-form">
+            <div class="form-title">
+                <h1>Mechanic Profile</h1>
+                <p>Manage and update mechanic details</p>
             </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="nic">NIC<span class="required-dot">*</span></label> <input type="text" id="nic" name="nic" required placeholder="Enter NIC"> </div>
+            <form id="mechanicForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="first_name">First Name<span class="required-dot">*</span></label>
+                        <input class="form-input" type="text" id="first_name" name="first_name" required placeholder="Enter first name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="last_name">Last Name<span class="required-dot">*</span></label>
+                        <input class="form-input" type="text" id="last_name" name="last_name" required placeholder="Enter last name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="nic">NIC<span class="required-dot">*</span></label>
+                        <input class="form-input" type="text" id="nic" name="nic" required placeholder="Enter NIC">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="contact">Contact Number<span class="required-dot">*</span></label>
+                        <input class="form-input" type="text" id="contact" name="contact" required placeholder="Enter contact number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email<span class="required-dot">*</span></label>
+                        <input class="form-input" type="email" id="email" name="email" required placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="date_employed">Date Employed<span class="required-dot">*</span></label>
+                        <input class="form-input" type="date" id="date_employed" name="date_employed" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label" for="address">Address<span class="required-dot">*</span></label>
+                        <input class="form-input" type="text" id="address" name="address" required placeholder="Enter address">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username<span class="required-dot">*</span></label>
+                        <input class="form-input" type="text" id="username" name="username" required placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password<span class="required-dot">*</span></label>
+                        <input class="form-input" type="password" id="password" name="password" required placeholder="Enter password">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" id="btnShowChangePassword" class="edit-button" style="background-color: #ef4444;">Change password</button>
+                    </div>
+
                 </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="contact">Contact Number<span class="required-dot">*</span></label> <input type="text" id="contact" name="contact" required placeholder="Enter contact number"> </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="email">Email<span class="required-dot">*</span></label> <input type="email" id="email" name="email" required placeholder="Enter email"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="date_employed">Date Employed<span class="required-dot">*</span></label> <input type="date" id="date_employed" name="date_employed" required> </div>
-                </div>
-            </div>
-            <div class="form-group"> <label for="address">Address<span class="required-dot">*</span></label> <input type="text" id="address" name="address" required placeholder="Enter address"> </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="username">Username<span class="required-dot">*</span></label> <input type="text" id="username" name="username" required placeholder="Enter username"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="password">Password<span class="required-dot">*</span></label> <input type="password" id="password" name="password" required placeholder="Enter password"> </div>
-                </div>
-            </div>
-            <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmEdit()">Edit</button> <button type="button" class="delete-button" onclick="confirmDelete()">Delete</button> </div>
-        </form>
+                <button type="button" class="edit-button" onclick="confirmEdit()">Save Changes</button>
+            </form>
+        </div>
     </div>
-    <div class="popup-overlay" id="popupOverlay">
-        <div class="popup" id="popup">
-            <h3 class="popup-title" id="popupTitle"></h3>
-            <p class="popup-message" id="popupMessage"></p>
-            <div class="popup-buttons">
-                <button class="popup-button popup-button-cancel" id="popupCancel">Cancel</button>
-                <button class="popup-button popup-button-confirm" id="popupConfirm">Confirm</button>
+
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="modalCancel">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirm">Confirm</button>
             </div>
         </div>
     </div>
@@ -351,35 +313,26 @@
         }
 
         function showPopup(title, message, confirmCallback) {
-            document.getElementById('popupTitle').textContent = title;
-            document.getElementById('popupMessage').textContent = message;
-            document.getElementById('popupOverlay').style.display = 'block';
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('confirmationModal').style.display = 'flex';
 
-            document.getElementById('popupConfirm').onclick = () => {
+            document.getElementById('modalConfirm').onclick = () => {
                 hidePopup();
                 confirmCallback();
             };
 
-            document.getElementById('popupCancel').onclick = hidePopup;
+            document.getElementById('modalCancel').onclick = hidePopup;
         }
 
         function hidePopup() {
-            document.getElementById('popupOverlay').style.display = 'none';
+            document.getElementById('confirmationModal').style.display = 'none';
         }
 
         function confirmEdit() {
             showPopup('Confirm Edit', 'Are you sure you want to edit this record?', () => {
                 // Perform edit operation
                 showPopup('Success', 'Record updated successfully', () => {});
-            });
-        }
-
-        function confirmDelete() {
-            showPopup('Confirm Delete', 'Are you sure you want to delete this record?', () => {
-                // Perform delete operation
-                showPopup('Success', 'Record deleted successfully', () => {
-                    clearForm();
-                });
             });
         }
 
