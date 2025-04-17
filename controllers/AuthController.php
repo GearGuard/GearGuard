@@ -138,6 +138,12 @@ class AuthController extends Controller
     public function customer(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
+            if (Application::$app->user->isAdmin()) {
+                $this->setLayout('admin_layout');
+                return $this->render('admin/admin', [
+                    'title' => 'Admin Dashboard'
+                ]);
+            }
             return $this->render('customer/customer', [
                 'title' => 'Customer Dashboard'
             ]);
@@ -146,8 +152,6 @@ class AuthController extends Controller
             return $this->render('garage/garage', [
                 'title' => 'Garage Dashboard'
             ]);
-        } elseif (Application::$app->user instanceof Admin) {
-
         }
         throw new NotFoundException();
     }
@@ -155,6 +159,12 @@ class AuthController extends Controller
     public function dashboard(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
+            if (Application::$app->user->isAdmin()) {
+                $this->setLayout('admin_layout');
+                return $this->render('admin/dashboard', [
+                    'title' => 'Admin Dashboard'
+                ]);
+            }
             return $this->render('customer/dashboard', [
                 'title' => 'Customer Dashboard'
             ]);

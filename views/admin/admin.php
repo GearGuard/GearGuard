@@ -241,15 +241,15 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/garage/services/view" class="nav-link">
-                    <i class="fas fa-car-side"></i>
+                <a href="/admin/viewservices" class="nav-link">
+                    <i class="fa fa-wrench"></i>
                     <span class="nav-text">Services</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/garage/customers/view" class="nav-link">
+                <a href="/admin/viewusers" class="nav-link">
                     <i class="fa fa-street-view" aria-hidden="true"></i>
-                    <span class="nav-text">Customer</span>
+                    <span class="nav-text">Users</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -259,9 +259,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/mechanic" class="nav-link">
-                    <i class="fa fa-wrench" aria-hidden="true"></i>
-                    <span class="nav-text">Mechanic</span>
+                <a href="/admin/viewvehicles" class="nav-link">
+                    <i class="fas fa-car-side" aria-hidden="true"></i>
+                    <span class="nav-text">Vehicles</span>
                 </a>
             </li>
             <li class="nav-item">

@@ -29,7 +29,11 @@ class Admin extends User
         $statement->bindValue(':user_id', $loggedInUser->id);
         $statement->execute();
 
-        return $statement->fetchObject(Admin::class);
+        $obj = $statement->fetchObject(Admin::class);
+        if ($obj === false)
+            return null;
+
+        return $obj;
     }
 
 }
