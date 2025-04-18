@@ -85,8 +85,10 @@ class AuthController extends Controller
                 'title' => 'Profile'
             ]);
         } else if (Application::$app->user instanceof Mechanic) {
+            $mechanic = Application::$app->user;
             return $this->render('mechanic/profile', [
-                'title' => 'Profile'
+                'title' => 'Profile',
+                'mechanic' => $mechanic
             ]);
         }
 

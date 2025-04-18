@@ -204,7 +204,7 @@
 
         .modal-btn-cancel {
             background-color: var(--border);
-            color: var(--text);
+            color: var (--text);
         }
 
         .modal-btn-cancel:hover {
@@ -240,39 +240,39 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label" for="first_name">First Name<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="first_name" name="first_name" required placeholder="Enter first name">
+                        <input class="form-input" type="text" id="first_name" name="first_name" required value="<?= htmlspecialchars($mechanic->first_name ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="last_name">Last Name<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="last_name" name="last_name" required placeholder="Enter last name">
+                        <input class="form-input" type="text" id="last_name" name="last_name" required value="<?= htmlspecialchars($mechanic->last_name ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="nic">NIC<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="nic" name="nic" required placeholder="Enter NIC">
+                        <input class="form-input" type="text" id="nic" name="nic" required value="<?= htmlspecialchars($mechanic->nic ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="contact">Contact Number<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="contact" name="contact" required placeholder="Enter contact number">
+                        <input class="form-input" type="text" id="contact" name="contact" required value="<?= htmlspecialchars($mechanic->contact_no ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="email">Email<span class="required-dot">*</span></label>
-                        <input class="form-input" type="email" id="email" name="email" required placeholder="Enter email">
+                        <input class="form-input" type="email" id="email" name="email" required value="<?= htmlspecialchars($mechanic->email ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="date_employed">Date Employed<span class="required-dot">*</span></label>
-                        <input class="form-input" type="date" id="date_employed" name="date_employed" required>
+                        <input class="form-input" type="date" id="date_employed" name="date_employed" required value="<?= htmlspecialchars($mechanic->date_employeed ?? '') ?>">
                     </div>
                     <div class="form-group full-width">
                         <label class="form-label" for="address">Address<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="address" name="address" required placeholder="Enter address">
+                        <input class="form-input" type="text" id="address" name="address" required value="<?= htmlspecialchars($mechanic->address ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="username">Username<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="username" name="username" required placeholder="Enter username">
+                        <input class="form-input" type="text" id="username" name="username" required value="<?= htmlspecialchars($mechanic->username ?? '') ?>">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="password">Password<span class="required-dot">*</span></label>
-                        <input class="form-input" type="password" id="password" name="password" required placeholder="Enter password">
+                        <input class="form-input" type="password" id="password" name="password" required value="********">
                     </div>
                     <div class="form-group">
                         <button type="button" id="btnShowChangePassword" class="edit-button" style="background-color: #ef4444;">Change password</button>
