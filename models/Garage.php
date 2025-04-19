@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\utilities\JWTGenerator;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
@@ -26,6 +27,8 @@ class Garage extends UserModel
     public string $registration_no = '';
     public ?string $description = null;
 
+    private $secretKey = 'Abracadabra@Hogwarts1959';
+
     public function tableName(): string
     {
         return 'gg_garage';
@@ -39,9 +42,10 @@ class Garage extends UserModel
     public function save()
     {
         $this->status_id = self::STATUS_ACTIVE;
-        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
         if (!$this->validate())
             throw new \Exception(array_values($this->errors)[0][0], 400);
+
+        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
 
         return parent::save();
     }
@@ -409,6 +413,19 @@ class Garage extends UserModel
             return true;
 
         return false;
+    }
+
+    public function hasNotifications(): bool
+    {
+        if (count(Notification::receiveNotification($this->id)) > 0)
+            return true;
+
+        return false;
+    }
+
+    public function getToken()
+    {
+        return JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT($this->id), $this->secretKey);
     }
 	
 }

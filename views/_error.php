@@ -107,10 +107,13 @@
 </head>
 
 <body>
+    <script>
+        document.querySelector('.navbar').setAttribute('hidden', true);
+    </script>
 	<div class="error-container">
 		<div class="error-code"><?php echo $exception->getCode() ?></div>
 		<div class="error-message"><?php echo $exception->getMessage() ?></div>
-		<a href="/" class="back-button">Back to Homepage</a>
+		<a href="/" target="_parent" class="back-button">Back to Homepage</a>
 	</div>
 </body>
 

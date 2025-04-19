@@ -296,6 +296,7 @@ class AuthController extends Controller
                 ['status_id' => $status],
                 true
             );
+
             return 'success';
         }
 

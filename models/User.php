@@ -163,5 +163,13 @@ class User extends UserModel
 
     }
 
+    public function hasNotifications() : bool
+    {
+        if (count(Notification::receiveNotification($this->id)) > 0)
+            return true;
+
+        return false;
+    }
+
 
 }

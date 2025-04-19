@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Appointment;
 use app\models\GarageService;
+use app\models\Notification;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
@@ -78,6 +79,7 @@ class GarageController extends Controller
     public function searchAppointments(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            Notification::sendNotification(Application::$app->user->id, 'You just visited this page!');
             return $this->render('garage/appointment/search', [
                 'name' => 'The GearGuard',
             ]);
