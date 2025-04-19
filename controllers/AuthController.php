@@ -790,31 +790,24 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function updateMechanicProfile(Request $request, Response $response)
+    public function updateProfile(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Mechanic) {
-            $mechanic = Application::$app->user;
-            $data = $request->getBody();
-            
-            // If this is a password update request
-            if (isset($data['currentPassword'])) {
-                $mechanic->currentPassword = $data['currentPassword'];
-                $mechanic->password = $data['password'];
-                $mechanic->passwordConfirm = $data['passwordConfirm'];
-            }
 
-            $mechanic->loadData($data);
-            if ($mechanic->validate() && $mechanic->update()) {
-                $response->setContentType('application/json');
-                echo json_encode(['success' => true, 'message' => 'Profile updated successfully!']);
-                return;
-            }
+        $body = $request->getBody();
+        try {
+            Application::$app->user->update($body);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+            ]);
+        } catch (\Exception $ex) {
 
-            $response->setContentType('application/json');
-            echo json_encode(['success' => false, 'message' => 'Failed to update profile.', 'errors' => $mechanic->errors]);
-            return;
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $ex->getMessage(),
+            ]);
         }
 
-        throw new NotFoundException();
     }
 }

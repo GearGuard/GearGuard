@@ -6,8 +6,7 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
-use gearguard\phpmvc\Request;
-use gearguard\phpmvc\Response;
+use app\utilities\EscapeAttributes;
 
 class Mechanic extends UserModel
 {
@@ -15,6 +14,7 @@ class Mechanic extends UserModel
 	const STATUS_ACTIVE = 2;
 	const STATUS_DELETED = 3;
 
+	public int $id;
 	public string $first_name = '';
 	public string $last_name = '';
 	public string $email = '';
@@ -43,6 +43,9 @@ class Mechanic extends UserModel
 	{
 		$this->status_id = self::STATUS_ACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
+		if (!$this->validate())
+			throw new \Exception(array_values($this->errors)[0][0], 400);
+			
 		return parent::save();
 	}
 
@@ -124,31 +127,166 @@ class Mechanic extends UserModel
 		$service = MechanicService::getMechanicService($result['id'], $result['type'], $result['price'], $result['duration'], $result['status_id'], $result['description']);
 		return $service;
 	}
-	
-	// public function mechanicSignup(Request $request, Response $response)
-	// {
-	// 	$mechanic = new Mechanic();
-	// 	if ($request->isPost()) {
-	// 		$mechanic->loadData($request->getBody());
-	// 		$mechanic->garage_id = Application::$app->session->get('garage_id'); // Set garage_id from session or request
 
-	// 		if (!$mechanic->garage_id) {
-	// 			Application::$app->session->setFlash('error', 'Garage ID is required.');
-	// 			return $this->render('mechanic/signup', ['model' => $mechanic]);
-	// 		}
+	public function update($toUpdate, bool $overrideValidations = false)
+	{
+		$shouldValidatePassword = false;
+		$shouldValidateUsername = false;
+		$updateData = [];
+		$attributeList = $this->attributes();
+		
+		if (empty($toUpdate)) {
+			return false;
+		}
 
-	// 		if ($mechanic->validate() && $mechanic->save()) {
-	// 			Application::$app->session->setFlash('success', 'Thanks for Registering');
-	// 			Application::$app->response->redirect('/');
-	// 			exit;
-	// 		}
-	// 		return $this->render('mechanic/signup', [
-	// 			'model' => $mechanic
-	// 		]);
-	// 	}
-	// 	$this->setLayout('auth');
-	// 	return $this->render('mechanic/signup', [
-	// 		'model' => $mechanic
-	// 	]);
-	// }
+		foreach ($toUpdate as $key => $value) {
+			if (in_array($key, $attributeList)) {
+				$updateData[$key] = $value;
+			}
+		}
+
+		if (isset($toUpdate['password'])) {
+			if (empty($toUpdate['currentPassword'])) {
+				throw new \Exception("Current password is required.", 400);
+			}
+			if (!password_verify($toUpdate['currentPassword'], $this->password)) {
+				throw new \Exception("Invalid password.", 400);
+			}
+			$shouldValidatePassword = true;
+			$updateData['password'] = $toUpdate['password'];
+			$this->passwordConfirm = $toUpdate['passwordConfirm'] ?? '';
+		}
+
+		if (isset($toUpdate['username']) && $this->username !== $toUpdate['username']) {
+			$shouldValidateUsername = true;
+		}
+
+		if (!$overrideValidations && !$this->validate($updateData, $shouldValidateUsername, $shouldValidatePassword, false, false, false, false)) {
+			throw new \Exception(array_values($this->errors)[0][0], 400);
+		}
+
+		if ($shouldValidatePassword) {
+			$updateData['password'] = password_hash($updateData['password'], PASSWORD_DEFAULT);
+		}
+
+		return parent::update($updateData);
+	}
+
+	public static function with(UserModel $model) : Mechanic
+	{
+		if(!$model instanceof Mechanic) {
+			throw new \Exception("Invalid model type.", 400);
+		}
+		$mechanic = new Mechanic();
+		$mechanic->loadData($model);
+
+		return $mechanic;
+
+	}
+
+	public function validate($valueUpdates = [], $validateUsername = true, $validatePassword = true, $validatePersonalInfo = true, $validateContact = true, $validateInternals = true, $useFrameworkValidations = true): bool
+	{
+		if ($useFrameworkValidations) {
+			return parent::validate();
+		}
+
+		if ($valueUpdates) {
+			$this->loadData($valueUpdates);
+		}
+
+		if ($validateUsername && isset($valueUpdates['username']) && $this->username !== $valueUpdates['username']) {
+			if (empty($this->username)) {
+				$this->addError('username', 'Username cannot be empty.');
+			} elseif (strlen($this->username) < 3 || strlen($this->username) > 30) {
+				$this->addError('username', 'Username must be between 3 and 30 characters.');
+			} elseif (!$this->isUsernameAvailable($this->username)) {
+				$this->addError('username', 'Username already exists.');
+			}
+		}
+
+		if ($validatePassword && isset($valueUpdates['password'])) {
+			if (empty($this->password)) {
+				$this->addError('password', 'Password cannot be empty.');
+			} elseif (strlen($this->password) < 8 || strlen($this->password) > 24) {
+				$this->addError('password', 'Password must be between 8 and 24 characters.');
+			} elseif ($this->password != $this->passwordConfirm) {
+				$this->addError('passwordConfirm', 'Passwords do not match.');
+			}
+		}
+
+		if ($validatePersonalInfo) {
+			if (empty($this->first_name)) {
+				$this->addError('first_name', 'First name cannot be empty.');
+			}
+			if (empty($this->last_name)) {
+				$this->addError('last_name', 'Last name cannot be empty.');
+			}
+			if (empty($this->nic)) {
+				$this->addError('nic', 'NIC cannot be empty.');
+			}
+			if (empty($this->email)) {
+				$this->addError('email', 'Email cannot be empty.');
+			} elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+				$this->addError('email', 'Email is not valid.');
+			}
+		}
+
+		if ($validateContact) {
+			$contactTemp = str_replace([' ', '-', '+', '(', ')'], '', $this->contact_no);
+			if (empty($this->contact_no)) {
+				$this->addError('contact_no', 'Contact Number cannot be empty.');
+			} elseif (!preg_match('/^\d{7,20}$/', $contactTemp)) {
+				$this->addError('contact_no', 'Contact Number is not valid.');
+			}
+		}
+
+		if ($validateInternals) {
+			if ($this->status_id < 1 || $this->status_id > 3) {
+				$this->addError('status_id', 'Status ID must be between one and three.');
+			}
+			if (!Garage::verifyGarageExistance($this->garage_id)) {
+				$this->addError('garage_id', 'Invalid garage assignment.');
+			}
+		}
+
+		return empty($this->errors);
+	}
+
+	public static function isUsernameAvailable(string $username) : bool
+	{
+		$sql = "SELECT * FROM gg_garage_mechanic WHERE username = :username LIMIT 1";
+		$statement = Application::$app->db->prepare($sql);
+		$statement->bindValue(':username', $username);
+		$statement->execute();
+		$result = $statement->fetch();
+		return $result === false;
+	}
+
+	public function getAllServices(int $page = 1): array 
+	{
+		$sql = "SELECT * FROM gg_vehicle_service_take WHERE mechanic_id = :mechanic_id AND status_id = 2 ORDER BY id LIMIT 25 OFFSET :offset";
+		$statement = Application::$app->db->prepare($sql);
+		$statement->bindValue(':mechanic_id', $this->id);
+		$offset = ($page - 1) * 25;
+		$statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
+		$statement->execute();
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+	}
+
+	public function getServiceHistory(int $page = 1): array
+	{
+		$sql = "SELECT vst.*, v.license_plate_no, u.first_name, u.last_name 
+				FROM gg_vehicle_service_take vst 
+				LEFT JOIN gg_vehicle v ON vst.vehicle_id = v.id
+				LEFT JOIN gg_user u ON v.current_user_id = u.id 
+				WHERE vst.mechanic_id = :mechanic_id 
+				ORDER BY vst.begin_timestamp DESC 
+				LIMIT 25 OFFSET :offset";
+		$statement = Application::$app->db->prepare($sql);
+		$statement->bindValue(':mechanic_id', $this->id);
+		$offset = ($page - 1) * 25;
+		$statement->bindValue(':offset', $offset, \PDO::PARAM_INT);
+		$statement->execute();
+		return $statement->fetchAll(\PDO::FETCH_ASSOC);
+	}
 }

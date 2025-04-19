@@ -339,19 +339,27 @@
                         passwordConfirm: confirmPassword.value,
                     },
                     success: function(response) {
-                        response = JSON.parse(response);
-                        if (response.success) {
-                            alert('Password updated successfully!');
-                            changePasswordModal.style.display = 'none';
-                            currentPassword.value = '';
-                            newPassword.value = '';
-                            confirmPassword.value = '';
-                        } else {
-                            alert('Error updating password: ' + response.message);
+                        try {
+                            if (typeof response === 'string') {
+                                response = JSON.parse(response);
+                            }
+                            if (response.success) {
+                                alert('Password updated successfully!');
+                                changePasswordModal.style.display = 'none';
+                                currentPassword.value = '';
+                                newPassword.value = '';
+                                confirmPassword.value = '';
+                            } else {
+                                alert('Error updating password: ' + response.message);
+                            }
+                        } catch (e) {
+                            alert('Error processing response');
+                            console.error(e);
                         }
                     },
-                    error: function(xhr) {
-                        alert('An error occurred: ' + xhr.responseText);
+                    error: function(xhr, status, error) {
+                        alert('An error occurred: ' + error);
+                        console.error(xhr.responseText);
                     }
                 });
             });
@@ -375,16 +383,25 @@
                     type: 'POST',
                     data: data,
                     success: function(response) {
-                        response = JSON.parse(response);
-                        if (response.success) {
-                            alert('Profile updated successfully!');
-                            confirmationModal.style.display = 'none';
-                        } else {
-                            alert('Error updating profile: ' + response.message);
+                        try {
+                            if (typeof response === 'string') {
+                                response = JSON.parse(response);
+                            }
+                            if (response.success) {
+                                alert('Profile updated successfully!');
+                                confirmationModal.style.display = 'none';
+                                location.reload(); // Reload to show updated data
+                            } else {
+                                alert('Error updating profile: ' + response.message);
+                            }
+                        } catch (e) {
+                            alert('Error processing response');
+                            console.error(e);
                         }
                     },
-                    error: function(xhr) {
-                        alert('An error occurred: ' + xhr.responseText);
+                    error: function(xhr, status, error) {
+                        alert('An error occurred: ' + error);
+                        console.error(xhr.responseText);
                     }
                 });
             });
