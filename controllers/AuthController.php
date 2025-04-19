@@ -4,7 +4,11 @@ namespace app\controllers;
 
 use app\models\Appointment;
 use app\models\GarageAppointment;
+use app\models\GarageService;
 use app\models\LoginFormGarage;
+use app\models\Notification;
+use app\models\Vehicle;
+use app\models\VehicleOwner;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
@@ -296,6 +300,24 @@ class AuthController extends Controller
                 ['status_id' => $status],
                 true
             );
+
+            $vehicleDetails = Vehicle::getVehicleDetails($model->vehicle_id);
+
+            if ($status == 3) {
+                $description = 'Your appointment for ' . $vehicleDetails['license_plate_no'] .  ' has been cancelled by the garage ' . GarageService::getGarageOfService($model->service_id) ?? 'NO-NAME'  . '.';
+                Notification::sendNotification(
+                    $vehicleDetails['vehicle_user'],
+                    $description,
+                    'Appointment Cancelled'
+                );
+            } elseif ($status == 2) {
+                $description = 'Your appointment for ' . $vehicleDetails['license_plate_no'] .  ' has been confirmed by the garage ' . GarageService::getGarageOfService($model->service_id) ?? 'NO-NAME'  . '.';
+                Notification::sendNotification(
+                    $vehicleDetails['vehicle_user'],
+                    $description,
+                    'Appointment Confirmed'
+                );
+            }
 
             return 'success';
         }

@@ -31,13 +31,25 @@ class NotificationServer implements MessageComponentInterface
             $conn->on('data', function ($msg) {
                 echo "Received message: $msg\n";
                 $msg = json_decode($msg, true);
-                echo "User ID: " . $msg['uid'] . "\n";
-                foreach($this->clients as $client) {
+                $uid = $msg['uid'];
+                unset($msg['uid']);
 
-                    if ($this->clients[$client] === $msg['uid']) {
-                        unset($msg['uid']);
-                        $client->send(json_encode($msg));
-                        break;
+                if (is_array($uid))
+                {
+                    foreach($this->clients as $client) {
+                        foreach ($uid as $userId) {
+                            if ($this->clients[$client] === $userId) {
+                                $client->send(json_encode($msg));
+                                break;
+                            }
+                        }
+                    }
+                } elseif (is_numeric($uid)) {
+                    foreach($this->clients as $client) {
+                        if ($this->clients[$client] === $uid) {
+                            $client->send(json_encode($msg));
+                            break;
+                        }
                     }
                 }
             });
@@ -93,5 +105,7 @@ $loop = Loop::get();
 $wsServer = new WsServer(new NotificationServer($loop));
 $httpServer = new HttpServer($wsServer);
 $server = new IoServer($httpServer, new SocketServer('0.0.0.0:8080', loop: $loop), $loop);
+
+echo "Notification server started on port 8080\nDo not colse this window unless you want to stop the server.\n";
 
 $server->run();

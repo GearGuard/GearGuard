@@ -187,6 +187,16 @@ class Appointment extends DbModel
         ]);
     }
 
+    public function getAppointmentDetails(int $id)
+    {
+        $sql = "SELECT * FROM gg_vehicle_service_appointment LEFT JOIN  WHERE id = :id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':id', $id);
+        $statement->execute();
+
+        return $statement->fetchObject(Appointment::class);
+    }
+
     public static function initialize(int $service_id, int $vehicle_id,  $date,  $time, string $note): Appointment
     {
         $object = new Appointment();
@@ -208,6 +218,16 @@ class Appointment extends DbModel
         $object->time = $time;
         $object->notes = $note;
         return $object;
+    }
+
+    public function getAppointmentType() : string
+    {
+        $sql = "SELECT type FROM gg_garage_service WHERE id = :service_id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':service_id', $this->service_id);
+        $statement->execute();
+
+        return $statement->fetchColumn();
     }
 
 }

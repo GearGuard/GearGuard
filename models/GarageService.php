@@ -196,4 +196,18 @@ class GarageService extends DbModel
 
         return false;
     }
+
+    public static function getGarageOfService(int $serviceID)
+    {
+        $sql = "SELECT ggg.name FROM gearguard.gg_garage ggg left join gearguard.gg_garage_service ggs on ggs.garage_id = ggg.id  WHERE ggs.id = :service_id LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':service_id', $serviceID, \PDO::PARAM_INT);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (count($result) > 0)
+            return $result[0]['name'];
+
+        return null;
+    }
 }

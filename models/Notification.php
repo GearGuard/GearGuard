@@ -56,7 +56,7 @@ class Notification extends DbModel
         ];
     }
 
-    public static function sendNotification(int $userId, string $description, string $title = 'New Notification')
+    public static function sendNotification(int $userId, string $description, string $title = 'New Notification'): bool
     {
         $notification = new Notification();
         $notification->user_id = $userId;
@@ -66,19 +66,27 @@ class Notification extends DbModel
 
         $notification->validate();
         if ($notification->save()) {
-            $socket = stream_socket_client('tcp://127.0.0.1:8081' . JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT(0, 3600), 'Abracadabra@Hogwarts1959'), $errno, $errstr);
-            if (!$socket) {
-                echo "Error: $errstr ($errno)\n";
-            } else {
-                fwrite($socket, json_encode([
-                    'uid' => $userId,
-                    'description' => $description,
-                    'timestamp' => $notification->timestamp,
-                    'title' => $title,
-                ]));
-                fclose($socket);
+            try {
+                $socket = stream_socket_client('tcp://127.0.0.1:8081' . JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT(0, 3600), 'Abracadabra@Hogwarts1959'), $errno, $errstr);
+                if (!$socket) {
+                    error_log("Error: $errstr ($errno)\n");
+                } else {
+                    fwrite($socket, json_encode([
+                        'uid' => $userId,
+                        'description' => $description,
+                        'timestamp' => $notification->timestamp,
+                        'title' => $title,
+                    ]));
+                    fclose($socket);
+                    return true;
+                }
+            } catch (\Exception $e) {
+                error_log("Error: " . $e->getMessage() . "\n");
+                return false;
             }
         }
+
+        return false;
     }
 
     public static function receiveNotification(int $userId): array

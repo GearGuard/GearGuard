@@ -23,6 +23,8 @@ $config = [
 	]
 ];
 
+date_default_timezone_set('Asia/Colombo');
+
 $app = new Application(dirname(__DIR__), $config);
 
 $app->router->get('/', [SiteController::class, 'home']);

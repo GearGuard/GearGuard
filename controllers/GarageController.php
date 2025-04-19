@@ -79,7 +79,6 @@ class GarageController extends Controller
     public function searchAppointments(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
-            Notification::sendNotification(Application::$app->user->id, 'You just visited this page!');
             return $this->render('garage/appointment/search', [
                 'name' => 'The GearGuard',
             ]);
