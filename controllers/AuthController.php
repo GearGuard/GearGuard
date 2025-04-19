@@ -790,14 +790,31 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    // public function mechanicSideBar(Request $request, Response $response)
-    // {
-    //     if (Application::$app->user instanceof Mechanic) {
-    //         return $this->render('/mechanic/sidebar', [
-    //             'title' => 'Sidebar'
-    //         ]);
-    //     }
+    public function updateMechanicProfile(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $mechanic = Application::$app->user;
+            $data = $request->getBody();
+            
+            // If this is a password update request
+            if (isset($data['currentPassword'])) {
+                $mechanic->currentPassword = $data['currentPassword'];
+                $mechanic->password = $data['password'];
+                $mechanic->passwordConfirm = $data['passwordConfirm'];
+            }
 
-    //     throw new NotFoundException();
-    // } 
+            $mechanic->loadData($data);
+            if ($mechanic->validate() && $mechanic->update()) {
+                $response->setContentType('application/json');
+                echo json_encode(['success' => true, 'message' => 'Profile updated successfully!']);
+                return;
+            }
+
+            $response->setContentType('application/json');
+            echo json_encode(['success' => false, 'message' => 'Failed to update profile.', 'errors' => $mechanic->errors]);
+            return;
+        }
+
+        throw new NotFoundException();
+    }
 }

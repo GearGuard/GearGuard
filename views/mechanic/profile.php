@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Mechanic - GearGuard</title>
+    <title>Mechanic Profile - GearGuard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -227,6 +227,7 @@
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -234,112 +235,170 @@
         <div class="profile-form">
             <div class="form-title">
                 <h1>Mechanic Profile</h1>
-                <p>Manage and update mechanic details</p>
+                <p>View and edit your mechanic details</p>
             </div>
-            <form id="mechanicForm">
+            <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post', 'mechanicProfileForm') ?>
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label" for="first_name">First Name<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="first_name" name="first_name" required value="<?= htmlspecialchars($mechanic->first_name ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="last_name">Last Name<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="last_name" name="last_name" required value="<?= htmlspecialchars($mechanic->last_name ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="nic">NIC<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="nic" name="nic" required value="<?= htmlspecialchars($mechanic->nic ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="contact">Contact Number<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="contact" name="contact" required value="<?= htmlspecialchars($mechanic->contact_no ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="email">Email<span class="required-dot">*</span></label>
-                        <input class="form-input" type="email" id="email" name="email" required value="<?= htmlspecialchars($mechanic->email ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="date_employed">Date Employed<span class="required-dot">*</span></label>
-                        <input class="form-input" type="date" id="date_employed" name="date_employed" required value="<?= htmlspecialchars($mechanic->date_employeed ?? '') ?>">
-                    </div>
-                    <div class="form-group full-width">
-                        <label class="form-label" for="address">Address<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="address" name="address" required value="<?= htmlspecialchars($mechanic->address ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="username">Username<span class="required-dot">*</span></label>
-                        <input class="form-input" type="text" id="username" name="username" required value="<?= htmlspecialchars($mechanic->username ?? '') ?>">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="password">Password<span class="required-dot">*</span></label>
-                        <input class="form-input" type="password" id="password" name="password" required value="********">
-                    </div>
+                    <?php
+                    echo $form->first_name = $form->field($mechanic, 'first_name')->required();
+                    echo $form->last_name = $form->field($mechanic, 'last_name')->required();
+                    echo $form->nic = $form->field($mechanic, 'nic')->required();
+                    echo $form->contact_no = $form->field($mechanic, 'contact_no')->required();
+                    echo $form->email = $form->field($mechanic, 'email')->required();
+                    echo $form->date_employeed = $form->field($mechanic, 'date_employeed')->required();
+                    echo $form->address = $form->field($mechanic, 'address')->required();
+                    echo $form->username = $form->field($mechanic, 'username')->required();
+                    ?>
+
+                    <script>
+                        document.querySelectorAll('.form-group textarea').forEach(e => e.parentElement.classList.add('full-width'))
+                        address = document.getElementById('address');
+                        address.classList.add('form-textarea');
+                        description = document.getElementById('description');
+                        description.classList.add('form-textarea');
+                        document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
+                    </script>
+                        
+                    
                     <div class="form-group">
                         <button type="button" id="btnShowChangePassword" class="edit-button" style="background-color: #ef4444;">Change password</button>
                     </div>
-
                 </div>
-                <button type="button" class="edit-button" onclick="confirmEdit()">Save Changes</button>
+                <button type="submit" class="edit-button">Save Changes</button>
             </form>
         </div>
     </div>
 
-    <div class="confirmation-modal" id="confirmationModal">
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal">
         <div class="modal-content">
-            <h3 id="modalTitle"></h3>
-            <p id="modalMessage"></p>
+            <h2>Confirm Changes</h2>
+            <p>Are you sure you want to save the changes to your mechanic profile?</p>
             <div class="modal-buttons">
-                <button class="modal-btn modal-btn-cancel" id="modalCancel">Cancel</button>
-                <button class="modal-btn modal-btn-confirm" id="modalConfirm">Confirm</button>
+                <button id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+     
+    <div id="changePasswordModal" class="confirmation-modal">
+        <div class="modal-content">
+            <h2>Change Password</h2>
+            <div class="form-group">
+                <label for="password" class="form-label">Current Password<span class="required-dot">*</span></label>
+                <input type="password" id="currentPassword" name="password" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">New Password<span class="required-dot">*</span></label>
+                <input type="password" id="newPassword" name="password" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Confirm Password<span class="required-dot">*</span></label>
+                <input type="password" id="confirmPassword" name="password" class="form-input" required>
+            </div>
+            <div class="modal-buttons">
+                <button id="btnConfirmPassword" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button id="btnCancelPassword" class="modal-btn modal-btn-cancel">Cancel</button>
             </div>
         </div>
     </div>
 
     <script>
-        function searchMechanic() {
-            const searchName = document.getElementById('search_mechanic').value;
-            // Simulated API call - replace with actual API call in production
-            if (searchName === 'sandhavi w') {
-                document.getElementById('first_name').value = searchName.split(' ')[0];
-                document.getElementById('last_name').value = searchName.split(' ')[1] || '';
-                document.getElementById('nic').value = '123456789V';
-                document.getElementById('contact').value = '0771234567';
-                document.getElementById('email').value = searchName.toLowerCase().replace(' ', '.') + '@example.com';
-                document.getElementById('date_employed').value = '2023-01-01';
-                document.getElementById('address').value = '123 Main St, Colombo';
-                document.getElementById('username').value = searchName.toLowerCase().replace(' ', '');
-                document.getElementById('password').value = '********';
-            }
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('mechanicProfileForm');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const changePasswordModal = document.getElementById('changePasswordModal');
+            const confirmButton = document.getElementById('confirmButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const btnShowChangePassword = document.getElementById('btnShowChangePassword');
+            const btnConfirmPassword = document.getElementById('btnConfirmPassword');
+            const btnCancelPassword = document.getElementById('btnCancelPassword');
 
-        function showPopup(title, message, confirmCallback) {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').textContent = message;
-            document.getElementById('confirmationModal').style.display = 'flex';
-
-            document.getElementById('modalConfirm').onclick = () => {
-                hidePopup();
-                confirmCallback();
-            };
-
-            document.getElementById('modalCancel').onclick = hidePopup;
-        }
-
-        function hidePopup() {
-            document.getElementById('confirmationModal').style.display = 'none';
-        }
-
-        function confirmEdit() {
-            showPopup('Confirm Edit', 'Are you sure you want to edit this record?', () => {
-                // Perform edit operation
-                showPopup('Success', 'Record updated successfully', () => {});
+            btnShowChangePassword.addEventListener('click', function() {
+                changePasswordModal.style.display = 'flex';
             });
-        }
 
-        function clearForm() {
-            document.getElementById('search_mechanic').value = '';
-            document.getElementById('mechanicForm').reset();
-        }
+            btnConfirmPassword.addEventListener('click', function() {
+                const currentPassword = document.getElementById('currentPassword');
+                const newPassword = document.getElementById('newPassword');
+                const confirmPassword = document.getElementById('confirmPassword');
+
+                if (newPassword.value !== confirmPassword.value) {
+                    alert('New password and confirmation do not match.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/mechanic/profile/update',
+                    type: 'POST',
+                    data: {
+                        currentPassword: currentPassword.value,
+                        password: newPassword.value,
+                        passwordConfirm: confirmPassword.value,
+                    },
+                    success: function(response) {
+                        response = JSON.parse(response);
+                        if (response.success) {
+                            alert('Password updated successfully!');
+                            changePasswordModal.style.display = 'none';
+                            currentPassword.value = '';
+                            newPassword.value = '';
+                            confirmPassword.value = '';
+                        } else {
+                            alert('Error updating password: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred: ' + xhr.responseText);
+                    }
+                });
+            });
+
+            btnCancelPassword.addEventListener('click', function() {
+                changePasswordModal.style.display = 'none';
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                confirmationModal.style.display = 'flex';
+            });
+
+            confirmButton.addEventListener('click', function() {
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => data[key] = value);
+
+                $.ajax({
+                    url: '/mechanic/profile/update',
+                    type: 'POST',
+                    data: data,
+                    success: function(response) {
+                        response = JSON.parse(response);
+                        if (response.success) {
+                            alert('Profile updated successfully!');
+                            confirmationModal.style.display = 'none';
+                        } else {
+                            alert('Error updating profile: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred: ' + xhr.responseText);
+                    }
+                });
+            });
+
+            cancelButton.addEventListener('click', function() {
+                confirmationModal.style.display = 'none';
+            });
+
+            [confirmationModal, changePasswordModal].forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) this.style.display = 'none';
+                });
+            });
+        });
     </script>
 </body>
 

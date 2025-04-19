@@ -82,9 +82,15 @@ class Mechanic extends UserModel
 			'passwordConfirm' => 'Confirm Password',
 		];
 	}
+	
 	public function getDisplayName(): string
 	{
 		return $this->first_name . ' ' . $this->last_name;
+	}
+
+	public function getDisplayPassword(): string 
+	{
+		return str_repeat('*', 8); // Return 8 asterisks for security
 	}
 
 	public function getServiceByType(string $type) : ?MechanicService
