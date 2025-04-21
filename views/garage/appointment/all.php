@@ -278,7 +278,20 @@ $this->title = 'View All Appointments';
 
             try {
                 const response = await fetch(`/api/garage/getAppointments?page=${page}`);
+
+                if (!response.ok) {
+                    loader.textContent = 'Error loading appointments.';
+                    hasMoreData = false;
+                    return;
+                }
+
                 const result = await response.json();
+
+                if (!result) {
+                    loader.textContent = 'Error loading appointments.';
+                    hasMoreData = false;
+                    return;
+                }
 
                 appendRows(result);
 
@@ -339,7 +352,35 @@ $this->title = 'View All Appointments';
 
         async function handleAcceptance(event, appointment_id, status_id) {
             event.stopPropagation();
-            $.ajax({
+
+            try {
+                const response = await fetch('/appointment/update_status', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({appointment_id: appointment_id, status_id: status_id})
+                });
+
+                if (!response.ok) {
+                    alert('An error occurred. Please try again later.');
+                    return;
+                }
+
+                result = await response.text();
+
+                if (!result === 'success') {
+                    alert('An error occurred. Please try again later.');
+                    return;
+                }
+
+                alert('Appointment status updated successfully.');
+                document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
+            } catch (error) {
+                console.log('Error:', error);
+                alert('An error occurred. Please try again later.');
+            }
+            /* $.ajax({
                 url: '/appointment/update_status',
                 type: 'POST',
                 data: {
@@ -358,7 +399,7 @@ $this->title = 'View All Appointments';
                     console.log('Error:', error);
                     alert('An error occurred. Please try again later.');
                 }
-            })
+            }) */
         }
 
         function handleScroll() {

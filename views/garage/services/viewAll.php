@@ -196,7 +196,18 @@
 
             try {
                 const response = await fetch(`/api/garage/getServices?page=${page}`);
+
+                if (!response.ok) {
+                    console.error('Error fetching services:', error);
+                    alert('Failed to load services. Please try again later.');
+                }
+
                 const result = await response.json();
+
+                if (!result) {
+                    console.error('Error fetching services:', error);
+                    alert('Failed to load services. Please try again later.');
+                }
 
                 appendRows(result);
 
@@ -213,6 +224,7 @@
                 }
             } catch (error) {
                 console.error('Error fetching services:', error);
+                alert('Failed to load services. Please try again later.');
             } finally {
                 isLoading = false;
             }

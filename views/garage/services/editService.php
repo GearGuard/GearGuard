@@ -295,7 +295,7 @@
 </div>
 
 <script>
-    function searchService() {
+    async function searchService() {
         const searchType = document.querySelector('input[name="search_type"]').value;
 
         if (!searchType) {
@@ -303,7 +303,42 @@
             return;
         }
 
-        $.ajax({
+        try {
+            const results = await fetch(`/garage/services/search?searchQuery=${searchType}`);
+
+            if (!results.ok) {
+                document.getElementById('updateButton').setAttribute('disabled', true);
+                document.getElementById('editForm').style.display = 'none';
+                alert('Something went wrong. Please try again later.');
+                return;
+            }
+
+            const response = await results.json();
+
+            if (response == null) {
+                document.getElementById('updateButton').setAttribute('disabled', true);
+                document.getElementById('editForm').style.display = 'none';
+                alert('Service not found!');
+                return;
+            }
+
+            document.getElementById('editForm').style.display = 'block';
+            document.getElementById('updateButton').removeAttribute('disabled');
+            document.querySelector('input[name="id"]').value = response.id;
+            document.querySelector('input[name="type"]').value = response.type;
+            document.querySelector('input[name="price"]').value = response.price;
+            document.querySelector('input[name="duration"]').value = response.duration;
+            document.querySelector('textarea[name="description"]').value = response.description;
+
+            document.querySelector('#updateButton').removeAttribute('disabled');
+
+        } catch (error) {
+            console.log('Error:', error);
+            document.getElementById('editForm').style.display = 'none';
+            document.getElementById('updateButton').setAttribute('disabled', true);
+        }
+
+        /* $.ajax({
             url: '/garage/services/search',
             type: 'GET',
             data: {
@@ -332,8 +367,9 @@
                 document.getElementById('editForm').style.display = 'none';
                 document.getElementById('updateButton').setAttribute('disabled', true);
             }
-        });
+        }); */
     }
+
 </script>
 </body>
 

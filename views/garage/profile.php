@@ -275,8 +275,8 @@
             <h2>Confirm Changes</h2>
             <p>Are you sure you want to save the changes to your garage profile?</p>
             <div class="modal-buttons">
-                <button id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
-                <button id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
+                <button type="button" id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button type="button" id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
             </div>
         </div>
     </div>
@@ -298,8 +298,8 @@
                 <input type="password" id="confirmPassword" name="password" class="form-input" required>
             </div>
             <div class="modal-buttons">
-                <button id="btnConfirmPassword" class="modal-btn modal-btn-confirm">Confirm</button>
-                <button id="btnCancelPassword" class="modal-btn modal-btn-cancel">Cancel</button>
+                <button type="button" id="btnConfirmPassword" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button type="button" id="btnCancelPassword" class="modal-btn modal-btn-cancel">Cancel</button>
             </div>
         </div>
     </div>
@@ -319,7 +319,7 @@
                 changePasswordModal.style.display = 'flex';
             });
 
-            btnConfirmPassword.addEventListener('click', function() {
+            btnConfirmPassword.addEventListener('click', async function() {
                const currentPassword = document.getElementById('currentPassword');
                const newPassword = document.getElementById('newPassword');
                const confirmPassword = document.getElementById('confirmPassword');
@@ -329,7 +329,46 @@
                    return;
                }
 
-               $.ajax({
+               try {
+                    const result = await fetch('/garage/profile/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            currentPassword: currentPassword.value,
+                            password: newPassword.value,
+                            passwordConfirm: confirmPassword.value,
+                        })
+                    });
+
+                    if (!result.ok) {
+                        alert('Could not change your password. Please try again later.');
+                        return;
+                    }
+
+                    const response = await result.json();
+
+                    if (!response) {
+                        alert('Could not change your password. Please try again later.');
+                        return;
+                    }
+
+                    if (response.success) {
+                        alert('Password changed successfully!');
+                        changePasswordModal.style.display = 'none';
+                        currentPassword.value = '';
+                        newPassword.value = '';
+                        confirmPassword.value = '';
+                    } else {
+                        alert('Error changing password: ' + response.message);
+                    }
+               } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while changing the password. Please try again later.');
+               }
+
+               /* $.ajax({
                    url: '/garage/profile/update',
                    type: 'POST',
                    data: {
@@ -351,7 +390,7 @@
                    error: function(xhr, status, error) {
                        alert('An error occurred: ' + xhr.error);
                    }
-               });
+               }); */
             });
 
             btnCancelPassword.addEventListener('click', function() {
@@ -372,7 +411,7 @@
             });
 
             // Confirm button clicks
-            confirmButton.addEventListener('click', function(event) {
+            confirmButton.addEventListener('click', async function(event) {
                 event.stopPropagation();
                 // Collect form data
                 const formData = new FormData(form);
@@ -382,7 +421,37 @@
                     data[key] = value;
                 });
 
-                $.ajax({
+                try {
+                    const result = await fetch('/garage/profile/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams(data)
+                    });
+
+                    if (!result.ok) {
+                        alert('Could not update your profile. Please try again later.');
+                        return;
+                    }
+
+                    const response = await result.json();
+
+                    if (!response) {
+                        alert('Could not update your profile. Please try again later.');
+                        return;
+                    }
+
+                    if (response.success) {
+                        alert('Profile updated successfully!');
+                    } else {
+                        alert('Error updating profile: ' + response.message);
+                    }
+                } catch (error) {
+                    console.log('Error:', error);
+                    alert('An error occurred while updating the profile. Please try again later.');
+                }
+                /* $.ajax({
                     url: '/garage/profile/update',
                     type: 'POST',
                     data: data,
@@ -396,7 +465,7 @@
                     error: function(xhr, status, error) {
                         alert('An error occurred: ' + xhr.error);
                     }
-                });
+                }); */
 
                 // Close the modal
                 confirmationModal.style.display = 'none';

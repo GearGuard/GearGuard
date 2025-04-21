@@ -261,7 +261,7 @@ $this->title = 'Search Appointments';
 
     <div class="search-container">
         <h2 class="search-title">Delete Appointments</h2>
-        <form id="searchForm" onsubmit="return handleSearch()">
+        <form id="searchForm" onsubmit="handleSearch(event)">
             <input type="text" id="firstname" class="search-input"
                    placeholder="Enter First Name"/>
     		<input name="textfield" type="text" class="search-input" id="lastname" placeholder="Enter Last Name">
@@ -334,7 +334,11 @@ $this->title = 'Search Appointments';
 
             document.querySelectorAll('#searchForm input, #searchForm select').forEach(a => addEventListener("input", (event) => resetVariables()));
 
-            function handleSearch() {
+            async function handleSearch(event) {
+                if (event !== null) {
+                    event.preventDefault();
+                }
+
                 const firstname = document.getElementById('firstname').value.trim();
         		const lastname = document.getElementById('lastname').value.trim();
         		const numberplate = document.getElementById('numberplate').value.trim();
@@ -351,7 +355,57 @@ $this->title = 'Search Appointments';
                 loader.textContent = 'Loading...';
                 loader.style.display = 'block';
 
-                $.ajax({
+                try {
+                    const response = await fetch(`/api/garage/getAppointmentsFiltered?firstname=${firstname}&lastname=${lastname}&numberplate=${numberplate}&contact=${contact}&date=${date}&condition=${condition}&status=active&page=${page}`);
+
+                    if (!response.ok) {
+                        alert('Something went wrong. Please try again later.');
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    if (!data) {
+                        alert('Something went wrong. Please try again later.');
+                        return;
+                    }
+
+                    resultsBody.innerHTML = '';
+                        if (data.length === 0 && loadedResults === 0) {
+                            loader.textContent = 'No appointments found.';
+                            hasMoreData = false;
+                            window.removeEventListener('scroll', handleScroll);
+                        } else if (data.length < limit) {
+                           loader.textContent = '--- End of Search Results ---';
+                           hasMoreData = false;
+                           window.removeEventListener('scroll', handleScroll);
+                        } else {
+                            page++;
+                        }
+                        data.forEach(item => {
+                            let tablerow = `<tr id='table-row-id-${item.id}' onclick='confirmAppointmentDeletion(${item.id})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
+                                <td>${item.vehicle_type}</td>
+                                <td>${item.first_name} ${item.last_name}</td>
+                                <td>${item.contact_no}</td>
+                                <td>${item.license_plate_no}</td>
+                                <td>${item.service_type}</td>
+                                <td>${item.date} ${item.time}</td>`;
+
+                            tablerow += `</tr>`;
+
+                            resultsBody.innerHTML += tablerow;
+                            loadedResults++;
+                        });
+                        resultsContainer.style.display = 'block';
+                        resultsContainer.scrollIntoView();
+
+                        return false;
+                } catch (error) {
+                    console.log('Error:', error);
+                    return false;
+                }
+
+                /* $.ajax({
                     url: '/api/garage/getAppointmentsFiltered',
                     type: 'GET',
                     data: {
@@ -399,7 +453,7 @@ $this->title = 'Search Appointments';
                     error: function (xhr, status, error) {
                         console.log('Error:', error);
                     }
-                });
+                }); */
 
                 // Filter results
                 /*const filteredResults = data.filter(item =>
@@ -446,7 +500,7 @@ $this->title = 'Search Appointments';
             function handleScroll() {
                 const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
                 if (scrollTop + clientHeight >= scrollHeight - 5 && page < 0) {
-                    handleSearch();
+                    handleSearch(null);
                 }
             }
 
@@ -462,12 +516,45 @@ $this->title = 'Search Appointments';
                 document.getElementById('deleteModal').style.display = 'none';
             }
 
-            function deleteAppointment() {
+            async function deleteAppointment() {
                 if (appointmentID === -1) {
                     alert('No appointment selected for deletion.');
                     return;
                 }
-                $.ajax({
+                try {
+                    const response = await fetch('/garage/appointment/delete', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: new URLSearchParams({
+                            appointment_id: appointmentID,
+                            status_id: 3
+                        })
+                    });
+
+                    if (!response.ok) {
+                        alert('An error occurred. Please try again later.');
+                        return;
+                    }
+
+                    result = await response.text();
+
+                    if (result === 'success') {
+                        alert('Appointment deleted successfully.');
+                        document.getElementById(`table-row-id-${appointmentID}`).remove();
+                        closeModal();
+                        resetVariables();
+                    } else {
+                        alert('An error occurred. Please try again later.');
+                    }
+                } catch (error) {
+                    console.error('Error deleting appointment:', error);
+                    alert('We could not delete the service!');
+                    closeModal();
+                    appointmentID = -1;
+                }
+                /* $.ajax({
                     url: '/garage/appointment/delete',
                     type: 'POST',
                     data: {
@@ -490,7 +577,7 @@ $this->title = 'Search Appointments';
                         closeModal();
                         appointmentID = -1;
                     }
-                });
+                }); */
             }
     </script>
 </body>

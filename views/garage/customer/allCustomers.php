@@ -219,7 +219,18 @@
 
             try {
                 const response = await fetch(`/api/garage/getCustomers?page=${page}`);
+
+                if (!response.ok) {
+                    console.error('Error fetching customers:', error);
+                    loader.textContent = 'Error loading customers. Please try again.';
+                }
+
                 const result = await response.json();
+
+                if (!result) {
+                    console.error('Error fetching customers:', error);
+                    loader.textContent = 'Error loading customers. Please try again.';
+                }
 
                 appendRows(result);
 
@@ -292,7 +303,20 @@
     async function fetchVehicleDetails(customer) {
         try {
             const response = await fetch(`/api/garage/getCustomerVehicles?customerID=${customer.id}`);
+
+            if (!response.ok) {
+                console.error('Error fetching vehicle details:', error);
+                alert('Could not load vehicle details!');
+                return;
+            }
+
             const vehicles = await response.json();
+
+            if (!vehicles) {
+                console.error('Error fetching vehicle details:', error);
+                alert('Could not load vehicle details!');
+                return;
+            }
 
             if (vehicles.length === 0) {
                 document.getElementById('modal-content').innerHTML = `<p>No vehicles found for this customer.</p>
@@ -320,6 +344,7 @@
                 </div>`;
         } catch (error) {
             console.error('Error fetching vehicle details:', error);
+            alert('Could not load vehicle details!');
         }
     }
 

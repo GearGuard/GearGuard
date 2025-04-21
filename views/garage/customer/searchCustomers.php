@@ -305,7 +305,22 @@
 
             try {
                 const response = await fetch(`/api/garage/getCustomers?page=${page}&firstname=${searchTerm}&lastname=${searchTerm}&email=${searchTerm}`);
+
+                if (!response.ok) {
+                    console.error('Error fetching customers:', error);
+                    document.getElementById('resultsContainer').style.display = 'none';
+                    alert('Could not load customers. Please try again later');
+                    return;
+                }
+
                 const result = await response.json();
+
+                if (!result) {
+                    console.error('Error fetching customers:', error);
+                    document.getElementById('resultsContainer').style.display = 'none';
+                    alert('Could not load customers. Please try again later');
+                    return;
+                }
 
                 appendRows(result);
 
