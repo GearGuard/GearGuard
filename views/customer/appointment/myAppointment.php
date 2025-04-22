@@ -16,8 +16,8 @@ $this->title = 'Appointment';
             --primary: #C0C0C0FF;
             --secondary: #25272d;
             --accent: #2463eb;
-            --canel:
-                --hover-bg: rgba(36, 99, 235, 0.1);
+            --canel: #f44336;
+            --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
         }
 
@@ -166,13 +166,24 @@ $this->title = 'Appointment';
         }
 
         .action-button[onclick^="viewAppointment"] {
-            background: var(--secondary);
-            color: var(--accent);
+            background: #4a4e59;
+            color: #e6e6e6;
             border: 1px solid var(--border);
         }
 
         .action-button[onclick^="viewAppointment"]:hover {
-            background: var(--hover-bg);
+            background: #555a66;
+            border-color: var(--accent);
+        }
+
+        .action-button[onclick^="deleteAppointment"] {
+            background: var(--canel);
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        .action-button[onclick^="deleteAppointment"]:hover {
+            background: #C70039;
             border-color: var(--accent);
         }
 
@@ -259,6 +270,15 @@ $this->title = 'Appointment';
 
         .modal-button.cancel:hover {
             background: var(--hover-bg);
+            border-color: var(--accent);
+        }
+        .modal-button.delete {
+            background: var(--canel);
+            border: 1px solid var(--border);
+        }
+
+        .modal-button.delete:hover {
+            background: #C70039;
             border-color: var(--accent);
         }
 
@@ -358,8 +378,8 @@ $this->title = 'Appointment';
                             <td>${appointment.date || 'N/A'}</td>
                             <td class="button-container">
                                 <button class="action-button" onclick='viewAppointment(${JSON.stringify(appointment)})'>View More</button>
-                                <button class="action-button" onclick='editAppointment(${JSON.stringify(appointment)})'>Edit Reservation</button>
-                                <button class="action-button" onclick='deleteAppointment(${appointment.id})'>Cancel</button>
+                                <button class="action-button" onclick='editAppointment(${JSON.stringify(appointment)})'><i class="fas fa-pencil"></i></button>
+                                <button class="action-button" onclick='deleteAppointment(${appointment.id})'><i class="fas fa-trash"></i></button>
                             </td>
                         `;
 
@@ -407,17 +427,27 @@ $this->title = 'Appointment';
             const content = document.createElement('div');
             content.classList.add('modal-content');
 
-            content.innerHTML = `
+            // Add custom styles for date and time inputs
+            const customStyles = `
+        <style>
+            .custom-date-input::-webkit-calendar-picker-indicator,
+            .custom-time-input::-webkit-calendar-picker-indicator {
+                filter: invert(100%);
+            }
+        </style>
+    `;
+
+            content.innerHTML = customStyles + `
         <h2 class="modal-title">Edit Appointment</h2>
         <form action="/customer/appointment/update" method="post">
             <input type="hidden" name="id" value="${appointment.id}">
             <div class="modal-form-group">
                 <label class="modal-label" for="date">Date:</label>
-                <input class="modal-input" type="date" id="date" name="date" value="${appointment.date}" required>
+                <input class="modal-input custom-date-input" type="date" id="date" name="date" value="${appointment.date}" required>
             </div>
             <div class="modal-form-group">
                 <label class="modal-label" for="time">Time:</label>
-                <input class="modal-input" type="time" id="time" name="time" value="${appointment.time}" required>
+                <input class="modal-input custom-time-input" type="time" id="time" name="time" value="${appointment.time}" required>
             </div>
             <div class="modal-form-group">
                 <label class="modal-label" for="notes">Notes:</label>
@@ -432,21 +462,56 @@ $this->title = 'Appointment';
             document.body.appendChild(modal);
         }
 
+
         function deleteAppointment(id) {
-            if (confirm('Are you sure you want to cancel this appointment?')) {
+            // Create the modal container
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+
+            // Create the modal content
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+            content.style.maxWidth = '400px'; // Make it smaller than regular modals
+
+            // Add the confirmation message and buttons
+            content.innerHTML = `
+        <h2 class="modal-title">Confirm Cancellation</h2>
+        <p>Are you sure you want to delete this appointment?</p>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 5px;">
+            <button type="button" class="modal-button cancel" id="noButton">No</button>
+            <button type="button" class="modal-button delete" id="yesButton">Yes</button>
+        </div>
+    `;
+
+            // Add the modal to the document
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+
+            // Handle the "No" button click
+            document.getElementById('noButton').addEventListener('click', function() {
+                modal.remove();
+            });
+
+            // Handle the "Yes" button click
+            document.getElementById('yesButton').addEventListener('click', function() {
                 // Create a form and submit it
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/customer/appointment/delete`;
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'id';
-                input.value = id;
-                form.appendChild(input);
+                form.innerHTML = `<input type="hidden" name="id" value="${id}">`;
+                form.style.display = 'none';
+
                 document.body.appendChild(form);
                 form.submit();
-            }
+
+                // Remove the modal
+                modal.remove();
+
+                // Refresh the appointments list
+                setTimeout(fetchAppointments, 500);
+            });
         }
+
 
 
 

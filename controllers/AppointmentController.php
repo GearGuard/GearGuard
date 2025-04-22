@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\Application;
+use gearguard\phpmvc\Request;
+use gearguard\phpmvc\Response;
 use app\models\Appointment;
 
 class AppointmentController extends Controller
@@ -82,31 +84,37 @@ class AppointmentController extends Controller
 		}
 	}
 
-	public function deleteAppointment($id)
+	public function deleteAppointment(Request $request, Response $response)
 	{
-		if (!$id) {
-			$_SESSION['error'] = 'Invalid appointment ID';
-			Application::$app->response->redirect('/customer/appointment/my_appointment');
-			return;
+		// Extract the ID from the request parameters or body
+		$id = $request->getBody()['id'] ?? null;
+
+		// Validate the ID
+		if (!$id || !is_numeric($id)) {
+			$response->setStatusCode(400);
+			echo json_encode(['success' => false, 'message' => 'Invalid appointment ID']);
+			exit;
 		}
 
 		try {
+			// Use the correct table name for your database
 			$sql = 'DELETE FROM gg_vehicle_service_appointment WHERE id = :id';
 			$statement = Application::$app->db->prepare($sql);
-			$statement->bindValue(':id', $id);
+			$statement->bindValue(':id', $id, \PDO::PARAM_INT); // Bind the extracted ID value
 
 			if ($statement->execute()) {
-				$_SESSION['success'] = 'Appointment cancelled successfully';
+				Application::$app->response->redirect('/customer/appointment/my_appointment');
 			} else {
-				$_SESSION['error'] = 'Failed to cancel appointment';
+				$response->setStatusCode(500);
+				echo json_encode(['success' => false, 'message' => 'Failed to cancel appointment']);
 			}
 		} catch (\PDOException $e) {
 			error_log('Error deleting appointment: ' . $e->getMessage());
-			$_SESSION['error'] = 'Database error occurred';
+			$response->setStatusCode(500);
+			echo json_encode(['success' => false, 'message' => 'Database error occurred']);
 		}
-
-		Application::$app->response->redirect('/customer/appointment/my_appointment');
 	}
+
 
 	public function getAllAppointments()
 	{

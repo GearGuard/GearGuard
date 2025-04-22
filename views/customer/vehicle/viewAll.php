@@ -225,7 +225,7 @@
 <div class='container'>
     <div class='header'>
         <h1 class='title'>My Vehicles</h1>
-        <a href='/new-vehicle' class='add-vehicle-btn'>+ Add New Vehicle</a>
+        <a href='/customer/vehicle/register' class='add-vehicle-btn'>+ Add New Vehicle</a>
     </div>
     <div class='vehicles-grid' id='vehiclesGrid'>
 		<?php if (!empty($vehicles)): ?>
@@ -269,7 +269,7 @@
 		<?php else: ?>
             <div class="no-vehicles">
                 <p class="no-vehicles-text">You have no vehicles registered yet.</p>
-                <a href="/new-vehicle" class="add-vehicle-btn">+ Add New Vehicle</a>
+                <a href="/customer/vehicle/register" class="add-vehicle-btn">+ Add New Vehicle</a>
             </div>
 		<?php endif; ?>
     </div>
