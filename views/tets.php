@@ -3,9 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>GearGuard Chat</title>
+    <title>Friends List - GearGuard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Poppins font and FontAwesome icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -16,6 +15,7 @@
             --secondary: #25272d;
             --accent: #2463eb;
             --border: #33363f;
+            --hover-bg: rgba(36, 99, 235, 0.07);
         }
 
         body {
@@ -25,208 +25,260 @@
             margin: 0;
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
         }
 
-        .chatbox {
+        .friends-list-container {
+            width: 410px;
+            margin: 40px 0;
             background: var(--secondary);
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(0, 0, 0, 0.18);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 6px 32px rgba(0, 0, 0, 0.25);
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
-            min-width: 1500px;
-            margin-top:100px;
-            min-height: 580px
+            display: flex;
+            min-width: 900px;
+            flex-direction: column;
         }
 
-        .chatbox-header {
-            background: var(--background);
-            padding: 18px 24px;
-            border-bottom: 1px solid var(--border);
+        .friends-list-header {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
+            padding: 22px 28px 12px 28px;
+            border-bottom: 1px solid var(--border);
+            background: var(--background);
         }
 
-        .chatbox-header .fa-comments {
-            color: var(--accent);
-            font-size: 1.5rem;
-        }
-
-        .chatbox-header span {
+        .friends-list-header h2 {
+            font-size: 1.08rem;
             font-weight: 600;
             color: var(--primary);
-            font-size: 1.15rem;
+            letter-spacing: 1px;
+            margin: 0;
+            text-transform: uppercase;
         }
 
-        .chatbox-messages {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
+        .friends-list-header .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .friends-list-header .header-actions i {
+            color: var(--primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .friends-list-header .header-actions i:hover {
+            color: var(--accent);
+        }
+
+        .friends-list {
             display: flex;
             flex-direction: column;
-            gap: 18px;
-            background: var(--secondary);
+            padding: 0;
+            margin: 0;
+            list-style: none;
         }
 
-        .message {
-            max-width: 75%;
-            padding: 12px 18px;
-            border-radius: 12px;
-            font-size: 1rem;
-            word-break: break-word;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(36, 99, 235, 0.03);
-        }
-
-        .message.user {
-            margin-left: auto;
-            background: var(--accent);
-            color: #fff;
-            border-bottom-right-radius: 1px;
-        }
-
-        .message.agent {
-            background: var(--background);
-            color: var(--primary);
-            border-bottom-left-radius: 2px;
-            border: 1px solid var(--border);
-        }
-
-        .message-time {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--primary);
-            margin-top: 6px;
-            text-align: right;
-            opacity: 0.7;
-        }
-
-        .chatbox-input-area {
+        .friend-item {
             display: flex;
             align-items: center;
-            background: var(--background);
-            border-top: 1px solid var(--border);
-            padding: 18px 16px;
-            gap: 10px;
-        }
-
-        .chatbox-input-area input {
-            flex: 1;
-            background: var(--secondary);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 1rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .chatbox-input-area input:focus {
-            border-color: var(--accent);
-        }
-
-        .chatbox-input-area button {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-weight: 600;
-            font-size: 1rem;
+            padding: 18px 28px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.18s;
             cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            gap: 14px;
         }
 
-        .chatbox-input-area button:hover {
-            background: #1b4ebd;
+        .friend-item:last-child {
+            border-bottom: none;
+        }
+
+        .friend-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .friend-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            background: var(--background);
+            flex-shrink: 0;
+        }
+
+        .friend-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .friend-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1.05rem;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .friend-username {
+            font-size: 0.92rem;
+            color: var(--primary);
+            opacity: 0.87;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat {
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .friend-actions {
+            margin-left: 10px;
+            color: var(--primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background 0.18s, color 0.18s;
+        }
+
+        .friend-actions:hover {
+            color: var(--accent);
+            background: var(--hover-bg);
         }
 
         @media (max-width: 500px) {
-            .chatbox {
+            .friends-list-container {
                 width: 100vw;
-                min-height: 100vh;
                 border-radius: 0;
+                margin: 0;
             }
 
-            .chatbox-header,
-            .chatbox-input-area {
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-            .chatbox-messages {
-                padding: 12px 8px;
+            .friends-list-header,
+            .friend-item {
+                padding-left: 12px;
+                padding-right: 12px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="chatbox">
-        <div class="chatbox-header">
-            <i class="fas fa-comments"></i>
-            <span>GearGuard Support</span>
+    <div class="friends-list-container">
+        <div class="friends-list-header">
+            <h2>GearGuard</h2>
         </div>
-        <div class="chatbox-messages" id="chatMessages">
-            <div class="message agent">
-                Hi! 👋 How can we help you with your vehicle today?
-                <span class="message-time">09:30 AM</span>
-            </div>
-        </div>
-        <form class="chatbox-input-area" id="chatForm" autocomplete="off">
-            <input type="text" id="chatInput" placeholder="Type your message..." required />
-            <button type="submit">
-                <span>Send</span>
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </form>
+        <ul class="friends-list">
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+            </li>
+            <li class="friend-item">
+                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
+                <a class="chat" href="/views/friends.php" class="friend-actions">
+                    <div class="friend-info">
+                        <div class="friend-name">Saman Perera</div>
+                        <div class="friend-username">@saman.perera</div>
+                    </div>
+                </a>
+
+            </li>
+        </ul>
     </div>
-    <script>
-        // Simple chat simulation part
-        const chatForm = document.getElementById('chatForm');
-        const chatInput = document.getElementById('chatInput');
-        const chatMessages = document.getElementById('chatMessages');
-
-        function getTime() {
-            const now = new Date();
-            let h = now.getHours();
-            let m = now.getMinutes();
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            h = h % 12 || 12;
-            return `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
-        }
-
-        chatForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const text = chatInput.value.trim();
-            if (!text) return;
-            // addd user message
-            const userMsg = document.createElement('div');
-            userMsg.className = 'message user';
-            userMsg.innerHTML = `${text}<span class="message-time">${getTime()}</span>`;
-            chatMessages.appendChild(userMsg);
-            chatInput.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            //dummy message (@PasinduRavimal meka epa neda)
-            setTimeout(() => {
-                const agentMsg = document.createElement('div');
-                agentMsg.className = 'message agent';
-                agentMsg.innerHTML = `Thank you for your message! We'll get back to you shortly.<span class="message-time">${getTime()}</span>`;
-                chatMessages.appendChild(agentMsg);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 1000);
-        });
-    </script>
 </body>
 
 </html>

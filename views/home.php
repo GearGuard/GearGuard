@@ -494,27 +494,6 @@
 </head>
 
 <body>
-    <!-- Navbar -->
-    <!-- <nav class="navbar">
-        <div class="container navbar-content">
-
-            <div class="logo">
-                <img src="assets/img/favicon.png" alt="GearGuard Logo">
-            </div>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#services">Services</a>
-                <a href="#feedback">Feedback</a>
-                <a href="#contact">Contact</a>
-                <a href="/login">Login</a>
-            </div>
-            <button class="mobile-menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </nav> -->
-
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="carousel" id="carousel">
