@@ -86,10 +86,18 @@ class SiteController extends Controller
     public function login()
     {
         $params = [
-            'name' => "The GearGurd"
+            'name' => "The GearGuard"
         ];
         return $this->render('common', $params);
     }
+	
+	public function logout()
+	{
+		$params = [
+			'name' => 'The GearGuard'
+		];
+		return $this->render('logout', $params);
+	}
 
     public function type()
     {

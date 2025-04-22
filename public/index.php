@@ -36,6 +36,7 @@ $app->router->get('/type', [SiteController::class, 'type']);
 $app->router->get('/typelogin', [SiteController::class, 'typelogin']);
 $app->router->get('/tets', [SiteController::class, 'tets']);
 $app->router->get('/community', [SiteController::class, 'community']);
+$app->router->get('/logout',[SiteController::class,'logout']);
 
 $app->router->get('/home', [AuthController::class, 'customer']);
 $app->router->get('/customer/dashboard', [AuthController::class, 'dashboard']);
