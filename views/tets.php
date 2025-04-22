@@ -3,362 +3,228 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>GearGuard Chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garage Profile - GearGuard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Poppins font and FontAwesome icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --text: #FFFFFFFF;
+            --text: #f5f5f5;
             --background: #181a20;
-            --primary: #c7adad;
+            --primary: #C0C0C0;
             --secondary: #25272d;
             --accent: #2463eb;
             --border: #33363f;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: "Inter", sans-serif;
-            background-color: var(--background);
+            background: var(--background);
             color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
             min-height: 100vh;
-            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .profile-wrapper {
-            width: 100%;
-            max-width: 1200px;
-            background-color: var(--secondary);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-form {
-            padding: 3rem;
-            background-color: var(--background);
+        .chatbox {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 6px 32px rgba(0, 0, 0, 0.25);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            border-top: 2px solid var(--accent);
+            overflow: hidden;
+            min-width: 1500px;
+            margin-top:100px;
+            min-height: 580px
         }
 
-        .form-title {
-            text-align: center;
-            margin-bottom: 2rem;
+        .chatbox-header {
+            background: var(--background);
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .form-title h1 {
-            font-size: 2.2rem;
-            color: var(--text);
-            margin-bottom: 0.5rem;
+        .chatbox-header .fa-comments {
+            color: var(--accent);
+            font-size: 1.5rem;
         }
 
-        .form-title p {
-            color: var(--text);
+        .chatbox-header span {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.15rem;
+        }
+
+        .chatbox-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            background: var(--secondary);
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 1rem;
+            word-break: break-word;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(36, 99, 235, 0.03);
+        }
+
+        .message.user {
+            margin-left: auto;
+            background: var(--accent);
+            color: #fff;
+            border-bottom-right-radius: 1px;
+        }
+
+        .message.agent {
+            background: var(--background);
+            color: var(--primary);
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border);
+        }
+
+        .message-time {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-top: 6px;
+            text-align: right;
             opacity: 0.7;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 0.25rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-size: 1rem;
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        .required-dot {
-            color: #ef4444;
-            margin-left: 4px;
-        }
-
-        .form-input,
-        .form-textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            background-color: #33363f;
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-            resize: vertical;
-        }
-
-        .form-input:hover,
-        .form-textarea:hover {
-            border-color: var(--accent);
-        }
-
-        .form-input:focus,
-        .form-textarea:focus {
-            border-color: var(--accent);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
-        }
-
-        .form-input.is-invalid,
-        .form-textarea.is-invalid {
-            border-color: #ef4444;
-        }
-
-        .form-input[type="password"] {
-            letter-spacing: 0.2em;
-        }
-
-        .invalid-feedback {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
-            display: block;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .edit-button {
-            width: 100%;
-            padding: 1rem;
-            background-color: var(--accent);
-            color: var(--text);
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 2rem;
-        }
-
-        .edit-button:hover {
-            background-color: #1b4ebd;
-            transform: translateY(-2px);
-        }
-
-        /* Confirmation Modal Styles */
-        .confirmation-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background-color: var(--secondary);
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .modal-buttons {
+        .chatbox-input-area {
             display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
+            align-items: center;
+            background: var(--background);
+            border-top: 1px solid var(--border);
+            padding: 18px 16px;
+            gap: 10px;
         }
 
-        .modal-btn {
-            padding: 0.75rem 1.5rem;
+        .chatbox-input-area input {
+            flex: 1;
+            background: var(--secondary);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chatbox-input-area input:focus {
+            border-color: var(--accent);
+        }
+
+        .chatbox-input-area button {
+            background: var(--accent);
+            color: #fff;
             border: none;
             border-radius: 8px;
-            cursor: pointer;
+            padding: 10px 18px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .modal-btn-confirm {
-            background-color: var(--accent);
-            color: var(--text);
+        .chatbox-input-area button:hover {
+            background: #1b4ebd;
         }
 
-        .modal-btn-confirm:hover {
-            background-color: #1b4ebd;
-        }
-
-        .modal-btn-cancel {
-            background-color: var(--border);
-            color: var(--text);
-        }
-
-        .modal-btn-cancel:hover {
-            background-color: #4a4e57;
-        }
-
-        @media (max-width: 1024px) {
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 500px) {
+            .chatbox {
+                width: 100vw;
+                min-height: 100vh;
+                border-radius: 0;
             }
 
-            .full-width {
-                grid-column: span 1;
+            .chatbox-header,
+            .chatbox-input-area {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .chatbox-messages {
+                padding: 12px 8px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="profile-wrapper">
-        <div class="profile-form">
-            <div class="form-title">
-                <h1>Garage Profile</h1>
-                <p>View and edit your garage details</p>
-            </div>
-            <form id="garageProfileForm" novalidate>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="name" class="form-label">Garage Name<span class="required-dot">*</span></label>
-                        <input type="text" id="name" name="name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registration_no" class="form-label">Business Registration Number<span class="required-dot">*</span></label>
-                        <input type="text" id="registration_no" name="registration_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" class="form-input" required>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="address" class="form-label">Address<span class="required-dot">*</span></label>
-                        <textarea id="address" name="address" class="form-textarea" rows="3" required></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="description" class="form-label">Description<span class="required-dot">*</span></label>
-                        <textarea id="description" name="description" class="form-textarea" rows="4" required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="contact_no" class="form-label">Contact Number<span class="required-dot">*</span></label>
-                        <input type="tel" id="contact_no" name="contact_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="username" class="form-label">Username<span class="required-dot">*</span></label>
-                        <input type="text" id="username" name="username" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password" class="form-label">Password<span class="required-dot">*</span></label>
-                        <input type="password" id="password" name="password" class="form-input" required>
-                    </div>
-                </div>
-                <button type="submit" class="edit-button">Save Changes</button>
-            </form>
+    <div class="chatbox">
+        <div class="chatbox-header">
+            <i class="fas fa-comments"></i>
+            <span>GearGuard Support</span>
         </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="confirmation-modal">
-        <div class="modal-content">
-            <h2>Confirm Changes</h2>
-            <p>Are you sure you want to save the changes to your garage profile?</p>
-            <div class="modal-buttons">
-                <button id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
-                <button id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
+        <div class="chatbox-messages" id="chatMessages">
+            <div class="message agent">
+                Hi! 👋 How can we help you with your vehicle today?
+                <span class="message-time">09:30 AM</span>
             </div>
         </div>
+        <form class="chatbox-input-area" id="chatForm" autocomplete="off">
+            <input type="text" id="chatInput" placeholder="Type your message..." required />
+            <button type="submit">
+                <span>Send</span>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
     </div>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('garageProfileForm');
-            const confirmationModal = document.getElementById('confirmationModal');
-            const confirmButton = document.getElementById('confirmButton');
-            const cancelButton = document.getElementById('cancelButton');
+        // Simple chat simulation part
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
 
-            // Pre-load data (replace with actual data fetching logic)
-            const garageData = {
-                name: "AutoFix Garage",
-                registration_no: "BRN123456",
-                email: "info@autofixgarage.com",
-                contact_no: "+1234567890",
-                address: "123 Main St, Anytown, AT 12345\nSuite 200\nParking available at rear",
-                description: "AutoFix Garage is a full-service auto repair shop in Anytown, offering a variety of services to keep your vehicle running smoothly.\n\nWe specialize in comprehensive vehicle maintenance and repair.",
-                username: "autofix_admin",
-                password: "autofix123"
-            };
+        function getTime() {
+            const now = new Date();
+            let h = now.getHours();
+            let m = now.getMinutes();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            return `${h}:${m.toString().padStart(2, '0')} ${ampm}`;
+        }
 
-            // Populate form fields with pre-loaded data
-            Object.keys(garageData).forEach(key => {
-                const field = document.getElementById(key);
-                if (field) {
-                    field.value = garageData[key];
-                }
-            });
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+            // addd user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.innerHTML = `${text}<span class="message-time">${getTime()}</span>`;
+            chatMessages.appendChild(userMsg);
+            chatInput.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Prevent default form submission and show modal
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                // Validate form before showing modal
-                if (this.checkValidity()) {
-                    confirmationModal.style.display = 'flex';
-                } else {
-                    this.classList.add('was-validated');
-                    this.reportValidity();
-                }
-            });
-
-            // Confirm button clicks
-            confirmButton.addEventListener('click', function() {
-                // Collect form data
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
-
-                // Here you would typically send this data to your server
-                console.log('Updated profile data:', data);
-
-                // Close the modal
-                confirmationModal.style.display = 'none';
-
-                // Show success message
-                alert('Profile updated successfully!');
-            });
-
-            // Cancel button closes the modal
-            cancelButton.addEventListener('click', function() {
-                confirmationModal.style.display = 'none';
-            });
-
-            // Close modal if clicking outside of it
-            confirmationModal.addEventListener('click', function(e) {
-                if (e.target === confirmationModal) {
-                    confirmationModal.style.display = 'none';
-                }
-            });
+            //dummy message (@PasinduRavimal meka epa neda)
+            setTimeout(() => {
+                const agentMsg = document.createElement('div');
+                agentMsg.className = 'message agent';
+                agentMsg.innerHTML = `Thank you for your message! We'll get back to you shortly.<span class="message-time">${getTime()}</span>`;
+                chatMessages.appendChild(agentMsg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
         });
     </script>
 </body>
