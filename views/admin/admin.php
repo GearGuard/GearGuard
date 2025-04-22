@@ -241,15 +241,15 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/garage/services/view" class="nav-link">
-                    <i class="fas fa-car-side"></i>
+                <a href="/admin/viewservices" class="nav-link">
+                    <i class="fa fa-wrench"></i>
                     <span class="nav-text">Services</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/garage/customers/view" class="nav-link">
+                <a href="/admin/viewusers" class="nav-link">
                     <i class="fa fa-street-view" aria-hidden="true"></i>
-                    <span class="nav-text">Customer</span>
+                    <span class="nav-text">Users</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -259,9 +259,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/mechanic" class="nav-link">
-                    <i class="fa fa-wrench" aria-hidden="true"></i>
-                    <span class="nav-text">Mechanic</span>
+                <a href="/admin/viewvehicles" class="nav-link">
+                    <i class="fas fa-car-side" aria-hidden="true"></i>
+                    <span class="nav-text">Vehicles</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -274,17 +274,6 @@
                 <a href="/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/notifications" class="nav-link">
-                    <span class="wrapper">
-                        <i class="fas fa-bell"></i>
-                        <span class="nav-text">Notifications</span>
-                        <?php if (\gearguard\phpmvc\Application::$app->user->hasNotifications()) : ?>
-                            <span class="notification-circle" style="position: relative;right: -0.8em;display: inline-block;width: 0.6em;height: 0.6em;border-radius: 50%;background-color: tomato;"></span>
-                        <?php endif; ?>
-                    </span>
                 </a>
             </li>
             <li class="nav-item">
@@ -303,23 +292,10 @@
         <iframe id="content-iframe" location="relative" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
     </div>
 
-    <div id="notification-wrapper" style="position: absolute;bottom: 1em;right: 2em;" hidden>
-    	<div style="width: 25em; height: 10em; background-color: #A3A3A3; border: none; border-radius: 1em; z-index: 999;position: relative;bottom: -11em;filter: blur(10px);right: -0.8em;" id="notification-card-shadow">
-    		</div>
-    		<div id="notification-card" style="width: 25em; height: 10em; background-color: #454545; border: none; border-radius: 1em; z-index: 1000;position: relative;display: flex;flex-direction: column;">
-    		<button style="position: relative;cursor: pointer;top: 0.5em;fill: transparent;background: transparent;border: transparent;color: white;text-align: right;right: 0.5em;">✖</button>
-        <h3 id="notification-header" style="margin-top: 0.1em;margin-bottom: 0.1em;font-family: 'Calibri';padding-left: 0.5em;color: white;"></h3>
-        <p id="notification-content" style="color: white;font-family: 'arial';padding-left: 1.1em;width: 23em;overflow-wrap: break-word;margin-top: 0.2em;"></p></div>
-    </div>
-
     <script>
         const toggleBtn = document.getElementById('toggleBtn');
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
-        const notificationHeader = document.getElementById('notification-header');
-        const notificationContent = document.getElementById('notification-content');
-        const notificationCardWrapper = document.getElementById('notification-wrapper');
-        let data;
 
         toggleBtn.addEventListener('click', () => {
             const isMobile = window.innerWidth <= 768;
@@ -353,22 +329,6 @@
         });
 
         document.getElementsByClassName('nav-link active')[0].click();
-
-        const socket = new WebSocket('ws://localhost:8080?token=<?php echo \gearguard\phpmvc\Application::$app->user->getToken() ?>');
-        socket.onmessage = (e) => {
-            console.log(e);
-            data = JSON.parse(e.data);
-            showNotification(data.title, data.description);
-        };
-
-        function showNotification(title, message) {
-            notificationHeader.innerText = title;
-            notificationContent.innerText = message;
-            notificationCardWrapper.removeAttribute("hidden");
-            setTimeout(() => {
-                notificationCardWrapper.setAttribute("hidden", true);
-            }, 5000);
-        }
     </script>
 </body>
 

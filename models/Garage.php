@@ -2,10 +2,12 @@
 
 namespace app\models;
 
+use app\utilities\JWTGenerator;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
+use app\utilities\EscapeAttributes;
 
 class Garage extends UserModel
 {
@@ -23,7 +25,9 @@ class Garage extends UserModel
     public string $address = '';
     public string $contact_no = '';
     public string $registration_no = '';
+    public ?string $description = null;
 
+    private $secretKey = 'Abracadabra@Hogwarts1959';
 
     public function tableName(): string
     {
@@ -38,17 +42,63 @@ class Garage extends UserModel
     public function save()
     {
         $this->status_id = self::STATUS_ACTIVE;
+        if (!$this->validate())
+            throw new \Exception(array_values($this->errors)[0][0], 400);
+
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+
         return parent::save();
+    }
+
+    public function update($toUpdate, bool $overrideValidations = false)
+    {
+        $shouldValidatePassword = false;
+        $shouldValidateUsername = false;
+        $updateData = [];
+        $attributeList = $this->attributes();
+        if (empty($toUpdate))
+            return false;
+
+        foreach ($toUpdate as $key => $value) {
+            if (in_array($key, $attributeList)) {
+                $updateData[$key] = $value;
+            }
+        }
+
+        if (isset($toUpdate['password']) && $this->password != $toUpdate['password']) {
+            if (empty($toUpdate['currentPassword'])) {
+                throw new \Exception("Current password is required.", 400);
+            } elseif (!password_verify($toUpdate['currentPassword'], $this->password)) {
+                throw new \Exception("Invalid password.", 400);
+            }
+            $shouldValidatePassword = true;
+        }
+
+        if (isset($toUpdate['username']) && $this->username != $toUpdate['username']) {
+            $shouldValidateUsername = true;
+        }
+
+        $data = Garage::with(Application::$app->user);
+        $data->loadData($updateData);
+
+        if (!$overrideValidations && !$data->validate($toUpdate, validateUsername: $shouldValidateUsername, validatePassword: $shouldValidatePassword, useFrameworkValidations : false)) {
+            throw new \Exception(array_values($data->errors)[0][0], 400);
+        }
+
+        if ($shouldValidatePassword) {
+            $updateData['password'] = password_hash($data->password, PASSWORD_DEFAULT);
+        }
+
+        return parent::update($updateData);
     }
 
     public function rules(): array
     {
         return [
             'username' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 3], [self::RULE_MAX, 'max' => 30], [self::RULE_UNIQUE, 'class' => self::class]],
-            'name' => [self::RULE_REQUIRED],
+            'name' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 3], [self::RULE_MAX, 'max' => 100]],
             'email' => [self::RULE_REQUIRED, self::RULE_EMAIL,],
-            'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 24]],
+            'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 72]],
             'passwordConfirm' => [self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']],
             'address' => [self::RULE_REQUIRED],
             'contact_no' => [self::RULE_REQUIRED],
@@ -58,7 +108,7 @@ class Garage extends UserModel
 
     public function attributes(): array
     {
-        return ['username', 'password', 'name', 'address', 'email', 'contact_no', 'registration_no', 'status_id'];
+        return ['username', 'password', 'name', 'address', 'email', 'contact_no', 'registration_no', 'status_id', 'description'];
     }
 
     public function labels(): array
@@ -69,16 +119,136 @@ class Garage extends UserModel
             'name' => 'Name',
             'address' => 'Address',
             'email' => 'Email',
-            'contact_no' => 'Contact No',
-            'registration_no' => 'Registration No',
+            'contact_no' => 'Contact Number',
+            'registration_no' => 'Business Registration Number',
             'status_id' => 'Status',
             'passwordConfirm' => 'Confirm Password',
+            'description' => 'Description',
         ];
     }
 
     public function getDisplayName(): string
     {
         return $this->name;
+    }
+
+    /** This method should <b>never</b> be called directly on the logged-in User model without setting $useFrameworkValidations to true.
+     * Instead, create a new model and use {@code Garage::with($model)} to create a new Garage model with the data from the User model.
+     * <br><br>
+     * <em>Note: This method fills up the model it is called on with $valueUpdates parameter values if it is set.<em>
+     */
+    public function validate($valueUpdates = [], $validateUsername = true, $validatePassword = true, $validateName = true, $validateAddress = true, $validateEmail = true, $validateContactNo = true, $validateBRN = true, $validateInternals = true, $useFrameworkValidations = true): bool
+    {
+        if ($useFrameworkValidations) {
+            return parent::validate();
+        }
+
+        if (isset($valueUpdates)) {
+            foreach($valueUpdates as $key => $value) {
+                $this->{$key} = $value;
+            }
+        }
+
+        if ($validateUsername) {
+            if (empty($this->username)) {
+                $this->addError('username', 'Username can not be empty.');
+            } elseif (strlen($this->username) < 3 || strlen($this->username) > 30) {
+                $this->addError('username', 'Username must be between 3 and 30 characters.');
+            } elseif (Garage::isUsernameAvailable($this->username)) {
+                $this->addError('username', 'Username already exists.');
+            }
+        }
+        if ($validatePassword) {
+            if (empty($this->password)) {
+                $this->addError('password', 'Password can not be empty.');
+            } elseif (strlen($this->password) < 8 || strlen($this->password) > 72) {
+                $this->addError('password', 'Password must be between 8 and 72 characters.');
+            } elseif ($this->password != $this->passwordConfirm) {
+                $this->addError('passwordConfirm', 'Password and Confirm Password do not match.');
+            }
+        }
+        if ($validateName) {
+            if (empty($this->name)) {
+                $this->addError('name', 'Name can not be empty.');
+            } elseif (strlen($this->name) < 3 || strlen($this->name) > 100) {
+                $this->addError('name', 'Name must be between 3 and 100 characters.');
+            }
+        }
+        if ($validateAddress) {
+            if (empty($this->address)) {
+                $this->addError('address', 'Address can not be empty.');
+            }
+        }
+        if ($validateEmail) {
+            if (empty($this->email)) {
+                $this->addError('email', 'Email can not be empty.');
+            } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+                $this->addError('email', 'Email is not valid.');
+            }
+        }
+        if ($validateContactNo) {
+            $contactTemp = str_replace(' ', '', $this->contact_no);
+            $contactTemp = str_replace('-', '', $contactTemp);
+            $contactTemp = str_replace('+', '', $contactTemp);
+            $contactTemp = str_replace('(', '', $contactTemp);
+            $contactTemp = str_replace(')', '', $contactTemp);
+
+            if (empty($this->contact_no)) {
+                $this->addError('contact_no', 'Contact Number can not be empty.');
+            } elseif (!preg_match('/^\d{7,20}$/', $contactTemp)) {
+                $this->addError('contact_no', 'Contact Number is not valid.');
+            }
+        }
+        if ($validateBRN) {
+            $brnTemp = str_replace(' ', '', $this->registration_no);
+            $brnTemp = str_replace('-', '', $brnTemp);
+            if (empty($this->registration_no)) {
+                $this->addError('registration_no', 'Business Registration Number can not be empty.');
+            } elseif (!preg_match('/^[0-9A-Za-z]{8,30}$/', $brnTemp)) {
+                $this->addError('registration_no', 'Business Registration Number is not valid.');
+            }
+        }
+        if ($validateInternals) {
+            if (isset($this->id) && $this->id < 0 && !Garage::verifyGarageExistance($this->id)) {
+                $this->addError('id', 'Internal Error: Please contact administrators.');
+            }
+            if ($this->status_id < 1 || $this->status_id > 3) {
+                $this->addError('status_id', 'Status ID must be between one and three.');
+            }
+        }
+
+        if (empty($this->errors)) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public static function isUsernameAvailable(string $username) : bool
+    {
+        $sql = "SELECT * FROM gearguard.gg_garage gg WHERE gg.username = :username LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':username', $username);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_NUM);
+        if (count($result) > 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function with(UserModel $model) : Garage
+    {
+        if (!$model instanceof Garage) {
+            throw new \Exception('Invalid model type passed.');
+        }
+
+        $garage = new Garage();
+        $garage->loadData($model);
+
+        return $garage;
     }
 
     public function getServiceByType(string $type): ?GarageService
@@ -97,7 +267,7 @@ class Garage extends UserModel
         return $service;
     }
 
-    public function getServiceByID(int $sid): ?GarageService
+    public function getServiceByID(int $sid): GarageService
     {
         $sql = "SELECT * FROM gg_garage_service WHERE garage_id = :garage_id AND id = :id AND status_id = 2 LIMIT 1";
         $statement = Application::$app->db->prepare($sql);
@@ -106,7 +276,7 @@ class Garage extends UserModel
         $statement->execute();
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
         if (!$result) {
-            return null;
+            return GarageService::getGarageService(-1, '', 0, 0, 0, '');
         }
         $result = $result[0];
         $service = GarageService::getGarageService($result['id'], $result['type'], $result['price'], $result['duration'], $result['status_id'], $result['description']);
@@ -136,7 +306,7 @@ class Garage extends UserModel
 
     }
 
-    public function getAppointmentByID(int $id): ?Appointment
+    public function getAppointmentByID(int $id): Appointment
     {
         $sql = "SELECT * FROM gg_vehicle_service_appointment gvsa WHERE gvsa.id = :id and gvsa.service_id in (select ggs.id from gearguard.gg_garage_service ggs where ggs.garage_id = :garage_id) LIMIT 1";
         $statement = self::prepare($sql);
@@ -145,8 +315,10 @@ class Garage extends UserModel
         $statement->execute();
         $object = $statement->fetchObject();
 
-        $appointment = Appointment::getAppointment($object->id, $object->service_id, $object->vehicle_id, $object->date, $object->time, $object->notes, $object->status_id);
-        return $appointment;
+        if (!$object)
+            return Appointment::getAppointment(-1, -1, -1, null, null, null);
+
+        return Appointment::getAppointment($object->id, $object->service_id, $object->vehicle_id, $object->date, $object->time, $object->notes, $object->status_id);
     }
 
     public function getAllAppointmentsFiltered(string $firstName, string $lastName, string $numberPlate, string $contactNo, string $date, string $condition, string $status, int $page): array
@@ -229,6 +401,31 @@ class Garage extends UserModel
         $statement->bindValue(':email', $email);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public static function verifyGarageExistance(int $garageID) : bool {
+        $sql = "SELECT gg.id FROM gearguard.gg_garage gg WHERE gg.id = :garage_id LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $garageID, \PDO::PARAM_INT);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if (count($result) > 0)
+            return true;
+
+        return false;
+    }
+
+    public function hasNotifications(): bool
+    {
+        if (count(Notification::receiveNotification($this->id)) > 0)
+            return true;
+
+        return false;
+    }
+
+    public function getToken()
+    {
+        return JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT($this->id), $this->secretKey);
     }
 	
 }

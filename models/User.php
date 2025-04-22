@@ -14,6 +14,7 @@ class User extends UserModel
 	const STATUS_ACTIVE = 2;
 	const STATUS_DELETED = 3;
 
+    public int $id;
 	public string $first_name = '';
 	public string $last_name = '';
 	public string $email = '';
@@ -27,6 +28,7 @@ class User extends UserModel
 	public string $passwordConfirm = '';
 
     private VehicleOwner $vehicleOwner;
+    private ?Admin $admin = null;
 
     public function __construct()
     {
@@ -47,6 +49,7 @@ class User extends UserModel
 	{
 		$this->status = self::STATUS_ACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
+        parent::validate();
 		return parent::save();
 	}
 
@@ -89,6 +92,12 @@ class User extends UserModel
 	{
 		return $this->first_name . ' ' . $this->last_name;
 	}
+
+    public function isAdmin(): bool
+    {
+        $this->admin = Admin::getInstance();
+        return $this->admin !== null;
+    }
 
 	public function getUserType(): string
 	{
@@ -168,6 +177,14 @@ class User extends UserModel
 
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
 
+    }
+
+    public function hasNotifications() : bool
+    {
+        if (count(Notification::receiveNotification($this->id)) > 0)
+            return true;
+
+        return false;
     }
 
 

@@ -184,6 +184,36 @@
             margin-bottom: 0.25rem;
         }
 
+        .no-results {
+            color: var(--primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #33363f;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #25272d;
+        }
+
 
         @media (max-width: 768px) {
             .search-form {
@@ -193,15 +223,25 @@
             .search-button {
                 width: 100%;
             }
+
+            .customers-container {
+                padding: 1rem;
+            }
+
+            table,
+            th,
+            td {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 
 <body>
     <nav class="navMenu">
-        <a href="/customers/view" target="_self">All Customers</a>
+        <a href="/garage/customers/view" target="_self">All Customers</a>
         <a href="#" class="active">Search Customers</a>
-        <a href="/customers/send_message" target="_self">Send Messages</a>
+        <a href="/garage/customers/send_message" target="_self">Send Messages</a>
     </nav>
     <div class="container">
         <div class="search-container">
@@ -214,7 +254,25 @@
             </form>
         </div>
 
-        <div class="results-container" id="resultsContainer">
+        <div class="results-container" id="customersContainer">
+            <table id="customersTable">
+                <thead>
+                    <tr>
+                        <th>Fist Name</th>
+                        <th>Last Name</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Table body will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <p id="loader" class="no-results">Loading...</p>
+        </div>
+
+        <!-- <div class="results-container" id="resultsContainer">
             <div class="customer-info">
                 <h2 id="customerName"></h2>
                 <p id="customerEmail"></p>
@@ -224,63 +282,105 @@
                 <h3>Recent Service History</h3>
                 <div id="serviceCards"></div>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <script>
-        function searchCustomer(event) {
-            event.preventDefault();
+        let page = 1;
+        let isLoading = false;
+        let hasMoreData = true;
+        const limit = 25;
+        const loader = document.getElementById('loader');
+
+        async function searchCustomer(event) {
+            if (event != null)
+                event.preventDefault();
             const searchTerm = document.getElementById('searchInput').value;
+            document.querySelector('.results-container').style.display = 'block';
 
-            // Simulated API call - replace with actual API call in production
-            setTimeout(() => {
-                const customerData = {
-                    name: "sandhavi",
-                    email: "john.doe@example.com",
-                    vehicle: "Toyota Camry 2019",
-                    serviceHistory: [{
-                            garageName: "QuickFix Auto",
-                            date: "2023-11-15",
-                            description: "Annual maintenance and oil change",
-                            totalCost: 150,
-                            spareParts: "Oil filter, Air filter"
-                        },
-                        {
-                            garageName: "Tire World",
-                            date: "2023-09-02",
-                            description: "Tire rotation and balance",
-                            totalCost: 80,
-                            spareParts: "None"
-                        },
-                        {
-                            garageName: "BrakeMax",
-                            date: "2023-06-20",
-                            description: "Brake pad replacement",
-                            totalCost: 220,
-                            spareParts: "Front brake pads"
-                        },
-                        {
-                            garageName: "QuickFix Auto",
-                            date: "2023-03-10",
-                            description: "Engine tune-up",
-                            totalCost: 180,
-                            spareParts: "Spark plugs"
-                        },
-                        {
-                            garageName: "AutoCare Plus",
-                            date: "2022-12-05",
-                            description: "Winter preparation service",
-                            totalCost: 200,
-                            spareParts: "Antifreeze, Wiper blades"
-                        }
-                    ]
-                };
+            if (isLoading || !hasMoreData) return;
 
-                displayResults(customerData);
-            }, 1000); // Simulated delay
+            isLoading = true;
+            loader.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`/api/garage/getCustomers?page=${page}&firstname=${searchTerm}&lastname=${searchTerm}&email=${searchTerm}`);
+
+                if (!response.ok) {
+                    console.error('Error fetching customers:', error);
+                    document.getElementById('resultsContainer').style.display = 'none';
+                    alert('Could not load customers. Please try again later');
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (!result) {
+                    console.error('Error fetching customers:', error);
+                    document.getElementById('resultsContainer').style.display = 'none';
+                    alert('Could not load customers. Please try again later');
+                    return;
+                }
+
+                appendRows(result);
+
+                if (result.length < limit) {
+                    loader.textContent = '--- End of Search Results ---';
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else if (result.length === 0 && loadedResults === 0) {
+                    loader.textContent = 'No customers found.';
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else {
+                    page++;
+                }
+
+                document.querySelector('.results-container').scrollIntoView();
+
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+                document.getElementById('resultsContainer').style.display = 'none';
+            } finally {
+                isLoading = false;
+            }
         }
 
-        function displayResults(data) {
+        function appendRows(data) {
+            const tableBody = document.querySelector('#customersTable tbody');
+            data.forEach(customer => {
+                const row = document.createElement('tr');
+                row.addEventListener('click', () => {
+                    showVehicleDetails(customer);
+                });
+                row.style.cursor = "pointer";
+                row.onmouseover = function () {
+                    this.style.backgroundColor = "#33363f";
+                };
+                row.onmouseout = function () {
+                    this.style.backgroundColor = "";
+                };
+                row.innerHTML = `
+                    <td>${customer.first_name}</td>
+                    <td>${customer.last_name}</td>
+                    <td>${customer.contact_no}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.address}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function handleScroll() {
+            const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+            if (scrollTop + clientHeight >= scrollHeight - 5) {
+                searchCustomer(null);
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll);
+
+        /* function displayResults(data) {
             document.getElementById('resultsContainer').style.display = 'block';
             document.getElementById('customerName').textContent = data.name;
             document.getElementById('customerEmail').textContent = `Email: ${data.email}`;
@@ -300,7 +400,7 @@
                 `;
                 serviceCardsContainer.appendChild(serviceCard);
             });
-        }
+        } */
     </script>
 </body>
 

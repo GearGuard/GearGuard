@@ -27,6 +27,8 @@ $config = [
 	]
 ];
 
+date_default_timezone_set('Asia/Colombo');
+
 $app = new Application(dirname(__DIR__), $config);
 
 $app->router->get('/', [SiteController::class, 'home']);
@@ -88,19 +90,21 @@ $app->router->get('/settings', [AuthController::class, 'settings']);
 $app->router->get('/appointment/appointments', [AuthController::class, 'appointments']);
 $app->router->post('/appointment/update_status', [AuthController::class, 'updateAppointmentStatus']);
 
-$app->router->get('/appointment/search', [GarageController::class, 'searchAppointments']);
-$app->router->get('/appointment/delete', [GarageController::class, 'deleteAppointment']);
-$app->router->get('/services/view', [GarageController::class, 'viewServices']);
-$app->router->get('/services/add', [GarageController::class, 'addServices']);
-$app->router->post('/services/add', [GarageController::class, 'addServicesPost']);
-$app->router->get('/services/update', [GarageController::class, 'editServices']);
-$app->router->post('/services/update', [GarageController::class, 'updateService']);
-$app->router->get('/services/delete', [GarageController::class, 'deleteServices']);
-$app->router->post('/services/delete', [GarageController::class, 'markServiceDeleted']);
-$app->router->get('/services/search', [GarageController::class, 'getService']);
-$app->router->get('/customers/view', [GarageController::class, 'viewCustomers']);
-$app->router->get('/customers/send_message', [GarageController::class, 'sendMessages']);
-$app->router->get('/customers/search', [GarageController::class, 'searchCustomer']);
+$app->router->get('/garage/appointment/search', [GarageController::class, 'searchAppointments']);
+$app->router->get('/garage/appointment/delete', [GarageController::class, 'deleteAppointment']);
+$app->router->post('/garage/appointment/delete', [AuthController::class, 'updateAppointmentStatus']);
+$app->router->get('/garage/services/view', [GarageController::class, 'viewServices']);
+$app->router->get('/garage/services/add', [GarageController::class, 'addServices']);
+$app->router->post('/garage/services/add', [GarageController::class, 'addServicesPost']);
+$app->router->get('/garage/services/update', [GarageController::class, 'editServices']);
+$app->router->post('/garage/services/update', [GarageController::class, 'updateService']);
+$app->router->get('/garage/services/delete', [GarageController::class, 'deleteServices']);
+$app->router->post('/garage/services/delete', [GarageController::class, 'markServiceDeleted']);
+$app->router->get('/garage/services/search', [GarageController::class, 'getService']);
+$app->router->get('/garage/customers/view', [GarageController::class, 'viewCustomers']);
+$app->router->get('/garage/customers/send_message', [GarageController::class, 'sendMessages']);
+$app->router->get('/garage/customers/search', [GarageController::class, 'searchCustomer']);
+$app->router->post('/garage/profile/update', [GarageController::class, 'updateProfile']);
 $app->router->get('/mechanic', [GarageController::class, 'manageMechanic']);
 
 

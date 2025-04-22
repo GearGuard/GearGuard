@@ -4,7 +4,11 @@ namespace app\controllers;
 
 use app\models\Appointment;
 use app\models\GarageAppointment;
+use app\models\GarageService;
 use app\models\LoginFormGarage;
+use app\models\Notification;
+use app\models\Vehicle;
+use app\models\VehicleOwner;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
@@ -29,7 +33,8 @@ class AuthController extends Controller
     {
         $loginForm = new LoginForm();
         if ($request->isPost()) {
-            $loginForm->loadData($request->getBody());
+            $data = array_map(function($value){return $value;}, $request->getBody());
+            $loginForm->loadData($data);
             if ($loginForm->validate() && $loginForm->login()) {
                 Application::$app->response->redirect('/');
                 return;
@@ -47,8 +52,8 @@ class AuthController extends Controller
         $errors = [];
         $user = new User();
         if ($request->isPost()) {
-            $user->loadData($request->getBody());
-
+            $data = $request->getBody();
+            $user->loadData($data);
 
             if ($user->validate() && $user->save()) {
                 Application::$app->session->setFlash('success', 'Thanks for Registering');
@@ -70,7 +75,8 @@ class AuthController extends Controller
         $errors = [];
         $garage = new Garage();
         if ($request->isPost()) {
-            $garage->loadData($request->getBody());
+            $data = $request->getBody();
+            $garage->loadData($data);
 
 
             if ($garage->validate() && $garage->save()) {
@@ -93,7 +99,9 @@ class AuthController extends Controller
     {
         $loginForm = new LoginFormGarage();
         if ($request->isPost()) {
-            $loginForm->loadData($request->getBody());
+            $data = $request->getBody();
+
+            $loginForm->loadData($data);
             if ($loginForm->validate() && $loginForm->login()) {
                 Application::$app->session->set('isGarage', true);
                 Application::$app->response->redirect('/');
@@ -121,8 +129,10 @@ class AuthController extends Controller
             ]);
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
+            $model = Garage::with(Application::$app->user);
             return $this->render('garage/profile', [
-                'title' => 'Profile'
+                'title' => 'Profile',
+                'model' => $model,
             ]);
         }
 
@@ -132,6 +142,12 @@ class AuthController extends Controller
     public function customer(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
+            if (Application::$app->user->isAdmin()) {
+                $this->setLayout('admin_layout');
+                return $this->render('admin/admin', [
+                    'title' => 'Admin Dashboard'
+                ]);
+            }
             return $this->render('customer/customer', [
                 'title' => 'Customer Dashboard'
             ]);
@@ -147,6 +163,12 @@ class AuthController extends Controller
     public function dashboard(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
+            if (Application::$app->user->isAdmin()) {
+                $this->setLayout('admin_layout');
+                return $this->render('admin/dashboard', [
+                    'title' => 'Admin Dashboard'
+                ]);
+            }
             return $this->render('customer/dashboard', [
                 'title' => 'Customer Dashboard'
             ]);
@@ -263,17 +285,40 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof Garage) {
             $body = $request->getBody();
-            $appointment_id = $body['appointment_id'] ?? '';
+            $appointmentID = $body['appointment_id'] ?? '';
             $status = $body['status_id'] ?? '';
-            $model = Application::$app->user->getAppointmentByID(htmlspecialchars($appointment_id));
+            if (!is_numeric($appointmentID) || !is_numeric($status))
+                throw new NotFoundException();
+
+            $model = Application::$app->user->getAppointmentByID((int) $appointmentID);
 
             if (!$model) {
                 throw new NotFoundException();
             }
 
             $model->update(
-                ['status_id' => $status]
+                ['status_id' => $status],
+                true
             );
+
+            $vehicleDetails = Vehicle::getVehicleDetails($model->vehicle_id);
+
+            if ($status == 3) {
+                $description = 'Your appointment for ' . $vehicleDetails['license_plate_no'] .  ' has been cancelled by the garage ' . GarageService::getGarageOfService($model->service_id) ?? 'NO-NAME'  . '.';
+                Notification::sendNotification(
+                    $vehicleDetails['vehicle_user'],
+                    $description,
+                    'Appointment Cancelled'
+                );
+            } elseif ($status == 2) {
+                $description = 'Your appointment for ' . $vehicleDetails['license_plate_no'] .  ' has been confirmed by the garage ' . GarageService::getGarageOfService($model->service_id) ?? 'NO-NAME'  . '.';
+                Notification::sendNotification(
+                    $vehicleDetails['vehicle_user'],
+                    $description,
+                    'Appointment Confirmed'
+                );
+            }
+
             return 'success';
         }
 
@@ -437,11 +482,11 @@ class AuthController extends Controller
             $time = $body['time'] ?? '';
             $notes = $body['notes'] ?? '';
             $model = Appointment::initialize(
-                htmlspecialchars($service_id),
-                htmlspecialchars($vehicle_id),
-                htmlspecialchars($date),
-                htmlspecialchars($time),
-                htmlspecialchars($notes)
+                ($service_id),
+                ($vehicle_id),
+                ($date),
+                ($time),
+                ($notes)
             );
             $model->save();
             return $this->render('customer/appointment/myAppointment', [

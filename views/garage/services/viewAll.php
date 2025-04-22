@@ -122,6 +122,13 @@
             background-color: #1b4ebd;
         }
 
+        .no-results {
+            color: var(--primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -152,10 +159,10 @@
 
 <body>
     <nav class="navMenu">
-        <a href="/services/add" target="_self">Add New Service</a>
+        <a href="/garage/services/add" target="_self">Add New Service</a>
         <a href="#" class="active">All Services</a>
-        <a href="/services/update" target="_self">Edit Services</a>
-        <a href="/services/delete" target="_self">Delete Services</a>
+        <a href="/garage/services/update" target="_self">Edit Services</a>
+        <a href="/garage/services/delete" target="_self">Delete Services</a>
     </nav>
     <div class="services-container">
         <h2 class="title">All Garage Services</h2>
@@ -171,7 +178,7 @@
                 <!-- Rows will be appended here dynamically -->
             </tbody>
         </table>
-        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
+        <p id="loader" class="no-results">Loading...</p>
     </div>
 
     <script>
@@ -189,11 +196,27 @@
 
             try {
                 const response = await fetch(`/api/garage/getServices?page=${page}`);
+
+                if (!response.ok) {
+                    console.error('Error fetching services:', error);
+                    alert('Failed to load services. Please try again later.');
+                }
+
                 const result = await response.json();
+
+                if (!result) {
+                    console.error('Error fetching services:', error);
+                    alert('Failed to load services. Please try again later.');
+                }
 
                 appendRows(result);
 
                 if (result.length < limit) {
+                    loader.textContent = '--- End of Services Table ---';
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else if (result.length === 0 && loadedResults === 0) {
+                    loader.textContent = 'No Services found.';
                     hasMoreData = false;
                     window.removeEventListener('scroll', handleScroll);
                 } else {
@@ -201,11 +224,10 @@
                 }
             } catch (error) {
                 console.error('Error fetching services:', error);
+                alert('Failed to load services. Please try again later.');
             } finally {
                 isLoading = false;
             }
-
-            document.getElementById('loader').style.display = 'none';
         }
 
     function appendRows(data) {

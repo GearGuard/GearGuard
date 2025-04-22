@@ -186,8 +186,8 @@
 
 <body>
     <nav class="navMenu">
-        <a href="/customers/view" target="_self">All Customers</a>
-        <a href="/customers/search" target="_self">Search Customers</a>
+        <a href="/garage/customers/view" target="_self">All Customers</a>
+        <a href="/garage/customers/search" target="_self">Search Customers</a>
         <a href="#" class="active">Send Messages</a>
     </nav>
     <div class="container">
