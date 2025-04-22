@@ -336,7 +336,7 @@
         .footer {
             background-color: var(--secondary);
             color: var(--text);
-            padding: 2rem 0;
+            padding: 2rem 2rem;
             text-align: center;
         }
 
@@ -553,17 +553,17 @@
         <h2 class="section-title">Why Choose GearGuard</h2>
         <div class="services-grid">
             <div class="service-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Expertise Icon">
+                <img src="/assets/img/ase.png" alt="Expertise Icon">
                 <h3>Certified Expertise</h3>
                 <p>Our technicians are ASE-certified with extensive training and years of hands-on experience.</p>
             </div>
             <div class="service-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Technology Icon">
+                <img src="/assets/img/two.png" alt="Technology Icon">
                 <h3>Advanced Technology</h3>
                 <p>We use state-of-the-art diagnostic tools to provide precise and efficient vehicle maintenance.</p>
             </div>
             <div class="service-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Transparency Icon">
+                <img src="/assets/img/three.webp" alt="Transparency Icon">
                 <h3>Transparent Service</h3>
                 <p>Clear communication and honest recommendations are at the core of our service philosophy.</p>
             </div>
@@ -575,17 +575,17 @@
         <h2 class="section-title">Our Services</h2>
         <div class="services-grid">
             <div class="service-card slide-in">
-                <img src="public/assets/img/profile.jpg" alt="Diagnostics Icon">
+                <img src="/assets/img/four.png" alt="Diagnostics Icon">
                 <h3>Vehicle Diagnostics</h3>
                 <p>Comprehensive system checks using advanced computerized diagnostic equipment.</p>
             </div>
             <div class="service-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Maintenance Icon">
+                <img src="/assets/img/five.png" alt="Maintenance Icon">
                 <h3>Routine Maintenance</h3>
                 <p>Regular service to keep your vehicle running smoothly and prevent potential issues.</p>
             </div>
             <div class="service-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Repair Icon">
+                <img src="/assets/img/four.png" alt="Repair Icon">
                 <h3>Repair Services</h3>
                 <p>Expert repairs for all major and minor vehicle systems and components.</p>
             </div>
@@ -602,19 +602,19 @@
         <h2 class="section-title">What Our Customers Say</h2>
         <div class="feedback-grid">
             <div class="feedback-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Customer 1">
+                <img src="/assets/img/perera.png" alt="Customer 1">
                 <p>"GearGuard saved me from a major engine problem. Their diagnostics are top-notch!"</p>
-                <h4>- Sarah Mitchell</h4>
+                <h4>- Nihal Perera</h4>
             </div>
             <div class="feedback-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Customer 2">
+                <img src="/assets/img/Gamage.png" alt="Customer 2">
                 <p>"Professional, reliable, and always transparent. My go-to maintenance service."</p>
-                <h4>- Michael Rodriguez</h4>
+                <h4>- Sanduni Gamage</h4>
             </div>
             <div class="feedback-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Customer 3">
+                <img src="/assets/img/silva.png" alt="Customer 3">
                 <p>"Affordable pricing and exceptional service. Highly recommended!"</p>
-                <h4>- Emily Chen</h4>
+                <h4>- Nimesha Silva</h4>
             </div>
         </div>
     </section>
@@ -654,8 +654,8 @@
 
     <!-- Footer -->
 
-    <div class="container">
-        <p>&copy; 2024 GearGuard. All Rights Reserved.</p>
+    <div class="footer">
+        <p>&copy; 2025 GearGuard. All Rights Reserved.</p>
     </div>
 
 
