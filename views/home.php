@@ -590,7 +590,7 @@
                 <p>Expert repairs for all major and minor vehicle systems and components.</p>
             </div>
             <div class="service-card slide-in">
-                <img src="/api/placeholder/100/100" alt="Tire Service Icon">
+                <img src="/assets/img/tire.png" alt="Tire Service Icon">
                 <h3>Tire Services</h3>
                 <p>Tire rotation, alignment, balancing, and replacement services.</p>
             </div>
