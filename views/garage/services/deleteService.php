@@ -243,9 +243,9 @@
 
 <body>
     <nav class="navMenu">
-        <a href="/services/add" target="_self">Add New Service</a>
-        <a href="/services/view" target="_self">All Services</a>
-        <a href="/services/update" target="_self">Edit Services</a>
+        <a href="/garage/services/add" target="_self">Add New Service</a>
+        <a href="/garage/services/view" target="_self">All Services</a>
+        <a href="/garage/services/update" target="_self">Edit Services</a>
         <a href="#" class="active">Delete Services</a>
     </nav>
     <div class="service-form">
@@ -276,6 +276,7 @@
             <p>Are you sure you want to delete this service?</p>
             <br>
             <i>If there are any appointments associated with this service, they will not be deleted.</i>
+            <span style="color: var(--accent); font-size: 0.8rem;">(This action cannot be undone)</span>
             <div class="modal-buttons">
                 <button type="button" class="search-button" onclick="closeModal()">Cancel</button>
                 <button type="button" class="delete-button" onclick="deleteService()">Delete</button>
@@ -285,7 +286,7 @@
 
     <script>
         var serviceId;
-        function searchService() {
+        async function searchService() {
             const searchType = document.querySelector('input[name="search_type"]').value;
 
             if (!searchType) {
@@ -293,8 +294,41 @@
                 return;
             }
 
-            $.ajax({
-                url: '/services/search',
+            try {
+                const results = await fetch(`/garage/services/search?searchQuery=${searchType}`);
+
+                if (!results.ok) {
+                    serviceDetails.style.display = 'none';
+                    alert('Something went wrong. Please try again later.');
+                    return;
+                }
+
+                const response = await results.json();
+
+                serviceDetails = document.getElementById('serviceDetails');
+                if (response == null) {
+                    serviceDetails.style.display = 'none';
+                    alert('No service found!');
+                    return;
+                }
+                serviceDetails.style.display = 'block';
+
+                // Populate form fields with dummy data (replace this with actual data from your backend)
+                serviceId = response.id;
+                document.getElementById('serviceType').textContent = response.type;
+                document.getElementById('serviceDescription').textContent = response.description;
+                document.getElementById('serviceDuration').textContent = response.duration;
+                document.getElementById('servicePrice').textContent = response.price;
+
+            } catch (error) {
+                console.log('Error:', error);
+                serviceDetails.style.display = 'none';
+                alert('Something went wrong. Please try again later.');
+                return;
+            }
+
+            /* $.ajax({
+                url: '/garage/services/search',
                 type: 'GET',
                 data: {
                     searchQuery: searchType
@@ -318,7 +352,7 @@
                 error: function (xhr, status, error) {
                     console.log('Error:', error);
                 }
-            });
+            }); */
         }
 
         function showDeleteConfirmation() {
@@ -329,9 +363,42 @@
             document.getElementById('deleteModal').style.display = 'none';
         }
 
-        function deleteService() {
-            $.ajax({
-                url: '/services/delete',
+        async function deleteService() {
+            try{
+                const result = await fetch('/garage/services/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        serviceID: serviceId
+                    })
+                });
+
+                if (!result.ok) {
+                    alert('We could not delete the service!');
+                    closeModal();
+                    document.getElementById('serviceDetails').style.display = 'none';
+                    document.getElementById('search_type').value = '';
+                    serviceId = null;
+                    return;
+                }
+
+                alert('Service deleted successfully. But if there are any appointments associated with this service, they will not be deleted.');
+                closeModal();
+                document.getElementById('serviceDetails').style.display = 'none';
+                document.getElementById('search_type').value = '';
+                serviceId = null;
+            } catch (error) {
+                alert('We could not delete the service!');
+                closeModal();
+                document.getElementById('serviceDetails').style.display = 'none';
+                document.getElementById('search_type').value = '';
+                serviceId = null;
+            }
+
+            /* $.ajax({
+                url: '/garage/services/delete',
                 type: 'POST',
                 data: {
                     serviceID: serviceId
@@ -341,14 +408,16 @@
                     closeModal();
                     document.getElementById('serviceDetails').style.display = 'none';
                     document.getElementById('search_type').value = '';
+                    serviceId = null;
                 },
                 error: function (xhr, status, error) {
                     alert('We could not delete the service!');
                     closeModal();
                     document.getElementById('serviceDetails').style.display = 'none';
                     document.getElementById('search_type').value = '';
+                    serviceId = null;
                 }
-            });
+            }); */
         }
     </script>
 </body>

@@ -253,6 +253,14 @@
                     <span class="nav-text">Settings</span>
                 </a>
             </li>
+            <li class='nav-item'>
+                <a href='javascript:void(0)' onclick="window.location.href='/logout'" class='nav-link'>
+                    <i class='fa fa-sign-out'></i>
+                    <span class='nav-text'>Logout</span>
+                </a>
+            </li>
+
+
         </ul>
     </div>
 

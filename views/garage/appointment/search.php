@@ -211,12 +211,12 @@ $this->title = 'Search Appointments';
 <nav class="navMenu">
     <a href="/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
     <a href="#" class="active">Search Appointment<span class="dot"></span></a>
-    <a href="/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
+    <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
 </nav>
 
 <div class="search-container">
     <h2 class="search-title">Search Appointments</h2>
-    <form id="searchForm" onsubmit="return handleSearch()">
+    <form id="searchForm" onsubmit="handleSearch(event)">
         <input type="text" id="firstname" class="search-input"
                placeholder="Enter First Name"/>
 		<input name="textfield" type="text" class="search-input" id="lastname" placeholder="Enter Last Name">
@@ -259,14 +259,14 @@ $this->title = 'Search Appointments';
         <!-- Results will be injected dynamically -->
         </tbody>
     </table>
-    <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
-    <p class="no-results" id="noResultsMessage" style="display: none;">No results found.</p>
+    <p class="no-results" id="loader" style="display: none;">No results found.</p>
 </div>
 
 <script>
     let page = 1;
     let isLoading = false;
     let hasMoreData = true;
+    let loadedResults = 0;
     const limit = 25;
     const loader = document.getElementById('loader');
 
@@ -274,11 +274,16 @@ $this->title = 'Search Appointments';
         page = 1;
         isLoading = false;
         hasMoreData = true;
+        loadedResults = 0;
     }
 
     document.querySelectorAll('#searchForm input, #searchForm select').forEach(a => addEventListener("input", (event) => resetVariables()));
 
-    function handleSearch() {
+    async function handleSearch(event) {
+        if (event !== null) {
+            event.preventDefault();
+        }
+
         const firstname = document.getElementById('firstname').value.trim();
 		const lastname = document.getElementById('lastname').value.trim();
 		const numberplate = document.getElementById('numberplate').value.trim();
@@ -296,7 +301,58 @@ $this->title = 'Search Appointments';
         loader.textContent = 'Loading...';
         loader.style.display = 'block';
 
-        $.ajax({
+        try {
+            const response = await fetch(`/api/garage/getAppointmentsFiltered?firstname=${firstname}&lastname=${lastname}&numberplate=${numberplate}&contact=${contact}&date=${date}&condition=${condition}&status=${status}&page=${page}`);
+
+            if (!response.ok) {
+                alert('Something went wrong. Please try again later.');
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!data) {
+                alert('Something went wrong. Please try again later.');
+                return;
+            }
+
+            resultsBody.innerHTML = '';
+            if (data.length === 0 && loadedResults === 0) {
+                loader.textContent = 'No appointments found.';
+                hasMoreData = false;
+                window.removeEventListener('scroll', handleScroll);
+            } else if (data.length < limit) {
+               loader.textContent = '--- End of Search Results ---';
+               hasMoreData = false;
+               window.removeEventListener('scroll', handleScroll);
+            } else {
+                page++;
+            }
+            data.forEach(item => {
+                let tablerow = `<tr id='table-row-id-${item.id}' onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
+                    <td>${item.vehicle_type}</td>
+                    <td>${item.first_name} ${item.last_name}</td>
+                    <td>${item.contact_no}</td>
+                    <td>${item.license_plate_no}</td>
+                    <td>${item.service_type}</td>
+                    <td>${item.date} ${item.time}</td>`;
+
+                if (item.status_id === 1) {
+                    tablerow += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 3)">Reject</button></td>`;
+                }
+
+                tablerow += `</tr>`;
+
+                resultsBody.innerHTML += tablerow;
+                loadedResults++;
+            });
+            resultsContainer.style.display = 'block';
+            resultsContainer.scrollIntoView();
+        } catch (error) {
+            console.log('Error:', error);
+        }
+
+        /* $.ajax({
             url: '/api/garage/getAppointmentsFiltered',
             type: 'GET',
             data: {
@@ -313,15 +369,19 @@ $this->title = 'Search Appointments';
                 let data = response;
 
                 resultsBody.innerHTML = '';
-                if (data.length > 0) {
-                    if (data.length < limit) {
+                    if (data.length === 0 && loadedResults === 0) {
+                        loader.textContent = 'No appointments found.';
                         hasMoreData = false;
                         window.removeEventListener('scroll', handleScroll);
+                    } else if (data.length < limit) {
+                       loader.textContent = '--- End of Search Results ---';
+                       hasMoreData = false;
+                       window.removeEventListener('scroll', handleScroll);
                     } else {
                         page++;
                     }
                     data.forEach(item => {
-                        let tablerow = `<tr onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
+                        let tablerow = `<tr id='table-row-id-${item.id}' onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
                             <td>${item.vehicle_type}</td>
                             <td>${item.first_name} ${item.last_name}</td>
                             <td>${item.contact_no}</td>
@@ -330,26 +390,21 @@ $this->title = 'Search Appointments';
                             <td>${item.date} ${item.time}</td>`;
 
                         if (item.status_id === 1) {
-                            tablerow += `<td><button class="view-more-button">Accept</button><button class="view-more-button">Reject</button></td>`;
+                            tablerow += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 3)">Reject</button></td>`;
                         }
 
                         tablerow += `</tr>`;
 
                         resultsBody.innerHTML += tablerow;
+                        loadedResults++;
                     });
                     resultsContainer.style.display = 'block';
-                    noResultsMessage.style.display = 'none';
-                    loader.style.display = 'none';
-                } else {
-                    noResultsMessage.style.display = 'block';
-                }
+                    resultsContainer.scrollIntoView();
             },
             error: function (xhr, status, error) {
                 console.log('Error:', error);
-                noResultsMessage.style.display = 'block';
-                loader.style.display = 'none';
             }
-        });
+        }); */
 
         // Filter results
         /*const filteredResults = data.filter(item =>
@@ -421,10 +476,63 @@ $this->title = 'Search Appointments';
         document.body.appendChild(modal);
     }
 
+    async function handleAcceptance(event, appointment_id, status_id) {
+        event.stopPropagation();
+
+        try {
+            const response = await fetch('/appointment/update_status', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({appointment_id: appointment_id, status_id: status_id})
+            });
+
+            if (!response.ok) {
+                alert('An error occurred. Please try again later.');
+                return;
+            }
+
+            result = await response.text();
+
+            if (!result === 'success') {
+                alert('An error occurred. Please try again later.');
+                return;
+            }
+
+            alert('Appointment status updated successfully.');
+            document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
+        } catch (error) {
+            console.log('Error:', error);
+            alert('An error occurred. Please try again later.');
+        }
+        /* event.stopPropagation();
+        $.ajax({
+            url: '/appointment/update_status',
+            type: 'POST',
+            data: {
+                appointment_id: appointment_id,
+                status_id: status_id
+            },
+            success: function (response) {
+                if (response === 'success') {
+                    alert('Appointment status updated successfully.');
+                    document.querySelector('#table-row-id-' + appointment_id + '>#status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
+                } else {
+                    alert('An error occurred. Please try again later.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('Error:', error);
+                alert('An error occurred. Please try again later.');
+            }
+        }) */
+    }
+
     function handleScroll() {
         const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
         if (scrollTop + clientHeight >= scrollHeight - 5 && page < 0) {
-            handleSearch();
+            handleSearch(event);
         }
     }
 

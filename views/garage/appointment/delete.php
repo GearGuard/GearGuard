@@ -19,6 +19,7 @@ $this->title = 'Search Appointments';
             --accent: #2463eb;
             --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
+            --danger: #ef4444;
         }
 
         * {
@@ -124,7 +125,8 @@ $this->title = 'Search Appointments';
             box-shadow: 0 0 5px var(--accent);
         }
 
-        .search-button {
+        .search-button,
+        .delete-button {
             background: var(--accent);
             color: var(--text);
             border: none;
@@ -136,13 +138,22 @@ $this->title = 'Search Appointments';
             transition: all 0.2s ease;
         }
 
-        .search-button:hover {
+        .search-button:hover,
+        .delete-button:hover {
             background: #1b4ebd;
             transform: translateY(-1px);
         }
 
         .search-button:active {
             transform: translateY(0);
+        }
+
+        .delete-button {
+            background: var(--danger);
+        }
+
+        .delete-button:hover {
+            background: #dc2626;
         }
 
         .results-container {
@@ -157,6 +168,35 @@ $this->title = 'Search Appointments';
         .results-table {
             width: 100%;
             border-collapse: collapse;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: var(--secondary);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
         }
 
         th,
@@ -199,24 +239,43 @@ $this->title = 'Search Appointments';
                 font-size: 0.875rem;
             }
 
-            .search-button {
+            .button-container {
+                flex-direction: column-reverse;
+            }
+
+            .search-button,
+            .delete-button {
                 font-size: 0.875rem;
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
     <nav class="navMenu">
         <a href="/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
-        <a href="/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
+        <a href="/garage/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
         <a href="#" class="active">Delete Appointment<span class="dot"></span></a>
     </nav>
 
     <div class="search-container">
         <h2 class="search-title">Delete Appointments</h2>
-        <form id="searchForm" onsubmit="return handleSearch()">
-            <input type="text" id="searchInput" class="search-input" placeholder="Enter Customer Name, Number Plate, or Contact Number" />
+        <form id="searchForm" onsubmit="handleSearch(event)">
+            <input type="text" id="firstname" class="search-input"
+                   placeholder="Enter First Name"/>
+    		<input name="textfield" type="text" class="search-input" id="lastname" placeholder="Enter Last Name">
+    		<input name="textfield" type="text" class="search-input" id="numberplate" placeholder="Enter Number Plate">
+    		<input name="tel" type="tel" class="search-input" id="contact" placeholder="Enter Contact Number">
+    		<input name="date" type="date" class="search-input" id="date" placeholder="Enter Date">
+    		<select name="select" class="search-input" id="condition">
+                <option value="">Select a condition for date</option>
+    			<option value="before">Before</option>
+    			<option value="after">After</option>
+    			<option value="on">On</option>
+    			<option value="on or before">On or Before</option>
+    			<option value="on or after">On or After</option>
+    		</select>
             <button type="submit" class="search-button">Search</button>
         </form>
     </div>
@@ -224,90 +283,302 @@ $this->title = 'Search Appointments';
     <div class="results-container" id="resultsContainer" style="display: none;">
         <table class="results-table">
             <thead>
-                <tr>
-                    <th>Vehicle Type</th>
-                    <th>Owner's Name</th>
-                    <th>Contact Number</th>
-                    <th>Number Plate</th>
-                    <th>Vehicle Model</th>
-                    <th>Model Year</th>
-                    <th>Service Type</th>
-                    <th>Date & Time</th>
-                </tr>
+            <tr>
+                <th>Vehicle Type</th>
+                <th>Client's Name</th>
+                <th>Contact Number</th>
+                <th>Number Plate</th>
+                <th>Service Type</th>
+                <th>Date & Time</th>
+                <th></th>
+                <th></th>
+            </tr>
             </thead>
             <tbody id="resultsBody">
-                <!-- Results will be injected dynamically -->
+            <!-- Results will be injected dynamically -->
             </tbody>
         </table>
-        <p class="no-results" id="noResultsMessage" style="display: none;">No results found.</p>
+        <p class="no-results" id="loader" style="display: none;">No results found.</p>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to delete this appointment?</p>
+            <br>
+            <em>We will notify the customer for you. But, please note that appointment cancellation may lead to unsatisfied customers.</em>
+            <span style="color: var(--accent); font-size: 0.8rem;">(This action cannot be undone)</span>
+            <div class="modal-buttons">
+                <button type="button" class="search-button" onclick="closeModal()">Cancel</button>
+                <button type="button" class="delete-button" onclick="deleteAppointment()">Delete</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            const resultsContainer = document.getElementById('resultsContainer');
-            const resultsBody = document.getElementById('resultsBody');
-            const noResultsMessage = document.getElementById('noResultsMessage');
+        let page = 1;
+            let isLoading = false;
+            let hasMoreData = true;
+            let loadedResults = 0;
+            let appointmentID = -1;
+            const limit = 25;
+            const loader = document.getElementById('loader');
+            const deleteModal = document.getElementById('deleteModal');
 
-            if (query === '') {
-                alert('Please enter a search term.');
+            function resetVariables() {
+                page = 1;
+                isLoading = false;
+                hasMoreData = true;
+                loadedResults = 0;
+                appointmentID = -1;
+            }
+
+            document.querySelectorAll('#searchForm input, #searchForm select').forEach(a => addEventListener("input", (event) => resetVariables()));
+
+            async function handleSearch(event) {
+                if (event !== null) {
+                    event.preventDefault();
+                }
+
+                const firstname = document.getElementById('firstname').value.trim();
+        		const lastname = document.getElementById('lastname').value.trim();
+        		const numberplate = document.getElementById('numberplate').value.trim();
+        		const contact = document.getElementById('contact').value.trim();
+        		const date = document.getElementById('date').value.trim();
+        		const condition = document.getElementById('condition').value.trim();
+                const resultsContainer = document.getElementById('resultsContainer');
+                const resultsBody = document.getElementById('resultsBody');
+                const noResultsMessage = document.getElementById('noResultsMessage');
+
+                if (isLoading || !hasMoreData) return false;
+
+                isLoading = true;
+                loader.textContent = 'Loading...';
+                loader.style.display = 'block';
+
+                try {
+                    const response = await fetch(`/api/garage/getAppointmentsFiltered?firstname=${firstname}&lastname=${lastname}&numberplate=${numberplate}&contact=${contact}&date=${date}&condition=${condition}&status=active&page=${page}`);
+
+                    if (!response.ok) {
+                        alert('Something went wrong. Please try again later.');
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    if (!data) {
+                        alert('Something went wrong. Please try again later.');
+                        return;
+                    }
+
+                    resultsBody.innerHTML = '';
+                        if (data.length === 0 && loadedResults === 0) {
+                            loader.textContent = 'No appointments found.';
+                            hasMoreData = false;
+                            window.removeEventListener('scroll', handleScroll);
+                        } else if (data.length < limit) {
+                           loader.textContent = '--- End of Search Results ---';
+                           hasMoreData = false;
+                           window.removeEventListener('scroll', handleScroll);
+                        } else {
+                            page++;
+                        }
+                        data.forEach(item => {
+                            let tablerow = `<tr id='table-row-id-${item.id}' onclick='confirmAppointmentDeletion(${item.id})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
+                                <td>${item.vehicle_type}</td>
+                                <td>${item.first_name} ${item.last_name}</td>
+                                <td>${item.contact_no}</td>
+                                <td>${item.license_plate_no}</td>
+                                <td>${item.service_type}</td>
+                                <td>${item.date} ${item.time}</td>`;
+
+                            tablerow += `</tr>`;
+
+                            resultsBody.innerHTML += tablerow;
+                            loadedResults++;
+                        });
+                        resultsContainer.style.display = 'block';
+                        resultsContainer.scrollIntoView();
+
+                        return false;
+                } catch (error) {
+                    console.log('Error:', error);
+                    return false;
+                }
+
+                /* $.ajax({
+                    url: '/api/garage/getAppointmentsFiltered',
+                    type: 'GET',
+                    data: {
+                        firstname: firstname,
+                        lastname: lastname,
+                        numberplate: numberplate,
+                        contact: contact,
+                        date: date,
+                        condition: condition,
+                        status: 'active',
+                        page: page,
+                    },
+                    success: function (response) {
+                        let data = response;
+
+                        resultsBody.innerHTML = '';
+                            if (data.length === 0 && loadedResults === 0) {
+                                loader.textContent = 'No appointments found.';
+                                hasMoreData = false;
+                                window.removeEventListener('scroll', handleScroll);
+                            } else if (data.length < limit) {
+                               loader.textContent = '--- End of Search Results ---';
+                               hasMoreData = false;
+                               window.removeEventListener('scroll', handleScroll);
+                            } else {
+                                page++;
+                            }
+                            data.forEach(item => {
+                                let tablerow = `<tr id='table-row-id-${item.id}' onclick='confirmAppointmentDeletion(${item.id})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
+                                    <td>${item.vehicle_type}</td>
+                                    <td>${item.first_name} ${item.last_name}</td>
+                                    <td>${item.contact_no}</td>
+                                    <td>${item.license_plate_no}</td>
+                                    <td>${item.service_type}</td>
+                                    <td>${item.date} ${item.time}</td>`;
+
+                                tablerow += `</tr>`;
+
+                                resultsBody.innerHTML += tablerow;
+                                loadedResults++;
+                            });
+                            resultsContainer.style.display = 'block';
+                            resultsContainer.scrollIntoView();
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Error:', error);
+                    }
+                }); */
+
+                // Filter results
+                /*const filteredResults = data.filter(item =>
+                    item.name.toLowerCase().includes(query.toLowerCase()) ||
+                    item.plate.toLowerCase().includes(query.toLowerCase()) ||
+                    item.contact.includes(query)
+                );
+
+                noResultsMessage.style.display = 'none';
+
+                resultsBody.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        resultsBody.innerHTML += `
+                                <tr>
+                                    <td>${item.vehicle_type}</td>
+                                    <td>${item.first_name} ${item.last_name}</td>
+                                    <td>${item.contact_no}</td>
+                                    <td>${item.license_plate_no}</td>
+                                    <td>${item.vehicle_model}</td>
+                                    <td>${item.date} ${item.time}</td>
+                                    <td><button onclick='viewDetails(${item})' class="view-more-button">View More</button></td>
+                                    <td><button class="view-more-button">Accept</button></td>
+                                </tr>
+                            `;
+                    });
+                    noResultsMessage.style.display = 'none';
+                } else {
+                    noResultsMessage.style.display = 'block';
+                }
+
+                resultsContainer.style.display = 'block';*/
                 return false;
             }
 
-            // Dummy data for demonstration
-            const data = [{
-                    type: 'SUV',
-                    name: 'John Doe',
-                    contact: '+123456789',
-                    plate: 'XYZ-1234',
-                    model: 'Toyota Highlander',
-                    year: 2022,
-                    service: 'Oil Change',
-                    datetime: '2024-11-20 10:30 AM'
-                },
-                {
-                    type: 'Sedan',
-                    name: 'Jane Smith',
-                    contact: '+987654321',
-                    plate: 'ABC-5678',
-                    model: 'Honda Accord',
-                    year: 2020,
-                    service: 'Tire Rotation',
-                    datetime: '2024-11-22 02:00 PM'
-                }
-            ];
-
-            // Filter results
-            const filteredResults = data.filter(item =>
-                item.name.toLowerCase().includes(query.toLowerCase()) ||
-                item.plate.toLowerCase().includes(query.toLowerCase()) ||
-                item.contact.includes(query)
-            );
-
-            resultsBody.innerHTML = '';
-            if (filteredResults.length > 0) {
-                filteredResults.forEach(item => {
-                    resultsBody.innerHTML += `
-                        <tr>
-                            <td>${item.type}</td>
-                            <td>${item.name}</td>
-                            <td>${item.contact}</td>
-                            <td>${item.plate}</td>
-                            <td>${item.model}</td>
-                            <td>${item.year}</td>
-                            <td>${item.service}</td>
-                            <td>${item.datetime}</td>
-                        </tr>
-                    `;
-                });
-                noResultsMessage.style.display = 'none';
-            } else {
-                noResultsMessage.style.display = 'block';
+            function addBackground(element) {
+                element.style.backgroundColor = '#33363f';
             }
 
-            resultsContainer.style.display = 'block';
-            return false;
-        }
+            function removeBackground(element) {
+                element.style.backgroundColor = '';
+            }
+
+            function handleScroll() {
+                const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+                if (scrollTop + clientHeight >= scrollHeight - 5 && page < 0) {
+                    handleSearch(null);
+                }
+            }
+
+            window.addEventListener('scroll', handleScroll);
+
+            function confirmAppointmentDeletion(id) {
+                appointmentID = id;
+                deleteModal.style.display = 'block';
+            }
+
+            function closeModal() {
+                appointmentID = -1;
+                document.getElementById('deleteModal').style.display = 'none';
+            }
+
+            async function deleteAppointment() {
+                if (appointmentID === -1) {
+                    alert('No appointment selected for deletion.');
+                    return;
+                }
+                try {
+                    const response = await fetch('/garage/appointment/delete', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: new URLSearchParams({
+                            appointment_id: appointmentID,
+                            status_id: 3
+                        })
+                    });
+
+                    if (!response.ok) {
+                        alert('An error occurred. Please try again later.');
+                        return;
+                    }
+
+                    result = await response.text();
+
+                    if (result === 'success') {
+                        alert('Appointment deleted successfully.');
+                        document.getElementById(`table-row-id-${appointmentID}`).remove();
+                        closeModal();
+                        resetVariables();
+                    } else {
+                        alert('An error occurred. Please try again later.');
+                    }
+                } catch (error) {
+                    console.error('Error deleting appointment:', error);
+                    alert('We could not delete the service!');
+                    closeModal();
+                    appointmentID = -1;
+                }
+                /* $.ajax({
+                    url: '/garage/appointment/delete',
+                    type: 'POST',
+                    data: {
+                        appointment_id: appointmentID,
+                        status_id: 3
+                    },
+                    success: function (response) {
+                        if (response === 'success') {
+                            alert('Appointment deleted successfully.');
+                            document.getElementById(`table-row-id-${appointmentID}`).remove();
+                            closeModal();
+                            resetVariables();
+                        } else {
+                            alert('An error occurred. Please try again later.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error deleting appointment:', error);
+                        alert('We could not delete the service!');
+                        closeModal();
+                        appointmentID = -1;
+                    }
+                }); */
+            }
     </script>
 </body>
 

@@ -116,6 +116,13 @@ $this->title = 'View All Appointments';
 			width: 20rem;
 		}
 
+        .no-results {
+            color: var(--primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
         table {
             width: 100%;
             border-collapse: separate;
@@ -180,8 +187,8 @@ $this->title = 'View All Appointments';
 <body>
     <nav class="navMenu">
         <a href="#" class="active">All Appointments<span class="dot"></span></a>
-        <a href="/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
-        <a href="/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
+        <a href="/garage/appointment/search" target="_self">Search Appointment<span class="dot"></span></a>
+        <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
     </nav>
 	<div class="SearchBar">
     	<label for="textfield">Search:</label>
@@ -206,7 +213,7 @@ $this->title = 'View All Appointments';
 
             </tbody>
         </table>
-        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading...</div>
+        <p id="loader" class="no-results">Loading...</p>
     </div>
 
     <script>
@@ -271,11 +278,29 @@ $this->title = 'View All Appointments';
 
             try {
                 const response = await fetch(`/api/garage/getAppointments?page=${page}`);
+
+                if (!response.ok) {
+                    loader.textContent = 'Error loading appointments.';
+                    hasMoreData = false;
+                    return;
+                }
+
                 const result = await response.json();
+
+                if (!result) {
+                    loader.textContent = 'Error loading appointments.';
+                    hasMoreData = false;
+                    return;
+                }
 
                 appendRows(result);
 
                 if (result.length < limit) {
+                    loader.textContent = '--- End of Appointments Table ---';
+                    hasMoreData = false;
+                    window.removeEventListener('scroll', handleScroll);
+                } else if (result.length === 0 && loadedResults === 0) {
+                    loader.textContent = 'No Appointments found.';
                     hasMoreData = false;
                     window.removeEventListener('scroll', handleScroll);
                 } else {
@@ -286,8 +311,6 @@ $this->title = 'View All Appointments';
             } finally {
                 isLoading = false;
             }
-
-            document.getElementById('loader').style.display = 'none';
         }
 
         function appendRows(data) {
@@ -303,7 +326,7 @@ $this->title = 'View All Appointments';
                           `;
 
                 if (appointment.status_id == 1) {
-                    content += `<td><button class="view-more-button" onclick="handleAcceptance(${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(${appointment.id}, 3)">Reject</button></td>`;
+                    content += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 3)">Reject</button></td>`;
                 } else if (appointment.status_id == 2) {
                     content += `<td>Accepted</td>`;
                 } else {
@@ -314,6 +337,7 @@ $this->title = 'View All Appointments';
                 row.addEventListener('click', () => {
                     viewDetails(appointment);
                 });
+                row.id = 'table-row-id-' + appointment.id;
                 row.style.cursor = "pointer";
                 row.onmouseover = function () {
                     this.style.backgroundColor = "#33363f";
@@ -326,8 +350,37 @@ $this->title = 'View All Appointments';
             });
         }
 
-        async function handleAcceptance(appointment_id, status_id) {
-            $.ajax({
+        async function handleAcceptance(event, appointment_id, status_id) {
+            event.stopPropagation();
+
+            try {
+                const response = await fetch('/appointment/update_status', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({appointment_id: appointment_id, status_id: status_id})
+                });
+
+                if (!response.ok) {
+                    alert('An error occurred. Please try again later.');
+                    return;
+                }
+
+                result = await response.text();
+
+                if (!result === 'success') {
+                    alert('An error occurred. Please try again later.');
+                    return;
+                }
+
+                alert('Appointment status updated successfully.');
+                document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
+            } catch (error) {
+                console.log('Error:', error);
+                alert('An error occurred. Please try again later.');
+            }
+            /* $.ajax({
                 url: '/appointment/update_status',
                 type: 'POST',
                 data: {
@@ -337,7 +390,7 @@ $this->title = 'View All Appointments';
                 success: function (response) {
                     if (response === 'success') {
                         alert('Appointment status updated successfully.');
-                        location.reload();
+                        document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
                     } else {
                         alert('An error occurred. Please try again later.');
                     }
@@ -346,7 +399,7 @@ $this->title = 'View All Appointments';
                     console.log('Error:', error);
                     alert('An error occurred. Please try again later.');
                 }
-            })
+            }) */
         }
 
         function handleScroll() {
