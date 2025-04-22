@@ -128,24 +128,25 @@ class User extends UserModel
         return $this->vehicleOwner->getOwnedVehiclesList() !== null;
     }
 
-//    public function getOwnedVehiclesList() : array
-//    {
-//        return $this->vehicleOwner->getOwnedVehiclesList()?? [];
-//    }
-	public function getOwnedVehiclesList(): array
-	{
-		// Ensure $this->vehicleOwner exists and is a valid object
-		if ($this->vehicleOwner && method_exists($this->vehicleOwner, 'getOwnedVehiclesList')) {
-			$vehicles = $this->vehicleOwner->getOwnedVehiclesList();
-			
-			// Convert arrays to objects if needed
-			return array_map(function($vehicle) {
-				return is_array($vehicle) ? (object)$vehicle : $vehicle;
-			}, $vehicles);
-		}
-		
-		return [];
-	}
+    public function getOwnedVehiclesList() : array
+    {
+        return $this->vehicleOwner->getOwnedVehiclesList()?? [];
+    }
+	
+//	public function getOwnedVehiclesList(): array
+//	{
+//		// Ensure $this->vehicleOwner exists and is a valid object
+//		if ($this->vehicleOwner && method_exists($this->vehicleOwner, 'getOwnedVehiclesList')) {
+//			$vehicles = $this->vehicleOwner->getOwnedVehiclesList();
+//
+//			// Convert arrays to objects if needed
+//			return array_map(function($vehicle) {
+//				return is_array($vehicle) ? (object)$vehicle : $vehicle;
+//			}, $vehicles);
+//		}
+//
+//		return [];
+//	}
 
 
     public function getAccessAvailableVehiclesList() : array
