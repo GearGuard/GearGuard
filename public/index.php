@@ -7,9 +7,11 @@ use app\controllers\AuthController;
 use app\controllers\SiteController;
 use app\controllers\AdminController;
 use app\controllers\GarageController;
-	use app\controllers\SparePartController;
-	use app\controllers\VehicleController;
-	use gearguard\phpmvc\Application;
+use app\controllers\SparePartController;
+use app\controllers\VehicleController;
+use app\controllers\AppointmentController;
+use gearguard\phpmvc\Application;
+
 
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -36,13 +38,19 @@ $app->router->get('/type', [SiteController::class, 'type']);
 $app->router->get('/typelogin', [SiteController::class, 'typelogin']);
 $app->router->get('/tets', [SiteController::class, 'tets']);
 $app->router->get('/community', [SiteController::class, 'community']);
-$app->router->get('/logout',[SiteController::class,'logout']);
+$app->router->get('/logout', [SiteController::class, 'logout']);
 
 $app->router->get('/home', [AuthController::class, 'customer']);
 $app->router->get('/customer/dashboard', [AuthController::class, 'dashboard']);
 $app->router->get('/customer/settings', [AuthController::class, 'settings']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
 $app->router->post('/customer/appointment/appoint', [AuthController::class, 'newAppointmentsPost']);
+
+$app->router->get('/customer/appointment/getMyAppointments', [AppointmentController::class, 'getMyAppointments']);
+$app->router->get('/customer/appointment/my_appointment', [AppointmentController::class, 'appointment']);
+$app->router->post('/customer/appointment/update', [AppointmentController::class, 'updateAppointment']);
+$app->router->post('/customer/appointment/delete', [app\controllers\AppointmentController::class, 'deleteAppointment']);
+
 $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehicle']);
 $app->router->post('/customer/vehicle/register', [VehicleController::class, 'addVehiclePost']);
 //$app->router->get('/customer/vehicle/all', [AuthController::class, 'viewAllVehicle']);

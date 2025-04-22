@@ -1,6 +1,8 @@
 <?php
 
-/** @var $this \gearguard\phpmvc\View */ $this->title = 'Appointment'; ?>
+/** @var $this \gearguard\phpmvc\View */
+$this->title = 'Appointment';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,7 +16,8 @@
             --primary: #C0C0C0FF;
             --secondary: #25272d;
             --accent: #2463eb;
-            --hover-bg: rgba(36, 99, 235, 0.1);
+            --canel:
+                --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
         }
 
@@ -292,6 +295,7 @@
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -312,22 +316,68 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <?php foreach ($appointments as $appoint): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($appoint['service_type']); ?></td>
-                        <td><?php echo htmlspecialchars($appoint['garage_name']); ?></td>
-                        <td><?php echo htmlspecialchars($appoint['date']); ?></td>
-                        <td class="button-container">
-                            <button class="action-button" onclick='viewAppointment(<?php echo htmlspecialchars(json_encode($appoint)); ?>)'>View More</button>
-                            <button class="action-button" onclick='editAppointment(<?php echo htmlspecialchars(json_encode($appoint)); ?>)'>Edit Reservation</button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+            <tbody id="appointmentTableBody">
+                <!-- Appointments will be loaded here via JavaScript -->
             </tbody>
         </table>
+        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading appointments...</div>
+        <div id="noAppointments" style="text-align: center; display: none; margin-top: 1em;">No appointments found</div>
     </div>
+
     <script>
+        // Function to fetch appointments from the server
+        async function fetchAppointments() {
+            const loader = document.getElementById('loader');
+            const noAppointments = document.getElementById('noAppointments');
+            const tableBody = document.getElementById('appointmentTableBody');
+
+            try {
+                // Show loader while fetching data
+                loader.style.display = 'block';
+                noAppointments.style.display = 'none';
+
+                // Fetch appointments from the server
+                const response = await fetch('/customer/appointment/getMyAppointments');
+                const appointments = await response.json();
+
+                // Hide loader after fetching
+                loader.style.display = 'none';
+
+                // Clear existing table content
+                tableBody.innerHTML = '';
+
+                // Check if there are any appointments
+                if (appointments && appointments.length > 0) {
+                    // Populate the table with appointments
+                    appointments.forEach(appointment => {
+                        const row = document.createElement('tr');
+
+                        row.innerHTML = `
+                            <td>${appointment.service_type || 'N/A'}</td>
+                            <td>${appointment.garage_name || 'N/A'}</td>
+                            <td>${appointment.date || 'N/A'}</td>
+                            <td class="button-container">
+                                <button class="action-button" onclick='viewAppointment(${JSON.stringify(appointment)})'>View More</button>
+                                <button class="action-button" onclick='editAppointment(${JSON.stringify(appointment)})'>Edit Reservation</button>
+                                <button class="action-button" onclick='deleteAppointment(${appointment.id})'>Cancel</button>
+                            </td>
+                        `;
+
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    // Show no appointments message
+                    noAppointments.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error fetching appointments:', error);
+                loader.style.display = 'none';
+                noAppointments.style.display = 'block';
+                noAppointments.textContent = 'Error loading appointments. Please try again later.';
+            }
+        }
+
+
         function viewAppointment(appointment) {
             const modal = document.createElement('div');
             modal.classList.add('modal');
@@ -336,12 +386,13 @@
             content.classList.add('modal-content');
 
             content.innerHTML = `
-                <h2 class="modal-title">${appointment.service_type}</h2>
-                <p><strong>Garage:</strong> ${appointment.garage_name}</p>
-                <p><strong>Date:</strong> ${appointment.date}</p>
+                <h2 class="modal-title">${appointment.service_type || 'Appointment Details'}</h2>
+                <p><strong>Garage:</strong> ${appointment.garage_name || 'N/A'}</p>
+                <p><strong>Date:</strong> ${appointment.date || 'N/A'}</p>
                 <p><strong>Time:</strong> ${appointment.time || 'Not specified'}</p>
                 <p><strong>Vehicle:</strong> ${appointment.vehicle_model || 'Not specified'}</p>
-                <p><strong>Status:</strong> ${appointment.status || 'Not specified'}</p>
+                <p><strong>Status:</strong> ${appointment.status || 'Pending'}</p>
+                <p><strong>Notes:</strong> ${appointment.notes || 'None'}</p>
                 <button class="modal-button" onclick='this.closest(".modal").remove()'>Close</button>
             `;
 
@@ -357,52 +408,50 @@
             content.classList.add('modal-content');
 
             content.innerHTML = `
-                <h2 class="modal-title">Edit Appointment</h2>
-                <form id="editAppointmentForm">
-                    <input type="hidden" name="id" value="${appointment.id}">
-                    <div class="modal-form-group">
-                        <label class="modal-label" for="date">Date:</label>
-                        <input class="modal-input" type="date" id="date" name="date" value="${appointment.date}" required>
-                    </div>
-                    <div class="modal-form-group">
-                        <label class="modal-label" for="time">Time:</label>
-                        <input class="modal-input" type="time" id="time" name="time" value="${appointment.time}" required>
-                    </div>
-                    <div class="modal-form-group">
-                        <label class="modal-label" for="notes">Notes:</label>
-                        <textarea class="modal-textarea" id="notes" name="notes">${appointment.notes || ''}</textarea>
-                    </div>
-                    <button type="submit" class="modal-button">Save Changes</button>
-                    <button type="button" class="modal-button cancel" onclick='this.closest(".modal").remove()'>Cancel</button>
-                </form>
-            `;
+        <h2 class="modal-title">Edit Appointment</h2>
+        <form action="/customer/appointment/update" method="post">
+            <input type="hidden" name="id" value="${appointment.id}">
+            <div class="modal-form-group">
+                <label class="modal-label" for="date">Date:</label>
+                <input class="modal-input" type="date" id="date" name="date" value="${appointment.date}" required>
+            </div>
+            <div class="modal-form-group">
+                <label class="modal-label" for="time">Time:</label>
+                <input class="modal-input" type="time" id="time" name="time" value="${appointment.time}" required>
+            </div>
+            <div class="modal-form-group">
+                <label class="modal-label" for="notes">Notes:</label>
+                <textarea class="modal-textarea" id="notes" name="notes">${appointment.notes || ''}</textarea>
+            </div>
+            <button type="submit" class="modal-button">Save Changes</button>
+            <button type="button" class="modal-button cancel" onclick='this.closest(".modal").remove()'>Cancel</button>
+        </form>
+    `;
 
             modal.appendChild(content);
             document.body.appendChild(modal);
-
-            document.getElementById('editAppointmentForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                fetch('/customer/appointment/update', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            alert('Appointment updated successfully');
-                            modal.remove();
-                            location.reload();
-                        } else {
-                            alert('Failed to update appointment');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Failed to update appointment');
-                    });
-            });
         }
+
+        function deleteAppointment(id) {
+            if (confirm('Are you sure you want to cancel this appointment?')) {
+                // Create a form and submit it
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/customer/appointment/delete`;
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'id';
+                input.value = id;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+
+
+        // Load appointments when the page loads
+        document.addEventListener('DOMContentLoaded', fetchAppointments);
     </script>
 </body>
 
