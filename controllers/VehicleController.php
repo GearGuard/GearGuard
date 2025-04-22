@@ -36,17 +36,17 @@ class VehicleController extends Controller
 	public function addVehiclePost(Request $request, Response $response)
 	{
 		if (Application::$app->user instanceof User) {
-			$data = $request->getBody(); // Assuming your framework provides this method
-			$engine_no = $data['engine_no'] ?? null;
-			$vin = $data['vin'] ?? null;
+			$data = $request->getBody();
+			$engine_no = $data->engine_no?? null;
+			$vin = $data->vin ?? null;
 			$model_id = 1;
-			$license_plate_no = $data['license_plate_no'] ?? null;
+			$license_plate_no = $data->license_plate_no?? null;
 			$class_id = 1;
 			$engine_capacity_id = 1;
 			$fuel_type_id = 1;
 			$bodytype_id = 1;
-			$insurance_no = $data['insurance_no'] ?? '123';
-			$year_manufactured = $data['year_manufactured'] ?? '';
+			$insurance_no = $data->insurance_no ?? '123';
+			$year_manufactured = $data->year_manufactured ?? '';
 
 			// Now pass it safely to initialize()
 			$vehicle = Vehicle::initialize([
