@@ -45,8 +45,8 @@ class Appointment extends DbModel
             'vehicle_id' => [self::RULE_REQUIRED],
             'garage_id' => [self::RULE_REQUIRED],
             'service_id' => [self::RULE_REQUIRED],
-            'appointment_date' => [self::RULE_REQUIRED],
-            'appointment_time' => [self::RULE_REQUIRED],
+            'date' => [self::RULE_REQUIRED],
+            'time' => [self::RULE_REQUIRED],
         ];
     }
 
@@ -56,8 +56,8 @@ class Appointment extends DbModel
             'vehicle_id' => 'Vehicle',
             'garage_id' => 'Garage',
             'service_id' => 'Service Type',
-            'appointment_date' => 'Appointment Date',
-            'appointment_time' => 'Appointment Time',
+            'date' => 'Appointment Date',
+            'time' => 'Appointment Time',
             'notes' => 'Additional Notes',
             'status_id' => 'Status'
         ];
