@@ -141,6 +141,10 @@ class User extends UserModel
     {
         return $this->vehicleOwner->getOwnedVehiclesList()?? [];
     }
+
+    public function updateOwnedVehiclesList() {
+        $this->vehicleOwner->updateVehicleList();
+    }
 	
 //	public function getOwnedVehiclesList(): array
 //	{

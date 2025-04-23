@@ -4,6 +4,7 @@ namespace app\models;
 
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\db\DbModel;
+use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Model;
 
 class Vehicle extends DbModel
@@ -93,6 +94,22 @@ class Vehicle extends DbModel
             'status_id' => [self::RULE_REQUIRED],
             'vehicle_type_id' => [self::RULE_REQUIRED]
         ];
+    }
+
+    public function save()
+    {
+        if (Application::$app->user instanceof User) {
+            $result = parent::save();
+            $this->id = Application::$app->db->pdo->lastInsertId();
+            $sql = "INSERT INTO gg_user_owner (user_id, vehicle_id, ownership_status_id, registration_date) VALUES (:userId, :vehicleId, 1, NOW())";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':userId', Application::$app->session->get('user'));
+            $statement->bindValue(':vehicleId', $this->id);
+            $statement->execute();
+            return $result;
+        }
+
+        throw new NotFoundException();
     }
 
     public static function findByOwner($userId)
