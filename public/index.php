@@ -59,8 +59,6 @@ $app->router->post('/customer/appointment/delete', [app\controllers\AppointmentC
 //$app->router->get('/customer/vehicle/all', [AuthController::class, 'viewAllVehicle']);
 $app->router->get('/customer/vehicle/all', [VehicleController::class, 'viewAllVehicle']);
 
-
-$app->router->post('/customer/vehicle/register', [VehicleController::class, 'addVehiclePost']);
 $app->router->get('/customer/vehicle/my', [VehicleController::class, 'viewMyVehicleDetails']);
 $app->router->post('/customer/vehicle/update', [VehicleController::class, 'updateVehicle']);
 $app->router->post('/customer/vehicle/delete', [VehicleController::class, 'deleteVehicle']);
@@ -74,6 +72,7 @@ $app->router->get('/customer/appointment/get_vehicle_service_history', [ServiceP
 
 
 $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehicle']);
+$app->router->post('/customer/vehicle/register', [AuthController::class, 'addVehiclePost']);
 
 $app->router->get('/customer/vehicle/service_history', [AuthController::class, 'vehicleServiceHistory']);
 $app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);

@@ -256,13 +256,16 @@ use gearguard\phpmvc\form\Form;
 
         <div class="form-row">
             <div class="form-column">
-                <div class="form-group">
+                <?php $form->vehicleModelField = new \gearguard\phpmvc\form\DropDownField($model, 'model_id', \app\models\Vehicle::getAllVehicleModelsWithIDs());
+                        echo $form->vehicleModelField->required();
+                ?>
+<!--                <div class="form-group">
                     <label for="model">Vehicle Model<span class="required-dot">*</span></label>
-                    <input type="text" id="model" name="model" value="<?= $model->model ?? '' ?>" required placeholder="Enter vehicle model" class="<?= $model->hasError('model') ? 'is-invalid' : '' ?>">
-                    <?php if ($model->hasError('model')): ?>
-                        <div class="invalid-feedback"><?= $model->getFirstError('model') ?></div>
-                    <?php endif; ?>
-                </div>
+                    <input type="text" id="model" name="model" value="<?php /*= $model->model ?? '' */?>" required placeholder="Enter vehicle model" class="<?php /*= $model->hasError('model') ? 'is-invalid' : '' */?>">
+                    <?php /*if ($model->hasError('model')): */?>
+                        <div class="invalid-feedback"><?php /*= $model->getFirstError('model') */?></div>
+                    <?php /*endif; */?>
+                </div>-->
             </div>
             <div class="form-column">
                 <div class="form-group">
@@ -324,87 +327,103 @@ use gearguard\phpmvc\form\Form;
 
         <div class="form-row">
             <div class="form-column">
-                <div class="form-group">
+                <?php $form->vehicleFuelField = new \gearguard\phpmvc\form\DropDownField($model, 'fuel_type_id', \app\models\Vehicle::getAllVehicleFuelTypesWithID());
+                        echo $form->vehicleFuelField->required();
+                ?>
+                <!--<div class="form-group">
                     <label for="fuel_type_id">Fuel Type<span class="required-dot">*</span></label>
-                    <select id="fuel_type_id" name="fuel_type_id" required class="<?= $model->hasError('fuel_type_id') ? 'is-invalid' : '' ?>">
+                    <select id="fuel_type_id" name="fuel_type_id" required class="<?php /*= $model->hasError('fuel_type_id') ? 'is-invalid' : '' */?>">
                         <option value="">Select Fuel Type</option>
-                        <option value="Petrol" <?= ($model->fuel_type_id == '1') ? 'selected' : '' ?>>Petrol</option>
-                        <option value="Diesel" <?= ($model->fuel_type_id == '2') ? 'selected' : '' ?>>Diesel</option>
-                        <option value="Electric" <?= ($model->fuel_type_id == '3') ? 'selected' : '' ?>>Electric</option>
-                        <option value="Hybrid" <?= ($model->fuel_type_id == '4') ? 'selected' : '' ?>>Hybrid</option>
+                        <option value="Petrol" <?php /*= ($model->fuel_type_id == '1') ? 'selected' : '' */?>>Petrol</option>
+                        <option value="Diesel" <?php /*= ($model->fuel_type_id == '2') ? 'selected' : '' */?>>Diesel</option>
+                        <option value="Electric" <?php /*= ($model->fuel_type_id == '3') ? 'selected' : '' */?>>Electric</option>
+                        <option value="Hybrid" <?php /*= ($model->fuel_type_id == '4') ? 'selected' : '' */?>>Hybrid</option>
                     </select>
-                    <?php if ($model->hasError('fuel_type_id')): ?>
-                        <div class="invalid-feedback"><?= $model->getFirstError('fuel_type_id') ?></div>
-                    <?php endif; ?>
-                </div>
+                    <?php /*if ($model->hasError('fuel_type_id')): */?>
+                        <div class="invalid-feedback"><?php /*= $model->getFirstError('fuel_type_id') */?></div>
+                    <?php /*endif; */?>
+                </div>-->
             </div>
             <div class="form-column">
-                <div class="form-group">
+                <?php $form->vehicleTypeField = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_type_id', \app\models\Vehicle::getAllVehicleTypesWithID());
+                        echo $form->vehicleTypeField->required();
+                ?>
+                <!--<div class="form-group">
                     <label for="vehicle_type_id">Vehicle Type<span class="required-dot">*</span></label>
-                    <select id="vehicle_type_id" name="vehicle_type_id" required class="<?= $model->hasError('vehicle_type_id') ? 'is-invalid' : '' ?>">
+                    <select id="vehicle_type_id" name="vehicle_type_id" required class="<?php /*= $model->hasError('vehicle_type_id') ? 'is-invalid' : '' */?>">
                         <option value="">Select Vehicle Type</option>
-                        <option value="Car" <?= ($model->vehicle_type_id == '1') ? 'selected' : '' ?>>Car</option>
-                        <option value="Truck" <?= ($model->vehicle_type_id == '2') ? 'selected' : '' ?>>Truck</option>
-                        <option value="Motorcycle" <?= ($model->vehicle_type_id == '3') ? 'selected' : '' ?>>Motorcycle</option>
-                        <option value="Bus" <?= ($model->vehicle_type_id == '4') ? 'selected' : '' ?>>Bus</option>
-                        <option value="Van" <?= ($model->vehicle_type_id == '5') ? 'selected' : '' ?>>Van</option>
-                        <option value="SUV" <?= ($model->vehicle_type_id == '6') ? 'selected' : '' ?>>SUV</option>
-                        <option value="Pickup" <?= ($model->vehicle_type_id == '7') ? 'selected' : '' ?>>Pickup</option>
-                        <option value="Other" <?= ($model->vehicle_type_id == '8') ? 'selected' : '' ?>>Other</option>
+                        <option value="Car" <?php /*= ($model->vehicle_type_id == '1') ? 'selected' : '' */?>>Car</option>
+                        <option value="Truck" <?php /*= ($model->vehicle_type_id == '2') ? 'selected' : '' */?>>Truck</option>
+                        <option value="Motorcycle" <?php /*= ($model->vehicle_type_id == '3') ? 'selected' : '' */?>>Motorcycle</option>
+                        <option value="Bus" <?php /*= ($model->vehicle_type_id == '4') ? 'selected' : '' */?>>Bus</option>
+                        <option value="Van" <?php /*= ($model->vehicle_type_id == '5') ? 'selected' : '' */?>>Van</option>
+                        <option value="SUV" <?php /*= ($model->vehicle_type_id == '6') ? 'selected' : '' */?>>SUV</option>
+                        <option value="Pickup" <?php /*= ($model->vehicle_type_id == '7') ? 'selected' : '' */?>>Pickup</option>
+                        <option value="Other" <?php /*= ($model->vehicle_type_id == '8') ? 'selected' : '' */?>>Other</option>
                     </select>
-                    <?php if ($model->hasError('vehicle_type_id')): ?>
-                        <div class="invalid-feedback"><?= $model->getFirstError('vehicle_type_id') ?></div>
-                    <?php endif; ?>
-                </div>
+                    <?php /*if ($model->hasError('vehicle_type_id')): */?>
+                        <div class="invalid-feedback"><?php /*= $model->getFirstError('vehicle_type_id') */?></div>
+                    <?php /*endif; */?>
+                </div>-->
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-column">
-                <div class="form-group">
+                <?php $form->vehicleBodyField = new \gearguard\phpmvc\form\DropDownField($model, 'bodytype_id', \app\models\Vehicle::getAllVehicleBodyTypesWithID());
+                        echo $form->vehicleBodyField->required();
+                ?>
+                <!--<div class="form-group">
                     <label for="bodytype_id">Body Type<span class="required-dot">*</span></label>
-                    <select id="bodytype_id" name="bodytype_id" required class="<?= $model->hasError('bodytype_id') ? 'is-invalid' : '' ?>">
+                    <select id="bodytype_id" name="bodytype_id" required class="<?php /*= $model->hasError('bodytype_id') ? 'is-invalid' : '' */?>">
                         <option value="">Select Body Type</option>
-                        <option value="Sedan" <?= ($model->bodytype_id == '1') ? 'selected' : '' ?>>Sedan</option>
-                        <option value="Hatchback" <?= ($model->bodytype_id == '2') ? 'selected' : '' ?>>Hatchback</option>
-                        <option value="Coupe" <?= ($model->bodytype_id == '3') ? 'selected' : '' ?>>Coupe</option>
+                        <option value="Sedan" <?php /*= ($model->bodytype_id == '1') ? 'selected' : '' */?>>Sedan</option>
+                        <option value="Hatchback" <?php /*= ($model->bodytype_id == '2') ? 'selected' : '' */?>>Hatchback</option>
+                        <option value="Coupe" <?php /*= ($model->bodytype_id == '3') ? 'selected' : '' */?>>Coupe</option>
                     </select>
-                    <?php if ($model->hasError('bodytype_id')): ?>
-                        <div class="invalid-feedback"><?= $model->getFirstError('bodytype_id') ?></div>
-                    <?php endif; ?>
-                </div>
+                    <?php /*if ($model->hasError('bodytype_id')): */?>
+                        <div class="invalid-feedback"><?php /*= $model->getFirstError('bodytype_id') */?></div>
+                    <?php /*endif; */?>
+                </div>-->
             </div>
             <div class="form-column">
-                <div class="form-group">
+                <?php $form->vehicleEngineCapacityField = new \gearguard\phpmvc\form\DropDownField($model, 'engine_capacity_id', \app\models\Vehicle::getAllVehicleEngineCapacitiesWithID());
+                        echo $form->vehicleEngineCapacityField->required();
+                ?>
+                <!--<div class="form-group">
                     <label for="engine_capacity_id">Engine Capacity<span class="required-dot">*</span></label>
-                    <select id="engine_capacity_id" name="engine_capacity_id" required class="<?= $model->hasError('engine_capacity_id') ? 'is-invalid' : '' ?>">
+                    <select id="engine_capacity_id" name="engine_capacity_id" required class="<?php /*= $model->hasError('engine_capacity_id') ? 'is-invalid' : '' */?>">
                         <option value="">Select Engine Capacity</option>
-                        <option value="1000cc" <?= ($model->engine_capacity_id == '1') ? 'selected' : '' ?>>1000cc</option>
-                        <option value="1500cc" <?= ($model->engine_capacity_id == '2') ? 'selected' : '' ?>>1500cc</option>
-                        <option value="2000cc" <?= ($model->engine_capacity_id == '3') ? 'selected' : '' ?>>2000cc</option>
+                        <option value="1000cc" <?php /*= ($model->engine_capacity_id == '1') ? 'selected' : '' */?>>1000cc</option>
+                        <option value="1500cc" <?php /*= ($model->engine_capacity_id == '2') ? 'selected' : '' */?>>1500cc</option>
+                        <option value="2000cc" <?php /*= ($model->engine_capacity_id == '3') ? 'selected' : '' */?>>2000cc</option>
                     </select>
-                    <?php if ($model->hasError('engine_capacity_id')): ?>
-                        <div class="invalid-feedback"><?= $model->getFirstError('engine_capacity_id') ?></div>
-                    <?php endif; ?>
-                </div>
+                    <?php /*if ($model->hasError('engine_capacity_id')): */?>
+                        <div class="invalid-feedback"><?php /*= $model->getFirstError('engine_capacity_id') */?></div>
+                    <?php /*endif; */?>
+                </div>-->
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-column">
-                <div class="form-group">
+                <?php
+                $form->vehicleClassField = new \gearguard\phpmvc\form\DropDownField($model, 'class_id', \app\models\Vehicle::getAllVehicleClassesWithID());
+                        echo $form->vehicleClassField->required();
+                ?>
+                <!--<div class="form-group">
                     <label for="class_id">Vehicle Class<span class="required-dot">*</span></label>
-                    <select id="class_id" name="class_id" required class="<?= $model->hasError('class_id') ? 'is-invalid' : '' ?>">
+                    <select id="class_id" name="class_id" required class="<?php /*= $model->hasError('class_id') ? 'is-invalid' : '' */?>">
                         <option value="">Select Vehicle Class</option>
-                        <option value="Luxury" <?= ($model->class_id == '1') ? 'selected' : '' ?>>Luxury</option>
-                        <option value="Economy" <?= ($model->class_id == '2') ? 'selected' : '' ?>>Economy</option>
-                        <option value="Standard" <?= ($model->class_id == '3') ? 'selected' : '' ?>>Standard</option>
-                        <option value="Premium" <?= ($model->class_id == '4') ? 'selected' : '' ?>>Premium</option>
+                        <option value="Luxury" <?php /*= ($model->class_id == '1') ? 'selected' : '' */?>>Luxury</option>
+                        <option value="Economy" <?php /*= ($model->class_id == '2') ? 'selected' : '' */?>>Economy</option>
+                        <option value="Standard" <?php /*= ($model->class_id == '3') ? 'selected' : '' */?>>Standard</option>
+                        <option value="Premium" <?php /*= ($model->class_id == '4') ? 'selected' : '' */?>>Premium</option>
                     </select>
-                    <?php if ($model->hasError('class_id')): ?>
-                        <div class="invalid-feedback"><?= $model->getFirstError('class_id') ?></div>
-                    <?php endif; ?>
-                </div>
+                    <?php /*if ($model->hasError('class_id')): */?>
+                        <div class="invalid-feedback"><?php /*= $model->getFirstError('class_id') */?></div>
+                    <?php /*endif; */?>
+                </div>-->
             </div>
             <div class="form-column">
                 <!-- This column is intentionally left empty for balance -->

@@ -3,9 +3,10 @@
 namespace app\models;
 
 use gearguard\phpmvc\Application;
+use gearguard\phpmvc\db\DbModel;
 use gearguard\phpmvc\Model;
 
-class Vehicle extends Model
+class Vehicle extends DbModel
 {
     public const STATUS_ACTIVE = 2; // Based on your gg_status table where 'active' has id 2
     public const STATUS_INACTIVE = 1; // Based on your gg_status table where 'Inactive' has id 1
@@ -62,7 +63,7 @@ class Vehicle extends Model
     {
         return [
             'vin' => 'VIN',
-            'model_id' => 'Model',
+            'model_id' => 'Vehicle Model',
             'year_manufactured' => 'Year Manufactured',
             'license_plate_no' => 'License Plate Number',
             'class_id' => 'Vehicle Class',
@@ -74,7 +75,6 @@ class Vehicle extends Model
             'current_user_id' => 'Current User',
             'status_id' => 'Status',
             'vehicle_type_id' => 'Vehicle Type',
-            'model' => 'Model'
         ];
     }
 
@@ -91,50 +91,8 @@ class Vehicle extends Model
             'bodytype_id' => [self::RULE_REQUIRED],
             'engine_no' => [self::RULE_REQUIRED, [self::RULE_UNIQUE, 'class' => self::class]],
             'status_id' => [self::RULE_REQUIRED],
-            'vehicle_type_id' => [self::RULE_REQUIRED],
-            'model' => [self::RULE_REQUIRED]
+            'vehicle_type_id' => [self::RULE_REQUIRED]
         ];
-    }
-
-    public function save(): bool
-    {
-        try {
-            $db = Application::$app->db;
-
-            // Begin transaction
-            $db->beginTransaction();
-
-            // Insert vehicle
-            $tableName = $this->tableName();
-            $attributes = $this->attributes();
-            $params = array_map(fn($attr) => ":$attr", $attributes);
-
-            $statement = $db->prepare("INSERT INTO $tableName (" . implode(",", $attributes) . ") 
-                VALUES (" . implode(",", $params) . ")");
-
-            foreach ($attributes as $attribute) {
-                $statement->bindValue(":$attribute", $this->{$attribute});
-            }
-
-            $result = $statement->execute();
-
-            if ($result) {
-                // Get the last insert ID
-                $this->id = (int)$db->getPdo()->lastInsertId();
-
-                // Commit transaction
-                $db->commit();
-                return true;
-            }
-
-            $db->rollBack();
-            return false;
-        } catch (\Exception $e) {
-            if (isset($db) && $db->inTransaction()) {
-                $db->rollBack();
-            }
-            return false;
-        }
     }
 
     public static function findByOwner($userId)
@@ -189,7 +147,7 @@ class Vehicle extends Model
 
         return $stmt->fetchAll(\PDO::FETCH_CLASS, self::class);
     }
-    public function findOne(array $where): ?self
+    /*public function findOne(array $where): ?self
     {
         $tableName = $this->tableName();
         $sql = "SELECT * FROM $tableName WHERE " . implode(' AND ', array_map(fn($k) => "$k = :$k", array_keys($where)));
@@ -212,5 +170,48 @@ class Vehicle extends Model
         }
 
         return $vehicle;
+    }*/
+
+    public static function getAllVehicleModelsWithIDs() {
+        $sql = "SELECT gvm.id, gvm.model FROM gearguard.gg_vehicle_model gvm order by gvm.id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    public static function getAllVehicleFuelTypesWithID() {
+        $sql = "SELECT gft.id, gft.fueltype FROM gearguard.gg_vehicle_fueltype gft order by gft.id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    public static function getAllVehicleTypesWithID() {
+        $sql = "SELECT gvt.id, gvt.type FROM gearguard.gg_vehicle_type gvt order by gvt.id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    public static function getAllVehicleBodyTypesWithID() {
+        $sql = "SELECT gvt.id, gvt.bodytype FROM gearguard.gg_vehicle_bodytype gvt order by gvt.id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    public static function getAllVehicleEngineCapacitiesWithID() {
+        $sql = "SELECT gvt.id, gvt.capacity FROM gearguard.gg_vehicle_engine_capacity gvt order by gvt.id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    public static function getAllVehicleClassesWithID()
+    {
+        $sql = "SELECT gvt.id, gvt.class FROM gearguard.gg_vehicle_class gvt order by gvt.id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 }

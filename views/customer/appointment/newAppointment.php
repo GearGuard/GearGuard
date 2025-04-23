@@ -260,10 +260,31 @@ use gearguard\phpmvc\form\DropDownField;
             const minDate = new Date(today.setDate(today.getDate() + 3));
             const maxDate = new Date(today.setDate(today.getDate() + 30));
             const dateInput = document.getElementById('date');
+            const serviceField = document.getElementById('service_id');
             dateInput.min = minDate.toISOString().split('T')[0];
             dateInput.max = maxDate.toISOString().split('T')[0];
 
-            $('#garage_id').change(function() {
+            serviceField.innerHTML = '<option value="">Select Garage first</option>';
+
+            document.getElementById('garage_id').addEventListener('change', async function() {
+                const garageId = this.value;
+                if (garageId) {
+                    const result = await fetch('/appointment/getServices?garage_id=' + garageId);
+
+                    if (!result.ok) {
+                        alert('We could not fetch services. Please try again later.');
+                        console.error('Error fetching services:', result.statusText);
+                        return;
+                    }
+
+                    serviceField.innerHTML = await result.text();
+
+                } else {
+                    serviceField.innerHTML = '<option value="">Select Garage first</option>';
+                }
+            });
+
+/*            $('#garage_id').change(function() {
                 var garageId = $(this).val();
                 if (garageId) {
                     $.ajax({
@@ -279,10 +300,10 @@ use gearguard\phpmvc\form\DropDownField;
                 } else {
                     $('#service_id').html('<option value="">Select Service Type</option>');
                 }
-            });
+            });*/
         });
 
-        $(document).ready(function() {
+        /*$(document).ready(function() {
             $('#garage_id').change(function() {
                 var garageId = $(this).val();
                 if (garageId) {
@@ -300,7 +321,7 @@ use gearguard\phpmvc\form\DropDownField;
                     $('#service_id').html('<option value="">Select Garage first</option>');
                 }
             });
-        });
+        });*/
     </script>
 </head>
 
