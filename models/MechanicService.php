@@ -4,62 +4,68 @@ namespace app\models;
 
 use Couchbase\InvalidStateException;
 use gearguard\phpmvc\Application;
-use gearguard\phpmvc\Model;
-use gearguard\phpmvc\DbModel;
-use gearguard\phpmvc\UserModel;
+use gearguard\phpmvc\db\DbModel;
 
-class MechanicService extends UserModel
+class MechanicService extends DbModel
 {
     const STATUS_INACTIVE = 1;
     const STATUS_ACTIVE = 2;
     const STATUS_DELETED = 3;
 
     public int $id;
-    public int $vehicle_id = 0;
-    public int $service_id = 0;
-    public int $mechanic_id = 0;
-    public int $duration = 0;
-    public string $note = '';
+    public string $type = '';
+    public float $price = 0;
+    public float $duration = 0;
+    public string $description = '';
+    public int $garage_id = 0;
+    private string $garage_name = '';
     public int $status_id = self::STATUS_INACTIVE;
-    public string $begin_timestamp = '';
-    public string $end_timestamp = '';
 
-    public static function initialize(int $vehicle_id, int $service_id, int $duration, string $note): MechanicService
+    public static function initialize(string $type, float $price, float $duration, string $description, int $garage_id = -1): GarageService
     {
-        $object = new MechanicService();
+        $object = new GarageService();
 
-        $object->vehicle_id = $vehicle_id;
-        $object->service_id = $service_id;
-        $object->mechanic_id = Application::$app->session->get('user');
+        $object->type = $type;
+        $object->price = $price;
         $object->duration = $duration;
-        $object->note = $note;
+        $object->description = $description;
+        $object->garage_id = ($garage_id < 0 ? Application::$app->session->get('user') : $garage_id);
         $object->status_id = self::STATUS_ACTIVE;
-        $object->begin_timestamp = date('Y-m-d H:i:s');
-        $object->end_timestamp = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
 
         return $object;
     }
 
-    public static function getMechanicService(int $id, int $vehicle_id, int $service_id, int $duration, int $status, string $note): MechanicService
+    public function assignMechanicToService(int $service_id, int $mechanic_id): bool
     {
-        $object = new MechanicService();
+        $sql = "INSERT INTO gg_service_mechanic_perform (service_id, mechanic_id) VALUES (:service_id, :mechanic_id)";
+        $statement = self::prepare($sql);
+        $statement->bindValue(':service_id', $service_id);
+        $statement->bindValue(':mechanic_id', $mechanic_id);
+        try {
+            return $statement->execute();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public static function getGarageService(int $id, string $type, float $price, float $duration, int $status, string $description, int $garage_id = -1): GarageService
+    {
+        $object = new GarageService();
 
         $object->id = $id;
-        $object->vehicle_id = $vehicle_id;
-        $object->service_id = $service_id;
-        $object->mechanic_id = Application::$app->session->get('user');
+        $object->type = $type;
+        $object->price = $price;
         $object->duration = $duration;
-        $object->note = $note;
+        $object->description = $description;
+        $object->garage_id = ($garage_id < 0 ? Application::$app->session->get('user') : $garage_id);
         $object->status_id = $status;
-        $object->begin_timestamp = date('Y-m-d H:i:s');
-        $object->end_timestamp = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
 
         return $object;
     }
 
     public function tableName(): string
     {
-        return 'gg_vehicle_service_take';
+        return 'gg_garage_service';
     }
 
     public function primaryKey(): string
@@ -67,99 +73,140 @@ class MechanicService extends UserModel
         return 'id';
     }
 
+    /**
+     * <em>Note: This method fills the model with the data given in the $valueUpdates array.</em>
+     */
+    public function validate($valueUpdates = [], bool $validateType = true, bool $validatePrice = true, bool $validateDuration = true, bool $validateInternals = false ) : bool
+    {
+        if (isset($valueUpdates)){
+            foreach ($valueUpdates as $key => $value)
+                $this->{$key} = $value;
+        }
+        if ($validateType && !$this->type) {
+            $this->addError('type', 'Type can not be empty.');
+        }
+        if ($validatePrice && $this->price <= 0) {
+            $this->addError('price', 'Price can not be less than or equal to zero.');
+        }
+        if ($validateDuration && $this->duration <= 0) {
+            $this->addError('duration', 'Duration can not be less than or equal to zero.');
+        }
+        if ($validateInternals && !(Garage::verifyGarageExistance($this->garage_id))) {
+            $this->addError('garage_id', 'Garage could not be found.');
+        }
+        if ($validateInternals && (($this->status_id > 3) || $this->status_id <= 0)) {
+            $this->addError('status_id', 'Status ID must be between one and three.');
+        }
+        if (isset($this->id) && !(GarageService::verifyServiceExistance($this->garage_id, $this->id))) {
+            $this->addError('id', 'Internal Error: Please contact administrators.');
+        }
+
+        if (empty($this->errors)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function save()
     {
+        if ($this->garage_id < 0) {
+            return false;
+        }
+        if (!$this->validate())
+            throw new \Exception(array_values($this->errors)[0][0], 400);
+
         return parent::save();
     }
 
     public function rules(): array
     {
         return [
-            'vehicle_id' => [self::RULE_REQUIRED],
-            'service_id' => [self::RULE_REQUIRED],
-            'duration' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 1]],
-            'note' => [self::RULE_REQUIRED],
-            'status_id' => [self::RULE_REQUIRED]
+            'type' => [self::RULE_REQUIRED],
+            'price' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 0]],
+            'duration' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 0]],
+            'description' => [self::RULE_REQUIRED],
+            'garage_id' => [self::RULE_REQUIRED],
+            'status_id' => [self::RULE_REQUIRED],
         ];
     }
 
     public function attributes(): array
     {
-        return [
-            'vehicle_id',
-            'service_id',
-            'mechanic_id',
-            'duration',
-            'note',
-            'status_id',
-            'begin_timestamp',
-            'end_timestamp'
-        ];
+        return ['type', 'price', 'duration', 'description', 'garage_id', 'status_id'];
     }
 
     public function labels(): array
     {
         return [
-            'vehicle_id' => 'Vehicle ID',
-            'service_id' => 'Service ID',
-            'mechanic_id' => 'Mechanic ID',
+            'type' => 'Service Type',
+            'price' => 'Price',
             'duration' => 'Duration',
-            'note' => 'Notes',
+            'description' => 'Description',
+            'garage_id' => 'Garage ID',
             'status_id' => 'Status ID',
-            'begin_timestamp' => 'Start Time',
-            'end_timestamp' => 'End Time'
         ];
     }
-
     public function getDisplayName(): string
     {
-        return "Service #{$this->id}";
+        return $this->type;
     }
 
-    public function getMechanicName(): string
+    public function getGarageName(): string
     {
-        if ($this->mechanic_id === 0) {
-            throw new InvalidStateException('Mechanic ID is not set');
+        if ($this->garage_id === 0) {
+            throw new InvalidStateException('Garage ID is not set');
         }
 
-        $sql = "SELECT name FROM gg_mechanic WHERE id = :id LIMIT 1";
+        if ($this->garage_name !== '') {
+            return $this->garage_name;
+        }
+
+        $sql = "SELECT name FROM gg_garage WHERE id = :id LIMIT 1";
         $statement = self::prepare($sql);
-        $statement->bindValue(':id', $this->mechanic_id);
+        $statement->bindValue(':id', $this->garage_id);
         $statement->execute();
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         if (empty($result)) {
-            throw new InvalidStateException('Mechanic not found');
+            throw new InvalidStateException('Garage not found');
+        } else {
+            $garage_name = $result[0]['name'];
         }
 
-        return $result[0]['name'];
+        return $garage_name;
     }
 
-    public function getVehicleDetails(): array
+    public function update($data, bool $overrideValidations = false)
     {
-        if ($this->vehicle_id === 0) {
-            throw new InvalidStateException('Vehicle ID is not set');
+        $attributeList = $this->attributes();
+        $updateData = [];
+        if (is_null($data) || $this->garage_id < 0)
+            return false;
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $attributeList)) {
+                $updateData[$key] = $value;
+            }
         }
 
-        $sql = "SELECT * FROM gg_vehicle WHERE id = :id LIMIT 1";
-        $statement = self::prepare($sql);
-        $statement->bindValue(':id', $this->vehicle_id);
-        $statement->execute();
-        return $statement->fetch(\PDO::FETCH_ASSOC);
+        if (!$overrideValidations && !$this->validate($data, validateInternals : true))
+            throw new \Exception(array_values($this->errors)[0][0], 400);
+
+        return parent::update($updateData);
     }
 
-    public function getServiceDetails(): array
+    public static function verifyServiceExistance(int $garageID, int $serviceID) : bool
     {
-        if ($this->service_id === 0) {
-            throw new InvalidStateException('Service ID is not set');
-        }
-
-        $sql = "SELECT * FROM gg_service WHERE id = :id LIMIT 1";
-        $statement = self::prepare($sql);
-        $statement->bindValue(':id', $this->service_id);
+        $sql = "SELECT ggs.id FROM gearguard.gg_garage_service ggs WHERE ggs.garage_id = :garage_id AND ggs.id = :service_id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $garageID, \PDO::PARAM_INT);
+        $statement->bindValue(':service_id', $serviceID, \PDO::PARAM_INT);
         $statement->execute();
-        return $statement->fetch(\PDO::FETCH_ASSOC);
-    }
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if (count($result) > 0)
+            return true;
 
-    
+        return false;
+    }
 }

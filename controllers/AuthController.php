@@ -13,6 +13,7 @@ use gearguard\phpmvc\Request;
 use app\models\User;
 use app\models\Garage;
 use app\models\Mechanic;
+use app\models\MechanicService;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Router;
@@ -147,6 +148,10 @@ class AuthController extends Controller
             ]);
         } else if (Application::$app->user instanceof Garage) {
             return $this->render('garage/setting', [
+                'title' => 'Settings'
+            ]);
+        } else if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/setting', [
                 'title' => 'Settings'
             ]);
         }
@@ -688,8 +693,8 @@ class AuthController extends Controller
 
     public function mechanicAddServices(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage) {
-            $model = new GarageService();
+        if (Application::$app->user instanceof Mechanic) {
+            $model = new MechanicService();
             return $this->render('mechanic/services/addService', [
                 'name' => 'The GearGuard',
                 'garage_id' => Application::$app->session->get('user'),
@@ -700,9 +705,37 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function assignMechanicService(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $message = '';
+            if ($request->isPost()) {
+                $service_id = $request->getBody()['service_id'] ?? null;
+                $mechanic_id = $request->getBody()['mechanic_id'] ?? null;
+
+                if (!$service_id || !$mechanic_id) {
+                    $message = "Service ID and Mechanic ID are required.";
+                } else {
+                    $model = new MechanicService();
+                    $success = $model->assignMechanicToService((int)$service_id, (int)$mechanic_id);
+                    if ($success) {
+                        $message = "New record inserted successfully!";
+                    } else {
+                        $message = "Error inserting record.";
+                    }
+                }
+            }
+            return $this->render('mechanic/services/addService', [
+                'message' => $message
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
     public function MechanicAddServicesPost(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage) {
+        if (Application::$app->user instanceof Mechanic) {
             $body = $request->getBody();
             $model = MechanicService::initialize(
                 $body['begin_timestamp'],
@@ -775,15 +808,11 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function mechanicMessages(Request $request, Response $response)
+    public function MechanicSendMessages(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User) {
-            return $this->render('/mechanic/messages', [
-                'title' => 'Messages'
-            ]);
-        } else if (Application::$app->user instanceof Garage) {
-            return $this->render('/mechanic/messages', [
-                'title' => 'Messages'
+        if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/messages', [
+                'name' => 'The GearGuard',
             ]);
         }
 

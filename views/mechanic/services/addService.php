@@ -191,6 +191,39 @@
             background: var(--hover-bg);
         }
 
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: var(--text);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            }
+
+            .popup-message span {
+            font-size: 0.95rem;
+            font-weight: 500;
+            }
+
+            .close-popup {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            }
+
+            .close-popup:hover {
+            color: #f5f5f5;
+            }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -229,38 +262,40 @@
 
 <body>
     <nav class="navMenu">
-            <a href="#" class="active">Add New Service</a>
+            <a href="#" class="active">Assign New Service</a>
             <a href="/mechanic/services/viewService" target="_self">All Services</a>
             <a href="/mechanic/services/editService" target="_self">Edit Services</a>
             <a href="/mechanic/services/deleteService" target="_self">Delete Services</a>
     </nav>
     <div class="service-form">
-        <h2 class="title">Add New Mechanic Service</h2>
+        <h2 class="title">Assign New Mechanic Service</h2>
         <?php
 
         use gearguard\phpmvc\form\Form;
-        use gearguard\phpmvc\form\TextAreaField;
 
-        $form = Form::begin('/mechanic/services/add', "post");
+        $form = Form::begin('/mechanic/services/addService', "post");
         ?>
-
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'begin_timestamp') ?>
+            <label for="service_id">Service ID: <span class="required-dot">*</span></label>
+            <input type="number" id="service_id" name="service_id" required>
             </div>
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'end_timestamp') ?>
+            <label for="mechanic_id">Mechanic ID: <span class="required-dot">*</span></label>
+            <input type="number" id="mechanic_id" name="mechanic_id" required>
             </div>
         </div>
-        <div class="form-group">
-            <?php echo new TextAreaField($model, 'note'); ?>
-        </div>
-        <div class="button-container">
-            <button type="reset" class="clear-button">Clear</button>
-            <button type="submit" class="add-button">Add Service</button>
-        </div>
+        <button type="reset" class="clear-button">Clear</button>
+        <button type="submit" class="add-button">Assign</button>
 
         <?php echo Form::end(); ?>
+
+        <?php if (!empty($message)): ?>
+            <div class="popup-message">
+            <span><?php echo htmlspecialchars($message); ?></span>
+            <button class="close-popup" onclick="this.parentElement.style.display='none';">&times;</button>
+            </div>
+        <?php endif; ?>
     </div>
 </body>
 

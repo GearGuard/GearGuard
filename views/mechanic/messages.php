@@ -1,143 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sent Messages</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Send Message - GearGuard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --text: #f5f5f5;
+            --background: #181a20;
+            --primary: #c7adad;
+            --secondary: #25272d;
+            --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
+            --border: #33363f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-        font-family: "Inter", sans-serif;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
+            background: var(--background);
+            font-family: "Inter", sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
 
-    
-        h2 {
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .message-form {
+            background: var(--secondary);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .form-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
             text-align: center;
-            color: #fff;
         }
-        .message-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-       .message-card {
-    width: 80%;
-    background: #25272d;
-    padding: 15px;
-    border-radius: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-    margin: 0 auto;
-}
 
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
 
-        .message-card .topic {
-            font-weight: bold;
-            color: #2463eb;
-            padding:5px;
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-weight: 500;
         }
-        .message-card .sender,
-        .message-card .receiver,
-        .message-card .vehicle {
-            font-size: 0.9em;
-            color: #f5f5f5;
-            padding:6px;
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--background);
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
-        .message-card .message-content {
-    color: #f5f5f5;
-    margin-top: 10px;
-    white-space: pre-wrap; 
-    font-style: italic; 
-}       
-        .message-card .timestamp {
-    font-size: 0.8em;
-    color: #f5f5f5;
-    position: absolute;
-    bottom: 10px;
-    left: 15px;
-}
-        .message-card .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            justify-content: flex-end;
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
         }
-        .message-card .action-buttons button {
-            background-color: #007bff;
-            color: white;
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .send-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent);
+            color: var(--text);
             border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .message-card .action-buttons button:hover {
-            background-color: #0056b3;
+
+        .send-button:hover {
+            background-color: #1b4ebd;
+            transform: translateY(-2px);
         }
-        .message-card .unread {
-            border-left: 5px solid #007bff;
-            padding-left: 10px;
+
+        .send-button:active {
+            transform: translateY(0);
         }
-        input[type="text"]:focus, input[type="email"]:focus, input[type="date"]:focus, input[type="password"]:focus, input[type="number"]:focus, input[type="tel"]:focus {
-    border-color: #007bff;
-    background-color: #181a20;
-    color: #007bff;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
+
+        .success-message {
+            display: none;
+            background-color: #10B981;
+            color: var(--text);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .navMenu {
+            background-color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 70%;
+            padding: 1rem;
+            margin: 0 auto 2rem;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .navMenu a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navMenu a.active {
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+
+        .navMenu a:hover {
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .message-form {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
+
 <body>
-
-    <h2>Sent Messages</h2>
-
-    <!-- Filters -->
-    <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px;">
- <input type="text" placeholder="Search by vehicle or sender..." style="padding: 8px; width: 200px; background-color: #fff; color: #000;">
-<select style="padding: 8px; background-color: #fff; color: #000;">
-    <option value="">Filter by Topic</option>
-    <option value="maintenance">Maintenance</option>
-    <option value="repair">Repair</option>
-    <option value="service">Service</option>
-</select>
-<input type="date" style="padding: 8px; background-color: #fff; color: #000;">
-    </div>
-
-    <!-- Message List -->
-    <div class="message-list">
-        <!-- Example message card -->
-        <div class="message-card unread">
-            <div class="topic">Scheduled Maintenance</div>
-            <div class="sender">Mechanic John Doe</div>
-            <div class="receiver">Vehicle Owner: Jane Smith</div>
-            <div class="vehicle">License Plate: ABC123</div>
-            <div class="message-content">
-                We are scheduled for a maintenance checkup on your vehicle. Please confirm the time.
+    <!-- <nav class="navMenu">
+        <a href="/garage/customers/view" target="_self">All Customers</a>
+        <a href="/garage/customers/search" target="_self">Search Customers</a>
+        <a href="#" class="active">Send Messages</a>
+    </nav> -->
+    <div class="container">
+        <form class="message-form" id="messageForm">
+            <h1 class="form-title">Send Message to Customer</h1>
+            <div class="form-group">
+                <label for="customerName">Customer Name</label>
+                <input type="text" id="customerName" name="customerName" required placeholder="Enter customer's name">
             </div>
-            <div class="timestamp">Sent: 2024-11-30 10:00 AM</div>
-            <div class="action-buttons">
-                <button>Reply</button>
-<button style="background-color: red; color: white;">Delete</button>            </div>
-        </div>
-
-        <!-- Repeat similar message cards dynamically with PHP or JavaScript -->
-        <div class="message-card">
-            <div class="topic">Repair Notification</div>
-            <div class="sender">Mechanic Mike Johnson</div>
-            <div class="receiver">Vehicle Owner: Mark Adams</div>
-            <div class="vehicle">License Plate: XYZ789</div>
-            <div class="message-content">
-                Your vehicle's repair has been completed. Please pick it up.
+            <div class="form-group">
+                <label for="messageTitle">Message Title</label>
+                <input type="text" id="messageTitle" name="messageTitle" required placeholder="Enter message title">
             </div>
-            <div class="timestamp">Sent: 2024-11-29 03:45 PM</div>
-            <div class="action-buttons">
-                <button>Reply</button>
-<button style="background-color: red; color: white;">Delete</button>            </div>
+            <div class="form-group">
+                <label for="messageDescription">Message Description</label>
+                <textarea id="messageDescription" name="messageDescription" required placeholder="Type your message here..."></textarea>
+            </div>
+            <button type="submit" class="send-button">
+                <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+        </form>
+        <div class="success-message" id="successMessage">
+            Message sent successfully!
         </div>
     </div>
 
+    <script>
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Simulated message sending - replace with actual API call in production
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('messageForm').reset();
+
+                // Hide success message after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'none';
+                }, 3000);
+            }, 1000);
+        });
+    </script>
 </body>
+
 </html>

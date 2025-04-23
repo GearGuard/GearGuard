@@ -130,8 +130,8 @@ $app->router->get('/mechanic/login', [AuthController::class, 'mechanicLogin']);
 $app->router->post('/mechanic/login', [AuthController::class, 'mechanicLogin']);
 $app->router->get('/mechanic/dashboard', [AuthController::class, 'dashboard']);
 $app->router->get('/mechanic/services/viewService', [SiteController::class, 'viewServicesByMechanic']);
-$app->router->get('/mechanic/services/addService', [AuthController::class, 'mechanicAddServices']);
-$app->router->post('/mechanic/services/addService', [AuthController::class, 'MechanicAddServicesPost']);
+$app->router->get('/mechanic/services/addService', [AuthController::class, 'assignMechanicService']);
+$app->router->post('/mechanic/services/addService', [AuthController::class, 'assignMechanicService']);
 $app->router->get('/mechanic/services/editService', [SiteController::class, 'editServices']);
 $app->router->post('/mechanic/services/editService', [SiteController::class, 'editServices']);
 $app->router->get('/mechanic/services/deleteService', [SiteController::class, 'deleteServices']);
@@ -142,8 +142,8 @@ $app->router->post('/mechanic/profile/update', [AuthController::class, 'updatePr
 $app->router->get('/mechanic/services', [SiteController::class, 'mechanicservices']);
 $app->router->get('/mechanic/service_history', [SiteController::class, 'mechanicServiceHistory']);
 $app->router->get('/mechanic/spareparts', [SiteController::class, 'mechanicSparePart']);
-$app->router->get('/mechanic/messages', [SiteController::class, 'mechanicMessages']);
-
+$app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMessages']);
+$app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
 
 
 $app->run();
