@@ -162,4 +162,55 @@ class Vehicle extends Model
 
         return $vehicles;
     }
+
+    public function isOwnedByUser($userId): bool
+    {
+        $stmt = Application::$app->db->prepare("
+            SELECT COUNT(*) FROM gg_user_owner 
+            WHERE vehicle_id = :vehicleId AND user_id = :userId
+        ");
+        $stmt->bindValue(':vehicleId', $this->id);
+        $stmt->bindValue(':userId', $userId);
+        $stmt->execute();
+
+        return (bool)$stmt->fetchColumn();
+    }
+
+    public function getVehiclesByOwner($userId): array
+    {
+        $stmt = Application::$app->db->prepare("
+            SELECT v.* FROM gg_vehicle v
+            INNER JOIN gg_user_owner uo ON v.id = uo.vehicle_id
+            WHERE uo.user_id = :userId AND v.status_id = :status_id
+        ");
+        $stmt->bindValue(':userId', $userId);
+        $stmt->bindValue(':status_id', self::STATUS_ACTIVE);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_CLASS, self::class);
+    }
+    public function findOne(array $where): ?self
+    {
+        $tableName = $this->tableName();
+        $sql = "SELECT * FROM $tableName WHERE " . implode(' AND ', array_map(fn($k) => "$k = :$k", array_keys($where)));
+        $stmt = Application::$app->db->prepare($sql);
+        foreach ($where as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+        $stmt->execute();
+
+        if ($stmt->rowCount() === 0) {
+            return null;
+        }
+
+        $vehicleData = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $vehicle = new self();
+        foreach ($vehicleData as $key => $value) {
+            if (property_exists($vehicle, $key)) {
+                $vehicle->{$key} = $value;
+            }
+        }
+
+        return $vehicle;
+    }
 }
