@@ -3,17 +3,15 @@
 namespace app\models;
 
 use gearguard\phpmvc\Application;
-use gearguard\phpmvc\db\DbModel;
-use gearguard\phpmvc\exception\NotFoundException;
-use gearguard\phpmvc\UserModel;
+use gearguard\phpmvc\Model;
 
-class Vehicle extends UserModel
+class Vehicle extends Model
 {
-    const STATUS_INACTIVE = 1;
-    const STATUS_ACTIVE = 2;
-    const STATUS_DELETED = 3;
+    public const STATUS_ACTIVE = 2; // Based on your gg_status table where 'active' has id 2
+    public const STATUS_INACTIVE = 1; // Based on your gg_status table where 'Inactive' has id 1
+    public const STATUS_DELETED = 3; // Based on your gg_status table where 'deleted' has id 3
 
-    public int $id = 0;
+    public ?int $id = null;
     public string $vin = '';
     public int $model_id = 0;
     public string $year_manufactured = '';
@@ -24,13 +22,21 @@ class Vehicle extends UserModel
     public int $bodytype_id = 0;
     public string $insurance_no = '';
     public string $engine_no = '';
-    public int $current_user_id = 0;
-    public int $status_id = self::STATUS_INACTIVE;
+    public ?int $current_user_id = null;
+    public int $status_id = self::STATUS_ACTIVE;
     public int $vehicle_type_id = 0;
+
+    // For form use only
+    public string $model = '';
 
     public function tableName(): string
     {
         return 'gg_vehicle';
+    }
+
+    public function primaryKey(): string
+    {
+        return 'id';
     }
 
     public function attributes(): array
@@ -52,14 +58,24 @@ class Vehicle extends UserModel
         ];
     }
 
-    public function primaryKey(): string
+    public function labels(): array
     {
-        return 'id';
-    }
-
-    public function getDisplayName(): string
-    {
-        return $this->license_plate_no;
+        return [
+            'vin' => 'VIN',
+            'model_id' => 'Model',
+            'year_manufactured' => 'Year Manufactured',
+            'license_plate_no' => 'License Plate Number',
+            'class_id' => 'Vehicle Class',
+            'engine_capacity_id' => 'Engine Capacity',
+            'fuel_type_id' => 'Fuel Type',
+            'bodytype_id' => 'Body Type',
+            'insurance_no' => 'Insurance Number',
+            'engine_no' => 'Engine Number',
+            'current_user_id' => 'Current User',
+            'status_id' => 'Status',
+            'vehicle_type_id' => 'Vehicle Type',
+            'model' => 'Model'
+        ];
     }
 
     public function rules(): array
@@ -73,31 +89,52 @@ class Vehicle extends UserModel
             'engine_capacity_id' => [self::RULE_REQUIRED],
             'fuel_type_id' => [self::RULE_REQUIRED],
             'bodytype_id' => [self::RULE_REQUIRED],
-            'insurance_no' => [self::RULE_REQUIRED],
             'engine_no' => [self::RULE_REQUIRED, [self::RULE_UNIQUE, 'class' => self::class]],
             'status_id' => [self::RULE_REQUIRED],
             'vehicle_type_id' => [self::RULE_REQUIRED],
+            'model' => [self::RULE_REQUIRED]
         ];
     }
 
-    public static function initialize(array $data): self
+    public function save(): bool
     {
-        $vehicle = new self();
-        foreach ($data as $key => $value) {
-            if (property_exists($vehicle, $key)) {
-                // Always assign a string to string fields, never null
-                if (is_null($value)) {
-                    if (gettype($vehicle->$key) === 'string') {
-                        $vehicle->$key = '';
-                    } elseif (gettype($vehicle->$key) === 'int') {
-                        $vehicle->$key = 0;
-                    }
-                } else {
-                    $vehicle->$key = $value;
-                }
+        try {
+            $db = Application::$app->db;
+
+            // Begin transaction
+            $db->beginTransaction();
+
+            // Insert vehicle
+            $tableName = $this->tableName();
+            $attributes = $this->attributes();
+            $params = array_map(fn($attr) => ":$attr", $attributes);
+
+            $statement = $db->prepare("INSERT INTO $tableName (" . implode(",", $attributes) . ") 
+                VALUES (" . implode(",", $params) . ")");
+
+            foreach ($attributes as $attribute) {
+                $statement->bindValue(":$attribute", $this->{$attribute});
             }
+
+            $result = $statement->execute();
+
+            if ($result) {
+                // Get the last insert ID
+                $this->id = (int)$db->getPdo()->lastInsertId();
+
+                // Commit transaction
+                $db->commit();
+                return true;
+            }
+
+            $db->rollBack();
+            return false;
+        } catch (\Exception $e) {
+            if (isset($db) && $db->inTransaction()) {
+                $db->rollBack();
+            }
+            return false;
         }
-        return $vehicle;
     }
 
     public static function findByOwner($userId)
