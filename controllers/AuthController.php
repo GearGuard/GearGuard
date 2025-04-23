@@ -9,6 +9,7 @@ use app\models\LoginFormGarage;
 use app\models\Notification;
 use app\models\Vehicle;
 use app\models\VehicleOwner;
+use Cassandra\Date;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
@@ -501,6 +502,26 @@ class AuthController extends Controller
             return $this->render('customer/appointment/myAppointment', [
                 'name' => 'The GearGuard',
 
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
+    public function addVehiclePost(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            $body = $request->getBody();
+            $model = new Vehicle();
+            $model->loadData($body);
+            $model->year_manufactured = $body['year_manufactured'] . '-01-01';
+            if ($model->validate() && $model->save()) {
+                // Application::$app->session->setFlash('success', 'Vehicle added successfully');
+                Application::$app->response->redirect('/customer/vehicle/all');
+                return;
+            }
+            return $this->render('customer/vehicle/addNew', [
+                'name' => 'The GearGuard',
+                'model' => $model
             ]);
         }
         throw new NotFoundException();
