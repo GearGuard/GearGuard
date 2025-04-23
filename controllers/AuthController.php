@@ -33,7 +33,9 @@ class AuthController extends Controller
     {
         $loginForm = new LoginForm();
         if ($request->isPost()) {
-            $data = array_map(function($value){return $value;}, $request->getBody());
+            $data = array_map(function ($value) {
+                return $value;
+            }, $request->getBody());
             $loginForm->loadData($data);
             if ($loginForm->validate() && $loginForm->login()) {
                 Application::$app->response->redirect('/');
@@ -245,7 +247,7 @@ class AuthController extends Controller
     public function getGarageServices(Request $request)
     {
         $body = $request->getBody();
-        if (!isset($body['garage_id'])){
+        if (!isset($body['garage_id'])) {
             throw new NotFoundException();
         }
         $garageId = $request->getBody()['garage_id'];
@@ -268,8 +270,7 @@ class AuthController extends Controller
                     'name' => 'The GearGuard',
                     'appointments' => $model,
                 ]);
-            }
-            else
+            } else
                 return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
@@ -370,13 +371,21 @@ class AuthController extends Controller
 
     public function addVehicle(Request $request, Response $response)
     {
-        // TODO: Complete
-        if (Application::$app->user instanceof User) {
-            return $this->render('customer/vehicle/addNew', ['name' => 'The GearGuard']);
+        if (!(Application::$app->user instanceof User)) {
+            throw new NotFoundException();
         }
 
-        throw new NotFoundException();
+        // Create a new Vehicle model instance
+        $model = new Vehicle();
+
+    
+
+        return $this->render('customer/vehicle/addNew', [
+            'name' => 'The GearGuard',
+            'model' => $model
+        ]);
     }
+
 
     public function transferVehicle(Request $request, Response $response)
     {
@@ -444,19 +453,19 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-//    public function viewAllVehicle(Request $request, Response $response)
-//    {
-//        if (Application::$app->user instanceof User)
-//            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
-//                return $this->render('customer/vehicle/viewAll', [
-//                    'name' => 'The GearGuard',
-//                ]);
-//            } else {
-//                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
-//            }
-//
-//        throw new NotFoundException();
-//    }
+    //    public function viewAllVehicle(Request $request, Response $response)
+    //    {
+    //        if (Application::$app->user instanceof User)
+    //            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
+    //                return $this->render('customer/vehicle/viewAll', [
+    //                    'name' => 'The GearGuard',
+    //                ]);
+    //            } else {
+    //                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+    //            }
+    //
+    //        throw new NotFoundException();
+    //    }
 
     public function vehicleServiceHistory(Request $request, Response $response)
     {
