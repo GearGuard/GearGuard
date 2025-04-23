@@ -26,82 +26,199 @@ class VehicleController extends Controller
 	/**
 	 * @throws NotFoundException
 	 */
-	public function addVehiclePost(Request $request, Response $response)
+	/**
+	 * Show vehicle registration form
+	 */
+	public function addVehicle(Request $request, Response $response)
 	{
 		if (!(Application::$app->user instanceof User)) {
 			throw new NotFoundException();
 		}
 
-		$data = $request->getBody();
-		$current_user_id = (int) Application::$app->session->get('user');
+		$model = new Vehicle();
 
-		// Ensure user exists in gg_user_vehicleuser
-		$stmt = Application::$app->db->prepare('SELECT COUNT(*) FROM gg_user_vehicleuser WHERE user_id = :user_id');
-		$stmt->bindValue(':user_id', $current_user_id);
-		$stmt->execute();
-		if ($stmt->fetchColumn() == 0) {
-			$insertStmt = Application::$app->db->prepare('INSERT INTO gg_user_vehicleuser (user_id) VALUES (:user_id)');
-			$insertStmt->bindValue(':user_id', $current_user_id);
-			$insertStmt->execute();
-		}
+		// Get dropdown data from database
+		$fuelTypes = $this->getFuelTypes();
+		$vehicleTypes = $this->getVehicleTypes();
+		$bodyTypes = $this->getBodyTypes();
+		$engineCapacities = $this->getEngineCapacities();
+		$vehicleClasses = $this->getVehicleClasses();
 
-		// 1. Handle model: Check if model exists, else insert and get id
-		$modelName = trim($data['model'] ?? '');
-		if (!$modelName) {
-			Application::$app->session->setFlash('error', 'Model name is required.');
-			$response->redirect('/customer/vehicle/register');
-			return;
-		}
-
-		$modelStmt = Application::$app->db->prepare('SELECT id FROM gg_vehicle_model WHERE model = :model');
-		$modelStmt->bindValue(':model', $modelName);
-		$modelStmt->execute();
-		$modelRow = $modelStmt->fetch(\PDO::FETCH_ASSOC);
-		if ($modelRow) {
-			$model_id = (int)$modelRow['id'];
-		} else {
-			// Insert new model
-			$insertModelStmt = Application::$app->db->prepare('INSERT INTO gg_vehicle_model (model, manufacturer_id) VALUES (:model, 1)');
-			$insertModelStmt->bindValue(':model', $modelName);
-			$insertModelStmt->execute();
-			$model_id = (int) Application::$app->db->lastInsertId();
-		}
-
-		// 2. Prepare vehicle data
-		$vehicle = Vehicle::initialize([
-			'vin' => $data['vin'] ?? '',
-			'model_id' => $model_id,
-			'year_manufactured' => $data['year_manufactured'] ?? '',
-			'license_plate_no' => $data['license_plate_no'] ?? '',
-			'class_id' => $data['class_id'] ?? 1,
-			'engine_capacity_id' => $data['engine_capacity_id'] ?? 1,
-			'fuel_type_id' => (int)($data['fuel_type_id'] ?? 0),
-			'bodytype_id' => $data['bodytype_id'] ?? 1,
-			'insurance_no' => $data['insurance_no'] ?? '',
-			'engine_no' => $data['engine_no'] ?? '',
-			'current_user_id' => $current_user_id,
-			'status_id' => Vehicle::STATUS_ACTIVE,
-			'vehicle_type_id' => $data['vehicle_type_id'] ?? 1
+		return $this->render('customer/vehicle/register', [
+			'model' => $model,
+			'fuelTypes' => $fuelTypes,
+			'vehicleTypes' => $vehicleTypes,
+			'bodyTypes' => $bodyTypes,
+			'engineCapacities' => $engineCapacities,
+			'vehicleClasses' => $vehicleClasses
 		]);
+	}
 
-		if ($vehicle->save()) {
-			// Add ownership record
-			$ownershipStmt = Application::$app->db->prepare('
-                INSERT INTO gg_user_owner (user_id, vehicle_id, ownership_status_id, registration_date)
-                VALUES (:user_id, :vehicle_id, 1, CURDATE())
-            ');
-			$ownershipStmt->bindValue(':user_id', $current_user_id);
-			$ownershipStmt->bindValue(':vehicle_id', $vehicle->id);
-			$ownershipStmt->execute();
+	/**
+	 * Process vehicle registration form submission
+	 * @throws NotFoundException
+	 */
+	public function addVehiclePost(Request $request, Response $response)
+	{
+		// save vehicle data to database
+		if (!(Application::$app->user instanceof User)) {
+			throw new NotFoundException();
+		}
+		$data = $request->getBody();
+		$vehicle = new Vehicle();
+		$vehicle->loadData($data);
+
+		$vehicle->status_id = Vehicle::STATUS_ACTIVE;
+		$vehicle->model_id = $data['model_id'] ?? null;
+		$vehicle->fuel_type_id = $data['fuel_type_id'] ?? null;
+		$vehicle->vehicle_type_id = $data['vehicle_type_id'] ?? null;
+		$vehicle->bodytype_id = $data['bodytype_id'] ?? null;
+		$vehicle->engine_capacity_id = $data['engine_capacity_id'] ?? null;
+		$vehicle->class_id = $data['class_id'] ?? null;
+		$vehicle->license_plate_no = $data['license_plate_no'] ?? null;
+		$vehicle->insurance_no = $data['insurance_no'] ?? null;
+
+
+		// Validate vehicle data
+		if (!$vehicle->validate()) {
+			Application::$app->session->setFlash('error', 'Please fill in all required fields.');
+			return $this->redirectToVehicleForm($response, $data, $vehicle);
+		}
+		// Check if vehicle already exists
+		$stmt = Application::$app->db->prepare('SELECT COUNT(*) FROM gg_vehicle WHERE license_plate_no = :license_plate_no AND status_id = :status_id');
+		$stmt->bindValue(':license_plate_no', $vehicle->license_plate_no);
+		$stmt->bindValue(':status_id', Vehicle::STATUS_ACTIVE);
+		$stmt->execute();
+
+		$vehicleExists = $stmt->fetchColumn() > 0;
+		if ($vehicleExists) {
+			Application::$app->session->setFlash('error', 'Vehicle with this license plate number already exists.');
+			return $this->redirectToVehicleForm($response, $data, $vehicle);
+		}
+		// Insert vehicle data into database
+		$stmt = Application::$app->db->prepare('
+			INSERT INTO gg_vehicle (user_id, model_id, fuel_type_id, vehicle_type_id, bodytype_id, engine_capacity_id, class_id, license_plate_no, insurance_no, status_id, created_at, updated_at)
+			VALUES (:user_id, :model_id, :fuel_type_id, :vehicle_type_id, :bodytype_id, :engine_capacity_id, :class_id, :license_plate_no, :insurance_no, :status_id, :created_at, :updated_at)
+		');
+
+		$stmt->bindValue(':model_id', $vehicle->model_id);
+		$stmt->bindValue(':fuel_type_id', $vehicle->fuel_type_id);
+		$stmt->bindValue(':vehicle_type_id', $vehicle->vehicle_type_id);
+		$stmt->bindValue(':bodytype_id', $vehicle->bodytype_id);
+		$stmt->bindValue(':engine_capacity_id', $vehicle->engine_capacity_id);
+		$stmt->bindValue(':class_id', $vehicle->class_id);
+		$stmt->bindValue(':license_plate_no', $vehicle->license_plate_no);
+		$stmt->bindValue(':insurance_no', $vehicle->insurance_no);
+		$stmt->bindValue(':status_id', $vehicle->status_id);
+
+		$stmt->execute();
+		$stmt->closeCursor();
+
+		// Get the last inserted vehicle ID
+		$vehicleId = Application::$app->db->lastInsertId();
+		if ($vehicleId) {
+			// Insert into gg_user_owner table
+			$stmt = Application::$app->db->prepare('
+				INSERT INTO gg_user_owner (user_id, vehicle_id, registration_date)
+				VALUES (:user_id, :vehicle_id, NOW())
+			');
+
+			$stmt->bindValue(':vehicle_id', $vehicleId);
+			$stmt->execute();
 			Application::$app->session->setFlash('success', 'Vehicle registered successfully!');
-			$response->redirect('/customer/vehicle/register');
-			return;
 		} else {
 			Application::$app->session->setFlash('error', 'Failed to register vehicle. Please try again.');
-			$response->redirect('/customer/vehicle/register');
-			return;
 		}
+		$response->redirect('/customer/vehicle/all');
+		return;
 	}
+
+	/**
+	 * Helper method to redirect back to vehicle form with data
+	 */
+	private function redirectToVehicleForm(Response $response, array $data, ?Vehicle $model = null)
+	{
+		if (!$model) {
+			$model = new Vehicle();
+			foreach ($data as $key => $value) {
+				if (property_exists($model, $key)) {
+					$model->{$key} = $value;
+				}
+			}
+
+			// Handle model name separately
+			if (isset($data['model'])) {
+				$model->model = $data['model'];
+			}
+		}
+
+		// Get dropdown data from database
+		$fuelTypes = $this->getFuelTypes();
+		$vehicleTypes = $this->getVehicleTypes();
+		$bodyTypes = $this->getBodyTypes();
+		$engineCapacities = $this->getEngineCapacities();
+		$vehicleClasses = $this->getVehicleClasses();
+
+		return $this->render('customer/vehicle/register', [
+			'model' => $model,
+			'fuelTypes' => $fuelTypes,
+			'vehicleTypes' => $vehicleTypes,
+			'bodyTypes' => $bodyTypes,
+			'engineCapacities' => $engineCapacities,
+			'vehicleClasses' => $vehicleClasses
+		]);
+	}
+
+	/**
+	 * Get fuel types for dropdown
+	 */
+	private function getFuelTypes()
+	{
+		$stmt = Application::$app->db->prepare('SELECT id, fueltype FROM gg_vehicle_fueltype');
+		$stmt->execute();
+		return $stmt->fetchAll(\PDO::FETCH_OBJ);
+	}
+
+	/**
+	 * Get vehicle types for dropdown
+	 */
+	private function getVehicleTypes()
+	{
+		$stmt = Application::$app->db->prepare('SELECT id, type FROM gg_vehicle_type');
+		$stmt->execute();
+		return $stmt->fetchAll(\PDO::FETCH_OBJ);
+	}
+
+	/**
+	 * Get body types for dropdown
+	 */
+	private function getBodyTypes()
+	{
+		$stmt = Application::$app->db->prepare('SELECT id, bodytype FROM gg_vehicle_bodytype');
+		$stmt->execute();
+		return $stmt->fetchAll(\PDO::FETCH_OBJ);
+	}
+
+	/**
+	 * Get engine capacities for dropdown
+	 */
+	private function getEngineCapacities()
+	{
+		$stmt = Application::$app->db->prepare('SELECT id, capacity FROM gg_vehicle_engine_capacity');
+		$stmt->execute();
+		return $stmt->fetchAll(\PDO::FETCH_OBJ);
+	}
+
+	/**
+	 * Get vehicle classes for dropdown
+	 */
+	private function getVehicleClasses()
+	{
+		$stmt = Application::$app->db->prepare('SELECT id, class FROM gg_vehicle_class');
+		$stmt->execute();
+		return $stmt->fetchAll(\PDO::FETCH_OBJ);
+	}
+
 
 	public function viewAllVehicle(Request $request, Response $response)
 	{
