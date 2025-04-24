@@ -4,6 +4,7 @@ User: GearGurd
 */
 
 use app\controllers\AuthController;
+use app\controllers\MechanicController;
 use app\controllers\SiteController;
 use app\controllers\AdminController;
 use app\controllers\GarageController;
@@ -191,7 +192,7 @@ $app->router->get('/mechanic/profile', [AuthController::class, 'myProfile']);
 $app->router->post('/mechanic/profile/update', [AuthController::class, 'updateProfile']);
 $app->router->get('/mechanic/services', [SiteController::class, 'mechanicservices']);
 $app->router->get('/mechanic/service_history', [SiteController::class, 'mechanicServiceHistory']);
-$app->router->get('/mechanic/sparepart/addNew', [AuthController::class, 'mechanicSparePartAddNew']);
+$app->router->get('/mechanic/sparepart/addNew', [MechanicController::class, 'mechanicSparePartAddNew']);
 $app->router->post('/mechanic/sparepart/addNew', [AuthController::class, 'mechanicSparePartAddNewPost']);
 $app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMessages']);
 $app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
