@@ -5,13 +5,14 @@
     <meta charset="UTF-8">
     <title>Friends List - GearGuard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Dashboard | GearGuard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --text: #f5f5f5;
             --background: #181a20;
-            --primary: #C0C0C0;
+            --text: #f5f5f5;
+            --primary: #C0C0C0FF;
             --secondary: #25272d;
             --accent: #2463eb;
             --border: #33363f;
@@ -20,265 +21,270 @@
 
         body {
             background: var(--background);
+            font-family: 'Inter', sans-serif;
             color: var(--text);
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            min-height: 100vh;
             display: flex;
-            align-items: flex-start;
-            justify-content: center;
+            overflow-x: hidden;
         }
 
-        .friends-list-container {
-            width: 410px;
-            margin: 40px 0;
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 260px;
             background: var(--secondary);
-            border-radius: 18px;
-            box-shadow: 0 6px 32px rgba(0, 0, 0, 0.18);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            display: flex;
-            min-width: 900px;
-            flex-direction: column;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
 
-        .friends-list-header {
+        .sidebar.collapsed {
+            width: 70px;
+            padding: 20px 10px;
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .sidebar-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 22px 28px 12px 28px;
-            border-bottom: 1px solid var(--border);
-            background: var(--background);
+            margin-bottom: 20px;
         }
 
-        .friends-list-header h2 {
-            font-size: 1.08rem;
-            font-weight: 600;
-            color: var(--primary);
-            letter-spacing: 1px;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .friends-list-header .header-actions {
-            display: flex;
-            gap: 16px;
-        }
-
-        .friends-list-header .header-actions i {
-            color: var(--primary);
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .friends-list-header .header-actions i:hover {
-            color: var(--accent);
-        }
-
-        .friends-list {
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            margin: 0;
-            list-style: none;
-        }
-
-        .friend-item {
+        .logo-container {
             display: flex;
             align-items: center;
-            padding: 18px 28px;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.18s;
-            cursor: pointer;
-            gap: 14px;
+            gap: 15px;
         }
 
-        .friend-item:last-child {
-            border-bottom: none;
-        }
-
-        .friend-item:hover {
-            background: var(--hover-bg);
-        }
-
-        .friend-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--accent);
-            background: var(--background);
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             flex-shrink: 0;
         }
 
-        .friend-info {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .friend-name {
-            font-weight: 600;
-            color: var(--text);
-            font-size: 1.05rem;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .friend-username {
-            font-size: 0.92rem;
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
             color: var(--primary);
-            opacity: 0.87;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        .chat {
-            text-decoration: none;
+        /* Toggle Button */
+        .toggle-btn {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            background: var(--secondary);
             color: var(--text);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 1100;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 100%;
+            transition: background 0.3s ease;
         }
 
-        .friend-actions {
-            margin-left: 10px;
+        .toggle-btn:hover {
+            background: var(--primary);
+            color: var(--background);
+        }
+
+        /* Navigation Menu */
+        .nav-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
             color: var(--primary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
-            transition: background 0.18s, color 0.18s;
+            border-radius: 8px;
+            transition: all 0.2s ease;
         }
 
-        .friend-actions:hover {
+        .nav-link:hover {
+            background-color: var(--hover-bg);
             color: var(--accent);
-            background: var(--hover-bg);
         }
 
-        @media (max-width: 500px) {
-            .friends-list-container {
-                width: 100vw;
-                border-radius: 0;
-                margin: 0;
+        .nav-link.active {
+            background-color: var(--hover-bg);
+            color: var(--accent);
+        }
+
+        .nav-link i {
+            width: 24px;
+            margin-right: 10px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+
+        .nav-text {
+            white-space: nowrap;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            flex-grow: 1;
+            width: calc(100vw - 260px);
+            transition: all 0.3s ease;
+        }
+
+        .main-content.collapsed {
+            margin-left: 70px;
+            width: calc(100vw - 70px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
             }
 
-            .friends-list-header,
-            .friend-item {
-                padding-left: 12px;
-                padding-right: 12px;
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.collapsed {
+                margin-left: 0;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="friends-list-container">
-        <div class="friends-list-header">
-            <h2>GearGuard</h2>
-        </div>
-        <ul class="friends-list">
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
 
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
-            </li>
-            <li class="friend-item">
-                <img class="friend-avatar" src="/assets/img/Gamage.png" alt="Saman Perera">
-                <a class="chat" href="/views/friends.php" class="friend-actions">
-                    <div class="friend-info">
-                        <div class="friend-name">Saman Perera</div>
-                        <div class="friend-username">@saman.perera</div>
-                    </div>
-                </a>
+<button class="toggle-btn" id="toggleBtn">
+        <i class="fas fa-bars"></i>
+    </button>
 
-            </li>
-        </ul>
+    <div class="sidebar" id="sidebar"> 
+    <div class="sidebar-header"> 
+        <div class="logo-container"> 
+            <img src="image.png" alt="GearGuard Logo" class="logo-img"> 
+            <span class="logo-text">GearGuard</span> 
+        </div> 
+    </div> 
+    <ul class="nav-list"> 
+        <li class="nav-item"> 
+            <a href="mechanic/dashboard" class="nav-link active"> 
+                <i class="fas fa-gauge"></i> 
+                <span class="nav-text">Dashboard</span> 
+            </a> 
+        </li> 
+        <li class="nav-item"> 
+            <a href="mechanic/profile_form" class="nav-link"> 
+                <i class="fas fa-user-circle"></i> 
+                <span class="nav-text">Profile</span> 
+            </a> 
+        </li> 
+        <li class="nav-item"> 
+            <a href="mechanic/services" class="nav-link"> 
+                <i class="fas fa-wrench"></i> 
+                <span class="nav-text">Service</span> 
+            </a> 
+        </li> 
+        <li class="nav-item"> 
+            <a href="mechanic/service_history" class="nav-link"> 
+                <i class="fas fa-history"></i> 
+                <span class="nav-text">History</span> 
+            </a> 
+        </li> 
+       <li class="nav-item"> 
+    <a href="mechanic/spareparts" class="nav-link"> 
+        <i class="fas fa-screwdriver-wrench"></i> 
+        <span class="nav-text">Spareparts</span> 
+    </a> 
+</li>
+        <li class="nav-item"> 
+            <a href="mechanic/messages" class="nav-link"> 
+                <i class="fas fa-envelope"></i> 
+                <span class="nav-text">Messages</span> 
+            </a> 
+        </li> 
+        <li class="nav-item"> 
+            <a href="" class="nav-link"> 
+                <i class="fas fa-sign-out-alt"></i> 
+                <span class="nav-text">Logout</span> 
+            </a> 
+        </li> 
+    </ul> 
+</div>
     </div>
+    
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+    <iframe id="content-iframe" location="relative" src="dashboard.php" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
+</div>
+    <script>
+        const toggleBtn = document.getElementById('toggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        toggleBtn.addEventListener('click', () => {
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                sidebar.classList.toggle('mobile-open');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('collapsed');
+            }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                const href = link.getAttribute('href');
+
+                try {
+                    document.getElementById("content-iframe").setAttribute("src", href);
+
+                    document.querySelectorAll('.nav-link').forEach(lnk => lnk.classList.remove('active'));
+
+                    link.classList.add('active');
+
+                } catch (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                    mainContent.innerHTML = '<p>There was an error loading the content. Please try again later.</p>';
+                }
+            });
+        });
+    </script>
+
+    
 </body>
 
 </html>
