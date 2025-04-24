@@ -242,7 +242,7 @@
             <div class='form-column'>
                 <div class='form-group'>
                     <div class="form-column">
-                        <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles) ?>
+                        <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'Vehicle', $vehicles) ?>
                     </div>
                 </div>
             </div>
@@ -256,11 +256,8 @@
 
         <div class='form-row'>
             <div class='form-column'>
-                <div class='form-group'>
-                    <label for='manufacturer'>Manufacturer<span class='required-dot'>*</span></label>
-                    <input type='text' id='manufacturer' name='manufacturer' required
-                        placeholder='Enter spare part type'>
-                </div>
+                <label for='type'>Spare Part Type<span class='required-dot'>*</span></label>
+                <input type='text' id='type' name='type' required placeholder='Enter spare part type'>
             </div>
             <div class='form-column'>
                 <div class='form-group'>
@@ -280,8 +277,9 @@
             </div>
             <div class='form-column'>
                 <div class='form-group'>
-                    <label for='waranty_period'>Warranty Period<span class='required-dot'>*</span></label>
-                    <input type='date' id='waranty_period' name='waranty_period' required>
+                    <label for='manufacturer'>Manufacturer<span class='required-dot'>*</span></label>
+                    <input type='text' id='manufacturer' name='manufacturer' required
+                        placeholder='Enter spare part type'>
                 </div>
             </div>
         </div>
@@ -291,6 +289,12 @@
                 <div class='form-group'>
                     <label for='installed-date'>Installed Date<span class='required-dot'>*</span></label>
                     <input type='date' id='installed-date' name='installed_date' required>
+                </div>
+            </div>
+            <div class='form-column'>
+                <div class='form-group'>
+                    <label for='waranty_period'>Warranty Period<span class='required-dot'>*</span></label>
+                    <input type='date' id='waranty_period' name='waranty_period' required>
                 </div>
             </div>
         </div>
