@@ -25,7 +25,7 @@ class MechanicController extends Controller
     }
     public function __construct()
     {
-        $this->registerMiddleware(new ExtendedMiddleware([], self::isGarage()));
+        $this->registerMiddleware(new ExtendedMiddleware([], self::isMechanic()));
         $this->setLayout('garage_layout');
     }
 
@@ -217,5 +217,16 @@ class MechanicController extends Controller
             ]);
         }
 
+    }
+
+    public function mechanicSparePartAddNew(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/sparepart/addNew', [
+                'title' => 'Add Spare Part'
+            ]);
+        }
+
+        throw new NotFoundException();
     }
 }
