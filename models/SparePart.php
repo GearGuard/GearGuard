@@ -34,14 +34,12 @@ class SparePart extends UserModel
 	public function rules(): array
 	{
 		return [
-			'username' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 3], [self::RULE_MAX, 'max' => 30], [self::RULE_UNIQUE, 'class' => self::class]],
-			'name' => [self::RULE_REQUIRED],
-			'email' => [self::RULE_REQUIRED, self::RULE_EMAIL,],
-			'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 24]],
-			'passwordConfirm' => [self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']],
-			'address' => [self::RULE_REQUIRED],
-			'contact_no' => [self::RULE_REQUIRED],
-			'status_id' => [self::RULE_REQUIRED],
+			'serial_no' => [self::RULE_REQUIRED],
+			'type' => [self::RULE_REQUIRED],
+			'manufacturer' => [self::RULE_REQUIRED],
+			'price' => [self::RULE_REQUIRED],
+			'manufactured_date' => [self::RULE_REQUIRED],
+			'waranty_period' => [self::RULE_REQUIRED],
 		];
 	}
 

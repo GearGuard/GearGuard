@@ -226,7 +226,7 @@
             </a> 
         </li> 
        <li class="nav-item"> 
-    <a href="spareparts" class="nav-link"> 
+    <a href="mechanic/sparepart/addNew" class="nav-link"> 
         <i class="fas fa-screwdriver-wrench"></i> 
         <span class="nav-text">Spareparts</span> 
     </a> 

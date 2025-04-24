@@ -243,19 +243,17 @@
             </thead>
             <tbody>
                 <?php
-                // Removed direct DB connection and query to fit framework usage
-                // Assuming $serviceAssignments is passed from the controller
 
                 if (!empty($serviceAssignments)) {
                     foreach ($serviceAssignments as $assignment) {
                         echo "<tr>
-                                <td>" . htmlspecialchars($assignment['id']) . "</td>
+                                <td>{$assignment['id']}</td>
                                 <td>" . htmlspecialchars($assignment['license_plate_no']) . "</td>
                                 <td>" . htmlspecialchars($assignment['service_type']) . "</td>
                                 <td>" . htmlspecialchars($assignment['mechanic_name']) . "</td>
-                                <td>" . htmlspecialchars($assignment['begin_timestamp']) . "</td>
-                                <td>" . htmlspecialchars($assignment['end_timestamp']) . "</td>
-                                <td>" . htmlspecialchars($assignment['duration']) . "</td>
+                                <td>{$assignment['begin_timestamp']}</td>
+                                <td>{$assignment['end_timestamp']}</td>
+                                <td>{$assignment['duration']}</td>
                                 <td>" . htmlspecialchars($assignment['notes']) . "</td>
                               </tr>";
                     }
