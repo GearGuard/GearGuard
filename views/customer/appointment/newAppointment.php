@@ -337,23 +337,28 @@ use gearguard\phpmvc\form\DropDownField;
         <?php $form = Form::begin('/customer/appointment/appoint', "post") ?>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles)?>
+                <?php $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles);
+                        echo $form->field->required() ?>
             </div>
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages)?>
+                <?php $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages);
+                        echo $form->field->required() ?>
             </div>
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', [])?>
+                <?php $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', []);
+                        echo $form->field->required() ?>
             </div>
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'date') ?>
+                <?php $form->field = new \gearguard\phpmvc\form\DateField($model, 'date');
+                        echo $form->field->required() ?>
             </div>
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'time') ?>
+                <?php $form->field = new \gearguard\phpmvc\form\TimeField($model, 'time');
+                        echo $form->field->required() ?>
             </div>
         </div>
         <div class="form-group">
