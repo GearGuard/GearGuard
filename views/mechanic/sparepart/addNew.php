@@ -228,7 +228,18 @@
 
     <div class="spare-part-form">
         <h2 class="title">Add New Spare Part</h2>
-<form action="/mechanic/spareparts/addNew" method="POST">
+        <?php if (!empty($errors)) : ?>
+            <div style="background-color: #ffdddd; color: #a94442; border: 1px solid #a94442; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                <ul>
+                    <?php foreach ($errors as $fieldErrors) : ?>
+                        <?php foreach ($fieldErrors as $error) : ?>
+                            <li><?= htmlspecialchars($error) ?></li>
+                        <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+<form action="/mechanic/sparepart/addNew" method="POST">
             <div class="form-row">
                 <div class="form-column">
                     <div class="form-group">
@@ -269,7 +280,7 @@
                 <div class="form-column">
                     <div class="form-group">
                         <label for="waranty-period">Warranty Period<span class="required-dot">*</span></label>
-                        <input type="text" id="waranty-period" name="waranty_period" required placeholder="Enter warranty period">
+                        <input type="date" id="waranty-period" name="waranty_period" required placeholder="Enter warranty period">
                     </div>
                 </div>
             </div>

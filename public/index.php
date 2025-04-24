@@ -194,6 +194,7 @@ $app->router->get('/mechanic/services', [SiteController::class, 'mechanicservice
 $app->router->get('/mechanic/service_history', [SiteController::class, 'mechanicServiceHistory']);
 $app->router->get('/mechanic/sparepart/addNew', [MechanicController::class, 'mechanicSparePartAddNew']);
 $app->router->post('/mechanic/sparepart/addNew', [AuthController::class, 'mechanicSparePartAddNewPost']);
+$app->router->get('/mechanic/sparepart/viewAll', [AuthController::class, 'mechanicSparePartViewAll']);
 $app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMessages']);
 $app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
 

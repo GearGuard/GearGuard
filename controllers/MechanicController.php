@@ -26,7 +26,7 @@ class MechanicController extends Controller
     public function __construct()
     {
         $this->registerMiddleware(new ExtendedMiddleware([], self::isMechanic()));
-        $this->setLayout('garage_layout');
+       
     }
 
     public function mechanicSignup(Request $request, Response $response)
@@ -172,20 +172,20 @@ class MechanicController extends Controller
         throw new NotFoundException();
     }
 
-    public function mechanicSparePart(Request $request, Response $response)
-    {
-        if (Application::$app->user instanceof User) {
-            return $this->render('/mechanic/spareparts', [
-                'title' => 'Spareparts'
-            ]);
-        } else if (Application::$app->user instanceof Garage) {
-            return $this->render('/mechanic/spareparts', [
-                'title' => 'Spareparts'
-            ]);
-        }
+    // public function mechanicSparePart(Request $request, Response $response)
+    // {
+    //     if (Application::$app->user instanceof User) {
+    //         return $this->render('/mechanic/spareparts', [
+    //             'title' => 'Spareparts'
+    //         ]);
+    //     } else if (Application::$app->user instanceof Garage) {
+    //         return $this->render('/mechanic/spareparts', [
+    //             'title' => 'Spareparts'
+    //         ]);
+    //     }
 
-        throw new NotFoundException();
-    }
+    //     throw new NotFoundException();
+    // }
 
     public function MechanicSendMessages(Request $request, Response $response)
     {
@@ -217,6 +217,17 @@ class MechanicController extends Controller
             ]);
         }
 
+    }
+
+    public function mechanicSparePart(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/sparepart/addNew', [
+                'title' => 'Add Spare Part'
+            ]);
+        }
+
+        throw new NotFoundException();
     }
 
     public function mechanicSparePartAddNew(Request $request, Response $response)

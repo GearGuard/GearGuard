@@ -22,6 +22,7 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Response;
 use app\models\LoginForm;
 use gearguard\phpmvc\middlewares\AuthMiddleware;
+use app\models\SparePart;
 
 class AuthController extends Controller
 {
@@ -203,8 +204,6 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-
-
     public function settings(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
@@ -224,6 +223,7 @@ class AuthController extends Controller
 
         throw new NotFoundException();
     }
+
 
     public function newSparepart(Request $request, Response $response)
     {
@@ -759,6 +759,23 @@ class AuthController extends Controller
         }
         $response->redirect('/mechanic/sparepart');
     }
+
+    public function mechanicSparePartViewAll(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $sql = "SELECT * FROM gg_sparepart";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            return $this->render('mechanic/sparepart/viewAll', [
+                'name' => 'The GearGuard',
+                'spareParts' => $spareParts
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
 
     public function MechanicSendMessages(Request $request, Response $response)
     {
