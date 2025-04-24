@@ -245,13 +245,6 @@ public function mechanicSidebar(Request $request, Response $response)
     return $this->render('mechanic/sidebar', $params);
 }
 
-public function viewServicesByMechanic(Request $request, Response $response)
-{
-    $params = [
-        'name' => "The GearGurd"
-    ];
-    return $this->render('mechanic/services/viewService', $params);
-}
 // private function getServicesListByMechanic()
 // {
 //     $sql = "SELECT id, type FROM gg_garage_service WHERE status_id = 1 AND mechanic_id = :mechanic_id";

@@ -10,6 +10,7 @@ use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\middlewares\ExtendedMiddleware;
+use app\models\LoginFormMechanic;
 use app\models\Mechanic;
 use app\utilities\EscapeAttributes;
 
@@ -27,6 +28,7 @@ class MechanicController extends Controller
         $this->registerMiddleware(new ExtendedMiddleware([], self::isGarage()));
         $this->setLayout('garage_layout');
     }
+
     public function mechanicSignup(Request $request, Response $response)
     {
         $errors = [];
@@ -216,6 +218,4 @@ class MechanicController extends Controller
         }
 
     }
-
 }
-    

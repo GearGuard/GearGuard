@@ -198,10 +198,6 @@ class AuthController extends Controller
             $mechanic = Application::$app->user;
             return $this->render('mechanic/dashboard', [
                 'title' => 'Mechanic Dashboard',
-                // 'upcomingServices' => $mechanic->getUpcomingServices(),
-                // 'serviceStats' => $mechanic->getServiceStatistics(),
-                // 'inventoryAlerts' => $mechanic->getInventoryAlerts(),
-                // 'customerMessages' => $mechanic->getUnreadMessages()
             ]);
         }
         throw new NotFoundException();
@@ -660,6 +656,28 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function viewServicesByMechanic(Request $request, Response $response)
+    {
+        $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                       CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
+                       vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
+                FROM gg_vehicle_service_take vst
+                JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                JOIN gg_garage_service gs ON vst.service_id = gs.id
+                JOIN gg_garage_mechanic m ON vst.mechanic_id = m.id
+                ORDER BY vst.begin_timestamp DESC";
+
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        $serviceAssignments = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        $params = [
+            'name' => "The GearGurd",
+            'serviceAssignments' => $serviceAssignments
+        ];
+        return $this->render('mechanic/services/viewService', $params);
+    }
+
     public function MechanicEditServices(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
@@ -703,17 +721,43 @@ class AuthController extends Controller
 
     public function mechanicSparePart(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User) {
-            return $this->render('/mechanic/spareparts', [
-                'title' => 'Spareparts'
-            ]);
-        } else if (Application::$app->user instanceof Garage) {
-            return $this->render('/mechanic/spareparts', [
-                'title' => 'Spareparts'
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/sparepart/addNew', [
+                'title' => 'Add Spare Part'
             ]);
         }
 
         throw new NotFoundException();
+    }
+
+    public function mechanicSparePartAddNew(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/sparepart/addNew', [
+                'title' => 'Add Spare Part'
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function mechanicSparePartAddNewPost(Request $request, Response $response)
+    {
+        if ($request->isPost()) {
+            $part = new \app\models\SparePart();
+            $part->loadData($request->getBody());
+
+            if ($part->save()) {
+                $response->redirect('/mechanic/sparepart');
+                return;
+            } else {
+                return $this->render('mechanic/sparepart/addNew', [
+                    'model' => $part,
+                    'errors' => $part->errors ?? []
+                ]);
+            }
+        }
+        $response->redirect('/mechanic/sparepart');
     }
 
     public function MechanicSendMessages(Request $request, Response $response)
@@ -745,6 +789,55 @@ class AuthController extends Controller
                 'message' => $ex->getMessage(),
             ]);
         }
-
     }
+
+    public function loadServiceAssignments(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                           CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
+                           vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
+                    FROM gg_vehicle_service_take vst
+                    JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                    JOIN gg_garage_service gs ON vst.service_id = gs.id
+                    JOIN gg_garage_mechanic m ON vst.mechanic_id = m.id
+                    ORDER BY vst.begin_timestamp DESC";
+
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $serviceAssignments = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($serviceAssignments);
+        } else {
+            $response->setStatusCode(403);
+            echo json_encode(['error' => 'Unauthorized']);
+        }
+    }
+
+    public function loadAppointments(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $sql = "SELECT a.id, v.type AS vehicle_type, u.name AS client_name, u.contact_number, v.license_plate_no, gs.type AS service_type, 
+                           CONCAT(a.date, ' ', a.time) AS date_time, a.notes, a.status
+                    FROM gg_appointment a
+                    JOIN gg_vehicle v ON a.vehicle_id = v.id
+                    JOIN gg_user u ON v.owner_id = u.id
+                    JOIN gg_garage_service gs ON a.service_id = gs.id
+                    ORDER BY a.date DESC, a.time DESC
+                    LIMIT 100";
+
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $appointments = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($appointments);
+        } else {
+            $response->setStatusCode(403);
+            echo json_encode(['error' => 'Unauthorized']);
+        }
+    }
+
+   
 }
