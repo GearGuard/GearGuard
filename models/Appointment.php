@@ -171,21 +171,7 @@ class Appointment extends DbModel
         return $options;
     }
 
-    public function newAppointment(Request $request)
-    {
-        if ($request->isPost()) {
-            $this->loadData($request->getBody());
-            if ($this->validate() && $this->save()) {
-                return Application::$app->response->redirect('/appointment/success');
-            }
-        }
-
-        $garages = $this->getGarages();
-        return Application::$app->view->renderView('newAppointment', [
-            'model' => $this,
-            'garages' => $garages
-        ]);
-    }
+  
 
     public function getAppointmentDetails(int $id)
     {

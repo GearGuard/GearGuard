@@ -1,3 +1,10 @@
+<?php
+
+/** @var $model  \app\models\SparePart */
+/** @var $garages array */
+/** @var $vehicles array */
+
+?>
 <!DOCTYPE html>
 <html lang='en'>
 
@@ -234,13 +241,9 @@
         <div class='form-row'>
             <div class='form-column'>
                 <div class='form-group'>
-                    <label for='type'>Vehicle<span class='required-dot'>*</span></label>
-                    <select id='type' name='type' required>
-                        <option value='' disabled selected>Select Vehicle</option>
-                        <option value='car'>Car</option>
-                        <option value='motorcycle'>Motorcycle</option>
-                        <option value='truck'>Truck</option>
-                    </select>
+                    <div class="form-column">
+                        <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles) ?>
+                    </div>
                 </div>
             </div>
             <div class='form-column'>
