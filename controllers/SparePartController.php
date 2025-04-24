@@ -47,7 +47,7 @@
 				$manufacturer = $data['manufacturer'] ?? null;
 				$price = $data['price'] ?? null;
 				$manufactured_date = $data['manufactured_date'] ?? null;
-				$warenty_period = $data['warenty_period'] ?? '';
+				$waranty_period = $data['waranty_period'] ?? '';
 				// Now pass it safely to initialize()
 		
 				$sparepart = SparePart::initialize([
@@ -56,7 +56,7 @@
 					'manufacturer' => $manufacturer,
 					'price' => $price,
 					'manufactured_date' => $manufactured_date,
-					'waranty_period' => $warenty_period,
+					'waranty_period' => $waranty_period,
 				]);
 				if ($sparepart->save()) {
 					$response->redirect('/customer/sparepart/view_sparepart');
