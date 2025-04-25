@@ -359,6 +359,7 @@
             console.log(e);
             data = JSON.parse(e.data);
             showNotification(data.title, data.description);
+            document.getElementById('notification-circle').style.display = 'inline-block';
         };
 
         function showNotification(title, message) {
