@@ -316,7 +316,6 @@ $this->title = 'Appointment';
             }
         }
     </style>
-    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
