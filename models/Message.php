@@ -7,8 +7,8 @@ use gearguard\phpmvc\db\DbModel;
 
 class Message extends DbModel
 {
-    const STATUS_INACTIVE = 1;
-    const STATUS_ACTIVE = 2;
+    const STATUS_UNREAD = 1;
+    const STATUS_READ = 2;
     const STATUS_DELETED = 3;
 
     public int $id;
@@ -16,7 +16,7 @@ class Message extends DbModel
     public int $tuid;
     public string $message;
     public string $timestamp;
-    public int $status_id = self::STATUS_INACTIVE;
+    public int $status_id = self::STATUS_UNREAD;
 
     public function tableName(): string
     {
@@ -66,9 +66,8 @@ class Message extends DbModel
         $messageModel->message = $message;
         $messageModel->timestamp = date('Y-m-d H:i:s');
 
-        if ($messageModel->validate()) {
-            $messageModel->save();
-            Notification::sendNotification($toUserId, 'You have a new message!', 'New Message');
+        if ($messageModel->validate() && $messageModel->save()) {
+            Notification::sendNotification($toUserId, 'You have a new message!', 'New Message', Notification::TYPE_MESSAGE);
             return true;
         }
         else return false;
@@ -81,5 +80,14 @@ class Message extends DbModel
         $statement->bindValue(':userId', $userId);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_CLASS, self::class);
+    }
+
+    public static function hasMessages(int $userID): bool
+    {
+        $sql = "SELECT * FROM gearguard.gg_messages gm WHERE gm.tuid = :userID AND gm.status_id = 1 LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':user_id', $userID);
+        $statement->execute();
+        return (bool)($statement->fetch());
     }
 }

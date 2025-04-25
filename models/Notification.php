@@ -15,6 +15,9 @@ class Notification extends DbModel
     public const STATUS_READ = 2;
     public const STATUS_DELETED = 3;
 
+    public const TYPE_NOTIFICATION = 1;
+    public const TYPE_MESSAGE = 2;
+
     public int $id;
     public int $user_id;
     public string $timestamp;
@@ -58,13 +61,36 @@ class Notification extends DbModel
         ];
     }
 
-    public static function sendNotification(int $userId, string $description, string $title = 'New Notification'): bool
+    public static function sendNotification(int $userId, string $description, string $title = 'New Notification', int $type = self::TYPE_NOTIFICATION): bool
     {
         $notification = new Notification();
         $notification->user_id = $userId;
         $notification->description = $description;
         $notification->timestamp = date('Y-m-d H:i:s');
         $notification->status_id = self::STATUS_UNREAD;
+
+        if ($type === self::TYPE_MESSAGE) {
+            try {
+                $socket = @stream_socket_client('tcp://127.0.0.1:8081' . JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT(0, 3600), 'Abracadabra@Hogwarts1959'), $errno, $errstr);
+                if (!$socket) {
+                    error_log("Error: $errstr ($errno)\n");
+                } else {
+                    fwrite($socket, json_encode([
+                        'uid' => $userId,
+                        'description' => $description,
+                        'timestamp' => $notification->timestamp,
+                        'title' => $title,
+                    ]));
+                    fclose($socket);
+                    return true;
+                }
+            } catch (\Exception $e) {
+                error_log("Error: " . $e->getMessage() . "\n");
+                return false;
+            }
+
+            return false;
+        }
 
         $notification->validate();
         if ($notification->save()) {

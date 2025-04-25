@@ -187,6 +187,9 @@ class Garage extends UserModel
             }
         }
         if ($validateContactNo) {
+            if (!preg_match('/^\+?(?:\d+[-\s]?)*\d+$|^\+?[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?$|^\+?(?:\d*[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?(?:\d+[-\s]?)*\d+)+$|^\+?(?:(?:\d+[-\s]?)*\d+[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?\d*)+$/', $this->contact_no)) {
+                $this->addError('contact_no', 'Contact Number is not valid.');
+            }
             $contactTemp = str_replace(' ', '', $this->contact_no);
             $contactTemp = str_replace('-', '', $contactTemp);
             $contactTemp = str_replace('+', '', $contactTemp);

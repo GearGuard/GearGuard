@@ -40,7 +40,6 @@ class NotificationServer implements MessageComponentInterface
                         foreach ($uid as $userId) {
                             if ($this->clients[$client] === $userId) {
                                 $client->send(json_encode($msg));
-                                break;
                             }
                         }
                     }
@@ -48,7 +47,6 @@ class NotificationServer implements MessageComponentInterface
                     foreach($this->clients as $client) {
                         if ($this->clients[$client] === $uid) {
                             $client->send(json_encode($msg));
-                            break;
                         }
                     }
                 }
