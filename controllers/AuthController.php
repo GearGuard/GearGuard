@@ -868,5 +868,76 @@ class AuthController extends Controller
         }
     }
 
-   
+    public function editMechanicServiceHistory(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $id = $request->getRouteParam('id');
+            
+            // Get the service record with all related data
+            $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                           CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
+                           vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes,
+                           vst.vehicle_id, vst.service_id, vst.mechanic_id
+                    FROM gg_vehicle_service_take vst
+                    JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                    JOIN gg_garage_service gs ON vst.service_id = gs.id
+                    JOIN gg_garage_mechanic m ON vst.mechanic_id = m.id
+                    WHERE vst.id = :id AND vst.mechanic_id = :mechanic_id";
+                    
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':id', $id);
+            $statement->bindValue(':mechanic_id', Application::$app->user->id);
+            $statement->execute();
+            $record = $statement->fetch(\PDO::FETCH_ASSOC);
+            
+            if (!$record) {
+                throw new NotFoundException();
+            }
+            
+            return $this->render('mechanic/serviceHistory/edit', [
+                'record' => $record
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
+    public function updateMechanicServiceHistory(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $id = $request->getRouteParam('id');
+            $body = $request->getBody();
+            
+            // Validate mechanic owns this record
+            $sql = "SELECT id FROM gg_vehicle_service_take 
+                    WHERE id = :id AND mechanic_id = :mechanic_id";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':id', $id);
+            $statement->bindValue(':mechanic_id', Application::$app->user->id);
+            $statement->execute();
+            
+            if (!$statement->fetch()) {
+                throw new NotFoundException();
+            }
+            
+            // Update the record
+            $sql = "UPDATE gg_vehicle_service_take 
+                    SET begin_timestamp = :begin, 
+                        end_timestamp = :end, 
+                        notes = :notes,
+                        duration = TIMEDIFF(:end, :begin)
+                    WHERE id = :id AND mechanic_id = :mechanic_id";
+                    
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':id', $id);
+            $statement->bindValue(':mechanic_id', Application::$app->user->id);
+            $statement->bindValue(':begin', $body['begin_timestamp']);
+            $statement->bindValue(':end', $body['end_timestamp']);
+            $statement->bindValue(':notes', $body['notes']);
+            
+            if ($statement->execute()) {
+                $response->redirect('/mechanic/serviceHistory');
+            }
+        }
+        throw new NotFoundException();
+    }
 }

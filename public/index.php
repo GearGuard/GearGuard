@@ -198,6 +198,8 @@ $app->router->get('/mechanic/sparepart/viewAll', [AuthController::class, 'mechan
 $app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMessages']);
 $app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
 $app->router->get('/mechanic/serviceHistory', [AuthController::class, 'mechanicServiceHistory']);
+$app->router->get('/mechanic/serviceHistory/edit', [AuthController::class, 'editMechanicServiceHistory']);
+$app->router->post('/mechanic/serviceHistory/update', [AuthController::class, 'updateMechanicServiceHistory']);
 
 
 
