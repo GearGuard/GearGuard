@@ -17,12 +17,10 @@ class VehicleController extends Controller
 	{
 		return Application::$app->user instanceof User && Application::$app->session->get('isCustomer');
 	}
-
 	public function __construct()
 	{
 		$this->registerMiddleware(new ExtendedMiddleware([], self::isCustomer()));
 	}
-
 	/**
 	 * @throws NotFoundException
 	 */
