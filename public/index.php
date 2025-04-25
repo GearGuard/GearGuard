@@ -40,6 +40,8 @@ $app->router->get('/about', [SiteController::class, 'about']);
 $app->router->get('/common', [SiteController::class, 'common']);
 $app->router->get('/type', [SiteController::class, 'type']);
 $app->router->get('/typelogin', [SiteController::class, 'typelogin']);
+$app->router->get('/notifications', [AuthController::class, 'notifications']);
+$app->router->get('/notifications/markAsRead', [AuthController::class, 'markNotificationAsRead']);
 
 $app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']);
 

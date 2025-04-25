@@ -23,6 +23,7 @@ use gearguard\phpmvc\Response;
 use app\models\LoginForm;
 use gearguard\phpmvc\middlewares\AuthMiddleware;
 use app\models\SparePart;
+use Ratchet\App;
 
 class AuthController extends Controller
 {
@@ -523,10 +524,16 @@ class AuthController extends Controller
                 ($time),
                 ($notes)
             );
-            $model->save();
-            return $this->render('customer/appointment/myAppointment', [
-                'name' => 'The GearGuard',
+            if ($model->validate() && $model->save()) {
+                return $this->render('customer/appointment/myAppointment', [
+                    'name' => 'The GearGuard',
 
+                ]);
+            }
+
+            return $this->render('customer/appointment/newAppointment', [
+                'name' => 'The GearGuard',
+                'model' => $model,
             ]);
         }
         throw new NotFoundException();
@@ -856,5 +863,31 @@ class AuthController extends Controller
         }
     }
 
+    public function notifications(Request $request, Response $response) {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $this->setLayout('garage_layout');
+            $notifications = Notification::receiveNotification(Application::$app->user->id);
+            return $this->render('notifications', [
+                'name' => 'The GearGuard',
+                'notifications' => $notifications,
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function markNotificationAsRead(Request $request, Response $response) {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $notificationId = $body['id'] ?? null;
+
+            if (Notification::readNotification($notificationId, Application::$app->user->id)){
+                echo 'success';
+                return;
+            }
+        } else {
+            throw new NotFoundException();
+        }
+    }
    
 }

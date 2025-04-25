@@ -117,6 +117,9 @@ class GarageController extends Controller
     {
         if (Application::$app->user instanceof Garage) {
             $body = $request->getBody();
+            if (!isset($body['type']) || !isset($body['price']) || !isset($body['duration']) || !isset($body['description']))
+                throw new NotFoundException();
+
             $model = GarageService::initialize(
                 $body['type'],
                 (is_numeric($body['price'])) ? $body['price'] : -1,
@@ -191,9 +194,13 @@ class GarageController extends Controller
     public function getService(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
-            if (!isset($_GET['searchQuery']))
-                echo '';
-            $data = Application::$app->user->getServiceByType($_GET['searchQuery']);
+            $body = $request->getBody();
+            if (!isset($body['searchQuery'])) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(null);
+                return;
+            }
+            $data = Application::$app->user->getServiceByType($body['searchQuery']);
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode($data);
         }

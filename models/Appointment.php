@@ -63,8 +63,12 @@ class Appointment extends DbModel
         ];
     }
 
-    public function validate($valueUpdates = [], $validateVehicleID = true, $validateGarageID = true, $validateServiceID = true, $validateAppointmentDateAndTime = true, $validateInternals = false) : bool
+    public function validate($valueUpdates = [], $validateVehicleID = true, $validateGarageID = true, $validateServiceID = true, $validateAppointmentDateAndTime = true, $validateInternals = false, $useFrameworkValidations = false) : bool
     {
+        if ($useFrameworkValidations) {
+            return parent::validate();
+        }
+
         if ($validateInternals && ($this->status_id < 1 || $this->status_id > 3)) {
             $this->addError('status_id', 'Status ID must be between 1 and 3.');
         }
