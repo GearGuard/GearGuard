@@ -246,10 +246,16 @@
         <span class="nav-text">Services</span> 
     </a> 
 </li>
-        <li class="nav-item"> 
+        <!-- <li class="nav-item"> 
             <a href="/mechanic/serviceHistory" class="nav-link"> 
                 <i class="fas fa-history"></i> 
                 <span class="nav-text">History</span> 
+            </a> 
+        </li>  -->
+        <li class="nav-item"> 
+            <a href="/mechanic/serviceHistory/viewAll" class="nav-link"> 
+                <i class="fas fa-history"></i> 
+                <span class="nav-text">Service History</span> 
             </a> 
         </li> 
        <li class="nav-item"> 
@@ -259,7 +265,7 @@
     </a> 
 </li>
 <li class="nav-item"> 
-    <a href="/community" class="nav-link"> 
+    <a href="community" class="nav-link"> 
         <i class="fas fa-users"></i> 
         <span class="nav-text">Community</span> 
     </a> 

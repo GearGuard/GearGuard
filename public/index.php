@@ -191,15 +191,15 @@ $app->router->get('/mechanic/services/search', [AuthController::class, 'getServi
 $app->router->get('/mechanic/profile', [AuthController::class, 'myProfile']);
 $app->router->post('/mechanic/profile/update', [AuthController::class, 'updateProfile']);
 $app->router->get('/mechanic/services', [SiteController::class, 'mechanicservices']);
-// $app->router->get('/mechanic/service_history', [SiteController::class, 'mechanicServiceHistory']);
 $app->router->get('/mechanic/sparepart/addNew', [MechanicController::class, 'mechanicSparePartAddNew']);
 $app->router->post('/mechanic/sparepart/addNew', [AuthController::class, 'mechanicSparePartAddNewPost']);
 $app->router->get('/mechanic/sparepart/viewAll', [AuthController::class, 'mechanicSparePartViewAll']);
 $app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMessages']);
 $app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
 $app->router->get('/mechanic/serviceHistory', [AuthController::class, 'mechanicServiceHistory']);
-$app->router->get('/mechanic/serviceHistory/edit', [AuthController::class, 'editMechanicServiceHistory']);
-$app->router->post('/mechanic/serviceHistory/update', [AuthController::class, 'updateMechanicServiceHistory']);
+$app->router->get('/mechanic/serviceHistory/viewAll', [AuthController::class, 'mechanicServiceHistory']);
+$app->router->get('/mechanic/serviceHistory/editService', [AuthController::class, 'mechanicServiceHistoryEdit']);
+$app->router->post('/mechanic/serviceHistory/update', [AuthController::class, 'updateServiceHistory']);
 
 
 
