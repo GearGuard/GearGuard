@@ -345,7 +345,13 @@ $this->title = 'Appointment';
     </div>
 
     <script>
-        // Function to fetch appointments from the server
+        function isFutureDate(dateStr) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const appointmentDate = new Date(dateStr);
+            return appointmentDate >= today;
+        }
+
         async function fetchAppointments() {
             const loader = document.getElementById('loader');
             const noAppointments = document.getElementById('noAppointments');
@@ -355,15 +361,16 @@ $this->title = 'Appointment';
                 loader.style.display = 'block';
                 noAppointments.style.display = 'none';
 
-                // Fetch appointments from the server using fetch API (not AJAX)
                 const response = await fetch('/customer/appointment/getMyAppointments');
                 const appointments = await response.json();
 
                 loader.style.display = 'none';
                 tableBody.innerHTML = '';
 
-                if (appointments && appointments.length > 0) {
-                    appointments.forEach(appointment => {
+                const upcomingAppointments = appointments.filter(app => isFutureDate(app.date));
+
+                if (upcomingAppointments.length > 0) {
+                    upcomingAppointments.forEach(appointment => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${appointment.service_type || 'N/A'}</td>
