@@ -1,3 +1,8 @@
+<?php
+
+/** @var $this \gearguard\phpmvc\View */
+$this->title = 'Spare Parts Management';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -284,8 +289,8 @@
 
             </tbody>
         </table>
-        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading spare parts...</div>
-        <div id="noSparePart" style="text-align: center; display: none; margin-top: 1em;">No spare parts found</div>
+        <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading Spare Parts...</div>
+        <div id="noAppointments" style="text-align: center; display: none; margin-top: 1em;">No Spare Parts found</div>
     </div>
     <script>
         async function fetchSpareParts() {
@@ -295,40 +300,124 @@
 
             try {
                 loader.style.display = 'block';
-                noAppointments.style.display = 'none';
-                const response = await fetch('/customer/sparepart/view_sparepart')
+                noSparePart.style.display = 'none';
+
+                const response = await fetch('/customer/sparepart/getMySpareParts');
                 const spareParts = await response.json();
 
                 loader.style.display = 'none';
                 tableBody.innerHTML = '';
 
-                if (spareParts.length === 0) {
-                    noSparePart.style.display = 'block';
-                } else {
-                    spareParts.forEach(sparePart => {
+                if (spareParts && spareParts.length > 0) {
+                    spareParts.forEach(spareParts => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${sparePart.vehicle}</td>
-                            <td>${sparePart.serial_number}</td>
-                            <td>${sparePart.type}</td>
-                            <td>${sparePart.price}</td>
+                            <td>${spareParts.vehicle || 'N/A'}</td>
+                            <td>${spareParts.serial_number || 'N/A'}</td>
+                            <td>${spareParts.type || 'N/A'}</td>
+                            <td>${spareParts.price || 'N/A'}</td>
                             <td class="button-container">
-                                <button class="action-button view" onclick="viewSparePart(${sparePart.id})">View</button>
-                                <button class="action-button edit" onclick="editSparePart(${sparePart.id})">Edit</button>
-                                <button class="action-button delete" onclick="deleteSparePart(${sparePart.id})">Delete</button>
+                                <button class="action-button" onclick='viewSparePart(${JSON.stringify(spareParts)})'>View More</button>
+                                <button class="action-button" onclick='editSparePart(${JSON.stringify(spareParts)})'><i class="fas fa-pencil"></i></button>
+                                <button class="action-button" onclick='deleteSparePart(${spareParts.id})'><i class="fas fa-trash"></i></button>
                             </td>`;
                         tableBody.appendChild(row);
                     });
+                } else {
+                    noSparePart.style.display = 'block';
                 }
 
             } catch (error) {
                 console.error('Error fetching spare parts:', error);
                 loader.style.display = 'none';
                 noSparePart.style.display = 'block';
+                noSparePart.textContent = 'Error loading spare parts. Please try again later.';
             }
         }
-    </script>
-    <script>
+
+        function viewSparePart(spareParts) {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+
+            content.innerHTML = `
+                <span class="close" onclick="closeModal()">×</span>
+                <h2>Spare Part Details</h2>
+                <p><strong>Vehicle:</strong> ${spareParts.vehicle}</p>
+                <p><strong>Serial Number:</strong> ${spareParts.serial_number}</p>
+                <p><strong>Type:</strong> ${spareParts.type}</p>
+                <p><strong>Price:</strong> ${spareParts.price}</p>
+                <p><strong>Manufacturer:</strong> ${spareParts.manufacturer}</p>
+                <p><strong>Manufactured Date:</strong> ${spareParts.manufactured_date}</p>
+                <p><strong>Warranty Period:</strong> ${spareParts.warranty_period}</p>
+            `;
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+
+        function editSparePart(spareParts) {
+            const model = document.createElement('div');
+            model.classList.add('modal');
+
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+
+            content.innerHTML = `
+                <span class="close" onclick="closeModal()">×</span>
+                <h2>Edit Spare Part</h2>
+                <form action="/customer/sparepart/edit_sparepart" method="post">
+                    <label for="serial_no">Serial Number:</label>
+                    <input type="text" id="serial_no" name="serial_no" value="${spareParts.serial_number}" required>
+                    <label for="type">Type:</label>
+                    <input type="text" id="type" name="type" value="${spareParts.type}" required>
+                    <label for="price">Price:</label>
+                    <input type="number" id="price" name="price" value="${spareParts.price}" required>
+                    <div class="form-actions">
+                        <button type="submit" class="action-button">Save Changes</button>
+                        <button type="button" class="action-button delete" onclick="deleteSparePart(${spareParts.id})">Delete</button>
+                    </div>
+                </form>`;
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+
+        function deleteSparePart(spareParts) {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+
+            content.innerHTML = `
+                <span class="close" onclick="closeModal()">×</span>
+                <h2>Delete Spare Part</h2>
+                <p>Are you sure you want to delete this spare spareParts?</p>
+                <div class="form-actions">
+                    <button type="button" class="action-button delete" onclick="confirmDelete(${spareParts.id})">Delete</button>
+                    <button type="button" class="action-button" onclick="closeModal()">Cancel</button>
+                </div>`;
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+
+            document.getElementById('noButton').addEventListener('click', function() {
+                modal.remove();
+            });
+
+            document.getElementById('yesButton').addEventListener('click', function() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/customer/sparepart/delete`;
+                form.innerHTML = `<input type="hidden" name="id" value="${id}">`;
+                form.style.display = 'none';
+                document.body.appendChild(form);
+                form.submit();
+                modal.remove();
+                // Optionally, refresh the appointments list after deletion
+                setTimeout(fetchSpareParts, 500);
+            });
+        }
         document.addEventListener('DOMContentLoaded', fetchSpareParts);
     </script>
 </body>
