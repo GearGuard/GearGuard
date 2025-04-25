@@ -143,6 +143,33 @@
             text-align: center;
         }
 
+        .nav-link-logout {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--primary);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link-logout:hover {
+            background-color: var(--hover-bg);
+            color: var(--accent);
+        }
+
+        .nav-link-logout.active {
+            background-color: var(--hover-bg);
+            color: var(--accent);
+        }
+
+        .nav-link-logout i {
+            width: 24px;
+            margin-right: 10px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
         .sidebar.collapsed .nav-link i {
             margin-right: 0;
         }
@@ -154,7 +181,7 @@
         /* Main Content */
         .main-content {
             margin-left: 260px;
-            padding: 30px;
+            /* padding: 30px; */
             flex-grow: 1;
             width: calc(100vw - 260px);
             transition: all 0.3s ease;
@@ -220,7 +247,7 @@
     </a> 
 </li>
         <li class="nav-item"> 
-            <a href="/service_history" class="nav-link"> 
+            <a href="/mechanic/serviceHistory" class="nav-link"> 
                 <i class="fas fa-history"></i> 
                 <span class="nav-text">History</span> 
             </a> 
@@ -249,12 +276,12 @@
                     <span class="nav-text">Settings</span>
                 </a>
             </li>
-        <li class="nav-item"> 
-            <a href="" class="nav-link"> 
-                <i class="fas fa-sign-out-alt"></i> 
-                <span class="nav-text">Logout</span> 
-            </a> 
-        </li> 
+            <li class="nav-item">
+                <a href= "/logout" class="nav-link-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="nav-text">Sign out</span>
+                </a>
+            </li> 
     </ul> 
 </div>
     </div>
