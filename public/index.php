@@ -84,7 +84,7 @@ $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::
 // Spare Part
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparePart']);
 $app->router->post('/customer/sparepart/add_sparepart', [SparePartController::class, 'addSparePart']);
-$app->router->get('/customer/sparepart/view_sparepart', [SparePartController::class, 'getMySpareParts']);
+$app->router->get('/customer/sparepart/getMySpareParts', [SparePartController::class, 'getMySpareParts']);
 $app->router->get('/customer/sparepart/edit_sparepart', [SparePartController::class, 'editSparepart']);
 $app->router->post('/customer/sparepart/edit_sparepart', [SparePartController::class, 'editSparepartPost']);
 $app->router->get('/customer/sparepart/delete_sparepart', [SparePartController::class, 'deleteSparepart']);
