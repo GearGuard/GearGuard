@@ -8,6 +8,7 @@ use app\models\GarageService;
 use app\models\LoginFormGarage;
 use app\models\Notification;
 use app\models\Vehicle;
+use app\models\LoginFormMechanic;
 use app\models\VehicleOwner;
 use app\models\SparePart;
 use Cassandra\Date;
@@ -16,10 +17,13 @@ use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
 use app\models\User;
 use app\models\Garage;
+use app\models\Mechanic;
+use app\models\MechanicService;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Response;
 use app\models\LoginForm;
 use gearguard\phpmvc\middlewares\AuthMiddleware;
+use app\models\SparePart;
 
 class AuthController extends Controller
 {
@@ -138,6 +142,12 @@ class AuthController extends Controller
                 'title' => 'Profile',
                 'model' => $model,
             ]);
+        } else if (Application::$app->user instanceof Mechanic) {
+            $mechanic = Application::$app->user;
+            return $this->render('mechanic/profile', [
+                'title' => 'Profile',
+                'mechanic' => $mechanic
+            ]);
         }
 
         throw new NotFoundException();
@@ -160,7 +170,12 @@ class AuthController extends Controller
             return $this->render('garage/garage', [
                 'title' => 'Garage Dashboard'
             ]);
+        } else if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/mechanic', [
+                'title' => 'Mechanic Dashboard'
+            ]);
         }
+
         throw new NotFoundException();
     }
 
@@ -181,6 +196,11 @@ class AuthController extends Controller
             return $this->render('garage/dashboard', [
                 'title' => 'Garage Dashboard'
             ]);
+        } else if (Application::$app->user instanceof Mechanic) {
+            $mechanic = Application::$app->user;
+            return $this->render('mechanic/dashboard', [
+                'title' => 'Mechanic Dashboard',
+            ]);
         }
         throw new NotFoundException();
     }
@@ -194,6 +214,10 @@ class AuthController extends Controller
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
             return $this->render('garage/setting', [
+                'title' => 'Settings'
+            ]);
+        } else if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/setting', [
                 'title' => 'Settings'
             ]);
         }
@@ -544,4 +568,310 @@ class AuthController extends Controller
         }
         throw new NotFoundException();
     }
+
+    //mechanic
+   
+    public function mechanicSignup(Request $request, Response $response)
+    {
+        $errors = [];
+        $mechanic = new Mechanic();
+        if ($request->isPost()) {
+            $mechanic->loadData($request->getBody());
+
+
+            if ($mechanic->validate() && $mechanic->save()) {
+                Application::$app->session->setFlash('success', 'Thanks for Registering');
+                Application::$app->response->redirect('/');
+                exit;
+            }
+            return $this->render('mechanic/signup', [
+                'model' => $mechanic
+            ]);
+        }
+        $this->setLayout('auth');
+        return $this->render('mechanic/signup', [
+            'model' => $mechanic
+        ]);
+    }
+
+    public function mechanicLogin(Request $request, Response $response)
+    {
+        $loginForm = new LoginFormMechanic();
+        if ($request->isPost()) {
+            $loginForm->loadData($request->getBody());
+            if ($loginForm->validate() && $loginForm->login()) {
+                Application::$app->session->set('isMechanic', true);
+                Application::$app->response->redirect('/');
+                return;
+            }
+        }
+
+        $this->setLayout('auth');
+        return $this->render('login', [
+            'model' => $loginForm
+        ]);
+    }
+
+    public function mechanicAddServices(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $model = new MechanicService();
+            return $this->render('mechanic/services/addService', [
+                'name' => 'The GearGuard',
+                'garage_id' => Application::$app->session->get('user'),
+                'model' => $model
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function assignMechanicService(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $message = '';
+            if ($request->isPost()) {
+                $service_id = $request->getBody()['service_id'] ?? null;
+                $mechanic_id = $request->getBody()['mechanic_id'] ?? null;
+
+                if (!$service_id || !$mechanic_id) {
+                    $message = "Service ID and Mechanic ID are required.";
+                } else {
+                    $model = new MechanicService();
+                    $success = $model->assignMechanicToService((int)$service_id, (int)$mechanic_id);
+                    if ($success) {
+                        $message = "New record inserted successfully!";
+                    } else {
+                        $message = "Error inserting record.";
+                    }
+                }
+            }
+            return $this->render('mechanic/services/addService', [
+                'message' => $message
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function MechanicAddServicesPost(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $body = $request->getBody();
+            $model = MechanicService::initialize(
+                $body['begin_timestamp'],
+                $body['end_timestamp'],
+                $body['note']
+            );
+            $model->save();
+            return $this->render('mechanic/services/viewService', [
+                'name' => 'The GearGuard',
+                'services' => $this->getServicesByGarage()
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function viewServicesByMechanic(Request $request, Response $response)
+    {
+        $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                       CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
+                       vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
+                FROM gg_vehicle_service_take vst
+                JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                JOIN gg_garage_service gs ON vst.service_id = gs.id
+                JOIN gg_garage_mechanic m ON vst.mechanic_id = m.id
+                ORDER BY vst.begin_timestamp DESC";
+
+        $statement = Application::$app->db->prepare($sql);
+        $statement->execute();
+        $serviceAssignments = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        $params = [
+            'name' => "The GearGurd",
+            'serviceAssignments' => $serviceAssignments
+        ];
+        return $this->render('mechanic/services/viewService', $params);
+    }
+
+    public function MechanicEditServices(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $model = new GarageService();
+            return $this->render('mechanic/services/editService', [
+                'name' => 'The GearGuard',
+                'garage_id' => Application::$app->session->get('user'),
+                'model' => $model
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function MechanicDeleteServices(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/services/deleteService', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+
+    public function mechanicServiceHistory(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            return $this->render('/mechanic/service_history', [
+                'title' => 'Service History'
+            ]);
+        } else if (Application::$app->user instanceof Garage) {
+            return $this->render('/mechanic/service_history', [
+                'title' => 'Service History'
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function mechanicSparePart(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/sparepart/addNew', [
+                'title' => 'Add Spare Part'
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function mechanicSparePartAddNew(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/sparepart/addNew', [
+                'title' => 'Add Spare Part'
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function mechanicSparePartAddNewPost(Request $request, Response $response)
+    {
+        if ($request->isPost()) {
+            $part = new \app\models\SparePart();
+            $part->loadData($request->getBody());
+
+            if ($part->save()) {
+                $response->redirect('/mechanic/sparepart');
+                return;
+            } else {
+                return $this->render('mechanic/sparepart/addNew', [
+                    'model' => $part,
+                    'errors' => $part->errors ?? []
+                ]);
+            }
+        }
+        $response->redirect('/mechanic/sparepart');
+    }
+
+    public function mechanicSparePartViewAll(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $sql = "SELECT * FROM gg_sparepart";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            return $this->render('mechanic/sparepart/viewAll', [
+                'name' => 'The GearGuard',
+                'spareParts' => $spareParts
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
+
+    public function MechanicSendMessages(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            return $this->render('mechanic/messages', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function updateProfile(Request $request, Response $response)
+    {
+
+        $body = $request->getBody();
+        try {
+            Application::$app->user->update($body);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+            ]);
+        } catch (\Exception $ex) {
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $ex->getMessage(),
+            ]);
+        }
+    }
+
+    public function loadServiceAssignments(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                           CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
+                           vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
+                    FROM gg_vehicle_service_take vst
+                    JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                    JOIN gg_garage_service gs ON vst.service_id = gs.id
+                    JOIN gg_garage_mechanic m ON vst.mechanic_id = m.id
+                    ORDER BY vst.begin_timestamp DESC";
+
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $serviceAssignments = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($serviceAssignments);
+        } else {
+            $response->setStatusCode(403);
+            echo json_encode(['error' => 'Unauthorized']);
+        }
+    }
+
+    public function loadAppointments(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof Mechanic) {
+            $sql = "SELECT a.id, v.type AS vehicle_type, u.name AS client_name, u.contact_number, v.license_plate_no, gs.type AS service_type, 
+                           CONCAT(a.date, ' ', a.time) AS date_time, a.notes, a.status
+                    FROM gg_appointment a
+                    JOIN gg_vehicle v ON a.vehicle_id = v.id
+                    JOIN gg_user u ON v.owner_id = u.id
+                    JOIN gg_garage_service gs ON a.service_id = gs.id
+                    ORDER BY a.date DESC, a.time DESC
+                    LIMIT 100";
+
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $appointments = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($appointments);
+        } else {
+            $response->setStatusCode(403);
+            echo json_encode(['error' => 'Unauthorized']);
+        }
+    }
+
+   
 }

@@ -4,6 +4,7 @@ User: GearGurd
 */
 
 use app\controllers\AuthController;
+use app\controllers\MechanicController;
 use app\controllers\SiteController;
 use app\controllers\AdminController;
 use app\controllers\GarageController;
@@ -39,6 +40,15 @@ $app->router->get('/about', [SiteController::class, 'about']);
 $app->router->get('/common', [SiteController::class, 'common']);
 $app->router->get('/type', [SiteController::class, 'type']);
 $app->router->get('/typelogin', [SiteController::class, 'typelogin']);
+
+$app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']);
+
+$app->router->get('/customer/appointment/appoint', [SiteController::class, 'newAppointments']);
+$app->router->get('/customer/appointment/myappoint', [SiteController::class, 'myAppointments']);
+
+$app->router->get('/customer/vehicle/register', [SiteController::class, 'addVehicle']);
+$app->router->get('/community', [SiteController::class, 'community']);
+
 $app->router->get('/tets', [SiteController::class, 'tets']);
 $app->router->get('/community', [SiteController::class, 'community']);
 $app->router->get('/logout', [SiteController::class, 'logout']);
@@ -129,6 +139,17 @@ $app->router->post('/garage/profile/update', [GarageController::class, 'updatePr
 $app->router->get('/mechanic', [GarageController::class, 'manageMechanic']);
 
 
+$app->router->get('/appointment/getServices', [SiteController::class, 'getServices']);
+
+$app->router->get('/customer/addsparepart', [SiteController::class, 'addSparepart']);
+$app->router->get('/customer/viewsparepart', [SiteController::class, 'viewSparepart']);
+
+//spare pats
+$app->router->post('/sparepart/add', [SparepartController::class, 'addSparePart']);
+$app->router->get('/sparepart/get', [SparepartController::class, 'getSparePart']);
+$app->router->post('/sparepart/delete', [SparepartController::class, 'deleteSparePart']);
+$app->router->post('/sparepart/edit', [SparepartController::class, 'editSparePart']);
+
 $app->router->get('/appointment/getServices', [AuthController::class, 'getGarageServices']);
 $app->router->get('/community/post', [AuthController::class, 'newPost']);
 $app->router->get('/community/my_posts', [AuthController::class, 'viewPosts']);
@@ -152,6 +173,37 @@ $app->router->get('/api/garage/getAppointments', [GarageController::class, 'getA
 $app->router->get('/api/garage/getAppointmentsFiltered', [GarageController::class, 'filteredAppointments']);
 $app->router->get('/api/garage/getServices', [GarageController::class, 'getServices']);
 $app->router->get('/api/garage/getCustomerVehicles', [GarageController::class, 'getCustomerVehicles']);
+
+
+
+//mechanic
+
+// $app->router->get('/mechanic', [SiteController::class, 'mechanic']);
+$app->router->get('/mechanic/register', [AuthController::class, 'mechanicSignup']);
+$app->router->post('/mechanic/register', [AuthController::class, 'mechanicSignup']);
+$app->router->get('/mechanic/login', [AuthController::class, 'mechanicLogin']);
+$app->router->post('/mechanic/login', [AuthController::class, 'mechanicLogin']);
+$app->router->get('/mechanic/dashboard', [AuthController::class, 'dashboard']);
+$app->router->get('/mechanic/services/viewService', [AuthController::class, 'viewServicesByMechanic']);
+$app->router->get('/mechanic/services/addService', [AuthController::class, 'assignMechanicService']);
+$app->router->post('/mechanic/services/addService', [AuthController::class, 'assignMechanicService']);
+$app->router->get('/mechanic/services/loadAppointments', [AuthController::class, 'loadAppointments']);
+$app->router->get('/mechanic/services/loadServiceAssignments', [AuthController::class, 'loadServiceAssignments']);
+$app->router->get('/mechanic/services/editService', [SiteController::class, 'editServices']);
+$app->router->post('/mechanic/services/editService', [SiteController::class, 'editServices']);
+$app->router->get('/mechanic/services/deleteService', [SiteController::class, 'deleteServices']);
+$app->router->post('/mechanic/services/deleteService', [SiteController::class, 'markServiceDeleted']);
+$app->router->get('/mechanic/services/search', [AuthController::class, 'getService']);
+$app->router->get('/mechanic/profile', [AuthController::class, 'myProfile']);
+$app->router->post('/mechanic/profile/update', [AuthController::class, 'updateProfile']);
+$app->router->get('/mechanic/services', [SiteController::class, 'mechanicservices']);
+$app->router->get('/mechanic/service_history', [SiteController::class, 'mechanicServiceHistory']);
+$app->router->get('/mechanic/sparepart/addNew', [MechanicController::class, 'mechanicSparePartAddNew']);
+$app->router->post('/mechanic/sparepart/addNew', [AuthController::class, 'mechanicSparePartAddNewPost']);
+$app->router->get('/mechanic/sparepart/viewAll', [AuthController::class, 'mechanicSparePartViewAll']);
+$app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMessages']);
+$app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
+
 
 
 $app->run();

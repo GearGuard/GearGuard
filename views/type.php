@@ -161,6 +161,13 @@
                 <p>Register your garage to offer services and connect with vehicle owners</p>
                 <button class="select-btn">Register as Garage</button>
             </div>
+
+            <div class="option-card" onclick="window.location.href='/mechanic/register'">
+                <i class="fas fa-wrench"></i>
+                <h2>Mechanic</h2>
+                <p>Register as a mechanic to offer your expertise and connect with vehicle owners</p>
+                <button class="select-btn">Register as Mechanic</button>
+            </div>
         </div>
     </div>
 </body>
