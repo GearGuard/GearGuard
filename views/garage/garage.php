@@ -282,7 +282,7 @@
                         <i class="fas fa-bell"></i>
                         <span class="nav-text">Notifications</span>
                         <?php if (\gearguard\phpmvc\Application::$app->user->hasNotifications()) : ?>
-                            <span class="notification-circle" style="position: relative;right: -0.8em;display: inline-block;width: 0.6em;height: 0.6em;border-radius: 50%;background-color: tomato;"></span>
+                            <span id="notification-circle" class="notification-circle" style="position: relative;right: -0.8em;display: inline-block;width: 0.6em;height: 0.6em;border-radius: 50%;background-color: tomato;"></span>
                         <?php endif; ?>
                     </span>
                 </a>

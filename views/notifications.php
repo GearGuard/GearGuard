@@ -236,6 +236,9 @@
     </form>
 
     <script>
+        let notifications = <?php echo count($notifications) ?>;
+        let readNotifications = 0;
+
         async function markAsRead(id) {
             const response = await fetch(`/notifications/markAsRead?id=${id}`);
 
@@ -250,6 +253,11 @@
                 const notificationItem = document.getElementById(`notification-item-${id}`);
                 if (notificationItem) {
                     notificationItem.classList.add('notification-read');
+                    readNotifications++;
+
+                    if (notifications === readNotifications && window.parent && window.parent.document.getElementById('notification-circle')) {
+                        window.parent.document.getElementById('notification-circle').style.display = 'none';
+                    }
                 }
             } else {
                 console.error('Failed to mark notification as read:', result);
@@ -285,7 +293,12 @@
                 document.querySelectorAll('.notification-item').forEach(e => {
                     e.classList.add('notification-read');
                 });
+                if (window.parent && window.parent.document.getElementById('notification-circle'))
+                    window.parent.document.getElementById('notification-circle').style.display = 'none';
+                readNotifications = notifications;
             } else {
+                if (notifications === readNotifications)
+                    return;
                 console.error('Failed to mark all notifications as read');
                 alert('Failed to mark all notifications as read. Please reload the page.');
             }
