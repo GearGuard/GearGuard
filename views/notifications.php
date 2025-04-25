@@ -220,7 +220,7 @@
         </div>
         <ul class="notifications-list">
         <?php foreach ($notifications as $notification): ?>
-            <li class="notification-item" id="notification-item-<?php echo $notification->id;?>" onclick="markAsRead(<?php echo $notification->id;?>)">
+            <li class="notification-item" id="notification-item-<?php echo $notification->id;?>" notification-id="<?php echo $notification->id;?>" onclick="markAsRead(<?php echo $notification->id;?>)">
                 <div class="notification-wrapper">
                     <div class="notification-info">
                         <div class="notification-name"><?php echo $notification->description; ?></div>
@@ -228,11 +228,11 @@
                     </div>
                 </div>
             </li>
-            <?php endforeach;?> 
+            <?php endforeach;?>
         </ul>
     </div>
     <form>
-        <button type="button" class="button">Mark All as Read</button>
+        <button type="button" class="button" onClick="markAllAsRead()">Mark All as Read</button>
     </form>
 
     <script>
@@ -253,6 +253,41 @@
                 }
             } else {
                 console.error('Failed to mark notification as read:', result);
+            }
+        }
+
+        async function markAllAsRead() {
+            const ids = [];
+            document.querySelectorAll('.notification-item[notification-id]').forEach(e => ids.push(Number.parseInt(e.getAttribute('notification-id'))));
+
+            if (ids.length === 0) {
+                return;
+            }
+
+            const response = await fetch(`/notifications/markAllAsRead`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    'ids': JSON.stringify(ids)
+                })
+            });
+
+            if (!response.ok) {
+                console.error('Error marking all notifications as read:', response.statusText);
+                return;
+            }
+
+            const result = await response.text();
+
+            if (result === 'success') {
+                document.querySelectorAll('.notification-item').forEach(e => {
+                    e.classList.add('notification-read');
+                });
+            } else {
+                console.error('Failed to mark all notifications as read');
+                alert('Failed to mark all notifications as read. Please reload the page.');
             }
         }
     </script>

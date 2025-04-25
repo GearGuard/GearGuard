@@ -889,5 +889,29 @@ class AuthController extends Controller
             throw new NotFoundException();
         }
     }
+
+    public function markAllNotificationsAsRead(Request $request, Response $response) {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $userId = Application::$app->user->id;
+
+            if (!isset($body['ids'])) {
+                throw new NotFoundException();
+            }
+
+            $ids = json_decode($body['ids']);
+
+            if (!$ids) {
+                throw new NotFoundException();
+            }
+
+            if (Notification::readAllNotifications($ids)) {
+                echo 'success';
+                return;
+            }
+        } else {
+            throw new NotFoundException();
+        }
+    }
    
 }

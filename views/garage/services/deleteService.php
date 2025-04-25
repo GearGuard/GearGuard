@@ -326,33 +326,6 @@
                 alert('Something went wrong. Please try again later.');
                 return;
             }
-
-            /* $.ajax({
-                url: '/garage/services/search',
-                type: 'GET',
-                data: {
-                    searchQuery: searchType
-                },
-                success: function (response) {
-                    serviceDetails = document.getElementById('serviceDetails');
-                    if (response == null) {
-                        serviceDetails.style.display = 'none';
-                        alert('No service found!');
-                        return;
-                    }
-                    serviceDetails.style.display = 'block';
-
-                    // Populate form fields with dummy data (replace this with actual data from your backend)
-                    serviceId = response.id;
-                    document.getElementById('serviceType').textContent = response.type;
-                    document.getElementById('serviceDescription').textContent = response.description;
-                    document.getElementById('serviceDuration').textContent = response.duration;
-                    document.getElementById('servicePrice').textContent = response.price;
-                },
-                error: function (xhr, status, error) {
-                    console.log('Error:', error);
-                }
-            }); */
         }
 
         function showDeleteConfirmation() {
@@ -396,28 +369,6 @@
                 document.getElementById('search_type').value = '';
                 serviceId = null;
             }
-
-            /* $.ajax({
-                url: '/garage/services/delete',
-                type: 'POST',
-                data: {
-                    serviceID: serviceId
-                },
-                success: function (response) {
-                    alert('Service deleted successfully. But if there are any appointments associated with this service, they will not be deleted.');
-                    closeModal();
-                    document.getElementById('serviceDetails').style.display = 'none';
-                    document.getElementById('search_type').value = '';
-                    serviceId = null;
-                },
-                error: function (xhr, status, error) {
-                    alert('We could not delete the service!');
-                    closeModal();
-                    document.getElementById('serviceDetails').style.display = 'none';
-                    document.getElementById('search_type').value = '';
-                    serviceId = null;
-                }
-            }); */
         }
     </script>
 </body>

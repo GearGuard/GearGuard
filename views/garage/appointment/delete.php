@@ -337,19 +337,20 @@ $this->title = 'Search Appointments';
             async function handleSearch(event) {
                 if (event !== null) {
                     event.preventDefault();
+                    document.getElementById('resultsBody').innerHTML = '';
                 }
 
+                if (isLoading || !hasMoreData) return false;
+
                 const firstname = document.getElementById('firstname').value.trim();
-        		const lastname = document.getElementById('lastname').value.trim();
-        		const numberplate = document.getElementById('numberplate').value.trim();
-        		const contact = document.getElementById('contact').value.trim();
-        		const date = document.getElementById('date').value.trim();
-        		const condition = document.getElementById('condition').value.trim();
+                const lastname = document.getElementById('lastname').value.trim();
+                const numberplate = document.getElementById('numberplate').value.trim();
+                const contact = document.getElementById('contact').value.trim();
+                const date = document.getElementById('date').value.trim();
+                const condition = document.getElementById('condition').value.trim();
                 const resultsContainer = document.getElementById('resultsContainer');
                 const resultsBody = document.getElementById('resultsBody');
                 const noResultsMessage = document.getElementById('noResultsMessage');
-
-                if (isLoading || !hasMoreData) return false;
 
                 isLoading = true;
                 loader.textContent = 'Loading...';
@@ -370,15 +371,12 @@ $this->title = 'Search Appointments';
                         return;
                     }
 
-                    resultsBody.innerHTML = '';
                         if (data.length === 0 && loadedResults === 0) {
                             loader.textContent = 'No appointments found.';
                             hasMoreData = false;
-                            window.removeEventListener('scroll', handleScroll);
                         } else if (data.length < limit) {
                            loader.textContent = '--- End of Search Results ---';
                            hasMoreData = false;
-                           window.removeEventListener('scroll', handleScroll);
                         } else {
                             page++;
                         }
@@ -405,87 +403,6 @@ $this->title = 'Search Appointments';
                     return false;
                 }
 
-                /* $.ajax({
-                    url: '/api/garage/getAppointmentsFiltered',
-                    type: 'GET',
-                    data: {
-                        firstname: firstname,
-                        lastname: lastname,
-                        numberplate: numberplate,
-                        contact: contact,
-                        date: date,
-                        condition: condition,
-                        status: 'active',
-                        page: page,
-                    },
-                    success: function (response) {
-                        let data = response;
-
-                        resultsBody.innerHTML = '';
-                            if (data.length === 0 && loadedResults === 0) {
-                                loader.textContent = 'No appointments found.';
-                                hasMoreData = false;
-                                window.removeEventListener('scroll', handleScroll);
-                            } else if (data.length < limit) {
-                               loader.textContent = '--- End of Search Results ---';
-                               hasMoreData = false;
-                               window.removeEventListener('scroll', handleScroll);
-                            } else {
-                                page++;
-                            }
-                            data.forEach(item => {
-                                let tablerow = `<tr id='table-row-id-${item.id}' onclick='confirmAppointmentDeletion(${item.id})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
-                                    <td>${item.vehicle_type}</td>
-                                    <td>${item.first_name} ${item.last_name}</td>
-                                    <td>${item.contact_no}</td>
-                                    <td>${item.license_plate_no}</td>
-                                    <td>${item.service_type}</td>
-                                    <td>${item.date} ${item.time}</td>`;
-
-                                tablerow += `</tr>`;
-
-                                resultsBody.innerHTML += tablerow;
-                                loadedResults++;
-                            });
-                            resultsContainer.style.display = 'block';
-                            resultsContainer.scrollIntoView();
-                    },
-                    error: function (xhr, status, error) {
-                        console.log('Error:', error);
-                    }
-                }); */
-
-                // Filter results
-                /*const filteredResults = data.filter(item =>
-                    item.name.toLowerCase().includes(query.toLowerCase()) ||
-                    item.plate.toLowerCase().includes(query.toLowerCase()) ||
-                    item.contact.includes(query)
-                );
-
-                noResultsMessage.style.display = 'none';
-
-                resultsBody.innerHTML = '';
-                if (data.length > 0) {
-                    data.forEach(item => {
-                        resultsBody.innerHTML += `
-                                <tr>
-                                    <td>${item.vehicle_type}</td>
-                                    <td>${item.first_name} ${item.last_name}</td>
-                                    <td>${item.contact_no}</td>
-                                    <td>${item.license_plate_no}</td>
-                                    <td>${item.vehicle_model}</td>
-                                    <td>${item.date} ${item.time}</td>
-                                    <td><button onclick='viewDetails(${item})' class="view-more-button">View More</button></td>
-                                    <td><button class="view-more-button">Accept</button></td>
-                                </tr>
-                            `;
-                    });
-                    noResultsMessage.style.display = 'none';
-                } else {
-                    noResultsMessage.style.display = 'block';
-                }
-
-                resultsContainer.style.display = 'block';*/
                 return false;
             }
 
@@ -499,7 +416,7 @@ $this->title = 'Search Appointments';
 
             function handleScroll() {
                 const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-                if (scrollTop + clientHeight >= scrollHeight - 5 && page < 0) {
+                if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
                     handleSearch(null);
                 }
             }
@@ -554,30 +471,7 @@ $this->title = 'Search Appointments';
                     closeModal();
                     appointmentID = -1;
                 }
-                /* $.ajax({
-                    url: '/garage/appointment/delete',
-                    type: 'POST',
-                    data: {
-                        appointment_id: appointmentID,
-                        status_id: 3
-                    },
-                    success: function (response) {
-                        if (response === 'success') {
-                            alert('Appointment deleted successfully.');
-                            document.getElementById(`table-row-id-${appointmentID}`).remove();
-                            closeModal();
-                            resetVariables();
-                        } else {
-                            alert('An error occurred. Please try again later.');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error deleting appointment:', error);
-                        alert('We could not delete the service!');
-                        closeModal();
-                        appointmentID = -1;
-                    }
-                }); */
+
             }
     </script>
 </body>

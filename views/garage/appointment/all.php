@@ -298,11 +298,9 @@ $this->title = 'View All Appointments';
                 if (result.length < limit) {
                     loader.textContent = '--- End of Appointments Table ---';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else if (result.length === 0 && loadedResults === 0) {
                     loader.textContent = 'No Appointments found.';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else {
                     page++;
                 }
@@ -380,31 +378,11 @@ $this->title = 'View All Appointments';
                 console.log('Error:', error);
                 alert('An error occurred. Please try again later.');
             }
-            /* $.ajax({
-                url: '/appointment/update_status',
-                type: 'POST',
-                data: {
-                    appointment_id: appointment_id,
-                    status_id: status_id
-                },
-                success: function (response) {
-                    if (response === 'success') {
-                        alert('Appointment status updated successfully.');
-                        document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
-                    } else {
-                        alert('An error occurred. Please try again later.');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.log('Error:', error);
-                    alert('An error occurred. Please try again later.');
-                }
-            }) */
         }
 
         function handleScroll() {
             const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-            if (scrollTop + clientHeight >= scrollHeight - 5) {
+            if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
                 fetchAppointments();
             }
         }

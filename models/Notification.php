@@ -5,6 +5,8 @@ namespace app\models;
 use app\utilities\JWTGenerator;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\db\DbModel;
+use gearguard\phpmvc\exception\NotFoundException;
+use Ratchet\App;
 
 class Notification extends DbModel
 {
@@ -108,5 +110,27 @@ class Notification extends DbModel
         $statement->bindValue(':id', $notificationId);
         $statement->bindValue(':user_id', $userId);
         return $statement->execute();
+    }
+
+    public static function readAllNotifications($idArray = []): bool {
+
+        if (empty($idArray))
+            return true;
+
+        foreach ($idArray as $id) {
+            if (is_numeric($id))
+                continue;
+
+            throw new \Exception("IDs must be numbers");
+        }
+
+        $sql = "UPDATE gearguard.gg_notification ggn SET status_id = "
+            . self::STATUS_READ
+            . " WHERE ggn.user_id = "
+            . Application::$app->user->id
+            . " AND ggn.id IN ("
+            . implode(',', $idArray)
+            . ")";
+        return Application::$app->db->pdo->exec($sql);
     }
 }

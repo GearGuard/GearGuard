@@ -237,11 +237,9 @@
                 if (result.length < limit) {
                     loader.textContent = '--- End of Customers Table ---';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else if (result.length === 0 && loadedResults === 0) {
                     loader.textContent = 'No customers found.';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else {
                     page++;
                 }
@@ -281,7 +279,7 @@
 
     function handleScroll() {
         const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 5) {
+        if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
             fetchCustomers();
         }
     }

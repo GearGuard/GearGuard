@@ -42,6 +42,7 @@ $app->router->get('/type', [SiteController::class, 'type']);
 $app->router->get('/typelogin', [SiteController::class, 'typelogin']);
 $app->router->get('/notifications', [AuthController::class, 'notifications']);
 $app->router->get('/notifications/markAsRead', [AuthController::class, 'markNotificationAsRead']);
+$app->router->post('/notifications/markAllAsRead', [AuthController::class, 'markAllNotificationsAsRead']);
 
 $app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']);
 

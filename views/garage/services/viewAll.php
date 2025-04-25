@@ -214,11 +214,9 @@
                 if (result.length < limit) {
                     loader.textContent = '--- End of Services Table ---';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else if (result.length === 0 && loadedResults === 0) {
                     loader.textContent = 'No Services found.';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else {
                     page++;
                 }
@@ -256,7 +254,7 @@
 
     function handleScroll() {
         const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 5) {
+        if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
             fetchServices();
         }
     }

@@ -282,6 +282,7 @@ $this->title = 'Search Appointments';
     async function handleSearch(event) {
         if (event !== null) {
             event.preventDefault();
+            document.getElementById('resultsBody').innerHTML = '';
         }
 
         const firstname = document.getElementById('firstname').value.trim();
@@ -316,15 +317,12 @@ $this->title = 'Search Appointments';
                 return;
             }
 
-            resultsBody.innerHTML = '';
             if (data.length === 0 && loadedResults === 0) {
                 loader.textContent = 'No appointments found.';
                 hasMoreData = false;
-                window.removeEventListener('scroll', handleScroll);
             } else if (data.length < limit) {
                loader.textContent = '--- End of Search Results ---';
                hasMoreData = false;
-               window.removeEventListener('scroll', handleScroll);
             } else {
                 page++;
             }
@@ -351,92 +349,6 @@ $this->title = 'Search Appointments';
         } catch (error) {
             console.log('Error:', error);
         }
-
-        /* $.ajax({
-            url: '/api/garage/getAppointmentsFiltered',
-            type: 'GET',
-            data: {
-                firstname: firstname,
-                lastname: lastname,
-                numberplate: numberplate,
-                contact: contact,
-                date: date,
-                condition: condition,
-                status: status,
-                page: page,
-            },
-            success: function (response) {
-                let data = response;
-
-                resultsBody.innerHTML = '';
-                    if (data.length === 0 && loadedResults === 0) {
-                        loader.textContent = 'No appointments found.';
-                        hasMoreData = false;
-                        window.removeEventListener('scroll', handleScroll);
-                    } else if (data.length < limit) {
-                       loader.textContent = '--- End of Search Results ---';
-                       hasMoreData = false;
-                       window.removeEventListener('scroll', handleScroll);
-                    } else {
-                        page++;
-                    }
-                    data.forEach(item => {
-                        let tablerow = `<tr id='table-row-id-${item.id}' onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
-                            <td>${item.vehicle_type}</td>
-                            <td>${item.first_name} ${item.last_name}</td>
-                            <td>${item.contact_no}</td>
-                            <td>${item.license_plate_no}</td>
-                            <td>${item.service_type}</td>
-                            <td>${item.date} ${item.time}</td>`;
-
-                        if (item.status_id === 1) {
-                            tablerow += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 3)">Reject</button></td>`;
-                        }
-
-                        tablerow += `</tr>`;
-
-                        resultsBody.innerHTML += tablerow;
-                        loadedResults++;
-                    });
-                    resultsContainer.style.display = 'block';
-                    resultsContainer.scrollIntoView();
-            },
-            error: function (xhr, status, error) {
-                console.log('Error:', error);
-            }
-        }); */
-
-        // Filter results
-        /*const filteredResults = data.filter(item =>
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.plate.toLowerCase().includes(query.toLowerCase()) ||
-            item.contact.includes(query)
-        );
-
-        noResultsMessage.style.display = 'none';
-
-        resultsBody.innerHTML = '';
-        if (data.length > 0) {
-            data.forEach(item => {
-                resultsBody.innerHTML += `
-                        <tr>
-                            <td>${item.vehicle_type}</td>
-                            <td>${item.first_name} ${item.last_name}</td>
-                            <td>${item.contact_no}</td>
-                            <td>${item.license_plate_no}</td>
-                            <td>${item.vehicle_model}</td>
-                            <td>${item.date} ${item.time}</td>
-                            <td><button onclick='viewDetails(${item})' class="view-more-button">View More</button></td>
-                            <td><button class="view-more-button">Accept</button></td>
-                        </tr>
-                    `;
-            });
-            noResultsMessage.style.display = 'none';
-        } else {
-            noResultsMessage.style.display = 'block';
-        }
-
-        resultsContainer.style.display = 'block';*/
         return false;
     }
 
@@ -506,33 +418,12 @@ $this->title = 'Search Appointments';
             console.log('Error:', error);
             alert('An error occurred. Please try again later.');
         }
-        /* event.stopPropagation();
-        $.ajax({
-            url: '/appointment/update_status',
-            type: 'POST',
-            data: {
-                appointment_id: appointment_id,
-                status_id: status_id
-            },
-            success: function (response) {
-                if (response === 'success') {
-                    alert('Appointment status updated successfully.');
-                    document.querySelector('#table-row-id-' + appointment_id + '>#status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
-                } else {
-                    alert('An error occurred. Please try again later.');
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log('Error:', error);
-                alert('An error occurred. Please try again later.');
-            }
-        }) */
     }
 
     function handleScroll() {
         const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 5 && page < 0) {
-            handleSearch(event);
+        if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
+            handleSearch(null);
         }
     }
 
