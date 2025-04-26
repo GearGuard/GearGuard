@@ -236,6 +236,8 @@ $this->title = 'Search Appointments';
 			<option value="accepted">Accepted</option>
 			<option value="rejected">Rejected</option>
 			<option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
 		</select>
         <button type="submit" class="search-button">Search</button>
     </form>
@@ -413,7 +415,17 @@ $this->title = 'Search Appointments';
             }
 
             alert('Appointment status updated successfully.');
-            document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
+            let status;
+            if (status_id === 2) {
+                status = 'Accepted';
+            } else if (status_id === 3) {
+                status = 'Rejected';
+            } else if (status_id === 4) {
+                status = 'Completed';
+            } else if (status_id === 5) {
+                status = 'Cancelled';
+            }
+            document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = status;
         } catch (error) {
             console.log('Error:', error);
             alert('An error occurred. Please try again later.');

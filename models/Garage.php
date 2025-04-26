@@ -356,6 +356,12 @@ class Garage extends UserModel
             case 'rejected':
                 $status_id = 3;
                 break;
+            case 'completed':
+                $status_id = 4;
+                break;
+            case 'cancelled':
+                $status_id = 5;
+                break;
             default:
                 $status_id = 2;
         }
