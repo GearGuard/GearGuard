@@ -156,8 +156,35 @@
     <label for="notes">Notes</label>
     <textarea id="notes" name="notes" rows="4"><?= htmlspecialchars($record['notes']) ?></textarea>
 
-    <button type="submit">Update</button>
+    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+        <button type="button" onclick="window.location.href='/mechanic/serviceHistory/viewAll'" style="background: var(--secondary); border: 1px solid var(--border);">Back</button>
+        <button type="submit">Update</button>
+    </div>
 </form>
+
+<script>
+document.getElementById('editServiceForm').onsubmit = function(e) {
+    e.preventDefault();
+    
+    fetch('/mechanic/serviceHistory/update', {
+        method: 'POST',
+        body: new FormData(this),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Service history updated successfully');
+            window.location.href = '/mechanic/serviceHistory/viewAll';
+        } else {
+            alert('Error: ' + (data.error || 'Failed to update service history'));
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+};
+</script>
+
 <?php elseif (isset($_GET['license_plate_no'])): ?>
 <p>No service record found for license plate number: <?= htmlspecialchars($_GET['license_plate_no']) ?></p>
 <?php else: ?>

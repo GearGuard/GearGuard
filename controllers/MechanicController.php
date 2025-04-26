@@ -283,4 +283,39 @@ class MechanicController extends Controller
 
         throw new NotFoundException();
     }
+
+    public function update(Request $request, Response $response)
+    {
+        if ($request->isPost()) {
+            $data = $request->getBody();
+            
+            try {
+                // Update service history record
+                $sql = "UPDATE gg_vehicle_service_take 
+                        SET begin_timestamp = :begin_timestamp, 
+                            end_timestamp = :end_timestamp, 
+                            notes = :notes 
+                        WHERE id = :id";
+                            
+                $statement = Application::$app->db->prepare($sql);
+                $statement->bindValue(':begin_timestamp', $data['begin_timestamp']);
+                $statement->bindValue(':end_timestamp', $data['end_timestamp']); 
+                $statement->bindValue(':notes', $data['notes']);
+                $statement->bindValue(':id', $data['id']);
+                
+                if ($statement->execute()) {
+                    // Return success JSON response
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true]);
+                    exit;
+                }
+            } catch (\Exception $e) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                exit;
+            }
+        }
+        
+        throw new NotFoundException();
+    }
 }
