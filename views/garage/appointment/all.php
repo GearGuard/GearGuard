@@ -155,6 +155,21 @@ $this->title = 'View All Appointments';
             transition: all 0.2s ease;
         }
 
+        .view-more-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             body {
@@ -327,8 +342,12 @@ $this->title = 'View All Appointments';
                     content += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 3)">Reject</button></td>`;
                 } else if (appointment.status_id == 2) {
                     content += `<td>Accepted</td>`;
-                } else {
+                } else if (appointment.status_id == 3) {
                     content += `<td>Rejected</td>`;
+                } else if (appointment.status_id == 4) {
+                    content += `<td>Completed</td>`;
+                } else if (appointment.status_id == 5) {
+                    content += `<td>Cancelled</td>`;
                 }
 
                 row = document.createElement('tr');
@@ -373,7 +392,17 @@ $this->title = 'View All Appointments';
                 }
 
                 alert('Appointment status updated successfully.');
-                document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
+                let status;
+                if (status_id === 2) {
+                    status = 'Accepted';
+                } else if (status_id === 3) {
+                    status = 'Rejected';
+                } else if (status_id === 4) {
+                    status = 'Completed';
+                } else if (status_id === 5) {
+                    status = 'Cancelled';
+                }
+                document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = status;
             } catch (error) {
                 console.log('Error:', error);
                 alert('An error occurred. Please try again later.');

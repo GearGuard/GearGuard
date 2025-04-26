@@ -241,7 +241,6 @@
     <nav class="navMenu">
         <a href="/garage/customers/view" target="_self">All Customers</a>
         <a href="#" class="active">Search Customers</a>
-        <a href="/garage/customers/send_message" target="_self">Send Messages</a>
     </nav>
     <div class="container">
         <div class="search-container">

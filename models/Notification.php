@@ -71,7 +71,7 @@ class Notification extends DbModel
 
         if ($type === self::TYPE_MESSAGE) {
             try {
-                $socket = @stream_socket_client('tcp://127.0.0.1:8081' . JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT(0, 3600), 'Abracadabra@Hogwarts1959'), $errno, $errstr);
+                $socket = @stream_socket_client('tcp://127.0.0.1:56781' . JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT(0, 3600), 'Abracadabra@Hogwarts1959'), $errno, $errstr);
                 if (!$socket) {
                     error_log("Error: $errstr ($errno)\n");
                 } else {
@@ -95,7 +95,7 @@ class Notification extends DbModel
         $notification->validate();
         if ($notification->save()) {
             try {
-                $socket = @stream_socket_client('tcp://127.0.0.1:8081' . JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT(0, 3600), 'Abracadabra@Hogwarts1959'), $errno, $errstr);
+                $socket = @stream_socket_client('tcp://127.0.0.1:56781' . JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT(0, 3600), 'Abracadabra@Hogwarts1959'), $errno, $errstr);
                 if (!$socket) {
                     error_log("Error: $errstr ($errno)\n");
                 } else {
