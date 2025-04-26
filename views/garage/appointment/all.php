@@ -155,6 +155,21 @@ $this->title = 'View All Appointments';
             transition: all 0.2s ease;
         }
 
+        .view-more-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             body {
