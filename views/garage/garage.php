@@ -252,12 +252,12 @@
                     <span class="nav-text">Customer</span>
                 </a>
             </li>
-            <li class="nav-item">
+<!--            <li class="nav-item">
                 <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>
-            </li>
+            </li>-->
             <li class="nav-item">
                 <a href="/mechanic" class="nav-link">
                     <i class="fa fa-wrench" aria-hidden="true"></i>
@@ -270,12 +270,12 @@
                     <span class="nav-text">Profile</span>
                 </a>
             </li>
-            <li class="nav-item">
+<!--            <li class="nav-item">
                 <a href="/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
                 </a>
-            </li>
+            </li>-->
             <li class="nav-item">
                 <a href="/notifications" class="nav-link">
                     <span class="wrapper">

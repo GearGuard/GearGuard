@@ -242,12 +242,12 @@
                     <?php
                     echo $this->garage_name = $form->field($model, 'name')->required();
                     echo $this->brn = $form->field($model, 'registration_no')->required();
-                    echo $this->email = $form->field($model, 'email')->required()->type(\gearguard\phpmvc\form\FieldTypes::TYPE_EMAIL);
+                    echo $this->email = $form->field($model, 'email')->required()->type('email');
                     $this->address = new \gearguard\phpmvc\form\TextAreaField($model, 'address');
                     echo $this->address->required()->rows(3)->placeholder('Enter the address');
                     $this->description = new \gearguard\phpmvc\form\TextAreaField($model, 'description');
                     echo $this->description->rows(4);
-                    echo $this->tel = $form->field($model, 'contact_no')->required()->type(\gearguard\phpmvc\form\FieldTypes::TYPE_TEL);
+                    echo $this->tel = $form->field($model, 'contact_no')->required()->type('tel');
                     echo $this->username = $form->field($model, 'username')->required();
                     ?>
                     <script>
