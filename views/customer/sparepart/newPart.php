@@ -242,7 +242,7 @@
             <div class='form-column'>
                 <div class='form-group'>
                     <div class="form-column">
-                        <?php $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'Vehicle', $vehicles);
+                        <?php $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles);
                         echo $form->field->required() ?>
                     </div>
                 </div>
