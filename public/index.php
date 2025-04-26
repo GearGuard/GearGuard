@@ -83,7 +83,8 @@ $app->router->post('/customer/vehicle/delete', [VehicleController::class, 'delet
 
 //Vehicle/Service History
 $app->router->get('/customer/appointment/service_history_customer', [ServicePerformController::class, 'viewServicePerformanceCustomer']);
-$app->router->get('/customer/appointment/delete_service_history/', [ServicePerformController::class, 'delete']);
+$app->router->get('/customer/appointment/delete_service_history', [ServicePerformController::class, 'deleteServicePerformance']);
+$app->router->post('/customer/appointment/delete_service_history', [ServicePerformController::class, 'deleteServicePerformance']);
 $app->router->post('/customer/appointment/vehicle_service_history', [ServicePerformController::class, 'viewVehicleServiceHistory']);
 $app->router->get('/customer/appointment/get_vehicle_service_history', [ServicePerformController::class, 'getVehicleServiceHistory']);
 
