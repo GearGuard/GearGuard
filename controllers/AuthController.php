@@ -172,6 +172,7 @@ class AuthController extends Controller
                 'title' => 'Garage Dashboard'
             ]);
         } else if (Application::$app->user instanceof Mechanic) {
+            $this->setLayout('garage_layout');
             return $this->render('mechanic/mechanic', [
                 'title' => 'Mechanic Dashboard'
             ]);
@@ -730,16 +731,70 @@ class AuthController extends Controller
 
     public function mechanicServiceHistory(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User) {
-            return $this->render('/mechanic/service_history', [
-                'title' => 'Service History'
-            ]);
-        } else if (Application::$app->user instanceof Garage) {
-            return $this->render('/mechanic/service_history', [
-                'title' => 'Service History'
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                           CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
+                           vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
+                    FROM gg_vehicle_service_take vst
+                    JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                    JOIN gg_garage_service gs ON vst.service_id = gs.id
+                    JOIN gg_garage_mechanic m ON vst.mechanic_id = m.id
+                    ORDER BY vst.begin_timestamp DESC";
+
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $serviceRecords = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/viewAll', [
+                'serviceRecords' => $serviceRecords,
+                'title' => 'Vehicle Service Assignments'
             ]);
         }
 
+        throw new NotFoundException();
+    }
+
+    public function mechanicServiceHistoryEdit(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/edit', [
+                'title' => 'Edit Vehicle Service'
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
+    public function updateServiceHistory(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $body = $request->getBody();
+            $id = $body['id'] ?? null;
+            $begin_timestamp = $body['begin_timestamp'] ?? null;
+            $end_timestamp = $body['end_timestamp'] ?? null;
+            $notes = $body['notes'] ?? null;
+
+            if (!$id || !$begin_timestamp || !$end_timestamp) {
+                $response->setStatusCode(400);
+                return json_encode(['success' => false, 'message' => 'Missing required fields']);
+            }
+
+            $sql = "UPDATE gg_vehicle_service_take SET begin_timestamp = :begin_timestamp, end_timestamp = :end_timestamp, notes = :notes WHERE id = :id";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':begin_timestamp', $begin_timestamp);
+            $statement->bindValue(':end_timestamp', $end_timestamp);
+            $statement->bindValue(':notes', $notes);
+            $statement->bindValue(':id', $id);
+
+            try {
+                $statement->execute();
+                return json_encode(['success' => true]);
+            } catch (\Exception $e) {
+                $response->setStatusCode(500);
+                return json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        }
         throw new NotFoundException();
     }
 

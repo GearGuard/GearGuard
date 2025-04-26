@@ -171,6 +171,13 @@
         </p>
         <button class="select-btn">Login as Garage</button>
       </div>
+
+      <div class="option-card" onclick="window.location.href='/mechanic/login'">
+                <i class="fas fa-wrench"></i>
+                <h2>Mechanic</h2>
+                <p>Login as a mechanic to offer your expertise and connect with vehicle owners</p>
+                <button class="select-btn">Login as Mechanic</button>
+            </div>
     </div>
   </div>
 </body>
