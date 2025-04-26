@@ -11,7 +11,6 @@ use app\models\Vehicle;
 use app\models\LoginFormMechanic;
 use app\models\VehicleOwner;
 use app\models\SparePart;
-use Cassandra\Date;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
@@ -23,7 +22,6 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Response;
 use app\models\LoginForm;
 use gearguard\phpmvc\middlewares\AuthMiddleware;
-use app\models\SparePart;
 use Ratchet\App;
 
 class AuthController extends Controller
