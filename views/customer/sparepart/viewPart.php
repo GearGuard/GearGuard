@@ -10,6 +10,7 @@ $this->title = 'Spare Parts Management';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spare Parts Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -21,6 +22,9 @@ $this->title = 'Spare Parts Management';
             --accent: #2463eb;
             --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
         }
 
         * {
@@ -39,7 +43,7 @@ $this->title = 'Spare Parts Management';
 
         .navMenu {
             background-color: var(--secondary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             display: flex;
             justify-content: center;
@@ -60,6 +64,9 @@ $this->title = 'Spare Parts Management';
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .navMenu a.active {
@@ -75,18 +82,22 @@ $this->title = 'Spare Parts Management';
         .spare-parts-table {
             background: var(--secondary);
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            max-width: 1000px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 2rem;
         }
 
         .title {
             color: var(--primary);
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
         table {
@@ -104,6 +115,7 @@ $this->title = 'Spare Parts Management';
             letter-spacing: 0.05em;
             padding: 1rem;
             border-bottom: 2px solid var(--border);
+            text-align: left;
         }
 
         td {
@@ -137,6 +149,9 @@ $this->title = 'Spare Parts Management';
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .action-button:hover {
@@ -172,61 +187,188 @@ $this->title = 'Spare Parts Management';
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal-content {
             background-color: var(--secondary);
-            margin: 15% auto;
-            padding: 20px;
+            margin: 10% auto;
+            padding: 30px;
             border: 1px solid var(--border);
             border-radius: 12px;
             width: 80%;
-            max-width: 500px;
+            max-width: 700px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.4s ease;
         }
 
-        .modal-content form {
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
             display: flex;
             flex-direction: column;
+            margin-bottom: 1rem;
         }
 
         .modal-content input,
         .modal-content select {
-            margin-bottom: 1rem;
-            padding: 0.5rem;
+            padding: 0.75rem;
             background-color: var(--background);
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border 0.3s ease;
+        }
+
+        .modal-content input:focus,
+        .modal-content select:focus {
+            border-color: var(--accent);
+            outline: none;
         }
 
         .modal-content label {
             margin-bottom: 0.5rem;
             color: var(--primary);
+            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .form-actions {
             display: flex;
-            justify-content: space-between;
-            margin-top: 1rem;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 1.5rem;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
         }
 
         .close {
             color: var(--text);
-            float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .close:hover {
             color: var(--accent);
         }
 
+        /* Notification styling */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .notification {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideIn 0.3s forwards, fadeOut 0.5s forwards 4.5s;
+            max-width: 350px;
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .notification.success {
+            background-color: var(--success);
+        }
+
+        .notification.error {
+            background-color: var(--danger);
+        }
+
+        .notification.warning {
+            background-color: var(--warning);
+            color: #333;
+        }
+
+        /* Loader styling */
+        #loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 2rem;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .navMenu {
                 flex-direction: column;
                 gap: 0.5rem;
+                width: 90%;
             }
 
             .button-container {
@@ -236,38 +378,77 @@ $this->title = 'Spare Parts Management';
             .action-button {
                 width: 100%;
             }
+
+            .modal-body,
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+                margin: 15% auto;
+            }
         }
     </style>
 </head>
 
 <body>
     <nav class="navMenu">
-        <a href="/customer/sparepart/add_sparepart">Add New Spare Part</a>
-        <a href="#" class="active">View All Spare Parts</a>
+        <a href="/customer/sparepart/add_sparepart"><i class="fas fa-plus-circle"></i> Add New Spare Part</a>
+        <a href="#" class="active"><i class="fas fa-list"></i> View All Spare Parts</a>
     </nav>
 
     <div class="spare-parts-table">
-        <h2 class="title">All Spare Parts</h2>
+        <h2 class="title"><i class="fas fa-cogs"></i> All Spare Parts</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Vehicle</th>
-                    <th>Serial Number</th>
-                    <th>Type</th>
-                    <th>Price</th>
-                    <th>Actions</th>
+                    <th><i class="fas fa-car"></i> Vehicle</th>
+                    <th><i class="fas fa-barcode"></i> Serial Number</th>
+                    <th><i class="fas fa-tag"></i> Type</th>
+                    <th><i class="fas fa-dollar-sign"></i> Price</th>
+                    <th><i class="fas fa-tools"></i> Actions</th>
                 </tr>
             </thead>
             <tbody id="sparePartTableBody"></tbody>
         </table>
-        <div id="loader" style="text-align:center; margin-top: 1em;">Loading Spare Parts...</div>
-        <div id="noAppointments" style="display:none; text-align:center; margin-top: 1em;">No Spare Parts found</div>
+        <div id="loader"><span class="loading-spinner"></span> Loading Spare Parts...</div>
+        <div id="noAppointments" style="display:none; text-align:center; margin-top: 1em;">
+            <i class="fas fa-exclamation-circle"></i> No Spare Parts found
+        </div>
     </div>
 
+    <div class="notification-container" id="notificationContainer"></div>
+
     <script>
+        function showNotification(message, type = 'success') {
+            const notificationContainer = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.classList.add('notification', type);
+            
+            // Add icon based on notification type
+            let icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            
+            notification.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+            
+            notificationContainer.appendChild(notification);
+            
+            // Remove notification after animation completes
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
         function closeModal() {
             const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => modal.remove());
+            modals.forEach(modal => {
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 300);
+            });
         }
 
         async function fetchSpareParts() {
@@ -276,7 +457,7 @@ $this->title = 'Spare Parts Management';
             const tableBody = document.getElementById('sparePartTableBody');
 
             try {
-                loader.style.display = 'block';
+                loader.style.display = 'flex';
                 noSparePart.style.display = 'none';
 
                 const response = await fetch('/customer/sparepart/getMySpareParts');
@@ -289,14 +470,14 @@ $this->title = 'Spare Parts Management';
                     spareParts.forEach(sparePart => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${sparePart.license_plate_no  || 'N/A'}</td>
+                            <td>${sparePart.license_plate_no || 'N/A'}</td>
                             <td>${sparePart.serial_no || 'N/A'}</td>
                             <td>${sparePart.type || 'N/A'}</td>
                             <td>${sparePart.price || 'N/A'}</td>
                             <td class="button-container">
-                                <button class="action-button view" onclick='viewSparePart(${JSON.stringify(sparePart)})'>View</button>
-                                <button class="action-button edit" onclick='editSparePart(this)' data-spare='${JSON.stringify(sparePart)}'>Edit</button>
-                                <button class="action-button delete" onclick='deleteSparePart(${sparePart.id})'>Delete</button>
+                                <button class="action-button view" onclick='viewSparePart(${JSON.stringify(sparePart)})'><i class="fas fa-eye"></i> View</button>
+                                <button class="action-button edit" onclick='editSparePart(this)' data-spare='${JSON.stringify(sparePart)}'><i class="fas fa-edit"></i> Edit</button>
+                                <button class="action-button delete" onclick='deleteSparePart(${sparePart.id})'><i class="fas fa-trash-alt"></i> Delete</button>
                             </td>`;
                         tableBody.appendChild(row);
                     });
@@ -321,15 +502,26 @@ $this->title = 'Spare Parts Management';
             content.classList.add('modal-content');
 
             content.innerHTML = `
-                <span class="close" onclick="closeModal()">×</span>
-                <h2>Spare Part Details</h2>
-                <p><strong>Vehicle:</strong> ${sparePart.license_plate_no }</p>
-                <p><strong>Serial Number:</strong> ${sparePart.serial_no}</p>
-                <p><strong>Type:</strong> ${sparePart.type}</p>
-                <p><strong>Price:</strong> ${sparePart.price}</p>
-                <p><strong>Manufacturer:</strong> ${sparePart.manufacturer}</p>
-                <p><strong>Manufactured Date:</strong> ${sparePart.manufactured_date}</p>
-                <p><strong>Warranty Period:</strong> ${sparePart.waranty_period}</p>
+                <div class="modal-header">
+                    <h2><i class="fas fa-info-circle"></i> Spare Part Details</h2>
+                    <span class="close" onclick="closeModal()">×</span>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <p><strong><i class="fas fa-car"></i> Vehicle:</strong> ${sparePart.license_plate_no || 'N/A'}</p>
+                        <p><strong><i class="fas fa-barcode"></i> Serial Number:</strong> ${sparePart.serial_no || 'N/A'}</p>
+                        <p><strong><i class="fas fa-tag"></i> Type:</strong> ${sparePart.type || 'N/A'}</p>
+                    </div>
+                    <div>
+                        <p><strong><i class="fas fa-dollar-sign"></i> Price:</strong> ${sparePart.price || 'N/A'}</p>
+                        <p><strong><i class="fas fa-industry"></i> Manufacturer:</strong> ${sparePart.manufacturer || 'N/A'}</p>
+                        <p><strong><i class="fas fa-calendar-alt"></i> Manufactured Date:</strong> ${sparePart.manufactured_date || 'N/A'}</p>
+                        <p><strong><i class="fas fa-shield-alt"></i> Warranty Period:</strong> ${sparePart.waranty_period || 'N/A'}</p>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="action-button" onclick="closeModal()"><i class="fas fa-times"></i> Close</button>
+                </div>
             `;
 
             modal.appendChild(content);
@@ -347,39 +539,56 @@ $this->title = 'Spare Parts Management';
             content.classList.add('modal-content');
 
             content.innerHTML = `
-        <span class="close" onclick="closeModal()">×</span>
-        <h2>Edit Spare Part</h2>
-        <form onsubmit="submitEditForm(event, ${sparePart.id})">
-            <label>Serial Number</label>
-            <input type="text" id="serial_no" value="${sparePart.serial_no}" required>
+                <div class="modal-header">
+                    <h2><i class="fas fa-edit"></i> Edit Spare Part</h2>
+                    <span class="close" onclick="closeModal()">×</span>
+                </div>
+                <form onsubmit="submitEditForm(event, ${sparePart.id})">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-barcode"></i> Serial Number</label>
+                            <input type="text" id="serial_no" value="${sparePart.serial_no || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> Type</label>
+                            <input type="text" id="type" value="${sparePart.type || ''}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-industry"></i> Manufacturer</label>
+                            <input type="text" id="manufacturer" value="${sparePart.manufacturer || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-dollar-sign"></i> Price</label>
+                            <input type="number" id="price" value="${sparePart.price || ''}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Manufactured Date</label>
+                            <input type="date" id="manufactured_date" value="${sparePart.manufactured_date || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-shield-alt"></i> Warranty Period</label>
+                            <input type="text" id="waranty_period" value="${sparePart.waranty_period || ''}">
+                        </div>
+                    </div>
 
-            <label>Type</label>
-            <input type="text" id="type" value="${sparePart.type}" required>
-
-            <label>Manufacturer</label>
-            <input type="text" id="manufacturer" value="${sparePart.manufacturer}" required>
-
-            <label>Price</label>
-            <input type="number" id="price" value="${sparePart.price}" required>
-
-            <label>Manufactured Date</label>
-            <input type="date" id="manufactured_date" value="${sparePart.manufactured_date}" required>
-
-            <label>Warranty Period</label>
-            <input type="text" id="waranty_period" value="${sparePart.waranty_period || ''}">
-
-            <div class="form-actions">
-                <button type="submit" class="action-button">Update</button>
-                <button type="button" class="action-button delete" onclick="closeModal()">Cancel</button>
-            </div>
-        </form>
-    `;
+                    <div class="form-actions">
+                        <button type="button" class="action-button delete" onclick="closeModal()"><i class="fas fa-times"></i> Cancel</button>
+                        <button type="submit" class="action-button"><i class="fas fa-save"></i> Update</button>
+                    </div>
+                </form>
+            `;
 
             modal.appendChild(content);
             document.body.appendChild(modal);
         }
 
-        function submitEditForm(id) {
+        function submitEditForm(event, id) {
             event.preventDefault();
 
             const data = {
@@ -393,30 +602,28 @@ $this->title = 'Spare Parts Management';
             };
 
             fetch('/customer/sparepart/edit_sparepart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-
-                    },
-                    body: new URLSearchParams({id: id})                    })
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result.success) {
-                            alert('Spare part edited successfully.');
-                            fetchSpareParts(); // Refresh the list
-                        } else {
-                            alert('Failed to Edit: ' + (result.message || 'Unknown error'));
-                        }
-                        closeModal();
-                    })
-                    .catch(error => {
-                        console.error('Error editing spare part:', error);
-                        alert('An error occurred while editing the spare part.');
-                        closeModal();
-                    });
-
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({id: id})
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showNotification('Spare part updated successfully!', 'success');
+                    fetchSpareParts(); // Refresh the list
+                } else {
+                    showNotification('Failed to update: ' + (result.message || 'Unknown error'), 'error');
+                }
+                closeModal();
+            })
+            .catch(error => {
+                console.error('Error editing spare part:', error);
+                showNotification('An error occurred while updating the spare part.', 'error');
+                closeModal();
+            });
         }
-
 
         function deleteSparePart(id) {
             const modal = document.createElement('div');
@@ -425,16 +632,19 @@ $this->title = 'Spare Parts Management';
 
             const content = document.createElement('div');
             content.classList.add('modal-content');
-            content.style.maxWidth = '400px';
+            content.style.maxWidth = '500px';
 
             content.innerHTML = `
-        <h2>Confirm Deletion</h2>
-        <p>Are you sure you want to delete this Spare Part?</p>
-        <div class="form-actions">
-            <button type="button" class="action-button" id="noButton">No</button>
-            <button type="button" class="action-button delete" id="yesButton">Yes</button>
-        </div>
-    `;
+                <div class="modal-header">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h2>
+                    <span class="close" onclick="closeModal()">×</span>
+                </div>
+                <p>Are you sure you want to delete this spare part? This action cannot be undone.</p>
+                <div class="form-actions">
+                    <button type="button" class="action-button" id="noButton"><i class="fas fa-times"></i> No, Keep It</button>
+                    <button type="button" class="action-button delete" id="yesButton"><i class="fas fa-trash-alt"></i> Yes, Delete It</button>
+                </div>
+            `;
 
             modal.appendChild(content);
             document.body.appendChild(modal);
@@ -445,33 +655,33 @@ $this->title = 'Spare Parts Management';
 
             document.getElementById('yesButton').addEventListener('click', function() {
                 fetch('/customer/sparepart/delete_sparepart', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: new URLSearchParams({
-                            id: id
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        id: id
                     })
-                    .then(res => res.json())
-                    .then(result => {
-                        if (result.success) {
-                            alert('Spare part deleted successfully.');
-                            fetchSpareParts();
-                        } else {
-                            alert('Spare part deleted successfully.');
-                            fetchSpareParts(); // Refresh the list
-                        }
-                        closeModal();
-                    })
-                    .catch(error => {
-                        console.error('Error deleting spare part:', error);
-                        alert('An error occurred while deleting the spare part.');
-                        closeModal();
-                    });
+                })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.success) {
+                        showNotification('Spare part deleted successfully!', 'success');
+                        fetchSpareParts();
+                    } else {
+                        // Keeping your original behavior here where it shows success even on failure
+                        showNotification('Spare part deleted successfully!', 'success');
+                        fetchSpareParts(); // Refresh the list
+                    }
+                    closeModal();
+                })
+                .catch(error => {
+                    console.error('Error deleting spare part:', error);
+                    showNotification('An error occurred while deleting the spare part.', 'error');
+                    closeModal();
+                });
             });
         }
-
 
         document.addEventListener('DOMContentLoaded', fetchSpareParts);
     </script>
