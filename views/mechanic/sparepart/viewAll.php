@@ -105,7 +105,7 @@ ini_set('display_errors', 1);
             font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            padding: 1rem;
+            /* padding: 1rem; */
             border-bottom: 2px solid var(--border);
         }
 
@@ -452,9 +452,29 @@ ini_set('display_errors', 1);
         }
 
         function deleteSparePart() {
-            // Here you would typically make an AJAX call to delete the part
-            alert(`Spare Part ${currentDeleteId} deleted successfully`);
-            closeDeleteModal();
+            if (!currentDeleteId) return;
+
+            fetch('/mechanic/sparepart/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: currentDeleteId })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete spare part');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(`Spare Part ${currentDeleteId} deleted successfully`);
+                closeDeleteModal();
+                location.reload();
+            })
+            .catch(error => {
+                alert(error.message);
+            });
         }
 
         function closeEditModal() {
@@ -474,22 +494,35 @@ ini_set('display_errors', 1);
             const formData = {
                 id: document.getElementById("editId").value,
                 vehicle: document.getElementById("editVehicle").value,
-                serial: document.getElementById("editSerial").value,
-                partType: document.getElementById("editPartType").value,
+                serial_no: document.getElementById("editSerial").value,
+                type: document.getElementById("editType").value,
+                manufacturer: document.getElementById("editManufacturer").value,
                 price: document.getElementById("editPrice").value,
-                details: document.getElementById("editDetails").value
+                manufactured_date: document.getElementById("editManufacturedDate").value,
+                waranty_period: document.getElementById("editWarrantyPeriod").value
             };
 
-            // Here you would typically send an AJAX request to update the spare part
-            // For this example, we'll just show an alert
-            alert(`Spare Part ${formData.id} updated successfully:\n` +
-                `Vehicle: ${formData.vehicle}\n` +
-                `Serial: ${formData.serial}\n` +
-                `Part Type: ${formData.partType}\n` +
-                `Price: $${formData.price}`);
-
-            // Close the modal
-            closeEditModal();
+            fetch('/mechanic/sparepart/edit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update spare part');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(`Spare Part ${formData.id} updated successfully`);
+                closeEditModal();
+                location.reload();
+            })
+            .catch(error => {
+                alert(error.message);
+            });
         });
     </script>
 </body>

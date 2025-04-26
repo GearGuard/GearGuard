@@ -37,7 +37,6 @@
             background: var(--background);
             font-family: "Inter", sans-serif;
             color: var(--text);
-            line-height: 1.6;
             padding: 20px;
         }
 

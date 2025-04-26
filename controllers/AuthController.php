@@ -34,36 +34,6 @@ class AuthController extends Controller
         $this->registerMiddleware(new AuthMiddleware(['settings']));
     }
 
-    public function mechanicServiceHistorySearch(Request $request, Response $response)
-    {
-        if (Application::$app->user instanceof \app\models\Mechanic) {
-            $this->setLayout('garage_layout');
-            return $this->render('mechanic/serviceHistory/search', [
-                'title' => 'Search Vehicle Service'
-            ]);
-        }
-        throw new NotFoundException();
-    }
-
-    public function getDropdownData(Request $request, Response $response)
-    {
-        if (Application::$app->user) {
-            $userId = Application::$app->user->id;
-            $vehicles = (new \app\models\Vehicle())->getVehiclesByOwner($userId);
-            $mechanics = (new \app\models\Mechanic())->getAllMechanics();
-            $services = (new \app\models\ServicePerform())->getServicesByGarage();
-
-            header('Content-Type: application/json');
-            echo json_encode([
-                'vehicles' => $vehicles,
-                'mechanics' => $mechanics,
-                'services' => $services
-            ]);
-            exit;
-        }
-
-        throw new NotFoundException();
-    }
 
     public function login(Request $request, Response $response)
     {
@@ -964,6 +934,38 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function mechanicServiceHistorySearch(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/search', [
+                'title' => 'Search Vehicle Service'
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
+    public function getDropdownData(Request $request, Response $response)
+    {
+        if (Application::$app->user) {
+            $userId = Application::$app->user->id;
+            $vehicles = (new \app\models\Vehicle())->getVehiclesByOwner($userId);
+            $mechanics = (new \app\models\Mechanic())->getAllMechanics();
+            $services = (new \app\models\ServicePerform())->getServicesByGarage();
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'vehicles' => $vehicles,
+                'mechanics' => $mechanics,
+                'services' => $services
+            ]);
+            exit;
+        }
+
+        throw new NotFoundException();
+    }
+
+
     public function mechanicSparePart(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
@@ -1005,14 +1007,21 @@ class AuthController extends Controller
         $response->redirect('/mechanic/sparepart');
     }
 
-public function mechanicSparePartViewAll(Request $request, Response $response)
+    public function mechanicSparePartViewAll(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
             $sql = "SELECT sp.*, v.license_plate_no 
                     FROM gg_sparepart sp
-                    LEFT JOIN gg_vehicle v ON sp.vehicle_id = v.id";
+                    LEFT JOIN gg_vehicle v ON sp.vehicle_license_plate_no = v.license_plate_no";
             $statement = Application::$app->db->prepare($sql);
-            $statement->execute();
+            try {
+                $statement->execute();
+            } catch (\PDOException $e) {
+                // If vehicle_license_plate_no column does not exist, fallback to no join
+                $sql = "SELECT * FROM gg_sparepart sp";
+                $statement = Application::$app->db->prepare($sql);
+                $statement->execute();
+            }
             $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
             return $this->render('mechanic/sparepart/viewAll', [

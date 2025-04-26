@@ -221,8 +221,8 @@
 <body>
     <nav class="navMenu">
 
-        <a href="mechanic/sparepart/addNew" class="active">Add New Spare Part</a>
-        <a href="mechanic/sparepart/viewAll">View All Spare Parts</a>
+        <a href="/mechanic/sparepart/addNew" class="active">Add New Spare Part</a>
+        <a href="/mechanic/sparepart/viewAll">View All Spare Parts</a>
 
     </nav>
 
