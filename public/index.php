@@ -58,7 +58,9 @@ $app->router->get('/community', [SiteController::class, 'community']);
 $app->router->get('/logout', [SiteController::class, 'logout']);
 
 $app->router->get('/home', [AuthController::class, 'customer']);
+
 $app->router->get('/customer/dashboard', [AuthController::class, 'dashboard']);
+$app->router->get('/customer/my_profile', [AuthController::class, 'myProfile']);
 $app->router->get('/customer/settings', [AuthController::class, 'settings']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
 $app->router->post('/customer/appointment/appoint', [AuthController::class, 'newAppointmentsPost']);
@@ -81,7 +83,7 @@ $app->router->post('/customer/vehicle/delete', [VehicleController::class, 'delet
 
 //Vehicle/Service History
 $app->router->get('/customer/appointment/service_history_customer', [ServicePerformController::class, 'viewServicePerformanceCustomer']);
-
+$app->router->get('/customer/appointment/delete_service_history/', [ServicePerformController::class, 'delete']);
 $app->router->post('/customer/appointment/vehicle_service_history', [ServicePerformController::class, 'viewVehicleServiceHistory']);
 $app->router->get('/customer/appointment/get_vehicle_service_history', [ServicePerformController::class, 'getVehicleServiceHistory']);
 
