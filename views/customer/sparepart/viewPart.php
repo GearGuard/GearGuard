@@ -395,20 +395,20 @@ $this->title = 'Spare Parts Management';
 
 <body>
     <nav class="navMenu">
-        <a href="/customer/sparepart/add_sparepart"><i class="fas fa-plus-circle"></i> Add New Spare Part</a>
-        <a href="#" class="active"><i class="fas fa-list"></i> View All Spare Parts</a>
+        <a href="/customer/sparepart/add_sparepart"> Add New Spare Part</a>
+        <a href="#" class="active"> View All Spare Parts</a>
     </nav>
 
     <div class="spare-parts-table">
-        <h2 class="title"><i class="fas fa-cogs"></i> All Spare Parts</h2>
+        <h2 class="title"> All Spare Parts</h2>
         <table>
             <thead>
                 <tr>
-                    <th><i class="fas fa-car"></i> Vehicle</th>
-                    <th><i class="fas fa-barcode"></i> Serial Number</th>
-                    <th><i class="fas fa-tag"></i> Type</th>
-                    <th><i class="fas fa-dollar-sign"></i> Price</th>
-                    <th><i class="fas fa-tools"></i> Actions</th>
+                    <th>Vehicle</th>
+                    <th>Serial Number</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="sparePartTableBody"></tbody>
