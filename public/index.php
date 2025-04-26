@@ -11,8 +11,9 @@ use app\controllers\GarageController;
 use app\controllers\SparePartController;
 use app\controllers\VehicleController;
 use app\controllers\AppointmentController;
-use app\controllers\ServicePerformController;
+use app\controllers\WarrentyController;
 use gearguard\phpmvc\Application;
+use app\controllers\ServicePerformController;
 
 
 
@@ -63,6 +64,7 @@ $app->router->get('/customer/appointment/getMyAppointments', [AppointmentControl
 $app->router->get('/customer/appointment/my_appointment', [AppointmentController::class, 'appointment']);
 $app->router->post('/customer/appointment/update', [AppointmentController::class, 'updateAppointment']);
 $app->router->post('/customer/appointment/delete', [app\controllers\AppointmentController::class, 'deleteAppointment']);
+$app->router->get('/customer/warrenty', [WarrentyController::class, 'actionIndex']);
 
 
 // $app->router->post('/customer/vehicle/register', [VehicleController::class, 'addVehiclePost']);
@@ -75,7 +77,8 @@ $app->router->post('/customer/vehicle/delete', [VehicleController::class, 'delet
 
 
 //Vehicle/Service History
-$app->router->get('/customer/appointment/service_history', [ServicePerformController::class, 'viewServiceHistory']);
+$app->router->get('/customer/appointment/service_history', [ServicePerformController::class, 'viewServicePerformanceCustomer']);
+
 $app->router->post('/customer/appointment/vehicle_service_history', [ServicePerformController::class, 'viewVehicleServiceHistory']);
 $app->router->get('/customer/appointment/get_vehicle_service_history', [ServicePerformController::class, 'getVehicleServiceHistory']);
 
@@ -93,12 +96,12 @@ $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::
 
 // Spare Part
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparePart']);
-$app->router->post('/customer/sparepart/add_sparepart', [SparePartController::class, 'addSparePart']);
+$app->router->post('/customer/sparepart/add_sparepart', [SparePartController::class, 'addSparePartCustomer']);
 $app->router->get('/customer/sparepart/getMySpareParts', [SparePartController::class, 'getMySpareParts']);
-$app->router->get('/customer/sparepart/edit_sparepart', [SparePartController::class, 'editSparepart']);
-$app->router->post('/customer/sparepart/edit_sparepart', [SparePartController::class, 'editSparepartPost']);
-$app->router->get('/customer/sparepart/delete_sparepart', [SparePartController::class, 'deleteSparepart']);
-$app->router->post('/customer/sparepart/delete_sparepart', [SparePartController::class, 'deleteSparepartPost']);
+$app->router->get('/customer/sparepart/edit_sparepart', [SparePartController::class, 'editSparepartPostCustomer']);
+$app->router->post('/customer/sparepart/edit_sparepart', [SparePartController::class, 'editSparepartPostCustomer']);
+$app->router->get('/customer/sparepart/delete_sparepart', [SparePartController::class, 'deleteSparepartPostCustomer']);
+$app->router->post('/customer/sparepart/delete_sparepart', [SparePartController::class, 'deleteSparepartPostCustomer']);
 
 //$app->router->post('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepartPost']);
 $app->router->get('/customer/sparepart/view_sparepart', [AuthController::class, 'viewSparepart']);
