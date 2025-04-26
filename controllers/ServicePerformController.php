@@ -9,7 +9,7 @@ class ServicePerformController extends Controller
 {
     public function viewServicePerformanceCustomer()
     {
-        $userId = Application::$app->user->id ?? 2;
+        $userId = Application::$app->user->id ?? null;
         header('Content-Type: application/json');
 
         if (!$userId) {
@@ -29,7 +29,7 @@ class ServicePerformController extends Controller
             JOIN gg_garage_mechanic gm ON vst.mechanic_id = gm.id 
             JOIN gg_garage g ON gm.garage_id = g.id 
             JOIN gg_user_owner uo ON v.id = uo.vehicle_id 
-            WHERE uo.user_id = 2 
+            WHERE uo.user_id = :userId 
             ORDER BY vst.begin_timestamp DESC
             ";
 

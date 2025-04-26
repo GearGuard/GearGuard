@@ -253,6 +253,9 @@ $this->title = 'Spare Parts Management';
             <thead>
                 <tr>
                     <th>Vehicle Number Plate</th>
+                    <th>Service Date</th>
+                    <th>Garage Name</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="serviceHistoryBody"></tbody>
@@ -271,7 +274,7 @@ $this->title = 'Spare Parts Management';
                 loader.style.display = 'block';
                 noService.style.display = 'none';
 
-                const response = await fetch('/customer/appointment/service_history');
+                const response = await fetch('/customer/appointment/service_history_customer');
                 const serviceHistory = await response.json();
 
                 loader.style.display = 'none';
@@ -282,6 +285,14 @@ $this->title = 'Spare Parts Management';
                         const row = document.createElement('tr');
                         row.innerHTML = `
                     <td>${service['Vehicle Number Plate'] || 'N/A'}</td>
+                    <td>${service['Service Date'] || 'N/A'}</td>
+                    <td>${service['Garage Name'] || 'N/A'}</td>
+                    
+                    <td class="button-container">
+                        <button class="action-button view" onclick="viewServicePerform(${JSON.stringify(service)})">View</button>
+                        <button class="action-button edit">Edit</button>
+                        <button class="action-button delete">Delete</button>
+                    </td>
                 `;
                         tableBody.appendChild(row);
                     });
@@ -289,10 +300,10 @@ $this->title = 'Spare Parts Management';
                     noService.style.display = 'block';
                 }
             } catch (error) {
-               
-               loader.style.display = 'none';
+
+                loader.style.display = 'none';
                 noService.style.display = 'block';
-                noService.textContent = 'Error loading service history. Please try again later.'; 
+                noService.textContent = 'Error loading service history. Please try again later.';
             }
         }
 
@@ -307,12 +318,29 @@ $this->title = 'Spare Parts Management';
             content.innerHTML = `
         <h2>Spare Part Details</h2>
         <p>License Plate: ${service['Vehicle Number Plate'] || 'N/A'}</p>
-    `;
+        <p>Service Date: ${service['Service Date'] || 'N/A'}</p>
+        <p>Garage Name: ${service['Garage Name'] || 'N/A'}</p>
+        <p>Service Duration: ${service['Service Duration'] || 'N/A'}</p>
+        <p>Service Notes: ${service['Service Notes'] || 'N/A'}</p>
+        <span class="close" onclick="document.body.removeChild(modal)">&times;</span>
+        <button class="action-button" onclick="document.body.removeChild(modal)">Close</button>
+        `;
 
-            modal.appendChild(content);
-            document.body.appendChild(modal);
-        }
-        document.addEventListener('DOMContentLoaded', fetchServicePerform);
+            modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" onclick="document.body.removeChild(modal)">&times;</span>
+            <h2>Service Details</h2>
+            <p>Vehicle Number Plate: ${service['Vehicle Number Plate'] || 'N/A'}</p>
+            <p>Service Date: ${service['Service Date'] || 'N/A'}</p>
+            <p>Garage Name: ${service['Garage Name'] || 'N/A'}</p>
+            <p>Service Duration: ${service['Service Duration'] || 'N/A'}</p>
+            <p>Service Notes: ${service['Service Notes'] || 'N/A'}</p>
+            <button class="action-button" onclick="document.body.removeChild(modal)">Close</button>
+        `;
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+    }
+    document.addEventListener('DOMContentLoaded', fetchServicePerform);
     </script>
 </body>
 
