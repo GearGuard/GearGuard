@@ -1,0 +1,58 @@
+<?php
+
+namespace app\controllers;
+
+use gearguard\phpmvc\Application;
+use gearguard\phpmvc\Controller;
+
+
+class WarrentyController extends Controller
+{
+    public function actionIndex()
+    {
+        // Ensure user is logged in
+        $userId = Application::$app->user->id ?? null;
+        if (!$userId) {
+            Application::$app->session->setFlash('error', 'You must be logged in to view this page.');
+            Application::$app->response->redirect('/login');
+            return;
+        }
+
+        // Fetch user's spare parts with installation and warranty info
+        $sql = 'SELECT sp.id, sp.serial_no, sp.type, sp.manufacturer, sp.price, sp.manufactured_date, sp.waranty_period,
+            COALESCE(svi.installed_date, ssvi.installed_date) as installed_date,
+            COALESCE(svi.vehicle_id, ssvi.vehicle_id) as vehicle_id
+            FROM gg_sparepart sp
+            LEFT JOIN gg_sparepart_vehicleuser_vehicle_install svi
+                ON sp.id = svi.sparepart_id AND svi.user_id = :user_id
+            LEFT JOIN (
+                SELECT ssvi.sparepart_id, ssvi.installed_date, v.id as vehicle_id
+                FROM gg_sparepart_service_vehicle_install ssvi
+                JOIN gg_vehicle v ON ssvi.vehicle_id = v.id
+                JOIN gg_user_owner uo ON v.id = uo.vehicle_id
+                WHERE uo.user_id = :user_id2
+            ) ssvi ON sp.id = ssvi.sparepart_id
+            WHERE sp.id IN (
+                SELECT sparepart_id FROM gg_sparepart_vehicleuser_vehicle_install WHERE user_id = :user_id3
+            ) OR sp.id IN (
+                SELECT ssvi.sparepart_id
+                FROM gg_sparepart_service_vehicle_install ssvi
+                JOIN gg_vehicle v ON ssvi.vehicle_id = v.id
+                JOIN gg_user_owner uo ON v.id = uo.vehicle_id
+                WHERE uo.user_id = :user_id4
+            )';
+
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':user_id', $userId);
+        $statement->bindValue(':user_id2', $userId);
+        $statement->bindValue(':user_id3', $userId);
+        $statement->bindValue(':user_id4', $userId);
+        $statement->execute();
+        $spareparts = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Render the view and pass data
+        return $this->render('warrenty', [
+            'spareparts' => $spareparts
+        ]);
+    }
+}
