@@ -240,6 +240,12 @@
             </div>
         <?php endif; ?>
 <form action="/mechanic/sparepart/addNew" method="POST">
+            <div class="form-column">
+                    <div class="form-group">
+                        <label for="Vehicle">Vehicle<span class="required-dot">*</span></label>
+                        <input type="text" id="Vehicle" name="Vehicle" required placeholder="Enter license plate number">
+                    </div>
+                </div>
             <div class="form-row">
                 <div class="form-column">
                     <div class="form-group">

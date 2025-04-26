@@ -1,9 +1,7 @@
 <?php
-// Fetch spare parts from database
-use models\SparePart;
-
-// Fetch spare parts with new table fields
-$spareParts = SparePart::getAll(); // Assuming this method returns array with new fields: id, serial_no, type, manufacturer, price, manufactured_date, waranty_period
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+// The $spareParts variable is passed from the controller, no need to fetch again here
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,6 +9,7 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="/" />
     <title>Spare Parts Management</title>
     <link rel="icon" href="/assets/img/favicon.png" type="image/png">
     <style>
@@ -271,8 +270,8 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
 <body>
     <nav class="navMenu">
 
-    <a href="mechanic/sparepart/addNew" class="active">Add New Spare Part</a>
-    <a href="mechanic/sparepart/viewAll">View All Spare Parts</a>
+    <a href="mechanic/sparepart/addNew">Add New Spare Part</a>
+    <a href="mechanic/sparepart/viewAll"class="active">View All Spare Parts</a>
 
 
     </nav>
@@ -282,6 +281,7 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
         <table>
             <thead>
                 <tr>
+                    <th>Vehicle</th>
                     <th>Serial Number</th>
                     <th>Type</th>
                     <th>Manufacturer</th>
@@ -294,6 +294,7 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
             <tbody>
                 <?php foreach ($spareParts as $part): ?>
                 <tr>
+                    <td><?= htmlspecialchars($part['vehicle_license_plate_no'] ?? '') ?></td>
                     <td><?= htmlspecialchars($part['serial_no']) ?></td>
                     <td><?= htmlspecialchars($part['type']) ?></td>
                     <td><?= htmlspecialchars($part['manufacturer']) ?></td>
@@ -316,6 +317,7 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
             <span class="close">&times;</span>
             <h2>Spare Part Details</h2>
             <div id="viewContent">
+                <p><strong>Vehicle:</strong> <span id="viewVehicle"></span></p>
                 <p><strong>Serial Number:</strong> <span id="viewSerial"></span></p>
                 <p><strong>Type:</strong> <span id="viewType"></span></p>
                 <p><strong>Manufacturer:</strong> <span id="viewManufacturer"></span></p>
@@ -332,6 +334,8 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
             <h2>Edit Spare Part</h2>
             <form id="editForm">
                 <input type="hidden" id="editId" name="id">
+                <label for="editVehicle">Vehicle</label>
+                <input type="text" id="editVehicle" name="vehicle" placeholder="Enter license plate number">
                 <label for="editSerial">Serial Number</label>
                 <input type="text" id="editSerial" name="serial_no" required>
                 <label for="editType">Type</label>
@@ -398,6 +402,7 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
             $jsArray = [];
             foreach ($spareParts as $part) {
                 $jsArray[$part['id']] = [
+                    'vehicle_license_plate_no' => $part['vehicle_license_plate_no'] ?? '',
                     'serial' => $part['serial_no'],
                     'type' => $part['type'],
                     'manufacturer' => $part['manufacturer'],
@@ -421,6 +426,7 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
             document.getElementById("viewPrice").textContent = sparePart.price;
             document.getElementById("viewManufacturedDate").textContent = sparePart.manufacturedDate;
             document.getElementById("viewWarrantyPeriod").textContent = sparePart.warrantyPeriod;
+            document.getElementById("viewVehicle").textContent = sparePart.vehicle_license_plate_no;
         }
 
         function editSparePart(id) {
@@ -433,6 +439,7 @@ $spareParts = SparePart::getAll(); // Assuming this method returns array with ne
             document.getElementById("editSerial").value = sparePart.serial;
             document.getElementById("editType").value = sparePart.type;
             document.getElementById("editManufacturer").value = sparePart.manufacturer;
+            document.getElementById("editVehicle").value = sparePart.vehicle_license_plate_no;
             // Remove $ sign for price input
             document.getElementById("editPrice").value = sparePart.price.replace('$', '');
             document.getElementById("editManufacturedDate").value = sparePart.manufacturedDate;

@@ -944,7 +944,7 @@ class AuthController extends Controller
 
     public function mechanicSparePart(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User || Application::$app->user instanceof Mechanic) {
+        if (Application::$app->user instanceof Mechanic) {
             return $this->render('mechanic/sparepart/addNew', [
                 'title' => 'Add Spare Part'
             ]);
@@ -983,10 +983,12 @@ class AuthController extends Controller
         $response->redirect('/mechanic/sparepart');
     }
 
-    public function mechanicSparePartViewAll(Request $request, Response $response)
+public function mechanicSparePartViewAll(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
-            $sql = "SELECT * FROM gg_sparepart";
+            $sql = "SELECT sp.*, v.license_plate_no 
+                    FROM gg_sparepart sp
+                    LEFT JOIN gg_vehicle v ON sp.vehicle_id = v.id";
             $statement = Application::$app->db->prepare($sql);
             $statement->execute();
             $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);

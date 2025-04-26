@@ -69,14 +69,9 @@
 			return $sparePart;
 		}
 		
-		public function getDisplayName(): string
-		{
-			return $this->serial_no;
-		}
-
-	public function attributes(): array
+	public function getDisplayName(): string
 	{
-		return ['serial_no', 'type', 'manufacturer', 'price', 'manufactured_date', 'waranty_period'];
+		return $this->serial_no;
 	}
 
 
@@ -122,7 +117,7 @@ public function delete()
         return $statement->execute();
     }
 
-    public static function findOne($where)
+    public function findOne($where)
     {
         $tableName = static::tableName();
         $attributes = array_keys($where);
