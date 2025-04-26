@@ -354,7 +354,7 @@
 
         document.getElementsByClassName('nav-link active')[0].click();
 
-        const socket = new WebSocket('ws://localhost:8080?token=<?php echo \gearguard\phpmvc\Application::$app->user->getToken() ?>');
+        const socket = new WebSocket('ws://localhost:56780?token=<?php echo \gearguard\phpmvc\Application::$app->user->getToken() ?>');
         socket.onmessage = (e) => {
             console.log(e);
             data = JSON.parse(e.data);
