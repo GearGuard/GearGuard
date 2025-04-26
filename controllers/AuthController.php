@@ -10,6 +10,7 @@ use app\models\Notification;
 use app\models\Vehicle;
 use app\models\LoginFormMechanic;
 use app\models\VehicleOwner;
+use app\models\SparePart;
 use Cassandra\Date;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
@@ -225,28 +226,44 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-
-    public function newSparepart(Request $request, Response $response)
+    public function newSparePart(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
-            return $this->render('customer/sparepart/newPart', [
-                'title' => 'Add Sparepart'
-            ]);
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
+                $model = new SparePart();
+
+
+                $vehicles_list = $this->getVehiclesListForDropDown();
+
+                return $this->render('customer/sparepart/newPart', [
+                    'model' => $model,
+                    'title' => 'Add Spare Part',
+                    'vehicles' => $vehicles_list,
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
         }
 
         throw new NotFoundException();
     }
+
 
     public function viewSparepart(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
-            return $this->render('customer/sparepart/viewPart', [
-                'title' => 'View Spareparts'
-            ]);
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
+                return $this->render('customer/sparepart/viewPart', [
+                    'title' => 'View Sparepart'
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
         }
 
         throw new NotFoundException();
     }
+
 
     public function newAppointments(Request $request, Response $response)
     {
@@ -405,7 +422,7 @@ class AuthController extends Controller
         // Create a new Vehicle model instance
         $model = new Vehicle();
 
-    
+
 
         return $this->render('customer/vehicle/addNew', [
             'name' => 'The GearGuard',

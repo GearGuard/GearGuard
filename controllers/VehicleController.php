@@ -17,12 +17,10 @@ class VehicleController extends Controller
 	{
 		return Application::$app->user instanceof User && Application::$app->session->get('isCustomer');
 	}
-
 	public function __construct()
 	{
 		$this->registerMiddleware(new ExtendedMiddleware([], self::isCustomer()));
 	}
-
 	/**
 	 * @throws NotFoundException
 	 */
@@ -115,7 +113,7 @@ class VehicleController extends Controller
 		$stmt->closeCursor();
 
 		// Get the last inserted vehicle ID
-		$vehicleId = Application::$app->db->lastInsertId();
+		$vehicleId = Application::$app->db->pdo->lastInsertId();
 		if ($vehicleId) {
 			// Insert into gg_user_owner table
 			$stmt = Application::$app->db->prepare('

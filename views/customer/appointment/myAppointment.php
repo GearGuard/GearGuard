@@ -272,6 +272,7 @@ $this->title = 'Appointment';
             background: var(--hover-bg);
             border-color: var(--accent);
         }
+
         .modal-button.delete {
             background: var(--canel);
             border: 1px solid var(--border);
@@ -315,7 +316,6 @@ $this->title = 'Appointment';
             }
         }
     </style>
-    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -345,33 +345,33 @@ $this->title = 'Appointment';
     </div>
 
     <script>
-        // Function to fetch appointments from the server
+        function isFutureDate(dateStr) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const appointmentDate = new Date(dateStr);
+            return appointmentDate >= today;
+        }
+
         async function fetchAppointments() {
             const loader = document.getElementById('loader');
             const noAppointments = document.getElementById('noAppointments');
             const tableBody = document.getElementById('appointmentTableBody');
 
             try {
-                // Show loader while fetching data
                 loader.style.display = 'block';
                 noAppointments.style.display = 'none';
 
-                // Fetch appointments from the server
                 const response = await fetch('/customer/appointment/getMyAppointments');
                 const appointments = await response.json();
 
-                // Hide loader after fetching
                 loader.style.display = 'none';
-
-                // Clear existing table content
                 tableBody.innerHTML = '';
 
-                // Check if there are any appointments
-                if (appointments && appointments.length > 0) {
-                    // Populate the table with appointments
-                    appointments.forEach(appointment => {
-                        const row = document.createElement('tr');
+                const upcomingAppointments = appointments.filter(app => isFutureDate(app.date));
 
+                if (upcomingAppointments.length > 0) {
+                    upcomingAppointments.forEach(appointment => {
+                        const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${appointment.service_type || 'N/A'}</td>
                             <td>${appointment.garage_name || 'N/A'}</td>
@@ -382,11 +382,9 @@ $this->title = 'Appointment';
                                 <button class="action-button" onclick='deleteAppointment(${appointment.id})'><i class="fas fa-trash"></i></button>
                             </td>
                         `;
-
                         tableBody.appendChild(row);
                     });
                 } else {
-                    // Show no appointments message
                     noAppointments.style.display = 'block';
                 }
             } catch (error) {
@@ -396,7 +394,6 @@ $this->title = 'Appointment';
                 noAppointments.textContent = 'Error loading appointments. Please try again later.';
             }
         }
-
 
         function viewAppointment(appointment) {
             const modal = document.createElement('div');
@@ -429,91 +426,77 @@ $this->title = 'Appointment';
 
             // Add custom styles for date and time inputs
             const customStyles = `
-        <style>
-            .custom-date-input::-webkit-calendar-picker-indicator,
-            .custom-time-input::-webkit-calendar-picker-indicator {
-                filter: invert(100%);
-            }
-        </style>
-    `;
+                <style>
+                    .custom-date-input::-webkit-calendar-picker-indicator,
+                    .custom-time-input::-webkit-calendar-picker-indicator {
+                        filter: invert(100%);
+                    }
+                </style>
+            `;
 
             content.innerHTML = customStyles + `
-        <h2 class="modal-title">Edit Appointment</h2>
-        <form action="/customer/appointment/update" method="post">
-            <input type="hidden" name="id" value="${appointment.id}">
-            <div class="modal-form-group">
-                <label class="modal-label" for="date">Date:</label>
-                <input class="modal-input custom-date-input" type="date" id="date" name="date" value="${appointment.date}" required>
-            </div>
-            <div class="modal-form-group">
-                <label class="modal-label" for="time">Time:</label>
-                <input class="modal-input custom-time-input" type="time" id="time" name="time" value="${appointment.time}" required>
-            </div>
-            <div class="modal-form-group">
-                <label class="modal-label" for="notes">Notes:</label>
-                <textarea class="modal-textarea" id="notes" name="notes">${appointment.notes || ''}</textarea>
-            </div>
-            <button type="submit" class="modal-button">Save Changes</button>
-            <button type="button" class="modal-button cancel" onclick='this.closest(".modal").remove()'>Cancel</button>
-        </form>
-    `;
+                <h2 class="modal-title">Edit Appointment</h2>
+                <form action="/customer/appointment/update" method="post">
+                    <input type="hidden" name="id" value="${appointment.id}">
+                    <div class="modal-form-group">
+                        <label class="modal-label" for="date">Date:</label>
+                        <input class="modal-input custom-date-input" type="date" id="date" name="date" value="${appointment.date}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label class="modal-label" for="time">Time:</label>
+                        <input class="modal-input custom-time-input" type="time" id="time" name="time" value="${appointment.time}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label class="modal-label" for="notes">Notes:</label>
+                        <textarea class="modal-textarea" id="notes" name="notes">${appointment.notes || ''}</textarea>
+                    </div>
+                    <button type="submit" class="modal-button">Save Changes</button>
+                    <button type="button" class="modal-button cancel" onclick='this.closest(".modal").remove()'>Cancel</button>
+                </form>
+            `;
 
             modal.appendChild(content);
             document.body.appendChild(modal);
         }
 
-
         function deleteAppointment(id) {
-            // Create the modal container
             const modal = document.createElement('div');
             modal.classList.add('modal');
 
-            // Create the modal content
             const content = document.createElement('div');
             content.classList.add('modal-content');
-            content.style.maxWidth = '400px'; // Make it smaller than regular modals
+            content.style.maxWidth = '400px';
 
-            // Add the confirmation message and buttons
             content.innerHTML = `
-        <h2 class="modal-title">Confirm Cancellation</h2>
-        <p>Are you sure you want to delete this appointment?</p>
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 5px;">
-            <button type="button" class="modal-button cancel" id="noButton">No</button>
-            <button type="button" class="modal-button delete" id="yesButton">Yes</button>
-        </div>
-    `;
+                <h2 class="modal-title">Confirm Cancellation</h2>
+                <p>Are you sure you want to delete this appointment?</p>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 5px;">
+                    <button type="button" class="modal-button cancel" id="noButton">No</button>
+                    <button type="button" class="modal-button delete" id="yesButton">Yes</button>
+                </div>
+            `;
 
-            // Add the modal to the document
             modal.appendChild(content);
             document.body.appendChild(modal);
 
-            // Handle the "No" button click
             document.getElementById('noButton').addEventListener('click', function() {
                 modal.remove();
             });
 
-            // Handle the "Yes" button click
             document.getElementById('yesButton').addEventListener('click', function() {
-                // Create a form and submit it
+                // Create a form and submit it (standard POST, not AJAX)
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/customer/appointment/delete`;
                 form.innerHTML = `<input type="hidden" name="id" value="${id}">`;
                 form.style.display = 'none';
-
                 document.body.appendChild(form);
                 form.submit();
-
-                // Remove the modal
                 modal.remove();
-
-                // Refresh the appointments list
+                // Optionally, refresh the appointments list after deletion
                 setTimeout(fetchAppointments, 500);
             });
         }
-
-
-
 
         // Load appointments when the page loads
         document.addEventListener('DOMContentLoaded', fetchAppointments);

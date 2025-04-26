@@ -9,9 +9,7 @@ use gearguard\phpmvc\Response;
 use app\models\Appointment;
 
 class AppointmentController extends Controller
-
 {
-
 	public function appointment()
 	{
 		// Fetch appointments from database or other source
@@ -24,7 +22,6 @@ class AppointmentController extends Controller
 	}
 	public function getMyAppointments()
 	{
-		// Get the current user ID
 		$userId = Application::$app->user->id ?? null;
 
 		if (!$userId) {
