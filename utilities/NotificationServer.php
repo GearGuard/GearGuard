@@ -25,7 +25,7 @@ class NotificationServer implements MessageComponentInterface
     {
         $this->clients = new \SplObjectStorage;
 
-        $tcpServer = new TcpServer('127.0.0.1:8081', $loop);
+        $tcpServer = new TcpServer('127.0.0.1:56781', $loop);
         $tcpServer->on('connection', function (ReactConn $conn) {
             echo 'TCP server connected!';
             $conn->on('data', function ($msg) {
@@ -40,7 +40,6 @@ class NotificationServer implements MessageComponentInterface
                         foreach ($uid as $userId) {
                             if ($this->clients[$client] === $userId) {
                                 $client->send(json_encode($msg));
-                                break;
                             }
                         }
                     }
@@ -48,7 +47,6 @@ class NotificationServer implements MessageComponentInterface
                     foreach($this->clients as $client) {
                         if ($this->clients[$client] === $uid) {
                             $client->send(json_encode($msg));
-                            break;
                         }
                     }
                 }
@@ -104,8 +102,8 @@ class NotificationServer implements MessageComponentInterface
 $loop = Loop::get();
 $wsServer = new WsServer(new NotificationServer($loop));
 $httpServer = new HttpServer($wsServer);
-$server = new IoServer($httpServer, new SocketServer('0.0.0.0:8080', loop: $loop), $loop);
+$server = new IoServer($httpServer, new SocketServer('0.0.0.0:56780', loop: $loop), $loop);
 
-echo "Notification server started on port 8080\nDo not colse this window unless you want to stop the server.\n";
+echo "Notification server started on port 56780\nDo not colse this window unless you want to stop the server.\n";
 
 $server->run();

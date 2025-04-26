@@ -8,6 +8,8 @@ $this->title = 'Spare Part Warranty';
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <title><?= $this->title ?></title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -158,7 +160,7 @@ $this->title = 'Spare Part Warranty';
         .time-left-active {
             font-size: 0.875rem;
             font-weight: 500;
-            color: #008633FF
+            color: #008633FF;
         }
 
         .time-left-expire {
@@ -210,21 +212,6 @@ $this->title = 'Spare Part Warranty';
             font-weight: 500;
         }
 
-        .part-description {
-            background: var(--secondary);
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
-            text-align: justify;
-        }
-
-        .warranty-info {
-            background: var(--hover-bg);
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
-        }
-
         .price-tag {
             font-weight: 600;
             color: var(--text);
@@ -232,10 +219,6 @@ $this->title = 'Spare Part Warranty';
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
             .navMenu {
                 flex-direction: column;
                 gap: 0.5rem;
@@ -259,61 +242,119 @@ $this->title = 'Spare Part Warranty';
 
 <body>
     <nav class="navMenu">
-        <a href="/customer/appointment/appoint"  target='_self'>Book Appointment<span class="dot"></span></a>
-        <a href="/customer/appointment/my_appointment" target='_self'>My Appointments<span class="dot"></span></a>
-        <a href="/customer/appointment/service_history" target='_self'>Service History<span class="dot"></span></a>
+        <a href="/customer/appointment/appoint" target="_self">Book Appointment<span class="dot"></span></a>
+        <a href="/customer/appointment/my_appointment" target="_self">My Appointments<span class="dot"></span></a>
+        <a href="/customer/appointment/service_history" target="_self">Service History<span class="dot"></span></a>
         <a href="#" class="active">Spare Parts Warranty<span class="dot"></span></a>
     </nav>
 
     <div class="warranty-container">
-        <h2 class="title">Spare Parts Warranty Information</h2>
-
-        <div class="warranty-card">
-            <div class="warranty-header">
-                <div class="part-info">
-                    <span class="part-name">Brake Pad Set</span>
-                    <span class="part-brand">by Brembo</span>
-                </div>
-                <div class="status-container">
-                    <span class="time-left-active">16 months left</span>
-                    <span class="warranty-status active">Warranty Active</span>
-                </div>
-            </div>
-
-            <h3 class="section-title">Part Information</h3>
-            <div class="warranty-details">
-                <div class="detail-group">
-                    <span class="detail-label">Part Number</span>
-                    <span class="detail-value">BRK-2024-X789</span>
-                </div>
-                <div class="detail-group">
-                    <span class="detail-label">Price</span>
-                    <span class="detail-value price-tag">$245.00</span>
-                </div>
-                <div class="detail-group">
-                    <span class="detail-label">Manufactured Date</span>
-                    <span class="detail-value">January 2024</span>
-                </div>
-            </div>
-
-            <div class="part-description">
-                <h3 class="section-title">Description</h3>
-                <p>High-performance ceramic brake pad set designed for superior stopping power and reduced brake dust. Features wear indicators and noise reduction shims. Suitable for high-performance vehicles and daily driving.</p>
-            </div>
-
-            <h3 class="section-title">Installation Details</h3>
-            <div class="warranty-details">
-                <div class="detail-group">
-                    <span class="detail-label">Installed At</span>
-                    <span class="detail-value">AutoCare Plus - G1</span>
-                </div>
-                <div class="detail-group">
-                    <span class="detail-label">Installation Date</span>
-                    <span class="detail-value">March 15, 2024</span>
-                </div>
-            </div>
+        <h1 class="title">My Spare Parts Warranty</h1>
+        <div id="warranty-list">
+            <!-- Content will be injected here -->
         </div>
     </div>
+
+    <script>
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr === '0000-00-00') return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function getWarrantyLeft(installedDate, warantyPeriod) {
+            if (!installedDate || !warantyPeriod || warantyPeriod === '0000-00-00') return {
+                expired: true,
+                text: 'No Warranty'
+            };
+            const expiry = new Date(warantyPeriod);
+            const now = new Date();
+            const diff = expiry - now;
+            if (isNaN(expiry.getTime())) return {
+                expired: true,
+                text: 'Invalid Warranty Date'
+            };
+            if (diff < 0) return {
+                expired: true,
+                text: 'Expired'
+            };
+            const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30.44));
+            const days = Math.floor((diff / (1000 * 60 * 60 * 24)) % 30.44);
+            let text = '';
+            if (months > 0) text += `${months} month${months > 1 ? 's' : ''} `;
+            if (days > 0) text += `${days} day${days > 1 ? 's' : ''}`;
+            return {
+                expired: false,
+                text: text.trim() || 'Less than 1 day'
+            };
+        }
+
+        function renderSpareParts(parts) {
+            const container = document.getElementById('warranty-list');
+            container.innerHTML = '';
+            if (!parts.length) {
+                container.innerHTML = '<p>No spare parts found.</p>';
+                return;
+            }
+            parts.forEach(part => {
+                const warrantyLeft = getWarrantyLeft(part.installed_date, part.waranty_period);
+                container.innerHTML += `
+                    <div class="warranty-card">
+                        <div class="warranty-header">
+                            <div class="part-info">
+                                <span class="part-vehicle">${part.license_plate_no || 'N/A'}</span>
+                                <span class="part-name">${part.type || 'Unknown Type'}</span>
+                                <span class="part-brand">by ${part.manufacturer || 'Unknown'}</span>
+                            </div>
+                            <div class="status-container">
+                                <span class="${warrantyLeft.expired ? 'time-left-expire' : 'time-left-active'}">${warrantyLeft.text}</span>
+                                <span class="warranty-status ${warrantyLeft.expired ? 'expired' : 'active'}">
+                                    ${warrantyLeft.expired ? 'Warranty Expired' : 'Warranty Active'}
+                                </span>
+                            </div>
+                        </div>
+                        <h3 class="section-title">Spare Part Information</h3>
+                        <div class="warranty-details">
+                            <div class="detail-group">
+                                <span class="detail-label">Spare Part Serial Number</span>
+                                <span class="detail-value">${part.serial_no || 'N/A'}</span>
+                            </div>
+                            <div class="detail-group">
+                                <span class="detail-label">Price</span>
+                                <span class="detail-value price-tag">Rs. ${part.price || '0.00'}</span>
+                            </div>
+                            <div class="detail-group">
+                                <span class="detail-label">Manufactured Date</span>
+                                <span class="detail-value">${formatDate(part.manufactured_date)}</span>
+                            </div>
+                        </div>
+                        <h3 class="section-title">Installation Details</h3>
+                        <div class="warranty-details">
+                            <div class="detail-group">
+                                <span class="detail-label">Installed At</span>
+                                <span class="detail-value">${part.vehicle_id || 'N/A'}</span>
+                            </div>
+                            <div class="detail-group">
+                                <span class="detail-label">Installation Date</span>
+                                <span class="detail-value">${formatDate(part.installed_date)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        fetch('/customer/sparepart/getMySpareParts')
+            .then(res => res.json())
+            .then(data => renderSpareParts(data))
+            .catch(() => {
+                document.getElementById('warranty-list').innerHTML = '<p>Error loading spare parts.</p>';
+            });
+    </script>
 </body>
 
 </html>

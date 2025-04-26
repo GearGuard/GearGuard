@@ -2,127 +2,49 @@
 
 namespace app\controllers;
 
-use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
-use gearguard\phpmvc\Request;
-use gearguard\phpmvc\Response;
-use app\models\ServicePerform;
-use app\models\Vehicle;
-use gearguard\phpmvc\middlewares\ExtendedMiddleware;
-use app\models\User;
+use gearguard\phpmvc\Application;
 
 class ServicePerformController extends Controller
 {
-    public function __construct()
+    public function viewServicePerformanceCustomer()
     {
-        $this->registerMiddleware(new ExtendedMiddleware([], self::isCustomer()));
-    }
-
-    /**
-     * Check if the current user is a customer
-     * 
-     * @return bool
-     */
-    public static function isCustomer(): bool
-    {
-        return Application::$app->user instanceof User && Application::$app->session->get('isCustomer');
-    }
-
-    /**
-     * View service history for all vehicles owned by the current user
-     * 
-     * @return string
-     */
-    public function serviceHistory(Request $request): string
-    {
-        // Get the current user ID
         $userId = Application::$app->user->id ?? null;
+        header('Content-Type: application/json');
 
         if (!$userId) {
-            Application::$app->session->setFlash('error', 'You must be logged in to view service history');
-            Application::$app->response->redirect('/login');
+            echo json_encode([]);
             exit;
         }
 
-        // Get all vehicles owned by the user
-        $vehicleModel = new Vehicle();
-        $vehicles = $vehicleModel->getVehiclesByOwner($userId);
+        try {
+            $sql = "
+            SELECT v.license_plate_no AS 'Vehicle Number Plate', 
+                   DATE(vst.begin_timestamp) AS 'Service Date', 
+                   g.name AS 'Garage Name', 
+                   TIMEDIFF(vst.end_timestamp, vst.begin_timestamp) AS 'Service Duration', 
+                   vst.notes AS 'Service Notes' 
+            FROM gg_vehicle_service_take vst 
+            JOIN gg_vehicle v ON vst.vehicle_id = v.id 
+            JOIN gg_garage_mechanic gm ON vst.mechanic_id = gm.id 
+            JOIN gg_garage g ON gm.garage_id = g.id 
+            JOIN gg_user_owner uo ON v.id = uo.vehicle_id 
+            WHERE uo.user_id = :userId 
+            ORDER BY vst.begin_timestamp DESC
+            ";
 
-        // Get service history for all vehicles owned by the user
-        $serviceHistory = ServicePerform::getServiceHistoryByUser($userId);
+            $stmt = Application::$app->db->prepare($sql);
+            $stmt->bindValue(':userId', $userId);
+            $stmt->execute();
 
-        // For testing purposes only - uncomment to add sample data if needed
-        if (empty($serviceHistory)) {
-            ServicePerform::insertSampleService();
-            $serviceHistory = ServicePerform::getServiceHistoryByUser($userId);
+            $history = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            echo json_encode($history);
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error'   => 'Failed to fetch details',
+                'details' => $e->getMessage()
+            ]);
         }
-
-        // Check if a specific vehicle is selected
-        $selectedVehicle = null;
-        if ($request->isGet()) {
-            $body = $request->getBody();
-            if (isset($body['vehicle_id']) && !empty($body['vehicle_id'])) {
-                $selectedVehicle = $body['vehicle_id'];
-                // Filter service history for the selected vehicle
-                $serviceHistory = ServicePerform::getServiceHistoryByVehicle($selectedVehicle);
-            }
-        }
-
-        return $this->render('serviceHistory', [
-            'serviceHistory' => $serviceHistory,
-            'vehicles' => $vehicles,
-            'selectedVehicle' => $selectedVehicle
-        ]);
-    }
-
-    /**
-     * View service history for a specific vehicle
-     * 
-     * @param Request $request
-     * @param Response $response
-     * @return string
-     */
-    public function vehicleServiceHistory(Request $request, Response $response): string
-    {
-        // Get the current user ID
-        $userId = Application::$app->user->id ?? null;
-
-        if (!$userId) {
-            Application::$app->session->setFlash('error', 'You must be logged in to view service history');
-            $response->redirect('/login');
-            exit;
-        }
-
-        $vehicleId = $request->getBody()['vehicle_id'] ?? null;
-
-        if (!$vehicleId) {
-            Application::$app->session->setFlash('error', 'Vehicle ID is required');
-            $response->redirect('/customer/appointment/service_history');
-            exit;
-        }
-
-        // Check if the user owns the vehicle
-        $vehicleModel = new Vehicle();
-        $vehicle = $vehicleModel->findOne(['id' => $vehicleId]);
-
-        if (!$vehicle || !$vehicle->isOwnedByUser($userId)) {
-            Application::$app->session->setFlash('error', 'You do not have permission to view this vehicle\'s service history');
-            $response->redirect('/customer/appointment/service_history');
-            exit;
-        }
-
-        // Get all vehicles owned by the user for the dropdown
-
-        $vehicleModel = new Vehicle();
-        $vehicles = $vehicleModel->getVehiclesByOwner($userId);
-
-        // Get service history for the specific vehicle
-        $serviceHistory = ServicePerform::getServiceHistoryByVehicle($vehicleId);
-
-        return $this->render('serviceHistory', [
-            'serviceHistory' => $serviceHistory,
-            'vehicles' => $vehicles,
-            'selectedVehicle' => $vehicleId
-        ]);
     }
 }

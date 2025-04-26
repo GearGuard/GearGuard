@@ -214,6 +214,21 @@
             background-color: #25272d;
         }
 
+        .search-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
 
         @media (max-width: 768px) {
             .search-form {
@@ -241,13 +256,12 @@
     <nav class="navMenu">
         <a href="/garage/customers/view" target="_self">All Customers</a>
         <a href="#" class="active">Search Customers</a>
-        <a href="/garage/customers/send_message" target="_self">Send Messages</a>
     </nav>
     <div class="container">
         <div class="search-container">
             <h1 class="search-title">Search Customers</h1>
             <form class="search-form" onsubmit="searchCustomer(event)">
-                <input type="text" class="search-input" id="searchInput" placeholder="Enter customer name or email" required>
+                <input type="text" class="search-input" id="searchInput" placeholder="Enter customer name or email" onchange="resetVariables()" required>
                 <button type="submit" class="search-button">
                     <i class="fas fa-search"></i> Search
                 </button>
@@ -271,34 +285,26 @@
             </table>
             <p id="loader" class="no-results">Loading...</p>
         </div>
-
-        <!-- <div class="results-container" id="resultsContainer">
-            <div class="customer-info">
-                <h2 id="customerName"></h2>
-                <p id="customerEmail"></p>
-                <p id="customerVehicle"></p>
-            </div>
-            <div class="service-history">
-                <h3>Recent Service History</h3>
-                <div id="serviceCards"></div>
-            </div>
-        </div> -->
     </div>
 
     <script>
         let page = 1;
         let isLoading = false;
         let hasMoreData = true;
+        let loadedResults = 0;
         const limit = 25;
         const loader = document.getElementById('loader');
 
         async function searchCustomer(event) {
-            if (event != null)
+            if (event != null) {
                 event.preventDefault();
-            const searchTerm = document.getElementById('searchInput').value;
-            document.querySelector('.results-container').style.display = 'block';
+                document.querySelector('#customersTable tbody').innerHTML = '';
+            }
 
             if (isLoading || !hasMoreData) return;
+
+            const searchTerm = document.getElementById('searchInput').value;
+            document.querySelector('.results-container').style.display = 'block';
 
             isLoading = true;
             loader.textContent = 'Loading...';
@@ -309,7 +315,7 @@
                 if (!response.ok) {
                     console.error('Error fetching customers:', error);
                     document.getElementById('resultsContainer').style.display = 'none';
-                    alert('Could not load customers. Please try again later');
+                    showPopup('Sorry','We could not load customers. Please try again later');
                     return;
                 }
 
@@ -318,7 +324,7 @@
                 if (!result) {
                     console.error('Error fetching customers:', error);
                     document.getElementById('resultsContainer').style.display = 'none';
-                    alert('Could not load customers. Please try again later');
+                    showPopup('Sorry', 'We could not load customers. Please try again later');
                     return;
                 }
 
@@ -327,11 +333,9 @@
                 if (result.length < limit) {
                     loader.textContent = '--- End of Search Results ---';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else if (result.length === 0 && loadedResults === 0) {
                     loader.textContent = 'No customers found.';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else {
                     page++;
                 }
@@ -373,34 +377,19 @@
 
         function handleScroll() {
             const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-            if (scrollTop + clientHeight >= scrollHeight - 5) {
+            if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
                 searchCustomer(null);
             }
         }
 
         window.addEventListener('scroll', handleScroll);
 
-        /* function displayResults(data) {
-            document.getElementById('resultsContainer').style.display = 'block';
-            document.getElementById('customerName').textContent = data.name;
-            document.getElementById('customerEmail').textContent = `Email: ${data.email}`;
-            document.getElementById('customerVehicle').textContent = `Vehicle: ${data.vehicle}`;
-
-            const serviceCardsContainer = document.getElementById('serviceCards');
-            serviceCardsContainer.innerHTML = '';
-
-            data.serviceHistory.forEach(service => {
-                const serviceCard = document.createElement('div');
-                serviceCard.className = 'service-card';
-                serviceCard.innerHTML = `
-                    <h4>${service.garageName} - ${service.date}</h4>
-                    <p><strong>Description:</strong> ${service.description}</p>
-                    <p><strong>Total Cost:</strong> $${service.totalCost}</p>
-                    <p><strong>Spare Parts:</strong> ${service.spareParts}</p>
-                `;
-                serviceCardsContainer.appendChild(serviceCard);
-            });
-        } */
+        function resetVariables() {
+            page = 1;
+            isLoading = false;
+            hasMoreData = true;
+            loadedResults = 0;
+        }
     </script>
 </body>
 

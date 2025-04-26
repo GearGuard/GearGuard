@@ -1,290 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Friends List - GearGuard</title>
+    <title>Admin Panel - Save Vehicle Data</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | GearGuard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
         :root {
-            --background: #181a20;
             --text: #f5f5f5;
-            --primary: #C0C0C0FF;
+            --background: #181a20;
+            --primary: #c7adad;
             --secondary: #25272d;
             --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
-            --hover-bg: rgba(36, 99, 235, 0.07);
+            --box-shadow: 0 6px 24px rgba(36, 99, 235, 0.10), 0 1.5px 6px rgba(0,0,0,0.22);
         }
 
         body {
             background: var(--background);
-            font-family: 'Inter', sans-serif;
+            font-family: "Inter", sans-serif;
             color: var(--text);
-            display: flex;
-            overflow-x: hidden;
+            line-height: 1.6;
+            padding: 32px;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 260px;
-            background: var(--secondary);
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sidebar.collapsed {
-            width: 70px;
-            padding: 20px 10px;
-        }
-
-        .sidebar.collapsed .logo-text,
-        .sidebar.collapsed .nav-text {
-            display: none;
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            flex-shrink: 0;
-        }
-
-        .logo-text {
-            font-size: 1.4rem;
-            font-weight: 700;
+        .admin-panel-title {
             color: var(--primary);
+            font-size: 2.4rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            letter-spacing: 1px;
         }
 
-        /* Toggle Button */
-        .toggle-btn {
-            position: fixed;
-            bottom: 15px;
-            left: 15px;
+        .admin-fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .admin-box {
             background: var(--secondary);
-            color: var(--text);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            z-index: 1100;
+            border-radius: 18px;
+            box-shadow: var(--box-shadow);
+            padding: 2.5rem 2.2rem;
             display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-height: 260px;
+            position: relative;
+            transition: transform 0.18s, box-shadow 0.18s;
+        }
+        .admin-box:hover {
+            transform: translateY(-3px) scale(1.015);
+            box-shadow: 0 12px 32px rgba(36,99,235,0.14), 0 2px 8px rgba(0,0,0,0.28);
+        }
+
+        .box-icon {
+            font-size: 2.2rem;
+            color: var(--accent);
+            margin-bottom: 0.7rem;
+        }
+
+        .box-title {
+            color: var(--primary);
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 1.3rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-input-row {
+            width: 100%;
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 1.15rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background-color: #33363f;
+            color: var(--text);
+            font-size: 1.12rem;
+            font-weight: 500;
+            transition: all 0.22s;
+            box-shadow: 0 1.5px 6px rgba(36,99,235,0.03);
+        }
+        input[type="text"]:hover,
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(36, 99, 235, 0.13);
+        }
+
+        .save-btn {
+            background: var(--accent);
+            color: var(--text);
+            padding: 1.08rem 2.1rem;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(36,99,235,0.09);
+            transition: background 0.18s, transform 0.15s;
+            letter-spacing: 0.2px;
+        }
+        .save-btn:hover {
+            background: #1b4ebd;
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        /* Popup styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(24,26,32,0.6);
+            display: none;
             align-items: center;
             justify-content: center;
-            transition: background 0.3s ease;
+            z-index: 9999;
         }
-
-        .toggle-btn:hover {
-            background: var(--primary);
-            color: var(--background);
-        }
-
-        /* Navigation Menu */
-        .nav-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .nav-item {
-            margin-bottom: 5px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            text-decoration: none;
+        .popup-content {
+            background: var(--secondary);
             color: var(--primary);
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .nav-link:hover {
-            background-color: var(--hover-bg);
-            color: var(--accent);
-        }
-
-        .nav-link.active {
-            background-color: var(--hover-bg);
-            color: var(--accent);
-        }
-
-        .nav-link i {
-            width: 24px;
-            margin-right: 10px;
-            font-size: 1.2em;
+            border-radius: 12px;
+            padding: 2.5rem 3.2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(36,99,235,0.18);
             text-align: center;
         }
-
-        .sidebar.collapsed .nav-link i {
-            margin-right: 0;
+        .popup-content button {
+            margin-top: 2rem;
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            border-radius: 8px;
+            padding: 0.85rem 2.2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(36,99,235,0.08);
+        }
+        .popup-content button:hover {
+            background: #1b4ebd;
         }
 
-        .nav-text {
-            white-space: nowrap;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 260px;
-            padding: 30px;
-            flex-grow: 1;
-            width: calc(100vw - 260px);
-            transition: all 0.3s ease;
-        }
-
-        .main-content.collapsed {
-            margin-left: 70px;
-            width: calc(100vw - 70px);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 260px;
+        @media (max-width: 900px) {
+            .admin-fields-grid {
+                grid-template-columns: 1fr;
+                gap: 1.4rem;
             }
-
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .main-content.collapsed {
-                margin-left: 0;
+            .admin-box {
+                padding: 1.6rem 1rem;
+                min-height: 180px;
             }
         }
     </style>
 </head>
-
 <body>
-
-<button class="toggle-btn" id="toggleBtn">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <div class="sidebar" id="sidebar"> 
-    <div class="sidebar-header"> 
-        <div class="logo-container"> 
-            <img src="image.png" alt="GearGuard Logo" class="logo-img"> 
-            <span class="logo-text">GearGuard</span> 
-        </div> 
-    </div> 
-    <ul class="nav-list"> 
-        <li class="nav-item"> 
-            <a href="mechanic/dashboard" class="nav-link active"> 
-                <i class="fas fa-gauge"></i> 
-                <span class="nav-text">Dashboard</span> 
-            </a> 
-        </li> 
-        <li class="nav-item"> 
-            <a href="mechanic/profile_form" class="nav-link"> 
-                <i class="fas fa-user-circle"></i> 
-                <span class="nav-text">Profile</span> 
-            </a> 
-        </li> 
-        <li class="nav-item"> 
-            <a href="mechanic/services" class="nav-link"> 
-                <i class="fas fa-wrench"></i> 
-                <span class="nav-text">Service</span> 
-            </a> 
-        </li> 
-        <li class="nav-item"> 
-            <a href="mechanic/service_history" class="nav-link"> 
-                <i class="fas fa-history"></i> 
-                <span class="nav-text">History</span> 
-            </a> 
-        </li> 
-       <li class="nav-item"> 
-    <a href="mechanic/spareparts" class="nav-link"> 
-        <i class="fas fa-screwdriver-wrench"></i> 
-        <span class="nav-text">Spareparts</span> 
-    </a> 
-</li>
-        <li class="nav-item"> 
-            <a href="mechanic/messages" class="nav-link"> 
-                <i class="fas fa-envelope"></i> 
-                <span class="nav-text">Messages</span> 
-            </a> 
-        </li> 
-        <li class="nav-item"> 
-            <a href="" class="nav-link"> 
-                <i class="fas fa-sign-out-alt"></i> 
-                <span class="nav-text">Logout</span> 
-            </a> 
-        </li> 
-    </ul> 
-</div>
+    <h2 class="admin-panel-title">Admin Panel: Save Vehicle Data</h2>
+    <div class="admin-fields-grid">
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🚗</span>Vehicle Model</div>
+            <div class="admin-input-row">
+                <input type="text" id="vehicle_model" placeholder="Enter Vehicle Model">
+                <button class="save-btn" onclick="saveField('vehicle_model')">Save</button>
+            </div>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">⛽</span>Fuel Type</div>
+            <div class="admin-input-row">
+                <input type="text" id="fuel_type" placeholder="Enter Fuel Type">
+                <button class="save-btn" onclick="saveField('fuel_type')">Save</button>
+            </div>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🚙</span>Vehicle Type</div>
+            <div class="admin-input-row">
+                <input type="text" id="vehicle_type" placeholder="Enter Vehicle Type">
+                <button class="save-btn" onclick="saveField('vehicle_type')">Save</button>
+            </div>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🚘</span>Body Type</div>
+            <div class="admin-input-row">
+                <input type="text" id="body_type" placeholder="Enter Body Type">
+                <button class="save-btn" onclick="saveField('body_type')">Save</button>
+            </div>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🛠️</span>Engine Capacity</div>
+            <div class="admin-input-row">
+                <input type="text" id="engine_capacity" placeholder="Enter Engine Capacity">
+                <button class="save-btn" onclick="saveField('engine_capacity')">Save</button>
+            </div>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🏷️</span>Vehicle Class</div>
+            <div class="admin-input-row">
+                <input type="text" id="vehicle_class" placeholder="Enter Vehicle Class">
+                <button class="save-btn" onclick="saveField('vehicle_class')">Save</button>
+            </div>
+        </div>
     </div>
-    
 
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
-    <iframe id="content-iframe" location="relative" src="dashboard.php" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
-</div>
+    <!-- Popup -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-content">
+            <div id="popupMessage">Successfully saved to the database!</div>
+            <button onclick="closePopup()">OK</button>
+        </div>
+    </div>
+
     <script>
-        const toggleBtn = document.getElementById('toggleBtn');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-
-        toggleBtn.addEventListener('click', () => {
-            const isMobile = window.innerWidth <= 768;
-
-            if (isMobile) {
-                sidebar.classList.toggle('mobile-open');
-            } else {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('collapsed');
+        function saveField(field) {
+            const value = document.getElementById(field).value.trim();
+            if (!value) {
+                showPopup('Please enter a value before saving.');
+                return;
             }
-        });
 
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', async function(e) {
-                e.preventDefault();
-
-                const href = link.getAttribute('href');
-
-                try {
-                    document.getElementById("content-iframe").setAttribute("src", href);
-
-                    document.querySelectorAll('.nav-link').forEach(lnk => lnk.classList.remove('active'));
-
-                    link.classList.add('active');
-
-                } catch (error) {
-                    console.error('There was a problem with the fetch operation:', error);
-                    mainContent.innerHTML = '<p>There was an error loading the content. Please try again later.</p>';
+            fetch('/admin/save-field', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ field, value })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showPopup('Successfully saved to the database!');
+                    document.getElementById(field).value = '';
+                } else {
+                    showPopup('Failed to save. ' + (data.message || 'Please try again.'));
                 }
+            })
+            .catch(() => {
+                showPopup('An error occurred. Please try again.');
             });
-        });
+        }
+
+        function showPopup(message) {
+            document.getElementById('popupMessage').textContent = message;
+            document.getElementById('popupOverlay').style.display = 'flex';
+        }
+        function closePopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
     </script>
-
-    
 </body>
-
 </html>

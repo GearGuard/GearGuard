@@ -10,7 +10,7 @@ use app\models\Notification;
 use app\models\Vehicle;
 use app\models\LoginFormMechanic;
 use app\models\VehicleOwner;
-use Cassandra\Date;
+use app\models\SparePart;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
@@ -22,7 +22,7 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Response;
 use app\models\LoginForm;
 use gearguard\phpmvc\middlewares\AuthMiddleware;
-use app\models\SparePart;
+use Ratchet\App;
 
 class AuthController extends Controller
 {
@@ -256,28 +256,44 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-
-    public function newSparepart(Request $request, Response $response)
+    public function newSparePart(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
-            return $this->render('customer/sparepart/newPart', [
-                'title' => 'Add Sparepart'
-            ]);
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
+                $model = new SparePart();
+
+
+                $vehicles_list = $this->getVehiclesListForDropDown();
+
+                return $this->render('customer/sparepart/newPart', [
+                    'model' => $model,
+                    'title' => 'Add Spare Part',
+                    'vehicles' => $vehicles_list,
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
         }
 
         throw new NotFoundException();
     }
+
 
     public function viewSparepart(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User) {
-            return $this->render('customer/sparepart/viewPart', [
-                'title' => 'View Spareparts'
-            ]);
+            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
+                return $this->render('customer/sparepart/viewPart', [
+                    'title' => 'View Sparepart'
+                ]);
+            } else {
+                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
+            }
         }
 
         throw new NotFoundException();
     }
+
 
     public function newAppointments(Request $request, Response $response)
     {
@@ -436,7 +452,7 @@ class AuthController extends Controller
         // Create a new Vehicle model instance
         $model = new Vehicle();
 
-    
+
 
         return $this->render('customer/vehicle/addNew', [
             'name' => 'The GearGuard',
@@ -555,10 +571,16 @@ class AuthController extends Controller
                 ($time),
                 ($notes)
             );
-            $model->save();
-            return $this->render('customer/appointment/myAppointment', [
-                'name' => 'The GearGuard',
+            if ($model->validate() && $model->save()) {
+                return $this->render('customer/appointment/myAppointment', [
+                    'name' => 'The GearGuard',
 
+                ]);
+            }
+
+            return $this->render('customer/appointment/newAppointment', [
+                'name' => 'The GearGuard',
+                'model' => $model,
             ]);
         }
         throw new NotFoundException();
@@ -1081,5 +1103,66 @@ public function mechanicSparePartViewAll(Request $request, Response $response)
         }
     }
 
+    public function notifications(Request $request, Response $response) {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $this->setLayout('garage_layout');
+            $notifications = Notification::receiveNotification(Application::$app->user->id);
+            return $this->render('notifications', [
+                'name' => 'The GearGuard',
+                'notifications' => $notifications,
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function markNotificationAsRead(Request $request, Response $response) {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $notificationId = $body['id'] ?? null;
+
+            if (Notification::readNotification($notificationId, Application::$app->user->id)){
+                echo 'success';
+                return;
+            }
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    public function markAllNotificationsAsRead(Request $request, Response $response) {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $userId = Application::$app->user->id;
+
+            if (!isset($body['ids'])) {
+                throw new NotFoundException();
+            }
+
+            $ids = json_decode($body['ids']);
+
+            if (!$ids) {
+                throw new NotFoundException();
+            }
+
+            if (Notification::readAllNotifications($ids)) {
+                echo 'success';
+                return;
+            }
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    public function messages(Request $request, Response $response) {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $this->setLayout('garage_layout');
+            return $this->render('messages', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
    
 }

@@ -185,6 +185,21 @@ $this->title = 'Search Appointments';
             margin-top: 1rem;
         }
 
+        .view-more-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
 
@@ -236,6 +251,8 @@ $this->title = 'Search Appointments';
 			<option value="accepted">Accepted</option>
 			<option value="rejected">Rejected</option>
 			<option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
 		</select>
         <button type="submit" class="search-button">Search</button>
     </form>
@@ -282,6 +299,7 @@ $this->title = 'Search Appointments';
     async function handleSearch(event) {
         if (event !== null) {
             event.preventDefault();
+            document.getElementById('resultsBody').innerHTML = '';
         }
 
         const firstname = document.getElementById('firstname').value.trim();
@@ -305,26 +323,23 @@ $this->title = 'Search Appointments';
             const response = await fetch(`/api/garage/getAppointmentsFiltered?firstname=${firstname}&lastname=${lastname}&numberplate=${numberplate}&contact=${contact}&date=${date}&condition=${condition}&status=${status}&page=${page}`);
 
             if (!response.ok) {
-                alert('Something went wrong. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
 
             const data = await response.json();
 
             if (!data) {
-                alert('Something went wrong. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
 
-            resultsBody.innerHTML = '';
             if (data.length === 0 && loadedResults === 0) {
                 loader.textContent = 'No appointments found.';
                 hasMoreData = false;
-                window.removeEventListener('scroll', handleScroll);
             } else if (data.length < limit) {
                loader.textContent = '--- End of Search Results ---';
                hasMoreData = false;
-               window.removeEventListener('scroll', handleScroll);
             } else {
                 page++;
             }
@@ -349,94 +364,9 @@ $this->title = 'Search Appointments';
             resultsContainer.style.display = 'block';
             resultsContainer.scrollIntoView();
         } catch (error) {
+            showPopup('Error', 'Something went wrong. Please try again later.');
             console.log('Error:', error);
         }
-
-        /* $.ajax({
-            url: '/api/garage/getAppointmentsFiltered',
-            type: 'GET',
-            data: {
-                firstname: firstname,
-                lastname: lastname,
-                numberplate: numberplate,
-                contact: contact,
-                date: date,
-                condition: condition,
-                status: status,
-                page: page,
-            },
-            success: function (response) {
-                let data = response;
-
-                resultsBody.innerHTML = '';
-                    if (data.length === 0 && loadedResults === 0) {
-                        loader.textContent = 'No appointments found.';
-                        hasMoreData = false;
-                        window.removeEventListener('scroll', handleScroll);
-                    } else if (data.length < limit) {
-                       loader.textContent = '--- End of Search Results ---';
-                       hasMoreData = false;
-                       window.removeEventListener('scroll', handleScroll);
-                    } else {
-                        page++;
-                    }
-                    data.forEach(item => {
-                        let tablerow = `<tr id='table-row-id-${item.id}' onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
-                            <td>${item.vehicle_type}</td>
-                            <td>${item.first_name} ${item.last_name}</td>
-                            <td>${item.contact_no}</td>
-                            <td>${item.license_plate_no}</td>
-                            <td>${item.service_type}</td>
-                            <td>${item.date} ${item.time}</td>`;
-
-                        if (item.status_id === 1) {
-                            tablerow += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 3)">Reject</button></td>`;
-                        }
-
-                        tablerow += `</tr>`;
-
-                        resultsBody.innerHTML += tablerow;
-                        loadedResults++;
-                    });
-                    resultsContainer.style.display = 'block';
-                    resultsContainer.scrollIntoView();
-            },
-            error: function (xhr, status, error) {
-                console.log('Error:', error);
-            }
-        }); */
-
-        // Filter results
-        /*const filteredResults = data.filter(item =>
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.plate.toLowerCase().includes(query.toLowerCase()) ||
-            item.contact.includes(query)
-        );
-
-        noResultsMessage.style.display = 'none';
-
-        resultsBody.innerHTML = '';
-        if (data.length > 0) {
-            data.forEach(item => {
-                resultsBody.innerHTML += `
-                        <tr>
-                            <td>${item.vehicle_type}</td>
-                            <td>${item.first_name} ${item.last_name}</td>
-                            <td>${item.contact_no}</td>
-                            <td>${item.license_plate_no}</td>
-                            <td>${item.vehicle_model}</td>
-                            <td>${item.date} ${item.time}</td>
-                            <td><button onclick='viewDetails(${item})' class="view-more-button">View More</button></td>
-                            <td><button class="view-more-button">Accept</button></td>
-                        </tr>
-                    `;
-            });
-            noResultsMessage.style.display = 'none';
-        } else {
-            noResultsMessage.style.display = 'block';
-        }
-
-        resultsContainer.style.display = 'block';*/
         return false;
     }
 
@@ -489,50 +419,39 @@ $this->title = 'Search Appointments';
             });
 
             if (!response.ok) {
-                alert('An error occurred. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
 
             result = await response.text();
 
             if (!result === 'success') {
-                alert('An error occurred. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
 
             alert('Appointment status updated successfully.');
-            document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
+            let status;
+            if (status_id === 2) {
+                status = 'Accepted';
+            } else if (status_id === 3) {
+                status = 'Rejected';
+            } else if (status_id === 4) {
+                status = 'Completed';
+            } else if (status_id === 5) {
+                status = 'Cancelled';
+            }
+            document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = status;
         } catch (error) {
             console.log('Error:', error);
-            alert('An error occurred. Please try again later.');
+            showPopup('Error', 'Something went wrong. Please try again later.');
         }
-        /* event.stopPropagation();
-        $.ajax({
-            url: '/appointment/update_status',
-            type: 'POST',
-            data: {
-                appointment_id: appointment_id,
-                status_id: status_id
-            },
-            success: function (response) {
-                if (response === 'success') {
-                    alert('Appointment status updated successfully.');
-                    document.querySelector('#table-row-id-' + appointment_id + '>#status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
-                } else {
-                    alert('An error occurred. Please try again later.');
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log('Error:', error);
-                alert('An error occurred. Please try again later.');
-            }
-        }) */
     }
 
     function handleScroll() {
         const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 5 && page < 0) {
-            handleSearch(event);
+        if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
+            handleSearch(null);
         }
     }
 

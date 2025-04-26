@@ -12,6 +12,8 @@ class Appointment extends DbModel
     const STATUS_INACTIVE = 1;
     const STATUS_ACTIVE = 2;
     const STATUS_DELETED = 3;
+    const STATUS_DONE = 4;
+    const STATUS_CANCELLED = 5;
 
     public int $id;
     public int $vehicle_id = 0;
@@ -63,8 +65,12 @@ class Appointment extends DbModel
         ];
     }
 
-    public function validate($valueUpdates = [], $validateVehicleID = true, $validateGarageID = true, $validateServiceID = true, $validateAppointmentDateAndTime = true, $validateInternals = false) : bool
+    public function validate($valueUpdates = [], $validateVehicleID = true, $validateGarageID = true, $validateServiceID = true, $validateAppointmentDateAndTime = true, $validateInternals = false, $useFrameworkValidations = false) : bool
     {
+        if ($useFrameworkValidations) {
+            return parent::validate();
+        }
+
         if ($validateInternals && ($this->status_id < 1 || $this->status_id > 3)) {
             $this->addError('status_id', 'Status ID must be between 1 and 3.');
         }
@@ -113,8 +119,8 @@ class Appointment extends DbModel
                 if ((isset($this->id) && $this->id < 0)) {
                     $this->addError('id', 'Internal Error: Please contact an administrator.');
                 }
-                if ($this->status_id < 1 || $this->status_id > 3) {
-                    $this->addError('status_id', 'Status ID must be between 1 and 3.');
+                if ($this->status_id < 1 || $this->status_id > 5) {
+                    $this->addError('status_id', 'Status ID must be between 1 and 5.');
                 }
 
                 if (empty($this->errors)) {
@@ -169,32 +175,6 @@ class Appointment extends DbModel
         }
 
         return $options;
-    }
-
-    public function newAppointment(Request $request)
-    {
-        if ($request->isPost()) {
-            $this->loadData($request->getBody());
-            if ($this->validate() && $this->save()) {
-                return Application::$app->response->redirect('/appointment/success');
-            }
-        }
-
-        $garages = $this->getGarages();
-        return Application::$app->view->renderView('newAppointment', [
-            'model' => $this,
-            'garages' => $garages
-        ]);
-    }
-
-    public function getAppointmentDetails(int $id)
-    {
-        $sql = "SELECT * FROM gg_vehicle_service_appointment LEFT JOIN  WHERE id = :id";
-        $statement = Application::$app->db->prepare($sql);
-        $statement->bindValue(':id', $id);
-        $statement->execute();
-
-        return $statement->fetchObject(Appointment::class);
     }
 
     public static function initialize(int $service_id, int $vehicle_id,  $date,  $time, string $note): Appointment

@@ -3,9 +3,9 @@
 	namespace app\models;
 	
 	use gearguard\phpmvc\Application;
-	use gearguard\phpmvc\db\DbModel;
+	use gearguard\phpmvc\UserModel;
 	
-	class SparePart extends DbModel
+	class SparePart extends UserModel
 	{
 		const STATUS_INACTIVE = 1;
 		const STATUS_ACTIVE = 2;
@@ -19,7 +19,8 @@
 		public string $waranty_period;
 		public string $installed_date;
 		public int $current_user_id = 0;
-		public int $status_id = self::STATUS_INACTIVE;	
+		public int $status_id = self::STATUS_INACTIVE;
+		public int $vehicle_id = 0;
 		
 		public function tableName(): string
 		{
@@ -58,9 +59,13 @@
 				'price' => 'Price',
 				'manufactured_date' => 'Manufactured Date',
 				'waranty_period' => 'Warranty Period',
-				'status_id' => 'Status'
+				'status_id' => 'Status',
+				'vehicle_id' => 'Vehicle',
+				
 			];
 		}
+		
+
 		
 		public static function initialize(array $data): SparePart
 		{
