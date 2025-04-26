@@ -281,7 +281,7 @@
 </head>
 
 <body>
-    <nav class="navMenu"> <a href="#">Dashboard</a> <a href="#" class="active">Manage Mechanic</a> <a href="#">Register New Mechanic</a> </nav>
+    <nav class="navMenu"><a href="#" class="active">Manage Mechanic</a> <a href="/garage/mechanic/add">Register New Mechanic</a> </nav>
     <div class="manage-form">
         <h2 class="title">Manage Mechanic</h2>
         <div class="search-section">

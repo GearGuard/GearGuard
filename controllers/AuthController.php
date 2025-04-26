@@ -983,5 +983,16 @@ class AuthController extends Controller
             throw new NotFoundException();
         }
     }
+
+    public function messages(Request $request, Response $response) {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $this->setLayout('garage_layout');
+            return $this->render('messages', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
    
 }

@@ -44,6 +44,7 @@ $app->router->get('/typelogin', [SiteController::class, 'typelogin']);
 $app->router->get('/notifications', [AuthController::class, 'notifications']);
 $app->router->get('/notifications/markAsRead', [AuthController::class, 'markNotificationAsRead']);
 $app->router->post('/notifications/markAllAsRead', [AuthController::class, 'markAllNotificationsAsRead']);
+$app->router->get('/messages', [AuthController::class, 'messages']);
 
 $app->router->get('/navbar_customer', [SiteController::class, 'navbar_customer']);
 
@@ -139,10 +140,11 @@ $app->router->get('/garage/services/delete', [GarageController::class, 'deleteSe
 $app->router->post('/garage/services/delete', [GarageController::class, 'markServiceDeleted']);
 $app->router->get('/garage/services/search', [GarageController::class, 'getService']);
 $app->router->get('/garage/customers/view', [GarageController::class, 'viewCustomers']);
-$app->router->get('/garage/customers/send_message', [GarageController::class, 'sendMessages']);
 $app->router->get('/garage/customers/search', [GarageController::class, 'searchCustomer']);
 $app->router->post('/garage/profile/update', [GarageController::class, 'updateProfile']);
-$app->router->get('/mechanic', [GarageController::class, 'manageMechanic']);
+$app->router->get('/garage/mechanic/add', [GarageController::class, 'addMechanic']);
+$app->router->post('/garage/mechanic/add', [GarageController::class, 'addMechanicPost']);
+$app->router->get('/garage/mechanic/manage', [GarageController::class, 'manageMechanic']);
 
 
 $app->router->get('/appointment/getServices', [SiteController::class, 'getServices']);

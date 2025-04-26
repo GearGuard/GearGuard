@@ -8,6 +8,8 @@ use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
 use app\utilities\EscapeAttributes;
+use http\Env\Request;
+use http\Env\Response;
 
 class Garage extends UserModel
 {
@@ -154,7 +156,7 @@ class Garage extends UserModel
                 $this->addError('username', 'Username can not be empty.');
             } elseif (strlen($this->username) < 3 || strlen($this->username) > 30) {
                 $this->addError('username', 'Username must be between 3 and 30 characters.');
-            } elseif (Garage::isUsernameAvailable($this->username)) {
+            } elseif (!Garage::isUsernameAvailable($this->username)) {
                 $this->addError('username', 'Username already exists.');
             }
         }
@@ -190,12 +192,7 @@ class Garage extends UserModel
             if (!preg_match('/^\+?(?:\d+[-\s]?)*\d+$|^\+?[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?$|^\+?(?:\d*[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?(?:\d+[-\s]?)*\d+)+$|^\+?(?:(?:\d+[-\s]?)*\d+[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?\d*)+$/', $this->contact_no)) {
                 $this->addError('contact_no', 'Contact Number is not valid.');
             }
-            $contactTemp = str_replace(' ', '', $this->contact_no);
-            $contactTemp = str_replace('-', '', $contactTemp);
-            $contactTemp = str_replace('+', '', $contactTemp);
-            $contactTemp = str_replace('(', '', $contactTemp);
-            $contactTemp = str_replace(')', '', $contactTemp);
-
+            $contactTemp = str_replace([' ', '-', '+', '(', ')'], '', $this->contact_no);
             if (empty($this->contact_no)) {
                 $this->addError('contact_no', 'Contact Number can not be empty.');
             } elseif (!preg_match('/^\d{7,20}$/', $contactTemp)) {
@@ -430,6 +427,11 @@ class Garage extends UserModel
             return true;
 
         return false;
+    }
+
+    public function hasMessages(): bool
+    {
+        return Message::hasMessages($this->id);
     }
 
     public function getToken()
