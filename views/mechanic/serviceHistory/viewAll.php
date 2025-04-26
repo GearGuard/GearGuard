@@ -217,9 +217,10 @@
                             <td><?= htmlspecialchars($row['end_timestamp']) ?></td>
                             <td><?= htmlspecialchars($row['duration']) ?></td>
                             <td><?= htmlspecialchars($row['notes']) ?></td>
-                            <td>
-                                <button onclick='viewServiceDetails(<?= json_encode($row) ?>)' class="btn btn-primary">View More</button>
-                            </td>
+<td>
+    <button onclick='viewServiceDetails(<?= json_encode($row) ?>)' class="btn btn-primary">View More</button>
+    <a href="/mechanic/serviceHistory/edit?license_plate_no=<?= urlencode($row['license_plate_no']) ?>" class="btn btn-secondary" style="margin-left: 5px;">Edit</a>
+</td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

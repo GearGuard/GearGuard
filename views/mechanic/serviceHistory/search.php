@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Vehicle Service</title>
+    <title>Search Vehicle Service</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,20 +13,17 @@
             --accent: #2463eb;
             --border: #33363f;
         }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background: var(--background);
             font-family: "Inter", sans-serif;
             color: var(--text);
             padding: 20px;
         }
-
         .navMenu {
             background-color: var(--secondary);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -41,7 +38,6 @@
             top: 20px;
             z-index: 100;
         }
-
         .navMenu a {
             color: var(--primary);
             text-decoration: none;
@@ -52,35 +48,14 @@
             transition: all 0.3s ease;
             position: relative;
         }
-
         .navMenu a.active {
             color: var(--accent);
             background: var(--hover-bg);
         }
-
         .navMenu a:hover {
             color: var(--accent);
             background: var(--hover-bg);
         }
-
-        .navMenu .dot {
-            width: 4px;
-            height: 4px;
-            background: var(--accent);
-            border-radius: 50%;
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .navMenu a:hover .dot,
-        .navMenu a.active .dot {
-            opacity: 1;
-        }
-
         form {
             background: var(--secondary);
             padding: 2rem;
@@ -88,17 +63,13 @@
             max-width: 600px;
             margin: 0 auto;
         }
-
         label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
             color: var(--primary);
         }
-
-        input[type="text"],
-        input[type="datetime-local"],
-        textarea {
+        input[type="text"] {
             width: 100%;
             padding: 0.5rem;
             background: var(--background);
@@ -109,11 +80,6 @@
             font-family: "Inter", sans-serif;
             font-size: 1rem;
         }
-
-        textarea {
-            resize: vertical;
-        }
-
         button {
             background: var(--accent);
             color: var(--text);
@@ -125,7 +91,6 @@
             font-weight: 600;
             transition: background 0.3s ease;
         }
-
         button:hover {
             background: #1a4ed8;
         }
@@ -133,40 +98,14 @@
 </head>
 <body>
 <nav class="navMenu">
-    <a href="/mechanic/serviceHistory/viewAll" >All Services</a>
-    <a href="#" class="active">Edit Service</a>
-    <a href="/mechanic/serviceHistory/delete" >Delete Services</a>
+    <a href="/mechanic/serviceHistory/viewAll">All Services</a>
+    <a href="/mechanic/serviceHistory/editService" class="active">Edit Service</a>
+    <a href="/mechanic/serviceHistory/delete">Delete Services</a>
 </nav>
-
-<?php if (isset($record)): ?>
-<form id="editServiceForm" method="POST" action="/mechanic/serviceHistory/update">
-    <input type="hidden" name="id" value="<?= htmlspecialchars($record['id']) ?>">
-    <label for="license_plate_no_display">Vehicle</label>
-    <input type="text" id="license_plate_no_display" value="<?= htmlspecialchars($record['license_plate_no']) ?>" disabled>
-
-    <label for="service_type">Service Type</label>
-    <input type="text" id="service_type" value="<?= htmlspecialchars($record['service_type']) ?>" disabled>
-
-    <label for="begin_timestamp">Begin Time</label>
-    <input type="datetime-local" id="begin_timestamp" name="begin_timestamp" value="<?= str_replace(' ', 'T', htmlspecialchars($record['begin_timestamp'])) ?>" required>
-
-    <label for="end_timestamp">End Time</label>
-    <input type="datetime-local" id="end_timestamp" name="end_timestamp" value="<?= str_replace(' ', 'T', htmlspecialchars($record['end_timestamp'])) ?>" required>
-
-    <label for="notes">Notes</label>
-    <textarea id="notes" name="notes" rows="4"><?= htmlspecialchars($record['notes']) ?></textarea>
-
-    <button type="submit">Update</button>
-</form>
-<?php elseif (isset($_GET['license_plate_no'])): ?>
-<p>No service record found for license plate number: <?= htmlspecialchars($_GET['license_plate_no']) ?></p>
-<?php else: ?>
-<form id="searchForm" method="GET" action="/mechanic/serviceHistory/edit">
+<form method="GET" action="/mechanic/serviceHistory/edit">
     <label for="license_plate_no">Search by License Plate Number:</label>
     <input type="text" id="license_plate_no" name="license_plate_no" required>
     <button type="submit">Search</button>
 </form>
-<?php endif; ?>
-
 </body>
 </html>

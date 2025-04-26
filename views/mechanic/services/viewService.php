@@ -200,7 +200,7 @@
         <label for="searchBox">Search:</label>
         <input type="text" id="searchBox" onkeyup="search()"> -->
         <div class="radioContainer">
-            <label><input type="radio" name="searchType" value="appointment"> Appointment</label>
+            <label><input type="radio" name="searchType" value="appointment" checked> Appointment</label>
             <label><input type="radio" name="searchType" value="customer"> Direct Customer</label>
         </div>
         <!-- </div> -->

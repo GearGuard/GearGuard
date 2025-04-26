@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Vehicle Service</title>
+    <title>Delete Vehicle Service</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -97,7 +97,6 @@
         }
 
         input[type="text"],
-        input[type="datetime-local"],
         textarea {
             width: 100%;
             padding: 0.5rem;
@@ -129,43 +128,46 @@
         button:hover {
             background: #1a4ed8;
         }
+
+        .confirm-message {
+            background: var(--secondary);
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 1rem auto;
+            padding: 1rem;
+            color: var(--text);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 <nav class="navMenu">
-    <a href="/mechanic/serviceHistory/viewAll" >All Services</a>
-    <a href="#" class="active">Edit Service</a>
-    <a href="/mechanic/serviceHistory/delete" >Delete Services</a>
+    <a href="/mechanic/serviceHistory/viewAll">All Services</a>
+    <a href="/mechanic/serviceHistory/delete" class="active">Delete Service</a>
+    <a href="/mechanic/serviceHistory/edit">Edit Services</a>
 </nav>
 
-<?php if (isset($record)): ?>
-<form id="editServiceForm" method="POST" action="/mechanic/serviceHistory/update">
-    <input type="hidden" name="id" value="<?= htmlspecialchars($record['id']) ?>">
-    <label for="license_plate_no_display">Vehicle</label>
-    <input type="text" id="license_plate_no_display" value="<?= htmlspecialchars($record['license_plate_no']) ?>" disabled>
-
-    <label for="service_type">Service Type</label>
-    <input type="text" id="service_type" value="<?= htmlspecialchars($record['service_type']) ?>" disabled>
-
-    <label for="begin_timestamp">Begin Time</label>
-    <input type="datetime-local" id="begin_timestamp" name="begin_timestamp" value="<?= str_replace(' ', 'T', htmlspecialchars($record['begin_timestamp'])) ?>" required>
-
-    <label for="end_timestamp">End Time</label>
-    <input type="datetime-local" id="end_timestamp" name="end_timestamp" value="<?= str_replace(' ', 'T', htmlspecialchars($record['end_timestamp'])) ?>" required>
-
-    <label for="notes">Notes</label>
-    <textarea id="notes" name="notes" rows="4"><?= htmlspecialchars($record['notes']) ?></textarea>
-
-    <button type="submit">Update</button>
-</form>
-<?php elseif (isset($_GET['license_plate_no'])): ?>
-<p>No service record found for license plate number: <?= htmlspecialchars($_GET['license_plate_no']) ?></p>
-<?php else: ?>
-<form id="searchForm" method="GET" action="/mechanic/serviceHistory/edit">
+<form id="searchForm" method="GET" action="/mechanic/serviceHistory/delete">
     <label for="license_plate_no">Search by License Plate Number:</label>
     <input type="text" id="license_plate_no" name="license_plate_no" required>
     <button type="submit">Search</button>
 </form>
+
+<?php if (isset($record)): ?>
+    <div class="confirm-message">
+        <p>Are you sure you want to delete the following service record?</p>
+        <p><strong>Vehicle:</strong> <?= htmlspecialchars($record['license_plate_no']) ?></p>
+        <p><strong>Service Type:</strong> <?= htmlspecialchars($record['service_type']) ?></p>
+        <p><strong>Begin Time:</strong> <?= htmlspecialchars($record['begin_timestamp']) ?></p>
+        <p><strong>End Time:</strong> <?= htmlspecialchars($record['end_timestamp']) ?></p>
+        <p><strong>Notes:</strong> <?= htmlspecialchars($record['notes']) ?></p>
+    </div>
+    <form id="deleteServiceForm" method="POST" action="/mechanic/serviceHistory/deleteConfirm">
+        <input type="hidden" name="id" value="<?= htmlspecialchars($record['id']) ?>">
+        <button type="submit" onclick="return confirm('Are you sure you want to delete this service record?');">Delete</button>
+    </form>
+<?php elseif (isset($_GET['license_plate_no'])): ?>
+    <p>No service record found for license plate number: <?= htmlspecialchars($_GET['license_plate_no']) ?></p>
 <?php endif; ?>
 
 </body>

@@ -198,9 +198,8 @@ $app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMes
 $app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
 $app->router->get('/mechanic/serviceHistory', [AuthController::class, 'mechanicServiceHistory']);
 $app->router->get('/mechanic/serviceHistory/viewAll', [AuthController::class, 'mechanicServiceHistory']);
-$app->router->get('/mechanic/serviceHistory/editService', [AuthController::class, 'mechanicServiceHistoryEdit']);
+$app->router->get('/mechanic/serviceHistory/edit', [AuthController::class, 'mechanicServiceHistoryEdit']);
+$app->router->get('/mechanic/serviceHistory/editService', [AuthController::class, 'mechanicServiceHistorySearch']);
 $app->router->post('/mechanic/serviceHistory/update', [AuthController::class, 'updateServiceHistory']);
-
-
 
 $app->run();

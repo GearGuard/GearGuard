@@ -34,6 +34,17 @@ class AuthController extends Controller
         $this->registerMiddleware(new AuthMiddleware(['settings']));
     }
 
+    public function mechanicServiceHistorySearch(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/search', [
+                'title' => 'Search Vehicle Service'
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
     public function login(Request $request, Response $response)
     {
         $loginForm = new LoginForm();
@@ -693,17 +704,6 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function MechanicDeleteServices(Request $request, Response $response)
-    {
-        if (Application::$app->user instanceof Mechanic) {
-            return $this->render('mechanic/services/deleteService', [
-                'name' => 'The GearGuard',
-            ]);
-        }
-
-        throw new NotFoundException();
-    }
-
 
     public function mechanicServiceHistory(Request $request, Response $response)
     {
@@ -734,9 +734,34 @@ class AuthController extends Controller
     public function mechanicServiceHistoryEdit(Request $request, Response $response)
     {
         if (Application::$app->user instanceof \app\models\Mechanic) {
+            $license_plate_no = $_GET['license_plate_no'] ?? null;
+            $record = null;
+
+            if ($license_plate_no) {
+                $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                               vst.begin_timestamp, vst.end_timestamp, vst.notes
+                        FROM gg_vehicle_service_take vst
+                        JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                        JOIN gg_garage_service gs ON vst.service_id = gs.id
+                        WHERE v.license_plate_no = :license_plate_no
+                        ORDER BY vst.begin_timestamp DESC
+                        LIMIT 1";
+
+                $statement = Application::$app->db->prepare($sql);
+                $statement->bindValue(':license_plate_no', $license_plate_no);
+                $statement->execute();
+                $record = $statement->fetch(\PDO::FETCH_ASSOC);
+
+                if (!$record) {
+                    $response->setStatusCode(404);
+                    // Continue to render the view with no record to show "not found" message
+                }
+            }
+
             $this->setLayout('garage_layout');
             return $this->render('mechanic/serviceHistory/edit', [
-                'title' => 'Edit Vehicle Service'
+                'title' => 'Edit Vehicle Service',
+                'record' => $record
             ]);
         }
         throw new NotFoundException();
