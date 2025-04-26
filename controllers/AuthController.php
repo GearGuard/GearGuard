@@ -23,7 +23,7 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Response;
 use app\models\LoginForm;
 use gearguard\phpmvc\middlewares\AuthMiddleware;
-use app\models\SparePart;
+
 
 class AuthController extends Controller
 {
@@ -871,7 +871,5 @@ class AuthController extends Controller
             $response->setStatusCode(403);
             echo json_encode(['error' => 'Unauthorized']);
         }
-    }
-
-   
+    } 
 }
