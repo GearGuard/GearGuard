@@ -323,14 +323,14 @@ $this->title = 'Search Appointments';
             const response = await fetch(`/api/garage/getAppointmentsFiltered?firstname=${firstname}&lastname=${lastname}&numberplate=${numberplate}&contact=${contact}&date=${date}&condition=${condition}&status=${status}&page=${page}`);
 
             if (!response.ok) {
-                alert('Something went wrong. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
 
             const data = await response.json();
 
             if (!data) {
-                alert('Something went wrong. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
 
@@ -364,6 +364,7 @@ $this->title = 'Search Appointments';
             resultsContainer.style.display = 'block';
             resultsContainer.scrollIntoView();
         } catch (error) {
+            showPopup('Error', 'Something went wrong. Please try again later.');
             console.log('Error:', error);
         }
         return false;
@@ -418,14 +419,14 @@ $this->title = 'Search Appointments';
             });
 
             if (!response.ok) {
-                alert('An error occurred. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
 
             result = await response.text();
 
             if (!result === 'success') {
-                alert('An error occurred. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
 
@@ -443,7 +444,7 @@ $this->title = 'Search Appointments';
             document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = status;
         } catch (error) {
             console.log('Error:', error);
-            alert('An error occurred. Please try again later.');
+            showPopup('Error', 'Something went wrong. Please try again later.');
         }
     }
 

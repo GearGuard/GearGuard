@@ -290,7 +290,7 @@
             const searchType = document.querySelector('input[name="search_type"]').value;
 
             if (!searchType) {
-                alert('Please enter the type of the service');
+                showPopup('Error', 'Please enter the type of the service');
                 return;
             }
 
@@ -299,7 +299,7 @@
 
                 if (!results.ok) {
                     serviceDetails.style.display = 'none';
-                    alert('Something went wrong. Please try again later.');
+                    showPopup('Sorry', 'Something went wrong. Please try again later.');
                     return;
                 }
 
@@ -308,7 +308,7 @@
                 serviceDetails = document.getElementById('serviceDetails');
                 if (response == null) {
                     serviceDetails.style.display = 'none';
-                    alert('No service found!');
+                    showPopup('Weird', 'No services found!');
                     return;
                 }
                 serviceDetails.style.display = 'block';
@@ -323,7 +323,7 @@
             } catch (error) {
                 console.log('Error:', error);
                 serviceDetails.style.display = 'none';
-                alert('Something went wrong. Please try again later.');
+                showPopup('Sorry', 'Something went wrong. Please try again later.');
                 return;
             }
         }
@@ -337,6 +337,13 @@
         }
 
         async function deleteService() {
+            if (!serviceId) {
+                showPopup('Error', 'No service selected for deletion');
+                return;
+            }
+
+            showPopup('Deleting', 'Deleting service...', true);
+
             try{
                 const result = await fetch('/garage/services/delete', {
                     method: 'POST',
@@ -349,7 +356,7 @@
                 });
 
                 if (!result.ok) {
-                    alert('We could not delete the service!');
+                    showPopup('Sorry', 'We could not delete the service!');
                     closeModal();
                     document.getElementById('serviceDetails').style.display = 'none';
                     document.getElementById('search_type').value = '';
@@ -357,13 +364,13 @@
                     return;
                 }
 
-                alert('Service deleted successfully. But if there are any appointments associated with this service, they will not be deleted.');
+                showPopup('Success', 'Service deleted successfully. But if there are any appointments associated with this service, they will not be deleted.');
                 closeModal();
                 document.getElementById('serviceDetails').style.display = 'none';
                 document.getElementById('search_type').value = '';
                 serviceId = null;
             } catch (error) {
-                alert('We could not delete the service!');
+                showPopup('Sorry', 'We could not delete the service!');
                 closeModal();
                 document.getElementById('serviceDetails').style.display = 'none';
                 document.getElementById('search_type').value = '';

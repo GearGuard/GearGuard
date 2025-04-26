@@ -303,7 +303,7 @@
 
             if (!response.ok) {
                 console.error('Error fetching vehicle details:', error);
-                alert('Could not load vehicle details!');
+                showPopup('Sorry', 'We could not load vehicle details!');
                 return;
             }
 
@@ -311,7 +311,7 @@
 
             if (!vehicles) {
                 console.error('Error fetching vehicle details:', error);
-                alert('Could not load vehicle details!');
+                showPopup('Sorry', 'We could not load vehicle details!');
                 return;
             }
 
@@ -341,7 +341,7 @@
                 </div>`;
         } catch (error) {
             console.error('Error fetching vehicle details:', error);
-            alert('Could not load vehicle details!');
+            showPopup('Sorry', 'Could not load vehicle details!');
         }
     }
 

@@ -300,7 +300,7 @@
                 if (!response.ok) {
                     console.error('Error fetching customers:', error);
                     document.getElementById('resultsContainer').style.display = 'none';
-                    alert('Could not load customers. Please try again later');
+                    showPopup('Sorry','We could not load customers. Please try again later');
                     return;
                 }
 
@@ -309,7 +309,7 @@
                 if (!result) {
                     console.error('Error fetching customers:', error);
                     document.getElementById('resultsContainer').style.display = 'none';
-                    alert('Could not load customers. Please try again later');
+                    showPopup('Sorry', 'We could not load customers. Please try again later');
                     return;
                 }
 
@@ -373,7 +373,7 @@
             page = 1;
             isLoading = false;
             hasMoreData = true;
-            let loadedResults = 0;
+            loadedResults = 0;
         }
     </script>
 </body>

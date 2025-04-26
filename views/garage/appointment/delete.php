@@ -360,14 +360,14 @@ $this->title = 'Search Appointments';
                     const response = await fetch(`/api/garage/getAppointmentsFiltered?firstname=${firstname}&lastname=${lastname}&numberplate=${numberplate}&contact=${contact}&date=${date}&condition=${condition}&status=active&page=${page}`);
 
                     if (!response.ok) {
-                        alert('Something went wrong. Please try again later.');
+                        showPopup('Error', 'Something went wrong. Please try again later.');
                         return;
                     }
 
                     const data = await response.json();
 
                     if (!data) {
-                        alert('Something went wrong. Please try again later.');
+                        showPopup('Error', 'Something went wrong. Please try again later.');
                         return;
                     }
 
@@ -400,6 +400,7 @@ $this->title = 'Search Appointments';
                         return false;
                 } catch (error) {
                     console.log('Error:', error);
+                    showPopup('Error', 'Something went wrong. Please try again later.');
                     return false;
                 }
 
@@ -435,9 +436,10 @@ $this->title = 'Search Appointments';
 
             async function deleteAppointment() {
                 if (appointmentID === -1) {
-                    alert('No appointment selected for deletion.');
+                    showPopup('Error', 'No appointment selected for deletion.');
                     return;
                 }
+                showPopup('Please wait', 'Deleting appointment...', true);
                 try {
                     const response = await fetch('/garage/appointment/delete', {
                         method: "POST",
@@ -451,23 +453,23 @@ $this->title = 'Search Appointments';
                     });
 
                     if (!response.ok) {
-                        alert('An error occurred. Please try again later.');
+                        showPopup('Error', 'Something went wrong. Please try again later.');
                         return;
                     }
 
                     result = await response.text();
 
                     if (result === 'success') {
-                        alert('Appointment deleted successfully.');
+                        showPopup('Success', 'Appointment deleted successfully.');
                         document.getElementById(`table-row-id-${appointmentID}`).remove();
                         closeModal();
                         resetVariables();
                     } else {
-                        alert('An error occurred. Please try again later.');
+                        showPopup('Error', 'We could not delete the appointment. Please try again later.');
                     }
                 } catch (error) {
                     console.error('Error deleting appointment:', error);
-                    alert('We could not delete the service!');
+                    showPopup('Error', 'An error occurred while deleting the appointment. Please try again later.');
                     closeModal();
                     appointmentID = -1;
                 }

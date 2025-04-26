@@ -325,7 +325,7 @@
                const confirmPassword = document.getElementById('confirmPassword');
 
                if (newPassword.value !== confirmPassword.value) {
-                   alert('New password and confirmation do not match.');
+                   showPopup('Wait!', 'New password and confirmation do not match.');
                    return;
                }
 
@@ -343,29 +343,29 @@
                     });
 
                     if (!result.ok) {
-                        alert('Could not change your password. Please try again later.');
+                        showPopup('Sorry', 'Could not change your password. Please try again later.');
                         return;
                     }
 
                     const response = await result.json();
 
                     if (!response) {
-                        alert('Could not change your password. Please try again later.');
+                        showPopup('Sorry', 'Could not change your password. Please try again later.');
                         return;
                     }
 
                     if (response.success) {
-                        alert('Password changed successfully!');
+                        showPopup('Success', 'Password changed successfully!');
                         changePasswordModal.style.display = 'none';
                         currentPassword.value = '';
                         newPassword.value = '';
                         confirmPassword.value = '';
                     } else {
-                        alert('Error changing password: ' + response.message);
+                        showPopup('Error', 'Error changing password: ' + response.message);
                     }
                } catch (error) {
                     console.error('Error:', error);
-                    alert('An error occurred while changing the password. Please try again later.');
+                    showPopup('Error','An error occurred while changing the password. Please try again later.');
                }
 
                /* $.ajax({
@@ -414,6 +414,7 @@
             confirmButton.addEventListener('click', async function(event) {
                 event.stopPropagation();
                 // Collect form data
+                showPopup('Hold on!', 'Saving changes...');
                 const formData = new FormData(form);
                 const data = {};
 
@@ -431,25 +432,25 @@
                     });
 
                     if (!result.ok) {
-                        alert('Could not update your profile. Please try again later.');
+                        showPopup('Sorry', 'Could not update your profile. Please try again later.');
                         return;
                     }
 
                     const response = await result.json();
 
                     if (!response) {
-                        alert('Could not update your profile. Please try again later.');
+                        showPopup('Sorry', 'Could not update your profile. Please try again later.');
                         return;
                     }
 
                     if (response.success) {
-                        alert('Profile updated successfully!');
+                        showPopup('Success', 'Profile updated successfully!');
                     } else {
-                        alert('Error updating profile: ' + response.message);
+                        showPopup('Error', 'Error updating profile: ' + response.message);
                     }
                 } catch (error) {
                     console.log('Error:', error);
-                    alert('An error occurred while updating the profile. Please try again later.');
+                    showPopup('Sorry', 'An error occurred while updating the profile. Please try again later.');
                 }
                 /* $.ajax({
                     url: '/garage/profile/update',

@@ -321,6 +321,7 @@ $this->title = 'View All Appointments';
                 }
             } catch (error) {
                 console.error('Error fetching appointments:', error);
+                showPopup('Error', 'Something went wrong. Please try again later.');
             } finally {
                 isLoading = false;
             }
@@ -370,6 +371,8 @@ $this->title = 'View All Appointments';
         async function handleAcceptance(event, appointment_id, status_id) {
             event.stopPropagation();
 
+            showPopup('Please wait', 'Updating appointment status...', true);
+
             try {
                 const response = await fetch('/appointment/update_status', {
                     method: "POST",
@@ -380,18 +383,18 @@ $this->title = 'View All Appointments';
                 });
 
                 if (!response.ok) {
-                    alert('An error occurred. Please try again later.');
+                    showPopup('Error', 'Something went wrong. Please try again later.');
                     return;
                 }
 
                 result = await response.text();
 
                 if (!result === 'success') {
-                    alert('An error occurred. Please try again later.');
+                    showPopup('Error', 'Something went wrong. Please try again later.');
                     return;
                 }
 
-                alert('Appointment status updated successfully.');
+                showPopup('Success', 'Appointment status updated successfully.');
                 let status;
                 if (status_id === 2) {
                     status = 'Accepted';
@@ -405,7 +408,7 @@ $this->title = 'View All Appointments';
                 document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = status;
             } catch (error) {
                 console.log('Error:', error);
-                alert('An error occurred. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
             }
         }
 

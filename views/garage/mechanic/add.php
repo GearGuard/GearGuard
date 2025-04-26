@@ -437,7 +437,7 @@
                 });
 
                 if (!response.ok) {
-                    alert('We encountered an error while adding the mechanic. Please try again.');
+                    showPopup('Sorry', 'We encountered an error while adding the mechanic. Please try again.');
                     return;
                 }
 
@@ -450,18 +450,9 @@
                     showPopup('Error', result.message);
                 }
             } catch (error) {
-                alert('We encountered an error while adding the mechanic. Please try again.');
+                showPopup('Sorry', 'We encountered an error while adding the mechanic. Please try again.');
                 console.error('There was a problem with the fetch operation:', error);
             }
-        }
-
-        function confirmDelete() {
-            showPopup('Confirm Delete', 'Are you sure you want to delete this record?', () => {
-                // Perform delete operation
-                showPopup('Success', 'Record deleted successfully', () => {
-                    clearForm();
-                });
-            });
         }
 
         function clearForm() {
