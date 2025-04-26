@@ -45,6 +45,26 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function getDropdownData(Request $request, Response $response)
+    {
+        if (Application::$app->user) {
+            $userId = Application::$app->user->id;
+            $vehicles = (new \app\models\Vehicle())->getVehiclesByOwner($userId);
+            $mechanics = (new \app\models\Mechanic())->getAllMechanics();
+            $services = (new \app\models\ServicePerform())->getServicesByGarage();
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'vehicles' => $vehicles,
+                'mechanics' => $mechanics,
+                'services' => $services
+            ]);
+            exit;
+        }
+
+        throw new NotFoundException();
+    }
+
     public function login(Request $request, Response $response)
     {
         $loginForm = new LoginForm();
@@ -670,6 +690,57 @@ class AuthController extends Controller
 
     public function viewServicesByMechanic(Request $request, Response $response)
     {
+        $message = '';
+        if ($request->isPost()) {
+            $body = $request->getBody();
+            $vehicle_id = $body['vehicle_id'] ?? null;
+            $service_id = $body['service_id'] ?? null;
+            $mechanic_id = $body['mechanic_id'] ?? null;
+            $begin = $body['begin_timestamp'] ?? null;
+            $end = $body['end_timestamp'] ?? null;
+            $notes = $body['notes'] ?? null;
+
+            if ($vehicle_id && $service_id && $mechanic_id && $begin && $end) {
+                $startTime = new \DateTime($begin);
+                $endTime = new \DateTime($end);
+                $interval = $startTime->diff($endTime);
+                $duration = $interval->format('%H:%I:%S');
+                $durationFormatted = "2000-01-01 $duration";
+
+                $model = \app\models\MechanicService::initializeVehicleService(
+                    $vehicle_id,
+                    $service_id,
+                    $mechanic_id,
+                    $begin,
+                    $end,
+                    $durationFormatted,
+                    $notes
+                );
+                $model->save();
+                $message = "<p class='success-msg'>✅ Record inserted successfully!</p>";
+            } else {
+                $message = "<p class='error-msg'>❌ Missing required fields.</p>";
+            }
+        }
+
+        // Fetch vehicles for dropdown
+        $vehiclesSql = "SELECT id, license_plate_no FROM gg_vehicle";
+        $vehiclesStmt = Application::$app->db->prepare($vehiclesSql);
+        $vehiclesStmt->execute();
+        $vehicles = $vehiclesStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Fetch services for dropdown
+        $servicesSql = "SELECT id, type FROM gg_garage_service";
+        $servicesStmt = Application::$app->db->prepare($servicesSql);
+        $servicesStmt->execute();
+        $services = $servicesStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Fetch mechanics for dropdown
+        $mechanicsSql = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM gg_garage_mechanic";
+        $mechanicsStmt = Application::$app->db->prepare($mechanicsSql);
+        $mechanicsStmt->execute();
+        $mechanics = $mechanicsStmt->fetchAll(\PDO::FETCH_ASSOC);
+
         $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
                        CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
                        vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
@@ -685,7 +756,11 @@ class AuthController extends Controller
 
         $params = [
             'name' => "The GearGurd",
-            'serviceAssignments' => $serviceAssignments
+            'serviceAssignments' => $serviceAssignments,
+            'message' => $message,
+            'vehicles' => $vehicles,
+            'services' => $services,
+            'mechanics' => $mechanics
         ];
         return $this->render('mechanic/services/viewService', $params);
     }

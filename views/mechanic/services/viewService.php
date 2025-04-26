@@ -1,7 +1,17 @@
+<?php
+// This view file does not require direct database connection or query execution.
+// The data should be passed from the controller to the view for rendering.
+
+// Handle form submission and data processing should be done in the controller.
+
+// The form and UI logic remain unchanged below.
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View All Appointments</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
@@ -9,11 +19,12 @@
         :root {
             --text: #f5f5f5;
             --background: #181a20;
-            --primary: #C0C0C0FF;
+            --primary: #c7adad;
             --secondary: #25272d;
             --accent: #2463eb;
             --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
+            --danger: #ef4444;
         }
 
         * {
@@ -162,27 +173,113 @@
             margin-top: 1rem;
         }
 
+        .appointment-form {
+            background: var(--secondary);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .manage-form {
+            background: var(--secondary);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            margin: 0 auto 2rem;
+            padding: 2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .required-dot {
+            color: #ef4444;
+            margin-left: 0.25rem;
+        }
+
+        input[type="datetime-local"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: #33363f;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .add-button {
+            background: var(--accent);
+            color: var(--text);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-button:hover {
+            background: #1b4ebd;
+            transform: translateY(-1px);
+        }
+
+        .clear-button {
+            background: var(--secondary);
+            color: var(--text);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .clear-button:hover {
+            background: var(--hover-bg);
+        }
+
+        .success-msg {
+            color: #4ade80;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .error-msg {
+            color: #f87171;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
 
-            .navMenu {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .navMenu a {
-                width: 100%;
-                text-align: center;
-            }
-
             .appointment-table {
                 padding: 1rem;
-            }
-
-            th, td {
-                padding: 0.75rem;
             }
         }
     </style>
@@ -196,14 +293,10 @@
         <a href="/mechanic/services/deleteService" target="_self">Delete Services</a>
     </nav>
 
-        <!-- <div class="SearchBar">
-        <label for="searchBox">Search:</label>
-        <input type="text" id="searchBox" onkeyup="search()"> -->
-        <div class="radioContainer">
-            <label><input type="radio" name="searchType" value="appointment" checked> Appointment</label>
-            <label><input type="radio" name="searchType" value="customer"> Direct Customer</label>
-        </div>
-        <!-- </div> -->
+    <div class="radioContainer">
+        <label><input type="radio" name="searchType" value="appointment" checked> Appointment</label>
+        <label><input type="radio" name="searchType" value="customer"> Direct Customer</label>
+    </div>
 
     <div class="appointment-table" id="appointmentTableContainer" style="display: none;">
         <h2 class="title">All Appointments</h2>
@@ -226,80 +319,125 @@
         <p id="loader" class="no-results">Loading...</p>
     </div>
 
-    <div class="appointment-table" id="timeTableContainer" style="display: none;">
-        <div class="title">Vehicle Service Assignments</div>
-        <table id="timeTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Vehicle</th>
-                    <th>Service</th>
-                    <th>Mechanic</th>
-                    <th>Begin</th>
-                    <th>End</th>
-                    <th>Duration</th>
-                    <th>Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
+    <div class="appointment-form" id="directCustomerForm" style="display: block;">
+        <div class="title">Vehicle Service Details</div>
 
-                if (!empty($serviceAssignments)) {
-                    foreach ($serviceAssignments as $assignment) {
-                        echo "<tr>
-                                <td>{$assignment['id']}</td>
-                                <td>" . htmlspecialchars($assignment['license_plate_no']) . "</td>
-                                <td>" . htmlspecialchars($assignment['service_type']) . "</td>
-                                <td>" . htmlspecialchars($assignment['mechanic_name']) . "</td>
-                                <td>{$assignment['begin_timestamp']}</td>
-                                <td>{$assignment['end_timestamp']}</td>
-                                <td>{$assignment['duration']}</td>
-                                <td>" . htmlspecialchars($assignment['notes']) . "</td>
-                              </tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='8' class='no-results'>❌ No service assignments found.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+        <?php if (!empty($message)) echo $message; ?>
+
+        <form method="POST" action="/mechanic/services/viewService">
+            <!-- Vehicle (Full width) -->
+            <div class="form-row">
+                <div class="form-column full-width">
+                    <div class="form-group">
+                        <label for="vehicle_id">Vehicle</label>
+                        <select name="vehicle_id" required>
+                            <option value=""> Select Vehicle </option>
+                            <?php if (isset($vehicles) && $vehicles !== null): ?>
+                                <?php foreach($vehicles as $row): ?>
+                                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['license_plate_no']) ?></option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="">No vehicles available</option>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service & Mechanic -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="service_id">Service</label>
+                    <select name="service_id" required>
+                        <option value=""> Select Service </option>
+                        <?php if (isset($services) && $services !== null): ?>
+                            <?php foreach($services as $row): ?>
+                                <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['type']) ?></option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="">No services available</option>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mechanic_id">Mechanic</label>
+                    <select name="mechanic_id" required>
+                        <option value=""> Select Mechanic </option>
+                        <?php if (isset($mechanics) && $mechanics !== null): ?>
+                            <?php foreach($mechanics as $row): ?>
+                                <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['full_name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="">No mechanics available</option>
+                        <?php endif; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Begin & End Timestamp -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div class="form-group">
+                    <label for="begin_timestamp">Begin Time</label>
+                    <input type="datetime-local" name="begin_timestamp" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_timestamp">End Time</label>
+                    <input type="datetime-local" name="end_timestamp" required>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea name="notes" rows="4" placeholder="Optional notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="button-container">
+                <button type="reset" class="clear-button">Clear</button>
+                <button type="submit" class="add-button">Add Service</button>
+            </div>
+        </form>
     </div>
 
     <script>
         document.querySelectorAll('input[name="searchType"]').forEach(radio => {
             radio.addEventListener('change', function () {
                 const appointmentTable = document.getElementById('appointmentTableContainer');
-                const timeTable = document.getElementById('timeTableContainer');
+                const directCustomerForm = document.getElementById('directCustomerForm');
                 if (this.value === 'appointment') {
                     appointmentTable.style.display = 'block';
-                    timeTable.style.display = 'none';
-                } else {
+                    directCustomerForm.style.display = 'none';
+                } else if (this.value === 'customer') {
                     appointmentTable.style.display = 'none';
-                    timeTable.style.display = 'block';
+                    directCustomerForm.style.display = 'block';
                 }
             });
         });
 
-        // Initialize table visibility based on selected radio button on page load
+        // Ensure the correct container is visible on page load based on selected radio button
         window.addEventListener('DOMContentLoaded', () => {
             const selectedValue = document.querySelector('input[name="searchType"]:checked')?.value;
             const appointmentTable = document.getElementById('appointmentTableContainer');
-            const timeTable = document.getElementById('timeTableContainer');
+            const directCustomerForm = document.getElementById('directCustomerForm');
             if (selectedValue === 'appointment') {
                 appointmentTable.style.display = 'block';
-                timeTable.style.display = 'none';
+                directCustomerForm.style.display = 'none';
             } else if (selectedValue === 'customer') {
                 appointmentTable.style.display = 'none';
-                timeTable.style.display = 'block';
+                directCustomerForm.style.display = 'block';
             } else {
-                // Default: hide both tables if no radio button is selected
+                // Default: hide all if no radio button is selected
                 appointmentTable.style.display = 'none';
-                timeTable.style.display = 'none';
+                directCustomerForm.style.display = 'none';
             }
-
-            // Load data for both tables
+        
+            // Load data for appointment table only
             loadAppointments();
-            loadServiceAssignments();
         });
 
         function search() {
