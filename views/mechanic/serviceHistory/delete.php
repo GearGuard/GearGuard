@@ -143,8 +143,8 @@
 <body>
 <nav class="navMenu">
     <a href="/mechanic/serviceHistory/viewAll">All Services</a>
-    <a href="/mechanic/serviceHistory/delete" class="active">Delete Service</a>
     <a href="/mechanic/serviceHistory/edit">Edit Services</a>
+    <a href="/mechanic/serviceHistory/delete" class="active">Delete Service</a>
 </nav>
 
 <form id="searchForm" method="GET" action="/mechanic/serviceHistory/delete">

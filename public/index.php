@@ -201,5 +201,7 @@ $app->router->get('/mechanic/serviceHistory/viewAll', [AuthController::class, 'm
 $app->router->get('/mechanic/serviceHistory/edit', [AuthController::class, 'mechanicServiceHistoryEdit']);
 $app->router->get('/mechanic/serviceHistory/editService', [AuthController::class, 'mechanicServiceHistorySearch']);
 $app->router->post('/mechanic/serviceHistory/update', [AuthController::class, 'updateServiceHistory']);
+$app->router->post('/mechanic/serviceHistory/deleteConfirm', [AuthController::class, 'mechanicServiceHistoryDeleteConfirm']);
+$app->router->get('/mechanic/serviceHistory/delete', [AuthController::class, 'mechanicServiceHistoryDelete']);
 
 $app->run();

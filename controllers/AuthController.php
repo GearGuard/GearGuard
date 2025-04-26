@@ -799,6 +799,74 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function mechanicServiceHistoryDeleteConfirm(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $body = $request->getBody();
+            $id = $body['id'] ?? null;
+
+            if (!$id) {
+                $response->setStatusCode(400);
+                return $response->redirect('/mechanic/serviceHistory/delete?error=Missing+ID');
+            }
+
+            $sql = "DELETE FROM gg_vehicle_service_take WHERE id = :id";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':id', $id);
+
+            try {
+                $statement->execute();
+                // Redirect to the delete page with success message or to viewAll
+                return $response->redirect('/mechanic/serviceHistory/delete?success=Record+deleted');
+            } catch (\Exception $e) {
+                $response->setStatusCode(500);
+                return $response->redirect('/mechanic/serviceHistory/delete?error=' . urlencode($e->getMessage()));
+            }
+        }
+        throw new NotFoundException();
+    }
+
+    public function mechanicServiceHistoryDelete(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $license_plate_no = $_GET['license_plate_no'] ?? null;
+            $record = null;
+            $error = $_GET['error'] ?? null;
+            $success = $_GET['success'] ?? null;
+
+            if ($license_plate_no) {
+                $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                               vst.begin_timestamp, vst.end_timestamp, vst.notes
+                        FROM gg_vehicle_service_take vst
+                        JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                        JOIN gg_garage_service gs ON vst.service_id = gs.id
+                        WHERE v.license_plate_no = :license_plate_no
+                        ORDER BY vst.begin_timestamp DESC
+                        LIMIT 1";
+
+                $statement = Application::$app->db->prepare($sql);
+                $statement->bindValue(':license_plate_no', $license_plate_no);
+                $statement->execute();
+                $record = $statement->fetch(\PDO::FETCH_ASSOC);
+
+                if (!$record) {
+                    $response->setStatusCode(404);
+                    // Continue to render the view with no record to show "not found" message
+                }
+            }
+
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/delete', [
+                'title' => 'Delete Vehicle Service',
+                'record' => $record,
+                'error' => $error,
+                'success' => $success,
+                'license_plate_no' => $license_plate_no
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
     public function mechanicSparePart(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User || Application::$app->user instanceof Mechanic) {
