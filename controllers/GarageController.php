@@ -61,8 +61,10 @@ class GarageController extends Controller
     public function manageMechanic(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            $model = new Mechanic();
             return $this->render('garage/mechanic/manage', [
                 'name' => 'The GearGuard',
+                'model' => $model,
             ]);
         }
 

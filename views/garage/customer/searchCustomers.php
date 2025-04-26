@@ -377,7 +377,7 @@
 
         function handleScroll() {
             const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-            if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
+            if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData && loadedResults > 0) {
                 searchCustomer(null);
             }
         }

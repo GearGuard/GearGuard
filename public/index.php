@@ -181,6 +181,7 @@ $app->router->get('/api/garage/getAppointments', [GarageController::class, 'getA
 $app->router->get('/api/garage/getAppointmentsFiltered', [GarageController::class, 'filteredAppointments']);
 $app->router->get('/api/garage/getServices', [GarageController::class, 'getServices']);
 $app->router->get('/api/garage/getCustomerVehicles', [GarageController::class, 'getCustomerVehicles']);
+$app->router->get('/api/garage/mechanic/getMechanic', [GarageController::class, 'mechanicSearch']);
 
 
 

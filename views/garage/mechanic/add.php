@@ -333,7 +333,7 @@
 <body>
     <nav class="navMenu"><a href="/garage/mechanic/manage">Manage Mechanic</a> <a href="#" class="active">Register New Mechanic</a> </nav>
     <div class="manage-form">
-        <h2 class="title">Manage Mechanic</h2>
+        <h2 class="title">Register New Mechanic</h2>
         <?php $this->form = gearguard\phpmvc\form\Form::begin('', 'post', 'mechanicForm'); ?>
             <div class="form-row">
                 <div class="form-column">
@@ -378,37 +378,8 @@
             document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
         </script>
     </div>
-    <div class="popup-overlay" id="popupOverlay">
-        <div class="popup" id="popup">
-            <h3 class="popup-title" id="popupTitle"></h3>
-            <p class="popup-message" id="popupMessage"></p>
-            <div class="popup-buttons">
-                <button class="popup-button popup-button-cancel" id="popupCancel">Cancel</button>
-                <button class="popup-button popup-button-confirm" id="popupConfirm">Confirm</button>
-            </div>
-        </div>
-    </div>
 
     <script>
-        function showPopup(title, message, hideCancel = false) {
-            document.getElementById('popupTitle').textContent = title;
-            document.getElementById('popupMessage').textContent = message;
-            document.getElementById('popupOverlay').style.display = 'block';
-
-            document.getElementById('popupConfirm').style.display = 'none';
-            if (hideCancel) {
-                document.getElementById('popupCancel').style.display = 'none';
-            } else {
-                document.getElementById('popupCancel').style.display = 'inline-block';
-            }
-
-            document.getElementById('popupCancel').onclick = hidePopup;
-        }
-
-        function hidePopup() {
-            document.getElementById('popupOverlay').style.display = 'none';
-        }
-
         function confirmAdd() {
             const form = document.getElementById('mechanicForm');
             if (form.reportValidity()) {
