@@ -290,8 +290,7 @@ $this->title = 'Spare Parts Management';
                     
                     <td class="button-container">
                         <button class="action-button view" onclick="viewServicePerform(${JSON.stringify(service)})">View</button>
-                        <button class="action-button edit">Edit</button>
-                        <button class="action-button delete">Delete</button>
+                        <button class="action-button delete" onclick="deleteServicePerform(${service.id})">Delete</button>
                     </td>
                 `;
                         tableBody.appendChild(row);
@@ -337,10 +336,31 @@ $this->title = 'Spare Parts Management';
             <p>Service Notes: ${service['Service Notes'] || 'N/A'}</p>
             <button class="action-button" onclick="document.body.removeChild(modal)">Close</button>
         `;
-        modal.appendChild(content);
-        document.body.appendChild(modal);
-    }
-    document.addEventListener('DOMContentLoaded', fetchServicePerform);
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+
+        function deleteServicePerform(id) {
+            if (confirm('Are you sure you want to delete this service history?')) {
+                fetch(`/customer/appointment/delete_service_history/`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Service history deleted successfully!');
+                            fetchServicePerform();
+                        } else {
+                            alert('Failed to delete service history. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting service history:', error);
+                        alert('An error occurred while deleting the service history. Please try again.');
+                    });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', fetchServicePerform);
     </script>
 </body>
 
