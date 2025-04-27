@@ -206,7 +206,7 @@ class GarageService extends DbModel
         $statement->bindValue(':garage_id', $garageID, \PDO::PARAM_INT);
         $statement->bindValue(':service_id', $serviceID, \PDO::PARAM_INT);
         $statement->execute();
-        $result = $statement->fetch(\PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
         if (count($result) > 0)
             return true;
 
@@ -233,7 +233,7 @@ class GarageService extends DbModel
         $statement->bindValue(':garage_id', $garageID, \PDO::PARAM_INT);
         $statement->bindValue(':service_type', $service_type);
         $statement->execute();
-        $result = $statement->fetch(\PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         if ($result)
             return $result['id'];
