@@ -519,7 +519,7 @@
                 }
 
                 try {
-                    const result = await fetch('/user/profile/update', {
+                    const result = await fetch('/customer/my_profile', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -593,7 +593,7 @@
                 data['_action'] = 'updateProfile';
 
                 try {
-                    const result = await fetch('/user/profile/update', {
+                    const result = await fetch('/customer/my_profile', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

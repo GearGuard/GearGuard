@@ -276,93 +276,35 @@ AND v.status_id = 2;
         }
     }
 
-    public function myProfilePost(Request $request, Response $response)
-{
-    $body = $request->getBody();
 
-    // Debug: Log received data
-    error_log('Profile update data received: ' . print_r($body, true));
-
-    // Determine the action type
-    $action = $body['_action'] ?? 'updateProfile';
-    
-    try {
-        if ($action === 'changePassword') {
-            // Process password change
-            $currentPassword = $body['currentPassword'] ?? '';
-            $newPassword = $body['password'] ?? '';
-            $confirmPassword = $body['passwordConfirm'] ?? '';
-            
-            // Validate password
-            if ($newPassword !== $confirmPassword) {
-                throw new \Exception('New password and confirmation do not match.');
-            }
-            
-            // Verify current password and update new password
-            $user = Application::$app->user;
-            if (!$user->verifyPassword($currentPassword)) {
-                throw new \Exception('Current password is incorrect.');
-            }
-            
-            // Update password
-            $user->updatePassword($newPassword);
-            
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'message' => 'Password updated successfully'
-            ]);
-        } else {
-            // Process profile update
-            unset($body['_action']); // Remove action flag before updating
-            Application::$app->user->update($body);
-            
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'message' => 'Profile updated successfully'
-            ]);
-        }
-    } catch (\Exception $ex) {
-        // Debug: Log the error
-        error_log('Profile update error: ' . $ex->getMessage());
-
+    public function viewMyProfile(Request $request, Response $response)
+    {
+        $userId = Application::$app->user->id ?? null;
         header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false,
-            'message' => $ex->getMessage(),
-        ]);
-    }
-}
 
-public function viewMyProfile(Request $request, Response $response)
-{
-    $userId = Application::$app->user->id ?? null;
-    header('Content-Type: application/json');
+        if (!$userId) {
+            echo json_encode([]);
+            exit;
+        }
 
-    if (!$userId) {
-        echo json_encode([]);
-        exit;
-    }
-
-    try {
-        $sql = "
+        try {
+            $sql = "
       SELECT * FROM gg_vehicle_users_view 
       WHERE id = :userId AND vehicle_status_id = 2;
         ";
 
-        $stmt = Application::$app->db->prepare($sql);
-        $stmt->bindValue(':userId', $userId);
-        $stmt->execute();
+            $stmt = Application::$app->db->prepare($sql);
+            $stmt->bindValue(':userId', $userId);
+            $stmt->execute();
 
-        $history = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        echo json_encode($history);
-    } catch (\PDOException $e) {
-        http_response_code(500);
-        echo json_encode([
-            'error'   => 'Failed to fetch details',
-            'details' => $e->getMessage()
-        ]);
+            $history = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            echo json_encode($history);
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error'   => 'Failed to fetch details',
+                'details' => $e->getMessage()
+            ]);
+        }
     }
-}
 }

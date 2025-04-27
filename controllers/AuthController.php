@@ -134,7 +134,7 @@ class AuthController extends Controller
             return $this->render('customer/my_Profile', [
                 'title' => 'My Profile',
                 'model' => Application::$app->user
-                
+
             ]);
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
@@ -271,6 +271,7 @@ class AuthController extends Controller
         if (Application::$app->user instanceof User) {
             if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 $model = new Appointment();
+
 
                 // Fetch garages from the database
                 $garages = $this->getGarages();
@@ -550,6 +551,12 @@ class AuthController extends Controller
 
                 ]);
             }
+            Notification::sendNotification(
+                $garage_id['garage_id'],
+                'A new appointment has been created for vehicle ' . Vehicle::getVehicleDetails($vehicle_id)['license_plate_no'] .  ' by the user ' . Application::$app->user->first_name . '.',
+                $service_id['service_id'] ?? 'NO-SERVICE',
+                'Appointment Created'
+            );
 
             return $this->render('customer/appointment/newAppointment', [
                 'name' => 'The GearGuard',
@@ -580,7 +587,7 @@ class AuthController extends Controller
     }
 
     //mechanic
-   
+
     public function mechanicSignup(Request $request, Response $response)
     {
         $errors = [];
@@ -937,7 +944,8 @@ class AuthController extends Controller
         }
     }
 
-    public function notifications(Request $request, Response $response) {
+    public function notifications(Request $request, Response $response)
+    {
         if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
             $notifications = Notification::receiveNotification(Application::$app->user->id);
@@ -950,12 +958,13 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
-    public function markNotificationAsRead(Request $request, Response $response) {
+    public function markNotificationAsRead(Request $request, Response $response)
+    {
         if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
             $body = $request->getBody();
             $notificationId = $body['id'] ?? null;
 
-            if (Notification::readNotification($notificationId, Application::$app->user->id)){
+            if (Notification::readNotification($notificationId, Application::$app->user->id)) {
                 echo 'success';
                 return;
             }
@@ -964,7 +973,8 @@ class AuthController extends Controller
         }
     }
 
-    public function markAllNotificationsAsRead(Request $request, Response $response) {
+    public function markAllNotificationsAsRead(Request $request, Response $response)
+    {
         if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
             $body = $request->getBody();
             $userId = Application::$app->user->id;
@@ -988,7 +998,8 @@ class AuthController extends Controller
         }
     }
 
-    public function messages(Request $request, Response $response) {
+    public function messages(Request $request, Response $response)
+    {
         if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
             return $this->render('messages', [
@@ -998,5 +1009,4 @@ class AuthController extends Controller
 
         throw new NotFoundException();
     }
-   
 }
