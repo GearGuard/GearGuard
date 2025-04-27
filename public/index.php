@@ -14,6 +14,7 @@ use app\controllers\AppointmentController;
 use app\controllers\WarrentyController;
 use gearguard\phpmvc\Application;
 use app\controllers\ServicePerformController;
+use app\controllers\CustomrtDashboardController;
 
 
 
@@ -61,6 +62,17 @@ $app->router->get('/logout', [SiteController::class, 'logout']);
 $app->router->get('/home', [AuthController::class, 'customer']);
 
 $app->router->get('/customer/dashboard', [AuthController::class, 'dashboard']);
+$app->router->get('/customer/viewappointment', [CustomrtDashboardController::class, 'viewNextAppointment']);
+$app->router->get('/customer/viewWarrenty', [CustomrtDashboardController::class, 'viewWarrentyExpireFirst']);
+$app->router->get('/customer/viewService', [CustomrtDashboardController::class, 'ViewLastServiceDone']);
+$app->router->get('/customer/tips', [CustomrtDashboardController::class, 'getMaintenanceTip']);
+$app->router->get('/customer/logedinUser', [CustomrtDashboardController::class, 'logedinUser']);
+$app->router->get('/customer/vehicleCount', [CustomrtDashboardController::class, 'vehicleCount']);
+$app->router->get('/customer/upcomingServices', [CustomrtDashboardController::class, 'upcmingServicesCount']);
+$app->router->get('/customer/nonExpire', [CustomrtDashboardController::class, 'nonExpire']);
+
+
+
 $app->router->get('/customer/my_profile', [AuthController::class, 'myProfile']);
 $app->router->get('/customer/settings', [AuthController::class, 'settings']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
