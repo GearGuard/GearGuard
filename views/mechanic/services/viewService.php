@@ -40,60 +40,6 @@
             padding: 20px;
         }
 
-        .navMenu {
-            background-color: var(--secondary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 70%;
-            padding: 1rem;
-            margin: 0 auto 2rem;
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-        }
-
-        .navMenu a {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            padding: 0.75rem 1.25rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .navMenu a.active {
-            color: var(--accent);
-            background: var(--hover-bg);
-        }
-
-        .navMenu a:hover {
-            color: var(--accent);
-            background: var(--hover-bg);
-        }
-
-        .navMenu .dot {
-            width: 4px;
-            height: 4px;
-            background: var(--accent);
-            border-radius: 50%;
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .navMenu a:hover .dot,
-        .navMenu a.active .dot {
-            opacity: 1;
-        }
-
         .appointment-table {
             background: var(--secondary);
             border-radius: 12px;
@@ -299,12 +245,6 @@
     <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-<!-- <nav class="navMenu">
-        <a href="/mechanic/services/addService" target="_self">Assign New Service</a>
-        <a href="#" class="active">All Services</a>
-        <a href="/mechanic/services/editService" target="_self">Edit Services</a>
-        <a href="/mechanic/services/deleteService" target="_self">Delete Services</a>
-    </nav> -->
 
     <div class="radioContainer">
         <label><input type="radio" name="searchType" value="appointment" checked> Appointment</label>
@@ -529,69 +469,78 @@
             // Scroll to form
             document.getElementById('directCustomerForm').scrollIntoView({ behavior: 'smooth' });
         }
-
+        // Function to load and display appointments from the server
         function loadAppointments() {
             fetch('/mechanic/services/loadAppointments')
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.querySelector('#appointmentTable tbody');
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="8" class="no-results">❌ No appointments found.</td></tr>';
-                        return;
-                    }
-                    data.forEach(appointment => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${appointment.vehicle_type}</td>
-                            <td>${appointment.client_name}</td>
-                            <td>${appointment.contact_number}</td>
-                            <td>${appointment.license_plate_no}</td>
-                            <td>${appointment.service_type}</td>
-                            <td>${appointment.date_time}</td>
-                            <td><button class="view-button" onclick='viewDetails(${JSON.stringify(appointment)})'>View</button></td>
-                            <td></td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                    loader.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error loading appointments:', error);
-                    loader.textContent = 'Error loading appointments.';
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#appointmentTable tbody');
+                tbody.innerHTML = '';
+                
+                // Display message if no appointments found
+                if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="no-results">❌ No appointments found.</td></tr>';
+                return;
+                }
+
+                // Create table rows for each appointment
+                data.forEach(appointment => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${appointment.vehicle_type}</td>
+                    <td>${appointment.client_name}</td>
+                    <td>${appointment.contact_number}</td>
+                    <td>${appointment.license_plate_no}</td>
+                    <td>${appointment.service_type}</td>
+                    <td>${appointment.date_time}</td>
+                    <td><button class="view-button" onclick='viewDetails(${JSON.stringify(appointment)})'>View</button></td>
+                    <td></td>
+                `;
+                tbody.appendChild(tr);
                 });
+                loader.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error loading appointments:', error);
+                loader.textContent = 'Error loading appointments.';
+            });
         }
 
+        // Function to load and display service assignments from the server
         function loadServiceAssignments() {
             fetch('/mechanic/services/loadServiceAssignments')
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.querySelector('#timeTable tbody');
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="8" class="no-results">❌ No service assignments found.</td></tr>';
-                        return;
-                    }
-                    data.forEach(assignment => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${assignment.id}</td>
-                            <td>${assignment.license_plate_no}</td>
-                            <td>${assignment.service_type}</td>
-                            <td>${assignment.mechanic_name}</td>
-                            <td>${assignment.begin_timestamp}</td>
-                            <td>${assignment.end_timestamp}</td>
-                            <td>${assignment.duration}</td>
-                            <td>${assignment.notes}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading service assignments:', error);
-                    const tbody = document.querySelector('#timeTable tbody');
-                    tbody.innerHTML = '<tr><td colspan="8" class="no-results">Error loading service assignments.</td></tr>';
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#timeTable tbody');
+                tbody.innerHTML = '';
+                
+                // Display message if no service assignments found
+                if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="no-results">❌ No service assignments found.</td></tr>';
+                return;
+                }
+
+                // Create table rows for each service assignment
+                data.forEach(assignment => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${assignment.id}</td>
+                    <td>${assignment.license_plate_no}</td>
+                    <td>${assignment.service_type}</td>
+                    <td>${assignment.mechanic_name}</td>
+                    <td>${assignment.begin_timestamp}</td>
+                    <td>${assignment.end_timestamp}</td>
+                    <td>${assignment.duration}</td>
+                    <td>${assignment.notes}</td>
+                `;
+                tbody.appendChild(tr);
                 });
+            })
+            .catch(error => {
+                console.error('Error loading service assignments:', error);
+                const tbody = document.querySelector('#timeTable tbody');
+                tbody.innerHTML = '<tr><td colspan="8" class="no-results">Error loading service assignments.</td></tr>';
+            });
         }
     </script>
    
