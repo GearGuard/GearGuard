@@ -283,8 +283,11 @@ class GarageController extends Controller
             ];
             Application::$app->user->getServiceByID((int) $id)->update($toUpdate, true);
 
-            return $this->render('garage/services/viewAll', [
-                'name' => 'The GearGuard',
+            header('Content-Type: application/json;');
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Service deleted successfully',
             ]);
         }
 

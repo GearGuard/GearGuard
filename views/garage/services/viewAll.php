@@ -198,14 +198,14 @@
                 const response = await fetch(`/api/garage/getServices?page=${page}`);
 
                 if (!response.ok) {
-                    console.error('Error fetching services:', error);
+                    console.error('Error fetching services:', response.statusText);
                     showPopup('Sorry', 'Failed to load services. Please try again later.');
                 }
 
                 const result = await response.json();
 
                 if (!result) {
-                    console.error('Error fetching services:', error);
+                    console.error('Error fetching services:', 'Response was not valid JSON');
                     showPopup('Sorry', 'Failed to load services. Please try again later.');
                 }
 

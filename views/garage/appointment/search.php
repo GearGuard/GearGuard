@@ -425,7 +425,7 @@ $this->title = 'Search Appointments';
 
             result = await response.text();
 
-            if (!result === 'success') {
+            if (!result || result === 'success') {
                 showPopup('Error', 'Something went wrong. Please try again later.');
                 return;
             }
