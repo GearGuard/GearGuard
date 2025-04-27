@@ -192,8 +192,13 @@ $this->title = 'Spare Parts Management';
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .modal-content {
@@ -209,8 +214,15 @@ $this->title = 'Spare Parts Management';
         }
 
         @keyframes slideDown {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -322,11 +334,17 @@ $this->title = 'Spare Parts Management';
         }
 
         @keyframes slideIn {
-            to { opacity: 1; transform: translateX(0); }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         @keyframes fadeOut {
-            to { opacity: 0; transform: translateY(-20px); }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
         }
 
         .notification.success {
@@ -361,7 +379,9 @@ $this->title = 'Spare Parts Management';
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @media (max-width: 768px) {
@@ -424,19 +444,19 @@ $this->title = 'Spare Parts Management';
     <script>
         function showNotification(message, type = 'success') {
             const notificationContainer = document.getElementById('notificationContainer');
-            
+
             const notification = document.createElement('div');
             notification.classList.add('notification', type);
-            
+
             // Add icon based on notification type
             let icon = 'check-circle';
             if (type === 'error') icon = 'exclamation-circle';
             if (type === 'warning') icon = 'exclamation-triangle';
-            
+
             notification.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
-            
+
             notificationContainer.appendChild(notification);
-            
+
             // Remove notification after animation completes
             setTimeout(() => {
                 notification.remove();
@@ -588,11 +608,12 @@ $this->title = 'Spare Parts Management';
             document.body.appendChild(modal);
         }
 
+        // Fix for the submitEditForm function
         function submitEditForm(event, id) {
             event.preventDefault();
 
             const data = {
-                id,
+                id: id,
                 serial_no: document.getElementById('serial_no').value,
                 type: document.getElementById('type').value,
                 manufacturer: document.getElementById('manufacturer').value,
@@ -602,27 +623,27 @@ $this->title = 'Spare Parts Management';
             };
 
             fetch('/customer/sparepart/edit_sparepart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({id: id})
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    showNotification('Spare part updated successfully!', 'success');
-                    fetchSpareParts(); // Refresh the list
-                } else {
-                    showNotification('Failed to update: ' + (result.message || 'Unknown error'), 'error');
-                }
-                closeModal();
-            })
-            .catch(error => {
-                console.error('Error editing spare part:', error);
-                showNotification('An error occurred while updating the spare part.', 'error');
-                closeModal();
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(data) // Send all form data, not just the ID
+                })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.success) {
+                        showNotification('Spare part updated successfully!', 'success');
+                        fetchSpareParts(); // Refresh the list
+                    } else {
+                        showNotification('Failed to update: ' + (result.message || 'Unknown error'), 'error');
+                    }
+                    closeModal();
+                })
+                .catch(error => {
+                    console.error('Error editing spare part:', error);
+                    showNotification('An error occurred while updating the spare part.', 'error');
+                    closeModal();
+                });
         }
 
         function deleteSparePart(id) {
@@ -655,31 +676,31 @@ $this->title = 'Spare Parts Management';
 
             document.getElementById('yesButton').addEventListener('click', function() {
                 fetch('/customer/sparepart/delete_sparepart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({
-                        id: id
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            id: id
+                        })
                     })
-                })
-                .then(res => res.json())
-                .then(result => {
-                    if (result.success) {
-                        showNotification('Spare part deleted successfully!', 'success');
-                        fetchSpareParts();
-                    } else {
-                        // Keeping your original behavior here where it shows success even on failure
-                        showNotification('Spare part deleted successfully!', 'success');
-                        fetchSpareParts(); // Refresh the list
-                    }
-                    closeModal();
-                })
-                .catch(error => {
-                    console.error('Error deleting spare part:', error);
-                    showNotification('An error occurred while deleting the spare part.', 'error');
-                    closeModal();
-                });
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            showNotification('Spare part deleted successfully!', 'success');
+                            fetchSpareParts();
+                        } else {
+                            // Keeping your original behavior here where it shows success even on failure
+                            showNotification('Spare part deleted successfully!', 'success');
+                            fetchSpareParts(); // Refresh the list
+                        }
+                        closeModal();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting spare part:', error);
+                        showNotification('An error occurred while deleting the spare part.', 'error');
+                        closeModal();
+                    });
             });
         }
 
