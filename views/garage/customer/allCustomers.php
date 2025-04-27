@@ -144,6 +144,21 @@
             background-color: #25272d;
         }
 
+        .search-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -303,7 +318,7 @@
 
             if (!response.ok) {
                 console.error('Error fetching vehicle details:', error);
-                alert('Could not load vehicle details!');
+                showPopup('Sorry', 'We could not load vehicle details!');
                 return;
             }
 
@@ -311,7 +326,7 @@
 
             if (!vehicles) {
                 console.error('Error fetching vehicle details:', error);
-                alert('Could not load vehicle details!');
+                showPopup('Sorry', 'We could not load vehicle details!');
                 return;
             }
 
@@ -341,7 +356,7 @@
                 </div>`;
         } catch (error) {
             console.error('Error fetching vehicle details:', error);
-            alert('Could not load vehicle details!');
+            showPopup('Sorry', 'Could not load vehicle details!');
         }
     }
 

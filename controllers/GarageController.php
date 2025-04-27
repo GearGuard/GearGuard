@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Appointment;
 use app\models\GarageService;
+use app\models\Mechanic;
 use app\models\Notification;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
@@ -60,8 +61,10 @@ class GarageController extends Controller
     public function manageMechanic(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            $model = new Mechanic();
             return $this->render('garage/mechanic/manage', [
                 'name' => 'The GearGuard',
+                'model' => $model,
             ]);
         }
 
@@ -286,6 +289,36 @@ class GarageController extends Controller
         }
 
         throw new NotFoundException();
+    }
+
+    public function addMechanic(Request $request, Response $response)
+    {
+        $model = new Mechanic();
+        return $this->render('garage/mechanic/add', [
+            'name' => 'The GearGuard',
+            'model' => $model,
+        ]);
+    }
+
+    public function addMechanicPost(Request $request, Response $response)
+    {
+        $model =  new Mechanic();
+        $model->loadData($body = $request->getBody());
+        $model->password = ".";
+        $model->garage_id = Application::$app->user->id?: Application::$app->session->get('user');
+        $model->status_id = Mechanic::STATUS_ACTIVE;
+
+        if ($model->validate(validatePassword: false, useFrameworkValidations: false) && $model->save()) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Mechanic added successfully',
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => array_values($model->errors)[0][0] ?? '',
+            ]);
+        }
     }
 
     public function filteredAppointments(Request $request, Response $response)

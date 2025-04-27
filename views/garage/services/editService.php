@@ -299,7 +299,7 @@
         const searchType = document.querySelector('input[name="search_type"]').value;
 
         if (!searchType) {
-            alert('Please enter the type of the service');
+            showPopup('Wait!', 'Please enter the type of the service');
             return;
         }
 
@@ -309,7 +309,7 @@
             if (!results.ok) {
                 document.getElementById('updateButton').setAttribute('disabled', true);
                 document.getElementById('editForm').style.display = 'none';
-                alert('Something went wrong. Please try again later.');
+                showPopup('Sorry', 'Something went wrong. Please try again later.');
                 return;
             }
 
@@ -318,7 +318,7 @@
             if (response == null) {
                 document.getElementById('updateButton').setAttribute('disabled', true);
                 document.getElementById('editForm').style.display = 'none';
-                alert('Service not found!');
+                showPopup('Weird!', 'Service not found!');
                 return;
             }
 
@@ -336,6 +336,7 @@
             console.log('Error:', error);
             document.getElementById('editForm').style.display = 'none';
             document.getElementById('updateButton').setAttribute('disabled', true);
+            showPopup('Sorry', 'Something went wrong. Please try again later.');
         }
 
     }

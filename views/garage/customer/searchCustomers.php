@@ -214,6 +214,21 @@
             background-color: #25272d;
         }
 
+        .search-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
 
         @media (max-width: 768px) {
             .search-form {
@@ -300,7 +315,7 @@
                 if (!response.ok) {
                     console.error('Error fetching customers:', error);
                     document.getElementById('resultsContainer').style.display = 'none';
-                    alert('Could not load customers. Please try again later');
+                    showPopup('Sorry','We could not load customers. Please try again later');
                     return;
                 }
 
@@ -309,7 +324,7 @@
                 if (!result) {
                     console.error('Error fetching customers:', error);
                     document.getElementById('resultsContainer').style.display = 'none';
-                    alert('Could not load customers. Please try again later');
+                    showPopup('Sorry', 'We could not load customers. Please try again later');
                     return;
                 }
 
@@ -362,7 +377,7 @@
 
         function handleScroll() {
             const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-            if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
+            if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData && loadedResults > 0) {
                 searchCustomer(null);
             }
         }
@@ -373,7 +388,7 @@
             page = 1;
             isLoading = false;
             hasMoreData = true;
-            let loadedResults = 0;
+            loadedResults = 0;
         }
     </script>
 </body>

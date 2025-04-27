@@ -86,7 +86,7 @@ class Message extends DbModel
     {
         $sql = "SELECT * FROM gearguard.gg_messages gm WHERE gm.tuid = :userID AND gm.status_id = 1 LIMIT 1";
         $statement = Application::$app->db->prepare($sql);
-        $statement->bindValue(':user_id', $userID);
+        $statement->bindValue(':userID', $userID);
         $statement->execute();
         return (bool)($statement->fetch());
     }
