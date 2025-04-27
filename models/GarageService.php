@@ -72,6 +72,9 @@ class GarageService extends DbModel
         if ($validateType && !$this->type) {
             $this->addError('type', 'Type can not be empty.');
         }
+        if ($validateType && GarageService::verifyServiceTypeExistance($this->garage_id, $this->type)) {
+            $this->addError('type', 'Service type already exists.');
+        }
         if ($validatePrice && $this->price <= 0) {
             $this->addError('price', 'Price can not be less than or equal to zero.');
         }
@@ -189,6 +192,20 @@ class GarageService extends DbModel
         $statement = Application::$app->db->prepare($sql);
         $statement->bindValue(':garage_id', $garageID, \PDO::PARAM_INT);
         $statement->bindValue(':service_id', $serviceID, \PDO::PARAM_INT);
+        $statement->execute();
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if (count($result) > 0)
+            return true;
+
+        return false;
+    }
+
+    public static function verifyServiceTypeExistance(int $garageID, string $service_type) : bool
+    {
+        $sql = "SELECT ggs.id FROM gearguard.gg_garage_service ggs WHERE ggs.garage_id = :garage_id AND ggs.type = :service_type";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $garageID, \PDO::PARAM_INT);
+        $statement->bindValue(':service_type', $service_type, \PDO::PARAM_INT);
         $statement->execute();
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
         if (count($result) > 0)

@@ -235,14 +235,14 @@
                 const response = await fetch(`/api/garage/getCustomers?page=${page}`);
 
                 if (!response.ok) {
-                    console.error('Error fetching customers:', error);
+                    console.error('Error fetching customers:', response.statusText);
                     loader.textContent = 'Error loading customers. Please try again.';
                 }
 
                 const result = await response.json();
 
                 if (!result) {
-                    console.error('Error fetching customers:', error);
+                    console.error('Error fetching customers:', 'Response was not valid JSON');
                     loader.textContent = 'Error loading customers. Please try again.';
                 }
 

@@ -305,7 +305,7 @@
 
                 const response = await results.json();
 
-                serviceDetails = document.getElementById('serviceDetails');
+                let serviceDetails = document.getElementById('serviceDetails');
                 if (response == null) {
                     serviceDetails.style.display = 'none';
                     showPopup('Weird', 'No services found!');
@@ -356,6 +356,17 @@
                 });
 
                 if (!result.ok) {
+                    showPopup('Sorry', 'We could not delete the service!');
+                    closeModal();
+                    document.getElementById('serviceDetails').style.display = 'none';
+                    document.getElementById('search_type').value = '';
+                    serviceId = null;
+                    return;
+                }
+
+                const response = await result.json();
+
+                if (!response || !response.success) {
                     showPopup('Sorry', 'We could not delete the service!');
                     closeModal();
                     document.getElementById('serviceDetails').style.display = 'none';
