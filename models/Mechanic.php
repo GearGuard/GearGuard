@@ -269,6 +269,9 @@ class Mechanic extends UserModel
 				$this->addError('garage_id', 'Invalid garage assignment.');
 			}
 		}
+        if (isset($this->id) && ($this->id < 0 || !Mechanic::verifyMechanicExistance($this->id))) {
+            $this->addError('id', 'Internal Error: Please contact an administrator.');
+        }
 
 		return empty($this->errors);
 	}
@@ -310,4 +313,14 @@ class Mechanic extends UserModel
 		$statement->execute();
 		return $statement->fetchAll(\PDO::FETCH_ASSOC);
 	}
+
+    public static function verifyMechanicExistance(int $id)
+    {
+        $sql = "SELECT * FROM gg_garage_mechanic WHERE id = :id LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':id', $id);
+        $statement->execute();
+        return (bool)$statement->fetch();
+    }
+
 }
