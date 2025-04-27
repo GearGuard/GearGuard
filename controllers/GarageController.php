@@ -9,11 +9,13 @@ use app\models\Notification;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
+use gearguard\phpmvc\Model;
 use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\middlewares\ExtendedMiddleware;
 use app\models\Garage;
 use app\utilities\EscapeAttributes;
+use Ratchet\App;
 
 class GarageController extends Controller
 {
@@ -297,9 +299,26 @@ class GarageController extends Controller
     public function addMechanic(Request $request, Response $response)
     {
         $model = new Mechanic();
+        $servicesModel = new class extends Model {
+            public $services = [];
+
+            public function rules(): array
+            {
+                return [];
+            }
+
+            public function labels(): array
+            {
+                return [
+                    'services' => 'Services',
+                ];
+            }
+        };
         return $this->render('garage/mechanic/add', [
             'name' => 'The GearGuard',
             'model' => $model,
+            'servicesModel' => $servicesModel,
+            'serviceOptions' => Application::$app->user->getAllGarageServiceTypesForDropDown(),
         ]);
     }
 
@@ -310,6 +329,36 @@ class GarageController extends Controller
         $model->password = ".";
         $model->garage_id = Application::$app->user->id?: Application::$app->session->get('user');
         $model->status_id = Mechanic::STATUS_ACTIVE;
+
+        if (isset($request->getBody()['services'])) {
+            $services = json_decode(($request->getBody())['services']);
+            $servicesAllowed = Application::$app->user->getAllGarageServiceTypesForDropDown();
+            $servicesNumeric = [];
+
+            foreach ($servicesAllowed as $key => $value) {
+                $servicesNumeric[] = (int)$key;
+            }
+
+            foreach ($services as $service) {
+                if (is_numeric($service)) {
+                    if (in_array($service, $servicesNumeric)) {
+                        $model->mechanicServices[] = (int)$service;
+                    } else {
+                        echo json_encode([
+                            'success' => false,
+                            'message' => 'Invalid service type',
+                        ]);
+                        return;
+                    }
+                } else {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Invalid service type',
+                    ]);
+                    return;
+                }
+            }
+        }
 
         if ($model->validate(validatePassword: false, useFrameworkValidations: false) && $model->save()) {
             echo json_encode([

@@ -7,6 +7,7 @@ use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
 use app\utilities\EscapeAttributes;
+use Ratchet\App;
 
 class Mechanic extends UserModel
 {
@@ -28,6 +29,7 @@ class Mechanic extends UserModel
 	public int $status_id = self::STATUS_ACTIVE;
 	public int $garage_id;
 	public string $passwordConfirm = '';
+    public array $mechanicServices = [];
 
 	public function tableName(): string
 	{
@@ -47,8 +49,24 @@ class Mechanic extends UserModel
 
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
 			
-		return parent::save();
+		if (parent::save()) {
+            $this->id = Application::$app->db->pdo->lastInsertId();
+            if (!empty($this->mechanicServices)) {
+                return $this->addServicesToMechanic();
+            }
+        }
 	}
+
+    private function addServicesToMechanic() {
+        $sql = "INSERT IGNORE INTO gearguard.gg_service_mechanic_perform (service_id, mechanic_id) VALUES ";
+        $services = "";
+        foreach ($this->mechanicServices as $service) {
+            $services .= "(" . $service . ", " . $this->id . "), ";
+        }
+        $services = rtrim($services, ", ");
+        $sql .= $services;
+        return (bool)Application::$app->db->pdo->exec($sql);
+    }
 
 	public function rules(): array
 	{

@@ -38,6 +38,34 @@
             padding: 20px;
         }
 
+        .services-button {
+            background: var(--accent);
+              color: var(--text);
+              border: none;
+              padding: 0.4rem;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              width: 12rem;
+              margin: 0.2rem;
+        }
+
+        .services-button.disabled {
+            background: var(--border);
+              color: var(--text);
+              border: none;
+              padding: 0.4rem;
+              border-radius: 5px;
+              cursor: default;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              width: 12rem;
+              margin: 0.2rem;
+        }
+
         .navMenu {
             background-color: var(--secondary);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -164,7 +192,7 @@
         .clear-button {
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
-            border: none;
+            border: solid 1px white;
             font-size: 0.95rem;
             font-weight: 500;
             cursor: pointer;
@@ -224,6 +252,7 @@
         .edit-button {
             background: var(--edit-color);
             color: var(--text);
+            border: none;
         }
 
         .delete-button {
@@ -234,15 +263,21 @@
         .clear-button {
             background: var(--secondary);
             color: var(--text);
-            border: 1px solid var(--border);
+            border: solid 1px white;
         }
 
         .search-button:hover,
         .edit-button:hover,
         .delete-button:hover,
-        .clear-button:hover {
+        .clear-button:hover,
+        .services-button:hover {
             transform: translateY(-1px);
             opacity: 0.9;
+        }
+
+        .services-button.disabled:hover {
+            transform: none;
+            opacity: 1;
         }
 
         .popup-overlay {
@@ -311,6 +346,32 @@
             opacity: 0.9;
         }
 
+        .table-container {
+            width: 30rem;
+            height: 10rem;
+            overflow-y: auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            user-select: none;
+          }
+
+          tr.selected td {
+            background-color: #007BFF;
+            color: white;
+          }
+
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -369,13 +430,53 @@
             <?php $this->address = new gearguard\phpmvc\form\TextAreaField($model, 'address');
                 echo $this->address->required(true)->rows(3);
             ?>
-            <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmAdd()">Add</button></div>
+            <div style="margin: 1rem;">Select the services the mechanic will perform</div>
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="table-container">
+                      <table id="services-table">
+                        <tbody>
+
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <?php echo $this->services = new gearguard\phpmvc\form\DropDownField($servicesModel, 'services', $serviceOptions); ?>
+                    <button type="button" id="addServicesBtn" class="services-button disabled">Add Service</button>
+                    <button type="button" id="removeServicesBtn" class="services-button disabled">Remove Service</button>
+                </div>
+            </div>
+            <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmAdd()">Register</button></div>
         </form>
         <script>
             document.querySelectorAll('.form-group textarea').forEach(e => e.parentElement.classList.add('full-width'))
             address = document.getElementById('address');
             address.classList.add('form-textarea');
-            document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
+            document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$');
+
+            document.getElementById('services').addEventListener('change', () => {
+                document.getElementById('addServicesBtn').classList.remove('disabled');
+                document.getElementById('addServicesBtn').addEventListener('click', () => {
+                    const serviceSelector = document.getElementById('services');
+
+                    if (serviceSelector.options[serviceSelector.selectedIndex].disabled) {
+                        return;
+                    }
+
+                    const table = document.querySelector('#services-table tbody');
+                    const selectedService = serviceSelector.options[serviceSelector.selectedIndex].text;
+                    const newRow = document.createElement('tr');
+                    const rowData = document.createElement('td');
+                    rowData.textContent = selectedService;
+                    newRow.appendChild(rowData);
+
+                    newRow.addEventListener('click', () => {selectRow(newRow)});
+
+                    table.appendChild(newRow);
+                    serviceSelector.options[serviceSelector.selectedIndex].setAttribute('disabled', 'true');
+                });
+            });
         </script>
     </div>
 
@@ -397,6 +498,19 @@
             formData.forEach((value, key) => {
                 data[key] = value;
             });
+
+            const services = [];
+            document.querySelectorAll('#services-table tbody tr').forEach(row => {
+                const serviceSelector = document.getElementById('services');
+                serviceSelector.childNodes.forEach(option => {
+                    if (option.text === row.textContent.trim()) {
+                        if (!Number.isNaN(option.value))
+                            services.push(Number.parseInt(option.value));
+                    }
+                });
+            });
+
+            data['services'] = JSON.stringify(services);
 
             try {
                 const response = await fetch(form.action, {
@@ -429,6 +543,39 @@
         function clearForm() {
             document.getElementById('mechanicForm').reset();
         }
+
+        function removeSelection(row) {
+            const selectedService = row.textContent.trim();
+            const serviceSelector = document.getElementById('services');
+
+            for (let i = 0; i < serviceSelector.options.length; i++) {
+                if (serviceSelector.options[i].text === selectedService) {
+                serviceSelector.options[i].removeAttribute('disabled');
+                break;
+                }
+            }
+
+            row.remove();
+        }
+
+        function selectRow(row) {
+            document.querySelectorAll('#services-table tbody tr').forEach(r => {
+                r.classList.remove('selected');
+            })
+
+            document.getElementById('removeServicesBtn').classList.remove('disabled');
+
+            row.classList.add('selected');
+
+            const button = document.getElementById('removeServicesBtn').cloneNode(true);
+            document.getElementById('removeServicesBtn').parentNode.replaceChild(button, document.getElementById('removeServicesBtn'));
+
+            document.getElementById('removeServicesBtn').addEventListener('click', () => {
+                removeSelection(row);
+                document.getElementById('removeServicesBtn').classList.add('disabled');
+            });
+        }
+
     </script>
 </body>
 
