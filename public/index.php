@@ -95,6 +95,7 @@ $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehi
 $app->router->post('/customer/vehicle/register', [AuthController::class, 'addVehiclePost']);
 
 $app->router->get('/customer/vehicle/service_history', [AuthController::class, 'vehicleServiceHistory']);
+$app->router->get('/customer/vehicle/service_history_all', [ServicePerformController::class, 'viewServicePerformanceAllCustomer']);
 $app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);
 $app->router->get('/customer/vehicleTransfer/transfer', [AuthController::class, 'transferVehicle']);
 $app->router->get('/customer/vehicleTransfer/instruction', [AuthController::class, 'transferInstructions']);

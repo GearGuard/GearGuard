@@ -83,4 +83,60 @@ ORDER BY vst.begin_timestamp DESC
             echo json_encode(['success' => false, 'message' => 'Database error occurred']);
         }
     }
+    public function viewServicePerformanceAllCustomer()
+    {
+        $userId = Application::$app->user->id ?? null;
+        header('Content-Type: application/json');
+
+        if (!$userId) {
+            echo json_encode([]);
+            exit;
+        }
+
+        try {
+            $sql = " 
+           SELECT  CONCAT(mf.name, ' ', vm.model) AS 'Vehicle Model',
+    v.license_plate_no AS 'Number Plate',
+    g.name AS 'Garage Name',
+    gs.price AS 'Cost',
+    gs.type AS 'Service Done',
+    vsa.date AS 'Service Start Date',
+    DATE_ADD(vsa.date, INTERVAL gs.duration HOUR) AS 'Service End Date',
+    sp.type AS 'Replaced Part',
+    sp.waranty_period AS 'Warranty Expiry Date',
+    vsa.notes AS 'Service Notes',
+    gs.description AS 'Service Description'
+FROM 
+    gg_user u
+    INNER JOIN gg_user_owner uo ON u.id = uo.user_id
+    INNER JOIN gg_vehicle v ON uo.vehicle_id = v.id
+    INNER JOIN gg_vehicle_model vm ON v.model_id = vm.id
+    INNER JOIN gg_vehicle_manufacturer mf ON vm.manufacturer_id = mf.id
+    INNER JOIN gg_vehicle_service_appointment vsa ON v.id = vsa.vehicle_id
+    INNER JOIN gg_garage_service gs ON vsa.service_id = gs.id
+    INNER JOIN gg_garage g ON gs.garage_id = g.id
+    LEFT JOIN gg_sparepart_vehicleuser_vehicle_install svvi ON v.id = svvi.vehicle_id 
+                                                          AND u.id = svvi.user_id
+                                                          AND ABS(DATEDIFF(vsa.date, svvi.installed_date)) <= 7
+    LEFT JOIN gg_sparepart sp ON svvi.sparepart_id = sp.id
+WHERE 
+    u.id = :userId
+ORDER BY 
+    vsa.date DESC, vsa.time DESC;
+            ";
+
+            $stmt = Application::$app->db->prepare($sql);
+            $stmt->bindValue(':userId', $userId);
+            $stmt->execute();
+
+            $history = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            echo json_encode($history);
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error'   => 'Failed to fetch details',
+                'details' => $e->getMessage()
+            ]);
+        }
+    }
 }
