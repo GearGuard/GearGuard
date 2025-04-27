@@ -26,7 +26,7 @@ class Mechanic extends UserModel
 	public int $status = self::STATUS_INACTIVE;
 	public string $password = '';
 	public int $status_id = self::STATUS_ACTIVE;
-	public int $garage_id = self::STATUS_ACTIVE;
+	public int $garage_id;
 	public string $passwordConfirm = '';
 
 	public function tableName(): string
@@ -42,9 +42,10 @@ class Mechanic extends UserModel
 	public function save()
 	{
 		$this->status_id = self::STATUS_ACTIVE;
-		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
-		if (!$this->validate())
+		if (!$this->validate(validatePassword: false, useFrameworkValidations: false))
 			throw new \Exception(array_values($this->errors)[0][0], 400);
+
+        $this->password = password_hash($this->password, PASSWORD_DEFAULT);
 			
 		return parent::save();
 	}
@@ -59,7 +60,7 @@ class Mechanic extends UserModel
 			'address' => [self::RULE_REQUIRED],
 			'contact_no' => [self::RULE_REQUIRED],
 			'username' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 3], [self::RULE_MAX, 'max' => 30], [self::RULE_UNIQUE, 'class' => self::class]],
-			'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 24]],
+			'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 72]],
 			'passwordConfirm' => [self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']],
 		];
 	}
@@ -184,7 +185,7 @@ class Mechanic extends UserModel
 
 	}
 
-	public function validate($valueUpdates = [], $validateUsername = true, $validatePassword = true, $validatePersonalInfo = true, $validateContact = true, $validateInternals = true, $useFrameworkValidations = true): bool
+	public function validate($valueUpdates = [], $validateUsername = true, $validatePassword = true, $validatePersonalInfo = true, $validateContact = true, $validateInternals = true, $validateEmployedDate = true, $useFrameworkValidations = true): bool
 	{
 		if ($useFrameworkValidations) {
 			return parent::validate();
@@ -194,25 +195,25 @@ class Mechanic extends UserModel
 			$this->loadData($valueUpdates);
 		}
 
-		if ($validateUsername && isset($valueUpdates['username']) && $this->username !== $valueUpdates['username']) {
-			if (empty($this->username)) {
-				$this->addError('username', 'Username cannot be empty.');
-			} elseif (strlen($this->username) < 3 || strlen($this->username) > 30) {
-				$this->addError('username', 'Username must be between 3 and 30 characters.');
-			} elseif (!$this->isUsernameAvailable($this->username)) {
-				$this->addError('username', 'Username already exists.');
-			}
-		}
+        if ($validateUsername) {
+            if (empty($this->username)) {
+                $this->addError('username', 'Username can not be empty.');
+            } elseif (strlen($this->username) < 3 || strlen($this->username) > 30) {
+                $this->addError('username', 'Username must be between 3 and 30 characters.');
+            } elseif (!Mechanic::isUsernameAvailable($this->username)) {
+                $this->addError('username', 'Username already exists.');
+            }
+        }
 
-		if ($validatePassword && isset($valueUpdates['password'])) {
-			if (empty($this->password)) {
-				$this->addError('password', 'Password cannot be empty.');
-			} elseif (strlen($this->password) < 8 || strlen($this->password) > 24) {
-				$this->addError('password', 'Password must be between 8 and 24 characters.');
-			} elseif ($this->password != $this->passwordConfirm) {
-				$this->addError('passwordConfirm', 'Passwords do not match.');
-			}
-		}
+        if ($validatePassword) {
+            if (empty($this->password)) {
+                $this->addError('password', 'Password can not be empty.');
+            } elseif (strlen($this->password) < 8 || strlen($this->password) > 72) {
+                $this->addError('password', 'Password must be between 8 and 72 characters.');
+            } elseif ($this->password != $this->passwordConfirm) {
+                $this->addError('passwordConfirm', 'Password and Confirm Password do not match.');
+            }
+        }
 
 		if ($validatePersonalInfo) {
 			if (empty($this->first_name)) {
@@ -223,7 +224,9 @@ class Mechanic extends UserModel
 			}
 			if (empty($this->nic)) {
 				$this->addError('nic', 'NIC cannot be empty.');
-			}
+			} elseif (!preg_match('/^[A-Z]{0,3}[-\s]?\d{2,8}(?:[-\/\s]?\d{2,8}){0,4}[A-Za-z]?\(?\d{0,3}\)?$/', $this->nic)) {
+                $this->addError('nic', 'NIC is not valid.');
+            }
 			if (empty($this->email)) {
 				$this->addError('email', 'Email cannot be empty.');
 			} elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
@@ -232,6 +235,9 @@ class Mechanic extends UserModel
 		}
 
 		if ($validateContact) {
+            if (!preg_match('/^\+?(?:\d+[-\s]?)*\d+$|^\+?[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?$|^\+?(?:\d*[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?(?:\d+[-\s]?)*\d+)+$|^\+?(?:(?:\d+[-\s]?)*\d+[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?\d*)+$/', $this->contact_no)) {
+                $this->addError('contact_no', 'Contact Number is not valid.');
+            }
 			$contactTemp = str_replace([' ', '-', '+', '(', ')'], '', $this->contact_no);
 			if (empty($this->contact_no)) {
 				$this->addError('contact_no', 'Contact Number cannot be empty.');
@@ -239,6 +245,21 @@ class Mechanic extends UserModel
 				$this->addError('contact_no', 'Contact Number is not valid.');
 			}
 		}
+
+        if ($validateEmployedDate) {
+            if (empty($this->date_employeed)) {
+                $this->addError('date_employeed', 'Date Employed cannot be empty.');
+            } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $this->date_employeed)) {
+                $this->addError('date_employeed', 'Date Employed is not valid.');
+            } else {
+                $date = \DateTime::createFromFormat('Y-m-d', $this->date_employeed);
+                if ($date === false) {
+                    $this->addError('date_employeed', 'Date Employed is not valid.');
+                } elseif ($date > new \DateTime()) {
+                    $this->addError('date_employeed', 'Date Employed cannot be in the future.');
+                }
+            }
+        }
 
 		if ($validateInternals) {
 			if ($this->status_id < 1 || $this->status_id > 3) {

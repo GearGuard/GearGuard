@@ -1,3 +1,8 @@
+<?php
+/** @var $model \app\models\Mechanic */
+use app\models\Mechanic;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -281,48 +286,57 @@
 </head>
 
 <body>
-    <nav class="navMenu"> <a href="#">Dashboard</a> <a href="#" class="active">Manage Mechanic</a> <a href="#">Register New Mechanic</a> </nav>
+    <nav class="navMenu"><a href="#" class="active">Manage Mechanic</a> <a href="/garage/mechanic/add">Register New Mechanic</a> </nav>
     <div class="manage-form">
         <h2 class="title">Manage Mechanic</h2>
         <div class="search-section">
-            <div class="form-group"> <label for="search_mechanic">Search Mechanic</label> <input type="text" id="search_mechanic" name="search_mechanic" placeholder="Enter mechanic name"> </div> <button type="button" class="search-button" onclick="searchMechanic()"> <i class="fas fa-search"></i> Search </button>
+            <div class="form-group"> <label for="search_mechanic">Search Mechanic</label> <input type="text" id="search_mechanic" name="search_mechanic" placeholder="Enter mechanic username"> </div> <button type="button" class="search-button" onclick="searchMechanic()"> <i class="fas fa-search"></i> Search </button>
         </div>
-        <form id="mechanicForm">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="first_name">First Name<span class="required-dot">*</span></label> <input type="text" id="first_name" name="first_name" required placeholder="Enter first name"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="last_name">Last Name<span class="required-dot">*</span></label> <input type="text" id="last_name" name="last_name" required placeholder="Enter last name"> </div>
-                </div>
+        <div id="form-wrapper" style="display: none">
+        <?php $this->form = gearguard\phpmvc\form\Form::begin('', 'post', 'mechanicForm'); ?>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $this->fname = $this->form->field($model, 'first_name')->required(true); ?>
             </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="nic">NIC<span class="required-dot">*</span></label> <input type="text" id="nic" name="nic" required placeholder="Enter NIC"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="contact">Contact Number<span class="required-dot">*</span></label> <input type="text" id="contact" name="contact" required placeholder="Enter contact number"> </div>
-                </div>
+            <div class="form-column">
+                <?php echo $this->lname = $this->form->field($model, 'last_name')->required(true); ?>
             </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="email">Email<span class="required-dot">*</span></label> <input type="email" id="email" name="email" required placeholder="Enter email"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="date_employed">Date Employed<span class="required-dot">*</span></label> <input type="date" id="date_employed" name="date_employed" required> </div>
-                </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $this->username = $this->form->field($model, 'username')->required(true); ?>
             </div>
-            <div class="form-group"> <label for="address">Address<span class="required-dot">*</span></label> <input type="text" id="address" name="address" required placeholder="Enter address"> </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="username">Username<span class="required-dot">*</span></label> <input type="text" id="username" name="username" required placeholder="Enter username"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="password">Password<span class="required-dot">*</span></label> <input type="password" id="password" name="password" required placeholder="Enter password"> </div>
-                </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $this->nic = $this->form->field($model, 'nic')->required(true); ?>
             </div>
-            <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmEdit()">Edit</button> <button type="button" class="delete-button" onclick="confirmDelete()">Delete</button> </div>
+            <div class="form-column">
+                <?php echo $this->contact = $this->form->field($model, 'contact_no')->required(true)->type('tel'); ?>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $this->email = $this->form->field($model, 'email')->required(true)->type('email'); ?>
+            </div>
+            <div class="form-column">
+                <?php $this->demployed = new gearguard\phpmvc\form\DateField($model, "date_employeed");
+                echo $this->demployed->required(true)->max(date('Y-m-d'));
+                ?>
+            </div>
+        </div>
+        <?php $this->address = new gearguard\phpmvc\form\TextAreaField($model, 'address');
+        echo $this->address->required(true)->rows(3);
+        ?>
+        <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmAdd()">Add</button></div>
         </form>
+        </div>
+        <script>
+            document.querySelectorAll('.form-group textarea').forEach(e => e.parentElement.classList.add('full-width'))
+            address = document.getElementById('address');
+            address.classList.add('form-textarea');
+            document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
+        </script>
     </div>
     <div class="popup-overlay" id="popupOverlay">
         <div class="popup" id="popup">
@@ -336,37 +350,44 @@
     </div>
 
     <script>
-        function searchMechanic() {
+        async function searchMechanic() {
             const searchName = document.getElementById('search_mechanic').value;
-            // Simulated API call - replace with actual API call in production
-            if (searchName === 'sandhavi w') {
-                document.getElementById('first_name').value = searchName.split(' ')[0];
-                document.getElementById('last_name').value = searchName.split(' ')[1] || '';
-                document.getElementById('nic').value = '123456789V';
-                document.getElementById('contact').value = '0771234567';
-                document.getElementById('email').value = searchName.toLowerCase().replace(' ', '.') + '@example.com';
-                document.getElementById('date_employed').value = '2023-01-01';
-                document.getElementById('address').value = '123 Main St, Colombo';
-                document.getElementById('username').value = searchName.toLowerCase().replace(' ', '');
-                document.getElementById('password').value = '********';
+
+            if (!searchName) {
+                showPopup("Wait!", "We need a username to search!");
+                return;
             }
-        }
 
-        function showPopup(title, message, confirmCallback) {
-            document.getElementById('popupTitle').textContent = title;
-            document.getElementById('popupMessage').textContent = message;
-            document.getElementById('popupOverlay').style.display = 'block';
+            try {
+                const response = await fetch(`/garage/mechanic/search?username=${searchName}`);
 
-            document.getElementById('popupConfirm').onclick = () => {
-                hidePopup();
-                confirmCallback();
-            };
+                if (!response.ok) {
+                    showPopup("Sorry", "Something went wrong. Please try again later.");
+                    return;
+                }
 
-            document.getElementById('popupCancel').onclick = hidePopup;
-        }
+                const result = await response.json();
 
-        function hidePopup() {
-            document.getElementById('popupOverlay').style.display = 'none';
+                if (result.success) {
+                    document.getElementById('first_name').value = result.mechanic.first_name;
+                    document.getElementById('last_name').value = result.mechanic.last_name;
+                    document.getElementById('nic').value = result.mechanic.nic;
+                    document.getElementById('contact').value = result.mechanic.contact;
+                    document.getElementById('email').value = result.mechanic.email;
+                    document.getElementById('date_employed').value = result.mechanic.date_employeed;
+                    document.getElementById('address').value = result.mechanic.address;
+                    document.getElementById('username').value = result.mechanic.username;
+
+                    document.getElementById('form-wrapper').style.display = 'inline-block';
+
+                } else {
+                    showPopup("Sorry", "We couldn't find that mechanic!");
+                    return;
+                }
+            } catch (error) {
+                showPopup("Sorry", "Something went wrong. Please try again later.");
+                console.log("Error: ", error);
+            }
         }
 
         function confirmEdit() {

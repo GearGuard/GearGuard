@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\utilities\JWTGenerator;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\db\Database;
@@ -29,6 +30,8 @@ class User extends UserModel
 
     private VehicleOwner $vehicleOwner;
     private ?Admin $admin = null;
+
+    private $secretKey = 'Abracadabra@Hogwarts1959';
 
     public function __construct()
     {
@@ -183,12 +186,17 @@ class User extends UserModel
 
     }
 
-    public function hasNotifications() : bool
+    public function hasNotifications(): bool
     {
         if (count(Notification::receiveNotification($this->id)) > 0)
             return true;
 
         return false;
+    }
+
+    public function getToken()
+    {
+        return JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT($this->id), $this->secretKey);
     }
 
 

@@ -155,6 +155,21 @@ $this->title = 'View All Appointments';
             transition: all 0.2s ease;
         }
 
+        .view-more-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             body {
@@ -298,16 +313,15 @@ $this->title = 'View All Appointments';
                 if (result.length < limit) {
                     loader.textContent = '--- End of Appointments Table ---';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else if (result.length === 0 && loadedResults === 0) {
                     loader.textContent = 'No Appointments found.';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else {
                     page++;
                 }
             } catch (error) {
                 console.error('Error fetching appointments:', error);
+                showPopup('Error', 'Something went wrong. Please try again later.');
             } finally {
                 isLoading = false;
             }
@@ -329,8 +343,12 @@ $this->title = 'View All Appointments';
                     content += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${appointment.id}, 3)">Reject</button></td>`;
                 } else if (appointment.status_id == 2) {
                     content += `<td>Accepted</td>`;
-                } else {
+                } else if (appointment.status_id == 3) {
                     content += `<td>Rejected</td>`;
+                } else if (appointment.status_id == 4) {
+                    content += `<td>Completed</td>`;
+                } else if (appointment.status_id == 5) {
+                    content += `<td>Cancelled</td>`;
                 }
 
                 row = document.createElement('tr');
@@ -353,6 +371,8 @@ $this->title = 'View All Appointments';
         async function handleAcceptance(event, appointment_id, status_id) {
             event.stopPropagation();
 
+            showPopup('Please wait', 'Updating appointment status...', true);
+
             try {
                 const response = await fetch('/appointment/update_status', {
                     method: "POST",
@@ -363,48 +383,38 @@ $this->title = 'View All Appointments';
                 });
 
                 if (!response.ok) {
-                    alert('An error occurred. Please try again later.');
+                    showPopup('Error', 'Something went wrong. Please try again later.');
                     return;
                 }
 
                 result = await response.text();
 
                 if (!result === 'success') {
-                    alert('An error occurred. Please try again later.');
+                    showPopup('Error', 'Something went wrong. Please try again later.');
                     return;
                 }
 
-                alert('Appointment status updated successfully.');
-                document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
+                showPopup('Success', 'Appointment status updated successfully.');
+                let status;
+                if (status_id === 2) {
+                    status = 'Accepted';
+                } else if (status_id === 3) {
+                    status = 'Rejected';
+                } else if (status_id === 4) {
+                    status = 'Completed';
+                } else if (status_id === 5) {
+                    status = 'Cancelled';
+                }
+                document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = status;
             } catch (error) {
                 console.log('Error:', error);
-                alert('An error occurred. Please try again later.');
+                showPopup('Error', 'Something went wrong. Please try again later.');
             }
-            /* $.ajax({
-                url: '/appointment/update_status',
-                type: 'POST',
-                data: {
-                    appointment_id: appointment_id,
-                    status_id: status_id
-                },
-                success: function (response) {
-                    if (response === 'success') {
-                        alert('Appointment status updated successfully.');
-                        document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = (status_id === 2 ? 'Accepted' : 'Rejected');
-                    } else {
-                        alert('An error occurred. Please try again later.');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.log('Error:', error);
-                    alert('An error occurred. Please try again later.');
-                }
-            }) */
         }
 
         function handleScroll() {
             const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-            if (scrollTop + clientHeight >= scrollHeight - 5) {
+            if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
                 fetchAppointments();
             }
         }
