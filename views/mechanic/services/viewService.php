@@ -149,6 +149,7 @@
         }
 
         input[type="datetime-local"],
+        input[type="number"],
         select,
         textarea {
             width: 100%;
@@ -325,6 +326,12 @@
                         <?php endif; ?>
                     </select>
                 </div>
+            </div>
+
+            <!-- Cost -->
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="cost">Cost</label>
+                <input type="number" name="cost" step="0.01" min="0" placeholder="Enter cost" required>
             </div>
 
             <!-- Begin & End Timestamp -->

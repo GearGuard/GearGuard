@@ -147,6 +147,9 @@
     <label for="service_type">Service Type</label>
     <input type="text" id="service_type" value="<?= htmlspecialchars($record['service_type']) ?>" disabled>
 
+    <label for="cost">Cost</label>
+    <input type="text" id="cost" name="cost" value="<?= htmlspecialchars($record['cost']) ?>">
+
     <label for="begin_timestamp">Begin Time</label>
     <input type="datetime-local" id="begin_timestamp" name="begin_timestamp" value="<?= str_replace(' ', 'T', htmlspecialchars($record['begin_timestamp'])) ?>" required>
 

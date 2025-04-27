@@ -352,8 +352,7 @@ ini_set('display_errors', 1);
             <h2>Edit Spare Part</h2>
                 <form id="editForm">
                 <input type="hidden" id="editId" name="id">
-                <label for="editVehicle">Vehicle</label>
-                <input type="text" id="editVehicle" name="vehicle" placeholder="Enter license plate number">
+                <!-- Removed vehicle input field -->
                 <label for="editSerial">Serial Number</label>
                 <input type="text" id="editSerial" name="serial_no" required>
                 <label for="editType">Type</label>
@@ -462,22 +461,51 @@ ini_set('display_errors', 1);
             }
         }
 
-            function editSparePart(id) {
-                editModal.style.display = "block";
+        function editSparePart(id) {
+            editModal.style.display = "block";
 
-                const sparePart = spareParts[id];
-                if (!sparePart) return;
+            const sparePart = spareParts[id];
+            if (!sparePart) return;
 
-                document.getElementById("editId").value = id;
-                document.getElementById("editSerial").value = sparePart.serial;
-                document.getElementById("editType").value = sparePart.type;
-                document.getElementById("editManufacturer").value = sparePart.manufacturer;
-                document.getElementById("editVehicle").value = sparePart.vehicle_license_plate_no;
-                // Remove Rs prefix for price input
-                document.getElementById("editPrice").value = sparePart.price.replace('Rs ', '');
-                document.getElementById("editManufacturedDate").value = sparePart.manufacturedDate;
-                document.getElementById("editWarrantyPeriod").value = sparePart.warrantyPeriod;
-            }
+            document.getElementById("editId").value = id;
+            document.getElementById("editSerial").value = sparePart.serial;
+            document.getElementById("editType").value = sparePart.type;
+            document.getElementById("editManufacturer").value = sparePart.manufacturer;
+            document.getElementById("editPrice").value = parseFloat(sparePart.price.replace('Rs ', '').replace(',', ''));
+            document.getElementById("editManufacturedDate").value = sparePart.manufacturedDate;
+            document.getElementById("editWarrantyPeriod").value = sparePart.warrantyPeriod;
+        }
+
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: document.getElementById("editId").value,
+                serial_no: document.getElementById("editSerial").value,
+                type: document.getElementById("editType").value,
+                manufacturer: document.getElementById("editManufacturer").value,
+                price: document.getElementById("editPrice").value,
+                manufactured_date: document.getElementById("editManufacturedDate").value,
+                waranty_period: document.getElementById("editWarrantyPeriod").value
+            };
+
+            fetch('/mechanic/sparepart/updateSparePart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Spare part updated successfully');
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to update spare part'));
+                }
+            })
+        });
 
         function confirmDeleteSparePart(id) {
             deleteModal.style.display = "block";
@@ -487,26 +515,24 @@ ini_set('display_errors', 1);
         function deleteSparePart() {
             if (!currentDeleteId) return;
 
-            fetch('/spare/deleteSparePart', {
+            fetch('/mechanic/sparepart/delete', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ id: currentDeleteId })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to delete spare part');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                alert(`Spare Part ${currentDeleteId} deleted successfully`);
-                closeDeleteModal();
-                location.reload();
+                if (data.success) {
+                    alert('Spare part deleted successfully');
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to delete spare part'));
+                }
             })
             .catch(error => {
-                alert(error.message);
+                alert('Error: ' + error.message);
             });
         }
 
@@ -526,7 +552,6 @@ ini_set('display_errors', 1);
                 // Collect form data with price auto-added "Rs " prefix
                 const formData = {
                     id: document.getElementById("editId").value,
-                    vehicle: document.getElementById("editVehicle").value,
                     serial_no: document.getElementById("editSerial").value,
                     type: document.getElementById("editType").value,
                     manufacturer: document.getElementById("editManufacturer").value,

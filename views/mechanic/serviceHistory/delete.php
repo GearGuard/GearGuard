@@ -160,6 +160,7 @@
         <p><strong>Service Type:</strong> <?= htmlspecialchars($record['service_type']) ?></p>
         <p><strong>Begin Time:</strong> <?= htmlspecialchars($record['begin_timestamp']) ?></p>
         <p><strong>End Time:</strong> <?= htmlspecialchars($record['end_timestamp']) ?></p>
+        <p><strong>Cost:</strong> <?= htmlspecialchars($record['cost']) ?></p>
         <p><strong>Notes:</strong> <?= htmlspecialchars($record['notes']) ?></p>
     </div>
     <form id="deleteServiceForm" method="POST" action="/mechanic/serviceHistory/deleteConfirm">

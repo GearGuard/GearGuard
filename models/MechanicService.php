@@ -28,6 +28,7 @@ class MechanicService extends DbModel
     public ?string $begin_timestamp = null;
     public ?string $end_timestamp = null;
     public ?string $notes = null;
+    public ?float $cost = null;
 
     // Existing initialize method for garage service
     public static function initialize(string $type, float $price, float $duration, string $description, int $garage_id = -1): GarageService
@@ -52,7 +53,8 @@ class MechanicService extends DbModel
         string $begin_timestamp,
         string $end_timestamp,
         string $duration,
-        ?string $notes = null
+        ?string $notes = null,
+        ?float $cost = null
     ): MechanicService {
         $object = new MechanicService();
         $object->vehicle_id = $vehicle_id;
@@ -62,6 +64,7 @@ class MechanicService extends DbModel
         $object->end_timestamp = $end_timestamp;
         $object->duration = floatval(strtotime($duration) - strtotime("2000-01-01 00:00:00")); // convert duration string to float seconds
         $object->notes = $notes;
+        $object->cost = $cost;
         return $object;
     }
 
@@ -82,8 +85,8 @@ class MechanicService extends DbModel
     public function save()
     {
         if ($this->vehicle_id !== null && $this->mechanic_id !== null && $this->begin_timestamp !== null && $this->end_timestamp !== null) {
-            $sql = "INSERT INTO gg_vehicle_service_take (vehicle_id, service_id, mechanic_id, begin_timestamp, end_timestamp, duration, notes)
-                    VALUES (:vehicle_id, :service_id, :mechanic_id, :begin_timestamp, :end_timestamp, :duration, :notes)";
+            $sql = "INSERT INTO gg_vehicle_service_take (vehicle_id, service_id, mechanic_id, begin_timestamp, end_timestamp, duration, notes, cost)
+                    VALUES (:vehicle_id, :service_id, :mechanic_id, :begin_timestamp, :end_timestamp, :duration, :notes, :cost)";
             $statement = self::prepare($sql);
             $statement->bindValue(':vehicle_id', $this->vehicle_id);
             $statement->bindValue(':service_id', $this->id);
@@ -92,6 +95,7 @@ class MechanicService extends DbModel
             $statement->bindValue(':end_timestamp', $this->end_timestamp);
             $statement->bindValue(':duration', gmdate("H:i:s", intval($this->duration)));
             $statement->bindValue(':notes', $this->notes);
+            $statement->bindValue(':cost', $this->cost);
             try {
                 return $statement->execute();
             } catch (\Exception $e) {
