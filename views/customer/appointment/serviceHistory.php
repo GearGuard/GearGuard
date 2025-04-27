@@ -502,6 +502,56 @@ $this->title = 'Spare Parts Management';
                 padding: 0.8rem 0.5rem;
                 font-size: 0.8rem;
             }
+
+            /* Notification styling */
+            .notification-container {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+            }
+
+            .notification {
+                padding: 15px 20px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                color: white;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                opacity: 0;
+                transform: translateX(50px);
+                animation: slideIn 0.3s forwards, fadeOut 0.5s forwards 4.5s;
+                max-width: 350px;
+            }
+
+            @keyframes slideIn {
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+            }
+
+            .notification.success {
+                background-color: var(--success);
+            }
+
+            .notification.error {
+                background-color: var(--danger);
+            }
+
+            .notification.warning {
+                background-color: var(--warning);
+                color: #333;
+            }
         }
     </style>
 </head>
@@ -538,8 +588,30 @@ $this->title = 'Spare Parts Management';
             <div id="noService" style="display:none;">No Service History found</div>
         </div>
     </div>
+    <div class="notification-container" id="notificationContainer"></div>
 
     <script>
+        function showNotification(message, type = 'success') {
+            const notificationContainer = document.getElementById('notificationContainer');
+
+            const notification = document.createElement('div');
+            notification.classList.add('notification', type);
+
+            // Add icon based on notification type
+            let icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+
+            notification.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+
+            notificationContainer.appendChild(notification);
+
+            // Remove notification after animation completes
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
         async function fetchServicePerform() {
             const loader = document.getElementById('loader');
             const noService = document.getElementById('noService');
@@ -659,22 +731,22 @@ $this->title = 'Spare Parts Management';
             content.style.maxWidth = '450px';
 
             content.innerHTML = `
-                <span class="close" onclick="closeModal(this)"><i class="fas fa-times"></i></span>
-                <div class="modal-header">
-                    <h2><i class="fas fa-exclamation-triangle"></i> Delete Service Record</h2>
-                </div>
-                <div class="modal-body" style="display: block;">
-                    <p>Are you sure you want to delete this service record? This action cannot be undone.</p>
-                </div>
-                <div class="form-actions">
-                    <button class="action-button" onclick="closeModal(this)">
-                        <i class="fas fa-ban"></i> Cancel
-                    </button>
-                    <button class="action-button delete" onclick="confirmDelete(${id}, this)">
-                        <i class="fas fa-trash-alt"></i> Delete
-                    </button>
-                </div>
-            `;
+        <span class="close" onclick="closeModal(this)"><i class="fas fa-times"></i></span>
+        <div class="modal-header">
+            <h2><i class="fas fa-exclamation-triangle"></i> Delete Service Record</h2>
+        </div>
+        <div class="modal-body" style="display: block;">
+            <p>Are you sure you want to delete this service record? This action cannot be undone.</p>
+        </div>
+        <div class="form-actions">
+            <button class="action-button" onclick="closeModal(this)">
+                <i class="fas fa-ban"></i> Cancel
+            </button>
+            <button class="action-button delete" onclick="confirmDelete(${id}, this)">
+                <i class="fas fa-trash-alt"></i> Delete
+            </button>
+        </div>
+    `;
 
             modal.appendChild(content);
             document.body.appendChild(modal);
@@ -683,6 +755,9 @@ $this->title = 'Spare Parts Management';
         function confirmDelete(id, element) {
             // First close the modal
             closeModal(element);
+
+            // Store deletion state in localStorage
+            localStorage.setItem('serviceDeleted', 'true');
 
             // Then submit the form
             const form = document.createElement('form');
@@ -693,6 +768,26 @@ $this->title = 'Spare Parts Management';
             form.submit();
         }
 
+        // Add this to your document ready or window.onload function
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we need to show a deletion notification
+            if (localStorage.getItem('serviceDeleted') === 'true') {
+                // Create notification container if it doesn't exist
+                let notificationContainer = document.getElementById('notificationContainer');
+                if (!notificationContainer) {
+                    notificationContainer = document.createElement('div');
+                    notificationContainer.id = 'notificationContainer';
+                    notificationContainer.className = 'notification-container';
+                    document.body.appendChild(notificationContainer);
+                }
+
+                // Show notification
+                showNotification('Service record deleted successfully!', 'success');
+
+                // Clear the deletion state
+                localStorage.removeItem('serviceDeleted');
+            }
+        });
         document.addEventListener('DOMContentLoaded', fetchServicePerform);
     </script>
 </body>
