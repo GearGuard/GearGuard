@@ -212,6 +212,7 @@ $app->router->get('/mechanic/login', [AuthController::class, 'mechanicLogin']);
 $app->router->post('/mechanic/login', [AuthController::class, 'mechanicLogin']);
 $app->router->get('/mechanic/dashboard', [AuthController::class, 'dashboard']);
 $app->router->get('/mechanic/services/viewService', [AuthController::class, 'viewServicesByMechanic']);
+$app->router->post('/mechanic/services/viewService', [\app\controllers\AuthController::class, 'viewServicesByMechanic']);
 $app->router->get('/mechanic/services/addService', [AuthController::class, 'assignMechanicService']);
 $app->router->post('/mechanic/services/addService', [AuthController::class, 'assignMechanicService']);
 $app->router->get('/mechanic/services/loadAppointments', [AuthController::class, 'loadAppointments']);
@@ -231,9 +232,10 @@ $app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMes
 $app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
 $app->router->get('/mechanic/serviceHistory', [AuthController::class, 'mechanicServiceHistory']);
 $app->router->get('/mechanic/serviceHistory/viewAll', [AuthController::class, 'mechanicServiceHistory']);
-$app->router->get('/mechanic/serviceHistory/editService', [AuthController::class, 'mechanicServiceHistoryEdit']);
+$app->router->get('/mechanic/serviceHistory/edit', [AuthController::class, 'mechanicServiceHistoryEdit']);
+$app->router->get('/mechanic/serviceHistory/editService', [AuthController::class, 'mechanicServiceHistorySearch']);
 $app->router->post('/mechanic/serviceHistory/update', [AuthController::class, 'updateServiceHistory']);
-
-
+$app->router->post('/mechanic/serviceHistory/deleteConfirm', [AuthController::class, 'mechanicServiceHistoryDeleteConfirm']);
+$app->router->get('/mechanic/serviceHistory/delete', [AuthController::class, 'mechanicServiceHistoryDelete']);
 
 $app->run();

@@ -12,6 +12,7 @@ class MechanicService extends DbModel
     const STATUS_ACTIVE = 2;
     const STATUS_DELETED = 3;
 
+    // Existing properties for garage service
     public int $id;
     public string $type = '';
     public float $price = 0;
@@ -21,6 +22,14 @@ class MechanicService extends DbModel
     private string $garage_name = '';
     public int $status_id = self::STATUS_INACTIVE;
 
+    // New properties for vehicle service assignment
+    public ?int $vehicle_id = null;
+    public ?int $mechanic_id = null;
+    public ?string $begin_timestamp = null;
+    public ?string $end_timestamp = null;
+    public ?string $notes = null;
+
+    // Existing initialize method for garage service
     public static function initialize(string $type, float $price, float $duration, string $description, int $garage_id = -1): GarageService
     {
         $object = new GarageService();
@@ -35,6 +44,27 @@ class MechanicService extends DbModel
         return $object;
     }
 
+    // New initialize method for vehicle service assignment
+    public static function initializeVehicleService(
+        int $vehicle_id,
+        int $service_id,
+        int $mechanic_id,
+        string $begin_timestamp,
+        string $end_timestamp,
+        string $duration,
+        ?string $notes = null
+    ): MechanicService {
+        $object = new MechanicService();
+        $object->vehicle_id = $vehicle_id;
+        $object->id = $service_id; // service id
+        $object->mechanic_id = $mechanic_id;
+        $object->begin_timestamp = $begin_timestamp;
+        $object->end_timestamp = $end_timestamp;
+        $object->duration = floatval(strtotime($duration) - strtotime("2000-01-01 00:00:00")); // convert duration string to float seconds
+        $object->notes = $notes;
+        return $object;
+    }
+
     public function assignMechanicToService(int $service_id, int $mechanic_id): bool
     {
         $sql = "INSERT INTO gg_service_mechanic_perform (service_id, mechanic_id) VALUES (:service_id, :mechanic_id)";
@@ -45,6 +75,31 @@ class MechanicService extends DbModel
             return $statement->execute();
         } catch (\Exception $e) {
             return false;
+        }
+    }
+
+    // Override save method to handle vehicle service assignment insertion
+    public function save()
+    {
+        if ($this->vehicle_id !== null && $this->mechanic_id !== null && $this->begin_timestamp !== null && $this->end_timestamp !== null) {
+            $sql = "INSERT INTO gg_vehicle_service_take (vehicle_id, service_id, mechanic_id, begin_timestamp, end_timestamp, duration, notes)
+                    VALUES (:vehicle_id, :service_id, :mechanic_id, :begin_timestamp, :end_timestamp, :duration, :notes)";
+            $statement = self::prepare($sql);
+            $statement->bindValue(':vehicle_id', $this->vehicle_id);
+            $statement->bindValue(':service_id', $this->id);
+            $statement->bindValue(':mechanic_id', $this->mechanic_id);
+            $statement->bindValue(':begin_timestamp', $this->begin_timestamp);
+            $statement->bindValue(':end_timestamp', $this->end_timestamp);
+            $statement->bindValue(':duration', gmdate("H:i:s", intval($this->duration)));
+            $statement->bindValue(':notes', $this->notes);
+            try {
+                return $statement->execute();
+            } catch (\Exception $e) {
+                return false;
+            }
+        } else {
+            // Call parent save for garage service save
+            return parent::save();
         }
     }
 
@@ -108,16 +163,6 @@ class MechanicService extends DbModel
         return false;
     }
 
-    public function save()
-    {
-        if ($this->garage_id < 0) {
-            return false;
-        }
-        if (!$this->validate())
-            throw new \Exception(array_values($this->errors)[0][0], 400);
-
-        return parent::save();
-    }
 
     public function rules(): array
     {

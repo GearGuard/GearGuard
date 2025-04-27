@@ -255,32 +255,32 @@
         <li class="nav-item"> 
             <a href="/mechanic/serviceHistory/viewAll" class="nav-link"> 
                 <i class="fas fa-history"></i> 
-                <span class="nav-text">Service History</span> 
+                <span class="nav-text">History</span> 
             </a> 
         </li> 
        <li class="nav-item"> 
     <a href="mechanic/sparepart/addNew" class="nav-link"> 
         <i class="fas fa-screwdriver-wrench"></i> 
-        <span class="nav-text">Spareparts</span> 
+        <span class="nav-text">Spare Parts</span> 
     </a> 
 </li>
-<li class="nav-item"> 
+<!-- <li class="nav-item"> 
     <a href="community" class="nav-link"> 
         <i class="fas fa-users"></i> 
         <span class="nav-text">Community</span> 
     </a> 
-</li>
+</li> -->
 <li class="nav-item"> 
             <a href="/mechanic/messages" class="nav-link"> 
                 <i class="fas fa-envelope"></i> 
                 <span class="nav-text">Messages</span> 
             </a> 
         </li> 
-        <li class="nav-item">
+        <!-- <li class="nav-item">
                 <a href="/mechanic/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
-                </a>
+                </a> -->
             </li>
             <li class="nav-item">
                 <a href= "/logout" class="nav-link-logout">

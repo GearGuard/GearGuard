@@ -5,13 +5,15 @@
     <title>Vehicle Service Assignments</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
+       :root {
             --text: #f5f5f5;
             --background: #181a20;
-            --primary: #C0C0C0FF;
+            --primary: #c7adad;
             --secondary: #25272d;
             --accent: #2463eb;
+            --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
+            --danger: #ef4444;
         }
 
         * {
@@ -36,7 +38,7 @@
             padding: 1.5rem;
         }
 
-        h1 {
+        h4 {
             color: var(--primary);
             text-align: center;
             margin-bottom: 2rem;
@@ -119,7 +121,7 @@
 </head>
 <body>
     <div class="table-container">
-        <h1>All Vehicle Services</h1>
+        <h4>All Vehicle Services</h4>
 
         <?php if (isset($serviceRecords) && count($serviceRecords) > 0): ?>
             <table>
@@ -149,8 +151,10 @@
                             <td><?= htmlspecialchars($row['notes']) ?></td>
                             <td>
                                 <button onclick='viewServiceDetails(<?= json_encode($row) ?>)' class="btn btn-primary">View</button>
-                                <button onclick='editServiceDetails(<?= json_encode($row) ?>)' class="btn btn-secondary">Edit</button>
-                                <a href="/mechanic/serviceHistory/delete/<?= htmlspecialchars($row['id']) ?>" class="btn btn-danger">Delete</a>
+                                <div style="display: inline-flex; gap: 0.25rem; align-items: center;">
+                                    <button onclick='editServiceDetails(<?= json_encode($row) ?>)' class="btn btn-secondary" style="background-color: #4caf50; color: white;">Edit</button>
+                                    <a href="/mechanic/serviceHistory/delete/<?= htmlspecialchars($row['id']) ?>" class="btn btn-danger">Delete</a>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

@@ -88,10 +88,10 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             max-width: 1000px;
             margin: 0 auto;
-            padding: 1.5rem;
+            /* padding: 1.5rem; */
         }
 
-        h1 {
+        h2 {
             color: var(--primary);
             text-align: center;
             margin-bottom: 2rem;
@@ -152,15 +152,22 @@
 
         .btn {
             padding: 0.5rem 1rem;
-            margin: 0 0.25rem;
+            margin: 0;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
             font-size: 0.875rem;
-            min-width: 100px; /* Added fixed minimum width */
-            text-align: center; /* Ensure text is centered */
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-start;
+            align-items: center;
         }
 
         .btn-primary {
@@ -169,8 +176,8 @@
         }
 
         .btn-secondary {
-            background: var(--primary);
-            color: var(--secondary);
+            background: #30414FFF;
+            color: var(--text);
         }
 
         .btn-danger {
@@ -188,10 +195,10 @@
         <!-- <a href="/mechanic/services/addService" target="_self">Assign New Service</a> -->
         <a href="#" class="active">All Services</a>
         <a href="/mechanic/serviceHistory/editService" target="_self">Edit Services</a>
-        <a href="/mechanic/serviceHistory/deleteService" target="_self">Delete Services</a>
+        <a href="/mechanic/serviceHistory/delete" target="_self">Delete Services</a>
     </nav>
     <div class="table-container">
-        <h1>All Vehicle Services</h1>
+        <h2>All Vehicle Services</h2>
 
         <?php if (isset($serviceRecords) && count($serviceRecords) > 0): ?>
             <table>
@@ -218,7 +225,10 @@
                             <td><?= htmlspecialchars($row['duration']) ?></td>
                             <td><?= htmlspecialchars($row['notes']) ?></td>
                             <td>
-                                <button onclick='viewServiceDetails(<?= json_encode($row) ?>)' class="btn btn-primary">View More</button>
+                                <div class="action-buttons">
+                                    <button onclick='viewServiceDetails(<?= json_encode($row) ?>)' class="btn btn-primary">View</button>
+                                    <a href="/mechanic/serviceHistory/edit?license_plate_no=<?= urlencode($row['license_plate_no']) ?>" class="btn btn-secondary">Edit</a>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
