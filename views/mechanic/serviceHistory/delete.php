@@ -155,7 +155,7 @@
 
 <?php if (isset($record)): ?>
     <div class="confirm-message">
-        <p>Are you sure you want to delete the following service record?</p>
+        <p style="color: red;">Are you sure you want to delete the following service record?</p>
         <p><strong>Vehicle:</strong> <?= htmlspecialchars($record['license_plate_no']) ?></p>
         <p><strong>Service Type:</strong> <?= htmlspecialchars($record['service_type']) ?></p>
         <p><strong>Begin Time:</strong> <?= htmlspecialchars($record['begin_timestamp']) ?></p>

@@ -159,7 +159,7 @@
             text-decoration: none;
             display: inline-block;
             font-size: 0.875rem;
-            min-width: 100px;
+            min-width: 50px;
             text-align: center;
         }
 
@@ -195,7 +195,7 @@
         <!-- <a href="/mechanic/services/addService" target="_self">Assign New Service</a> -->
         <a href="#" class="active">All Services</a>
         <a href="/mechanic/serviceHistory/editService" target="_self">Edit Services</a>
-        <a href="/mechanic/serviceHistory/deleteService" target="_self">Delete Services</a>
+        <a href="/mechanic/serviceHistory/delete" target="_self">Delete Services</a>
     </nav>
     <div class="table-container">
         <h2>All Vehicle Services</h2>
