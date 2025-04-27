@@ -259,66 +259,32 @@ $this->title = 'Customer Appointment';
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Oil Change</td>
-                        <td>Replacing old oil with new oil to ensure engine efficiency.</td>
-                        <td>$50</td>
-                        <td>30 minutes</td>
-                        <td>Arishana Chandimal</td>
-                        <td>Downtown Garage</td>
-                        <td>Toyota Camry</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Tire Rotation</td>
-                        <td>Rotating tires to ensure even wear and prolong tire life.</td>
-                        <td>$40</td>
-                        <td>45 minutes</td>
-                        <td>Kavinda Dewmith</td>
-                        <td>Main Street Garage</td>
-                        <td>Honda Accord</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>General Checkup</td>
-                        <td>Comprehensive inspection of vehicle systems and components.</td>
-                        <td>$100</td>
-                        <td>1 hour</td>
-                        <td>Isuru Naveen</td>
-                        <td>City Auto Repair</td>
-                        <td>Ford Focus</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Brake Inspection</td>
-                        <td>Checking brake pads, rotors, and fluid levels for safety.</td>
-                        <td>$30</td>
-                        <td>20 minutes</td>
-                        <td>Malith Kariyawasam</td>
-                        <td>Quick Fix Garage</td>
-                        <td>Chevrolet Malibu</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
+                    <?php if (!empty($services)): ?>
+                        <?php foreach ($services as $service): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($service['type']) ?></td>
+                                <td><?= htmlspecialchars($service['description']) ?></td>
+                                <td>$<?= htmlspecialchars($service['price']) ?></td>
+                                <td><?= htmlspecialchars($service['duration']) ?></td>
+                                <td><!-- Vehicle Owner data not available --></td>
+                                <td><?= htmlspecialchars($service['garage_name']) ?></td>
+                                <td><!-- Vehicle data not available --></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/admin/editservice?id=<?= htmlspecialchars($service['id']) ?>" class="btn btn-primary">Edit</a>
+                                        <form action="/admin/deleteservice" method="POST" style="display:inline;">
+                                            <input type="hidden" name="id" value="<?= htmlspecialchars($service['id']) ?>">
+                                            <button type="submit" onclick="return confirm('Are you sure you want to delete this service?');">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="8">No services found.</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

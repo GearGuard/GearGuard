@@ -242,7 +242,7 @@ $this->title = 'Customer Appointment';
 
     <div class="appointment-form">
     <h2 class="title">Add New User</h2>
-    <form action="/submit-user" method="POST">
+    <form action="/admin/adduser" method="POST">
         <div class="form-row">
             <div class="form-column">
                 <div class="form-group">

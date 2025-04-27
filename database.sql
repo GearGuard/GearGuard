@@ -1,3 +1,7 @@
+-- Top of file
+SET FOREIGN_KEY_CHECKS = 0;
+
+
 DROP TABLE IF EXISTS `gg_forum_comment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -1040,3 +1044,6 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (1,'asdf@gmail.com','asdf','asdf',0,'2024-11-25 09:02:13','$2y$10$2kBEEKfAdgGcYv17had/.ugIhEmtVI.Foz67hTCqCZ8WL3lR0pEPi');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
+-- Bottom of file
+SET FOREIGN_KEY_CHECKS = 1;
+

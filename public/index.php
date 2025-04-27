@@ -161,15 +161,23 @@ $app->router->get('/admin', [AdminController::class, 'admin']);
 $app->router->get('/admin/dashboard', [AdminController::class, 'admin_dashboard']);
 $app->router->get('/admin/viewusers', [AdminController::class, 'viewUsers']);
 $app->router->get('/admin/adduser', [AdminController::class, 'addUser']);
+$app->router->post('/admin/adduser', [AdminController::class, 'addUserPost']);
 $app->router->get('/admin/edituser', [AdminController::class, 'editUser']);
+$app->router->post('/admin/edituser', [AdminController::class, 'editUserPost']);
+$app->router->post('/admin/edituser', [AdminController::class, 'editUserPost']);
 $app->router->get('/admin/viewservices', [AdminController::class, 'viewServices']);
 $app->router->get('/admin/addservice', [AdminController::class, 'addService']);
 $app->router->get('/admin/editservice', [AdminController::class, 'editService']);
+$app->router->post('/admin/editservice', [AdminController::class, 'editService']);
 $app->router->get('/admin/viewvehicles', [AdminController::class, 'viewVehiclesByAdmin']);
 $app->router->get('/admin/addvehicle', [AdminController::class, 'addVehicleByAdmin']);
+$app->router->post('/admin/addvehicle', [AdminController::class, 'addVehicleByAdminPost']);
 $app->router->get('/admin/editvehicle', [AdminController::class, 'editVehicleByAdmin']);
+$app->router->post('/admin/deletevehicle', [AdminController::class, 'deleteVehiclePost']);
 $app->router->get('/admin/transaction', [AdminController::class, 'admin_transaction']);
 $app->router->get('/admin/q&a', [AdminController::class, 'questions']);
+
+$app->router->post('/submit-service', [AdminController::class, 'addServicePost']);
 
 $app->router->get('/api/garage/getCustomers', [GarageController::class, 'getCustomers']);
 $app->router->get('/api/garage/getAppointments', [GarageController::class, 'getAppointments']);
@@ -206,6 +214,8 @@ $app->router->post('/mechanic/sparepart/addNew', [AuthController::class, 'mechan
 $app->router->get('/mechanic/sparepart/viewAll', [AuthController::class, 'mechanicSparePartViewAll']);
 $app->router->get('/mechanic/messages', [AuthController::class, 'MechanicSendMessages']);
 $app->router->get('/mechanic/settings', [AuthController::class, 'settings']);
+$app->router->post('/admin/deleteuser', [AdminController::class, 'deleteUserPost']);
+$app->router->post('/admin/deleteservice', [AdminController::class, 'deleteServicePost']);
 
 
 

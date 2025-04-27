@@ -242,30 +242,19 @@ $this->title = 'Customer Appointment';
 
     <div class="appointment-form">
         <h2 class="title">Edit User</h2>
-        <form action="/submit-user" method="POST">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <input type="text" id="fname" name="fname" required placeholder="Search user by ID">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                    <button type="submit" class="book-button">Search User</button>
-                    </div>
-                </div>
-            </div>
+        <form action="/admin/edituser" method="POST">
+            <input type="hidden" name="id" value="<?= htmlspecialchars($user['id'] ?? '') ?>">
             <div class="form-row">
                 <div class="form-column">
                     <div class="form-group">
                         <label for="fname">First Name<span class="required-dot">*</span></label>
-                        <input type="text" id="fname" name="fname" required placeholder="Arishana">
+                        <input type="text" id="fname" name="fname" required placeholder="Arishana" value="<?= htmlspecialchars($user['first_name'] ?? '') ?>">
                     </div>
                 </div>
                 <div class="form-column">
                     <div class="form-group">
                         <label for="lname">Last Name<span class="required-dot">*</span></label>
-                        <input type="text" id="lname" name="lname" required placeholder="Mandara">
+                        <input type="text" id="lname" name="lname" required placeholder="Mandara" value="<?= htmlspecialchars($user['last_name'] ?? '') ?>">
                     </div>
                 </div>
             </div>
@@ -274,13 +263,13 @@ $this->title = 'Customer Appointment';
                 <div class="form-column">
                     <div class="form-group">
                         <label for="email">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" required placeholder="arishanamandara@gmail.com">
+                        <input type="email" id="email" name="email" required placeholder="arishanamandara@gmail.com" value="<?= htmlspecialchars($user['email'] ?? '') ?>">
                     </div>
                 </div>
                 <div class="form-column">
                     <div class="form-group">
                         <label for="phone">Contact Number<span class="required-dot">*</span></label>
-                        <input type="text" id="phone" name="phone" required placeholder="0786594236">
+                        <input type="text" id="phone" name="phone" required placeholder="0786594236" value="<?= htmlspecialchars($user['contact_no'] ?? '') ?>">
                     </div>
                 </div>
             </div>
@@ -290,7 +279,10 @@ $this->title = 'Customer Appointment';
                     <div class="form-group">
                         <label for="user-role">User Role<span class="required-dot">*</span></label>
                         <select id="user-role" name="user_role" required>
-                            <option value="" disabled selected>Admin</option>
+                            <option value="admin" <?= (isset($user['user_role']) && $user['user_role'] === 'admin') ? 'selected' : '' ?>>Admin</option>
+                            <option value="customer" <?= (isset($user['user_role']) && $user['user_role'] === 'customer') ? 'selected' : '' ?>>Customer</option>
+                            <option value="manager" <?= (isset($user['user_role']) && $user['user_role'] === 'manager') ? 'selected' : '' ?>>Manager</option>
+                            <option value="chef" <?= (isset($user['user_role']) && $user['user_role'] === 'chef') ? 'selected' : '' ?>>Chef</option>
                         </select>
                     </div>
                 </div>
@@ -298,8 +290,7 @@ $this->title = 'Customer Appointment';
 
             <div class="form-group">
                 <label for="notes">Additional Notes</label>
-                <textarea id="notes" name="notes" class="notes"
-                    placeholder="He is very talented boy from down south Sri Lanka"></textarea>
+                <textarea id="notes" name="notes" class="notes" placeholder="He is very talented boy from down south Sri Lanka"><?= htmlspecialchars($user['notes'] ?? '') ?></textarea>
             </div>
 
             <div class="button-container">
