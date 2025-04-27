@@ -71,9 +71,12 @@ class SpareController extends Controller
             }
 
             if ($sparePart->save()) {
-                // Redirect to viewAll with success query param
-                $response->redirect('/mechanic/sparepart/viewAll?success=1');
-                return;
+                // Render addNew with success message instead of redirect
+                $success = 'Spare part added successfully.';
+                return $this->render('mechanic/sparepart/addNew', [
+                    'errors' => [],
+                    'success' => $success
+                ]);
             } else {
                 $errors['save'][] = 'Failed to save spare part. Please try again.';
                 return $this->render('mechanic/sparepart/addNew', [
@@ -86,10 +89,27 @@ class SpareController extends Controller
     public function viewAll(Request $request, Response $response)
     {
         $db = \gearguard\phpmvc\Application::$app->db;
-        $sql = "SELECT sp.*, v.license_plate_no AS vehicle_license_plate_no
-                FROM gg_sparepart sp
-                LEFT JOIN gg_vehicle v ON sp.vehicle_license_plate_no = v.license_plate_no
-                WHERE sp.status_id = :status_active";
+
+        $sql = "
+            SELECT 
+                sp.id,
+                sp.serial_no,
+                sp.type,
+                sp.manufacturer,
+                sp.price,
+                sp.manufactured_date,
+                sp.waranty_period,
+                svi.installed_date,
+                v.license_plate_no,
+                v.id AS vehicle_id,
+                uo.user_id
+            FROM gg_sparepart sp
+            JOIN gg_sparepart_service_vehicle_install svi ON sp.id = svi.sparepart_id
+            JOIN gg_vehicle v ON svi.vehicle_id = v.id
+            LEFT JOIN gg_user_owner uo ON v.id = uo.vehicle_id
+            WHERE sp.status_id = :status_active
+        ";
+
         $statement = $db->prepare($sql);
         $statement->bindValue(':status_active', \app\models\MechanicSparePart::STATUS_ACTIVE);
         $statement->execute();

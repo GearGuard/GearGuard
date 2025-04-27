@@ -300,7 +300,7 @@ ini_set('display_errors', 1);
         <table>
             <thead>
                 <tr>
-                    <th>Vehicle</th>
+                    <!-- <th>Vehicle</th> -->
                     <th>Serial Number</th>
                     <th>Type</th>
                     <th>Manufacturer</th>
@@ -313,11 +313,11 @@ ini_set('display_errors', 1);
             <tbody>
                 <?php foreach ($spareParts as $part): ?>
                 <tr>
-                    <td><?= htmlspecialchars($part['vehicle_license_plate_no'] ?? '') ?></td>
+                    <!-- <td><?= htmlspecialchars($part['license_plate_no'] ?? '') ?></td> -->
                     <td><?= htmlspecialchars($part['serial_no']) ?></td>
                     <td><?= htmlspecialchars($part['type']) ?></td>
                     <td><?= htmlspecialchars($part['manufacturer']) ?></td>
-                    <td>$<?= htmlspecialchars(number_format($part['price'], 2)) ?></td>
+                    <td>Rs <?= htmlspecialchars(number_format($part['price'], 2)) ?></td>
                     <td><?= htmlspecialchars($part['manufactured_date']) ?></td>
                     <td><?= htmlspecialchars($part['waranty_period']) ?></td>
                     <td class="button-container">
@@ -335,7 +335,7 @@ ini_set('display_errors', 1);
             <span class="close">&times;</span>
             <h2>Spare Part Details</h2>
             <div id="viewContent">
-                <p><strong>Vehicle:</strong> <span id="viewVehicle"></span></p>
+                <!-- <p><strong>Vehicle:</strong> <span id="viewVehicle"></span></p> -->
                 <p><strong>Serial Number:</strong> <span id="viewSerial"></span></p>
                 <p><strong>Type:</strong> <span id="viewType"></span></p>
                 <p><strong>Manufacturer:</strong> <span id="viewManufacturer"></span></p>
@@ -350,7 +350,7 @@ ini_set('display_errors', 1);
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Edit Spare Part</h2>
-            <form id="editForm">
+                <form id="editForm">
                 <input type="hidden" id="editId" name="id">
                 <label for="editVehicle">Vehicle</label>
                 <input type="text" id="editVehicle" name="vehicle" placeholder="Enter license plate number">
@@ -416,17 +416,18 @@ ini_set('display_errors', 1);
         }
 
         // Prepare spare parts data for JavaScript
-        const spareParts = <?php
+            const spareParts = <?php
             $jsArray = [];
             foreach ($spareParts as $part) {
                 $jsArray[$part['id']] = [
-                    'vehicle_license_plate_no' => $part['vehicle_license_plate_no'] ?? '',
+                    'vehicle_license_plate_no' => $part['license_plate_no'] ?? '',
                     'serial' => $part['serial_no'],
                     'type' => $part['type'],
                     'manufacturer' => $part['manufacturer'],
-                    'price' => '$' . number_format($part['price'], 2),
+                    'price' => 'Rs ' . number_format($part['price'], 2),
                     'manufacturedDate' => $part['manufactured_date'] ?? '',
-                    'warrantyPeriod' => $part['waranty_period'] ?? ''
+                    'warrantyPeriod' => $part['waranty_period'] ?? '',
+                    'installed_date' => $part['installed_date'] ?? null
                 ];
             }
             echo json_encode($jsArray);
@@ -445,24 +446,38 @@ ini_set('display_errors', 1);
             document.getElementById("viewManufacturedDate").textContent = sparePart.manufacturedDate;
             document.getElementById("viewWarrantyPeriod").textContent = sparePart.warrantyPeriod;
             document.getElementById("viewVehicle").textContent = sparePart.vehicle_license_plate_no;
+
+            // Show installation details if available
+            const installedDate = sparePart.installed_date;
+
+            const installDetailsElem = document.getElementById("installDetails");
+            if (installedDate) {
+                installDetailsElem.innerHTML = `
+                    <p><strong>Installed Date:</strong> ${installedDate}</p>
+                `;
+                installDetailsElem.style.display = "block";
+            } else {
+                installDetailsElem.innerHTML = "<p>No installation details available.</p>";
+                installDetailsElem.style.display = "block";
+            }
         }
 
-        function editSparePart(id) {
-            editModal.style.display = "block";
+            function editSparePart(id) {
+                editModal.style.display = "block";
 
-            const sparePart = spareParts[id];
-            if (!sparePart) return;
+                const sparePart = spareParts[id];
+                if (!sparePart) return;
 
-            document.getElementById("editId").value = id;
-            document.getElementById("editSerial").value = sparePart.serial;
-            document.getElementById("editType").value = sparePart.type;
-            document.getElementById("editManufacturer").value = sparePart.manufacturer;
-            document.getElementById("editVehicle").value = sparePart.vehicle_license_plate_no;
-            // Remove $ sign for price input
-            document.getElementById("editPrice").value = sparePart.price.replace('$', '');
-            document.getElementById("editManufacturedDate").value = sparePart.manufacturedDate;
-            document.getElementById("editWarrantyPeriod").value = sparePart.warrantyPeriod;
-        }
+                document.getElementById("editId").value = id;
+                document.getElementById("editSerial").value = sparePart.serial;
+                document.getElementById("editType").value = sparePart.type;
+                document.getElementById("editManufacturer").value = sparePart.manufacturer;
+                document.getElementById("editVehicle").value = sparePart.vehicle_license_plate_no;
+                // Remove Rs prefix for price input
+                document.getElementById("editPrice").value = sparePart.price.replace('Rs ', '');
+                document.getElementById("editManufacturedDate").value = sparePart.manufacturedDate;
+                document.getElementById("editWarrantyPeriod").value = sparePart.warrantyPeriod;
+            }
 
         function confirmDeleteSparePart(id) {
             deleteModal.style.display = "block";
@@ -472,7 +487,7 @@ ini_set('display_errors', 1);
         function deleteSparePart() {
             if (!currentDeleteId) return;
 
-            fetch('/mechanic/sparepart/delete', {
+            fetch('/spare/deleteSparePart', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -505,44 +520,48 @@ ini_set('display_errors', 1);
         }
 
         // Handle form submission for editing
-        editForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-            // Collect form data
-            const formData = {
-                id: document.getElementById("editId").value,
-                vehicle: document.getElementById("editVehicle").value,
-                serial_no: document.getElementById("editSerial").value,
-                type: document.getElementById("editType").value,
-                manufacturer: document.getElementById("editManufacturer").value,
+                // Collect form data with price auto-added "Rs " prefix
+                const formData = {
+                    id: document.getElementById("editId").value,
+                    vehicle: document.getElementById("editVehicle").value,
+                    serial_no: document.getElementById("editSerial").value,
+                    type: document.getElementById("editType").value,
+                    manufacturer: document.getElementById("editManufacturer").value,
                 price: document.getElementById("editPrice").value,
-                manufactured_date: document.getElementById("editManufacturedDate").value,
-                waranty_period: document.getElementById("editWarrantyPeriod").value
-            };
+                    manufactured_date: document.getElementById("editManufacturedDate").value,
+                    waranty_period: document.getElementById("editWarrantyPeriod").value
+                };
 
-            fetch('/mechanic/sparepart/edit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to update spare part');
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert(`Spare Part ${formData.id} updated successfully`);
-                closeEditModal();
-                location.reload();
-            })
-            .catch(error => {
-                alert(error.message);
+                fetch('/spare/updateSparePart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update spare part');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(`Spare Part ${formData.id} updated successfully`);
+                    closeEditModal();
+                    location.reload();
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
             });
-        });
     </script>
+
+    <div id="installDetails" style="display:none; background-color: var(--secondary); color: var(--text); padding: 1rem; margin-top: 1rem; border-radius: 8px;">
+        <!-- Installation details will be injected here -->
+    </div>
 </body>
 
 </html>
