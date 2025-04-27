@@ -74,6 +74,8 @@ $app->router->get('/customer/nonExpire', [CustomrtDashboardController::class, 'n
 
 
 $app->router->get('/customer/my_profile', [AuthController::class, 'myProfile']);
+$app->router->post('/customer/my_profile', [CustomrtDashboardController::class, 'myProfilePost']);
+$app->router->get('/customer/my_profile_view', [CustomrtDashboardController::class, 'viewMyProfile']);
 $app->router->get('/customer/settings', [AuthController::class, 'settings']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
 $app->router->post('/customer/appointment/appoint', [AuthController::class, 'newAppointmentsPost']);

@@ -132,7 +132,9 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof User) {
             return $this->render('customer/my_Profile', [
-                'title' => 'My Profile'
+                'title' => 'My Profile',
+                'model' => Application::$app->user
+                
             ]);
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
