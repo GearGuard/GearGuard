@@ -39,6 +39,34 @@ use app\models\Mechanic;
             padding: 20px;
         }
 
+        .services-button {
+            background: var(--accent);
+              color: var(--text);
+              border: none;
+              padding: 0.4rem;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              width: 12rem;
+              margin: 0.2rem;
+        }
+
+        .services-button.disabled {
+            background: var(--border);
+              color: var(--text);
+              border: none;
+              padding: 0.4rem;
+              border-radius: 5px;
+              cursor: default;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              width: 12rem;
+              margin: 0.2rem;
+        }
+
         .navMenu {
             background-color: var(--secondary);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -126,7 +154,8 @@ use app\models\Mechanic;
         input[type="text"],
         input[type="email"],
         input[type="password"],
-        input[type="date"] {
+        input[type="date"],
+        input[type="tel"] {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -192,12 +221,82 @@ use app\models\Mechanic;
             border: 1px solid var(--border);
         }
 
+
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background-color: #33363f;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            resize: vertical;
+        }
+
+        .form-input:hover,
+        .form-textarea:hover {
+            border-color: var(--accent);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
+        }
+
+        .form-input.is-invalid,
+        .form-textarea.is-invalid {
+            border-color: #ef4444;
+        }
+
+        .form-input[type="password"] {
+            letter-spacing: 0.2em;
+        }
+
+        .invalid-feedback {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .edit-button {
+            background: var(--edit-color);
+            color: var(--text);
+            border: none;
+        }
+
+        .delete-button {
+            background: var(--delete-color);
+            color: var(--text);
+        }
+
+        .clear-button {
+            background: var(--secondary);
+            color: var(--text);
+            border: solid 1px white;
+        }
+
         .search-button:hover,
         .edit-button:hover,
         .delete-button:hover,
-        .clear-button:hover {
+        .clear-button:hover,
+        .services-button:hover {
             transform: translateY(-1px);
             opacity: 0.9;
+        }
+
+        .services-button.disabled:hover {
+            transform: none;
+            opacity: 1;
         }
 
         .popup-overlay {
@@ -266,6 +365,32 @@ use app\models\Mechanic;
             opacity: 0.9;
         }
 
+        .table-container {
+            width: 30rem;
+            height: 10rem;
+            overflow-y: auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            user-select: none;
+          }
+
+          tr.selected td {
+            background-color: #007BFF;
+            color: white;
+          }
+
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -328,6 +453,23 @@ use app\models\Mechanic;
         <?php $this->address = new gearguard\phpmvc\form\TextAreaField($model, 'address');
         echo $this->address->required(true)->rows(3);
         ?>
+        <div style="margin: 1rem;">Select the services the mechanic will perform</div>
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="table-container">
+                      <table id="services-table">
+                        <tbody>
+
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <?php echo $this->services = new gearguard\phpmvc\form\DropDownField($servicesModel, 'services', $serviceOptions); ?>
+                    <button type="button" id="addServicesBtn" class="services-button disabled">Add Service</button>
+                    <button type="button" id="removeServicesBtn" class="services-button disabled">Remove Service</button>
+                </div>
+            </div>
         <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmAdd()">Add</button></div>
         </form>
         </div>
@@ -336,6 +478,30 @@ use app\models\Mechanic;
             address = document.getElementById('address');
             address.classList.add('form-textarea');
             document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
+
+
+            document.getElementById('services').addEventListener('change', () => {
+                document.getElementById('addServicesBtn').classList.remove('disabled');
+                document.getElementById('addServicesBtn').addEventListener('click', () => {
+                    const serviceSelector = document.getElementById('services');
+
+                    if (serviceSelector.options[serviceSelector.selectedIndex].disabled) {
+                        return;
+                    }
+
+                    const table = document.querySelector('#services-table tbody');
+                    const selectedService = serviceSelector.options[serviceSelector.selectedIndex].text;
+                    const newRow = document.createElement('tr');
+                    const rowData = document.createElement('td');
+                    rowData.textContent = selectedService;
+                    newRow.appendChild(rowData);
+
+                    newRow.addEventListener('click', () => {selectRow(newRow)});
+
+                    table.appendChild(newRow);
+                    serviceSelector.options[serviceSelector.selectedIndex].setAttribute('disabled', 'true');
+                });
+            });
         </script>
     </div>
     <div class="popup-overlay" id="popupOverlay">
@@ -359,7 +525,7 @@ use app\models\Mechanic;
             }
 
             try {
-                const response = await fetch(`/garage/mechanic/search?username=${searchName}`);
+                const response = await fetch(`/api/garage/mechanic/getMechanic?username=${searchName}`);
 
                 if (!response.ok) {
                     showPopup("Sorry", "Something went wrong. Please try again later.");
@@ -367,6 +533,11 @@ use app\models\Mechanic;
                 }
 
                 const result = await response.json();
+
+                if (!result) {
+                    showPopup("Sorry", "We couldn't find that mechanic!");
+                    return;
+                }
 
                 if (result.success) {
                     document.getElementById('first_name').value = result.mechanic.first_name;

@@ -62,16 +62,32 @@ class GarageController extends Controller
 
     public function manageMechanic(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage) {
-            $model = new Mechanic();
-            return $this->render('garage/mechanic/manage', [
-                'name' => 'The GearGuard',
-                'model' => $model,
-            ]);
-        }
+        $model = new Mechanic();
+        $servicesModel = new class extends Model {
+            public $services = [];
 
-        throw new NotFoundException();
+            public function rules(): array
+            {
+                return [];
+            }
+
+            public function labels(): array
+            {
+                return [
+                    'services' => 'Services',
+                ];
+            }
+        };
+        return $this->render('garage/mechanic/manage', [
+            'name' => 'The GearGuard',
+            'model' => $model,
+            'servicesModel' => $servicesModel,
+            'serviceOptions' => Application::$app->user->getAllGarageServiceTypesForDropDown(),
+        ]);
+
     }
+
+    
 
     public function getAppointments(Request $request, Response $response)
     {
