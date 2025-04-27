@@ -545,18 +545,21 @@ class AuthController extends Controller
                 ($notes),
                 $garage_id
             );
+
             if ($model->validate() && $model->save()) {
+                Notification::sendNotification(
+                    $garage_id,
+                    'ko',
+                    'New Appointment Created'
+                );
+
                 return $this->render('customer/appointment/myAppointment', [
                     'name' => 'The GearGuard',
 
+
                 ]);
             }
-            Notification::sendNotification(
-                $garage_id['garage_id'],
-                'A new appointment has been created for vehicle ' . Vehicle::getVehicleDetails($vehicle_id)['license_plate_no'] .  ' by the user ' . Application::$app->user->first_name . '.',
-                $service_id['service_id'] ?? 'NO-SERVICE',
-                'Appointment Created'
-            );
+
 
             return $this->render('customer/appointment/newAppointment', [
                 'name' => 'The GearGuard',
