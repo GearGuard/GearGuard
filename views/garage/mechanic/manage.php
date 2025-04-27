@@ -429,7 +429,9 @@ use app\models\Mechanic;
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $this->username = $this->form->field($model, 'username')->required(true); ?>
+                <?php $this->username = $this->form->field($model, 'username')->required(true);
+                    echo $this->username->readonly(true);
+                ?>
             </div>
         </div>
         <div class="form-row">
@@ -470,7 +472,7 @@ use app\models\Mechanic;
                     <button type="button" id="removeServicesBtn" class="services-button disabled">Remove Service</button>
                 </div>
             </div>
-        <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmAdd()">Add</button></div>
+        <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmEdit()">Edit</button></div>
         </form>
         </div>
         <script>
@@ -543,11 +545,18 @@ use app\models\Mechanic;
                     document.getElementById('first_name').value = result.mechanic.first_name;
                     document.getElementById('last_name').value = result.mechanic.last_name;
                     document.getElementById('nic').value = result.mechanic.nic;
-                    document.getElementById('contact').value = result.mechanic.contact;
+                    document.getElementById('contact_no').value = result.mechanic.contact;
                     document.getElementById('email').value = result.mechanic.email;
-                    document.getElementById('date_employed').value = result.mechanic.date_employeed;
+                    document.getElementById('date_employeed').value = result.mechanic.date_employed;
                     document.getElementById('address').value = result.mechanic.address;
                     document.getElementById('username').value = result.mechanic.username;
+
+                    result.mechanic.services.forEach(service => {
+                        document.getElementById('services').value = service;
+                        addServiceRow();
+                    })
+
+                    document.getElementById('services').value = "";
 
                     document.getElementById('form-wrapper').style.display = 'inline-block';
 
@@ -562,11 +571,63 @@ use app\models\Mechanic;
         }
 
         function confirmEdit() {
-            showPopup('Confirm Edit', 'Are you sure you want to edit this record?', () => {
-                // Perform edit operation
-                showPopup('Success', 'Record updated successfully', () => {});
-            });
+            const form = document.getElementById('mechanicForm');
+            if (form.reportValidity()) {
+                showPopup('Please wait...', 'We are editing the mechanic of your garage.', true);
+                editMechanic();
+            }
         }
+
+        async function editMechanic() {
+                    const form = document.getElementById('mechanicForm');
+                    const formData = new FormData(form);
+
+                    const data = {};
+
+                    formData.forEach((value, key) => {
+                        data[key] = value;
+                    });
+
+                    const services = [];
+                    document.querySelectorAll('#services-table tbody tr').forEach(row => {
+                        const serviceSelector = document.getElementById('services');
+                        serviceSelector.childNodes.forEach(option => {
+                            if (option.text === row.textContent.trim()) {
+                                if (!Number.isNaN(option.value))
+                                    services.push(Number.parseInt(option.value));
+                            }
+                        });
+                    });
+
+                    data['services'] = JSON.stringify(services);
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams(data),
+                        });
+
+                        if (!response.ok) {
+                            showPopup('Sorry', 'We encountered an error while adding the mechanic. Please try again.');
+                            return;
+                        }
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showPopup('Success', 'Mechanic updated successfully!');
+                            clearForm();
+                        } else {
+                            showPopup('Error', result.message);
+                        }
+                    } catch (error) {
+                        showPopup('Sorry', 'We encountered an error while adding the mechanic. Please try again.');
+                        console.error('There was a problem with the fetch operation:', error);
+                    }
+                }
 
         function confirmDelete() {
             showPopup('Confirm Delete', 'Are you sure you want to delete this record?', () => {
@@ -581,6 +642,59 @@ use app\models\Mechanic;
             document.getElementById('search_mechanic').value = '';
             document.getElementById('mechanicForm').reset();
         }
+
+        function removeSelection(row) {
+            const selectedService = row.textContent.trim();
+            const serviceSelector = document.getElementById('services');
+
+            for (let i = 0; i < serviceSelector.options.length; i++) {
+                if (serviceSelector.options[i].text === selectedService) {
+                serviceSelector.options[i].removeAttribute('disabled');
+                break;
+                }
+            }
+
+            row.remove();
+        }
+
+        function selectRow(row) {
+            document.querySelectorAll('#services-table tbody tr').forEach(r => {
+                r.classList.remove('selected');
+            })
+
+            document.getElementById('removeServicesBtn').classList.remove('disabled');
+
+            row.classList.add('selected');
+
+            const button = document.getElementById('removeServicesBtn').cloneNode(true);
+            document.getElementById('removeServicesBtn').parentNode.replaceChild(button, document.getElementById('removeServicesBtn'));
+
+            document.getElementById('removeServicesBtn').addEventListener('click', () => {
+                removeSelection(row);
+                document.getElementById('removeServicesBtn').classList.add('disabled');
+            });
+        }
+
+        function addServiceRow() {
+            const serviceSelector = document.getElementById('services');
+
+                if (serviceSelector.options[serviceSelector.selectedIndex].disabled) {
+                    return;
+                }
+
+                const table = document.querySelector('#services-table tbody');
+                const selectedService = serviceSelector.options[serviceSelector.selectedIndex].text;
+                const newRow = document.createElement('tr');
+                const rowData = document.createElement('td');
+                rowData.textContent = selectedService;
+                newRow.appendChild(rowData);
+
+                newRow.addEventListener('click', () => {selectRow(newRow)});
+
+                table.appendChild(newRow);
+                serviceSelector.options[serviceSelector.selectedIndex].setAttribute('disabled', 'true');
+        }
+
     </script>
 </body>
 

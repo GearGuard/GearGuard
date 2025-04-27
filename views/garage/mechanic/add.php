@@ -541,6 +541,7 @@
         }
 
         function clearForm() {
+            document.getElementById('search_mechanic').value = '';
             document.getElementById('mechanicForm').reset();
         }
 

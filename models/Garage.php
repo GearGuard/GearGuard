@@ -446,5 +446,19 @@ class Garage extends UserModel
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
+
+    public function getMechanicByUsername(string $username) : ?Mechanic
+    {
+        $sql = "SELECT gm.* FROM gearguard.gg_garage_mechanic gm WHERE gm.username = :username AND gm.garage_id = :garage_id LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':username', $username);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->execute();
+        $result = $statement->fetchObject(Mechanic::class);
+        if ($result)
+            return $result;
+
+        return null;
+    }
 	
 }

@@ -163,6 +163,7 @@ $app->router->post('/garage/profile/update', [GarageController::class, 'updatePr
 $app->router->get('/garage/mechanic/add', [GarageController::class, 'addMechanic']);
 $app->router->post('/garage/mechanic/add', [GarageController::class, 'addMechanicPost']);
 $app->router->get('/garage/mechanic/manage', [GarageController::class, 'manageMechanic']);
+$app->router->post('/garage/mechanic/manage', [GarageController::class, 'manageMechanicPost']);
 
 
 $app->router->get('/appointment/getServices', [SiteController::class, 'getServices']);
