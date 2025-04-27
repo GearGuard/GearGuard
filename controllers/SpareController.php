@@ -2,225 +2,251 @@
 
 namespace app\controllers;
 
-use app\models\MechanicSparePart;
-use app\models\Vehicle;
-use gearguard\phpmvc\Application;
+use app\models\SparePart;
 use gearguard\phpmvc\Controller;
+use gearguard\phpmvc\Application;
+use gearguard\phpmvc\exception\NotFoundException;
+use app\models\mechanic;
+use gearguard\phpmvc\middlewares\ExtendedMiddleware;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\Response;
 
 class SpareController extends Controller
 {
-    public function addNew(Request $request, Response $response)
+    public static function isMechanic(): bool
     {
-        if ($request->isGet()) {
-            // Render the add new spare part form
-            return $this->render('mechanic/sparepart/addNew', [
-                'errors' => []
-            ]);
+        if (Application::$app->user instanceof User && Application::$app->session->get('isMechanic')) {
+            return true;
         }
 
-        if ($request->isPost()) {
-            $body = $request->getBody();
+        return false;
+    }
 
-            $errors = [];
+    public static function isGarage(): bool
+    {
+        if (Application::$app->user instanceof User && Application::$app->session->get('isGarage')) {
+            return true;
+        }
 
-            // Validate required fields
-            $requiredFields = [
-                'Vehicle', 'serial_no', 'type', 'manufacturer', 'price', 'manufactured_date', 'waranty_period'
-            ];
+        return false;
+    }
 
-            foreach ($requiredFields as $field) {
-                if (empty($body[$field])) {
-                    $errors[$field][] = ucfirst(str_replace('_', ' ', $field)) . ' is required.';
-                }
-            }
+    public function addSparePart()
+    {
+        $part = new SparePart();
+        $part->loadData(Application::$app->request->getBody());
 
-            // Check if vehicle exists by license_plate_no
-            $vehicle = null;
-            if (!empty($body['Vehicle'])) {
-                $vehicle = Vehicle::findOne(['license_plate_no' => $body['Vehicle']]);
-                if (!$vehicle) {
-                    $errors['Vehicle'][] = 'Vehicle with license plate number "' . htmlspecialchars($body['Vehicle']) . '" does not exist.';
-                }
-            }
+        if ($part->save()) {
+            echo json_encode(['success' => true]);
+        } else {
+            error_log('Review validation or save failed: ' . json_encode($part->errors));
+            echo json_encode(['success' => false, 'errors' => $part->errors]);
+        }
+    }
 
-            if (!empty($errors)) {
-                // Render form with errors
-                return $this->render('mechanic/sparepart/addNew', [
-                    'errors' => $errors
-                ]);
-            }
+    public function getSparePart()
+    {
+        $parts = SparePart::findAll([]);
+        $partData = [];
 
-            // Create new SparePart model and load data
-            $sparePart = new MechanicSparePart();
-            $sparePart->serial_no = $body['serial_no'];
-            $sparePart->type = $body['type'];
-            $sparePart->manufacturer = $body['manufacturer'];
-            $sparePart->price = $body['price'];
-            $sparePart->manufactured_date = $body['manufactured_date'];
-            $sparePart->waranty_period = $body['waranty_period'];
-            $sparePart->vehicle_license_plate_no = $body['Vehicle'];
-            $sparePart->status_id = MechanicSparePart::STATUS_ACTIVE;
+        foreach ($parts as $part) {
+            $partData[] = $part;
+        }
 
-            if (!$sparePart->validate()) {
-                $errors = $sparePart->errors;
-                return $this->render('mechanic/sparepart/addNew', [
-                    'errors' => $errors
-                ]);
-            }
+        header('Content-Type: application/json');
+        echo json_encode($partData);
+    }
 
-            if ($sparePart->save()) {
-                // Render addNew with success message instead of redirect
-                $success = 'Spare part added successfully.';
-                return $this->render('mechanic/sparepart/addNew', [
-                    'errors' => [],
-                    'success' => $success
-                ]);
+    
+    public function deleteSparepartPostCustomer(Request $request, Response $response)
+    {
+        $id = $request->getBody()['id'] ?? null;
+
+        
+        if (!$id || !is_numeric($id)) {
+            $response->setStatusCode(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid Spare Part ID']);
+            return;
+        }
+
+        try {
+            // Use the correct table name for your database
+            $sql = 'DELETE FROM gg_sparepart_service_vehicle_install WHERE sparepart_id = :sparepart_id';
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':sparepart_id', $id, \PDO::PARAM_INT); // Bind the extracted ID value
+
+            if ($statement->execute()) {
+                Application::$app->response->redirect('/mechanic/sparepart/getMySpareParts');
             } else {
-                $errors['save'][] = 'Failed to save spare part. Please try again.';
-                return $this->render('mechanic/sparepart/addNew', [
-                    'errors' => $errors
+                $response->setStatusCode(500);
+                echo json_encode(['success' => false, 'message' => 'Failed to cancel Spare Part']);
+            }
+        } catch (\PDOException $e) {
+            error_log('Error deleting Spare Part: ' . $e->getMessage());
+            $response->setStatusCode(500);
+            echo json_encode(['success' => false, 'message' => 'Database error occurred']);
+        }
+        error_log('POST data: ' . print_r($_POST, true));
+        error_log('Request body: ' . print_r($request->getBody(), true));
+    }
+
+
+    // EDIT SPARE PART (POST)
+    public function editSparepartPostCustomer(Request $request, Response $response)
+    {
+        $id = $request->getBody()['id'] ?? null;
+        $data = $request->getBody();
+
+        if (!$id || !is_numeric($id)) {
+            $response->setStatusCode(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid Spare Part ID']);
+            return;
+        }
+
+        // Check ownership
+        $stmt = Application::$app->db->prepare(
+            "SELECT * FROM gg_sparepart_service_vehicle_install WHERE sparepart_id = :sparepart_id AND user_id = :user_id"
+        );
+        $sparepart_id = $request->getBody()['id'] ?? null; // Extract the spare part ID from the request
+        $stmt->bindValue(':sparepart_id', $sparepart_id);
+        $user_id = Application::$app->user->id ?? null; // Get the current logged-in user's ID
+        $stmt->bindValue(':user_id', $user_id);
+        $stmt->execute();
+        if (!$stmt->fetch()) {
+            echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+            return;
+        }
+
+        $sparePartModel = new SparePart();
+        $sparePart = $sparePartModel->findOne(['sparepart_id' => $sparepart_id]);
+        if (!$sparePart) {
+            echo json_encode(['success' => false, 'error' => 'Not found']);
+            return;
+        }
+
+        // Update fields
+        $sparePart->serial_no = $data['serial_no'] ?? $sparePart->serial_no;
+        $sparePart->type = $data['type'] ?? $sparePart->type;
+        $sparePart->manufacturer = $data['manufacturer'] ?? $sparePart->manufacturer;
+        $sparePart->price = $data['price'] ?? $sparePart->price;
+        $sparePart->manufactured_date = $data['manufactured_date'] ?? $sparePart->manufactured_date;
+        $sparePart->waranty_period = $data['waranty_period'] ?? $sparePart->waranty_period;
+
+        // Save
+        $tableName = $sparePart->tableName();
+        $sql = "UPDATE $tableName SET serial_no = :serial_no, type = :type, manufacturer = :manufacturer, price = :price, manufactured_date = :manufactured_date, waranty_period = :waranty_period WHERE id = :id";
+        $stmt = Application::$app->db->prepare($sql);
+        $stmt->bindValue(':serial_no', $sparePart->serial_no);
+        $stmt->bindValue(':type', $sparePart->type);
+        $stmt->bindValue(':manufacturer', $sparePart->manufacturer);
+        $stmt->bindValue(':price', $sparePart->price);
+        $stmt->bindValue(':manufactured_date', $sparePart->manufactured_date);
+        $stmt->bindValue(':waranty_period', $sparePart->waranty_period);
+        $stmt->bindValue(':id', $sparepart_id);
+
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Update failed']);
+        }
+    }
+
+
+    public function addSparePartCustomer(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User) {
+            $data = $request->getBody();
+            $serial_no = $data['serial_no'] ?? '1';
+            $type = $data['type'] ?? null;
+            $manufacturer = $data['manufacturer'] ?? null;
+            $price = $data['price'] ?? null;
+            $manufactured_date = $data['manufactured_date'] ?? null;
+            $waranty_period = $data['waranty_period'] ?? '';
+            $vehicle_id = $data['vehicle_id'] ?? null;
+            $installed_date = $data['installed_date'] ?? date('Y-m-d'); // Default to current date
+
+            // Start transaction to ensure data consistency
+            Application::$app->db->pdo->beginTransaction();
+
+            try {
+                // Create and save spare part
+                $sparepart = SparePart::initialize([
+                    'serial_no' => $serial_no,
+                    'type' => $type,
+                    'manufacturer' => $manufacturer,
+                    'price' => $price,
+                    'manufactured_date' => $manufactured_date,
+                    'waranty_period' => $waranty_period,
                 ]);
+
+                if ($sparepart->save()) {
+                    // Get the newly inserted spare part ID
+                    $sparepart_id = Application::$app->db->pdo->lastInsertId();
+
+                    // Get the current logged-in user's ID
+                    $user_id = Application::$app->user->id;
+
+                    // Insert record into the installation table
+                    $sql = "INSERT INTO gg_sparepart_service_vehicle_install 
+                        (vehicle_id, service_id, sparepart_id, installed_date) 
+                        VALUES (:vehicle_id, :service_id, :sparepart_id, :installed_date)";
+
+                    $statement = Application::$app->db->prepare($sql);
+                    $statement->bindValue(':vehicle_id', $vehicle_id);
+                    $statement->bindValue('service_id', $user_id);
+                    $statement->bindValue(':sparepart_id', $sparepart_id);
+                    $statement->bindValue(':installed_date', $installed_date);
+
+                    if ($statement->execute()) {
+                        // Commit transaction if everything is successful
+                        Application::$app->db->pdo->commit();
+                        $response->redirect('/mechanic/sparepart/viewAll');
+                        echo 'SparePart added successfully';
+                        return;
+                    } else {
+                        // Rollback if installation record fails
+                        Application::$app->db->pdo->rollBack();
+                        echo 'Failed to associate spare part with vehicle. Please try again.';
+                    }
+                } else {
+                    // Rollback if spare part save fails
+                    Application::$app->db->pdo->rollBack();
+                    echo 'Failed to save spare part. Please check your input and try again.';
+                }
+            } catch (\Exception $e) {
+                // Rollback on any exception
+                Application::$app->db->pdo->rollBack();
+                echo 'An error occurred: ' . $e->getMessage();
             }
         }
+        throw new NotFoundException();
     }
-
-    public function viewAll(Request $request, Response $response)
+    public function getSpareParts()
     {
-        $db = \gearguard\phpmvc\Application::$app->db;
-
-        $sql = "
-            SELECT 
-                sp.id,
-                sp.serial_no,
-                sp.type,
-                sp.manufacturer,
-                sp.price,
-                sp.manufactured_date,
-                sp.waranty_period,
-                svi.installed_date,
-                v.license_plate_no,
-                v.id AS vehicle_id,
-                uo.user_id
-            FROM gg_sparepart sp
-            JOIN gg_sparepart_service_vehicle_install svi ON sp.id = svi.sparepart_id
-            JOIN gg_vehicle v ON svi.vehicle_id = v.id
-            LEFT JOIN gg_user_owner uo ON v.id = uo.vehicle_id
-            WHERE sp.status_id = :status_active
-        ";
-
-        $statement = $db->prepare($sql);
-        $statement->bindValue(':status_active', \app\models\MechanicSparePart::STATUS_ACTIVE);
-        $statement->execute();
-        $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);
-
-        $success = null;
-        if (isset($_GET['success']) && $_GET['success'] == '1') {
-            $success = 'Spare part added successfully.';
+        $userId = Application::$app->user->id ?? null;
+        if (!$userId) {
+            header('Content-Type: application/json');
+            echo json_encode([]);
+            exit;
         }
 
-        return $this->render('mechanic/sparepart/viewAll', [
-            'spareParts' => $spareParts,
-            'success' => $success
-        ]);
-    }
+        try {
+            $sql = '
+            SELECT sp.id, sp.serial_no, sp.type, sp.manufacturer, sp.price, sp.manufactured_date, sp.waranty_period, svi.installed_date, v.license_plate_no, v.id AS vehicle_id FROM gg_sparepart sp JOIN gg_sparepart_service_vehicle_install svi ON sp.id = svi.sparepart_id JOIN gg_vehicle v ON svi.vehicle_id = v.id JOIN gg_user_owner uo ON v.id = uo.vehicle_id WHERE uo.user_id = :user_id
+            ';
 
-    public function updateSparePart(Request $request, Response $response)
-    {
-        if (!$request->isPost()) {
-            $response->setStatusCode(405);
-            echo json_encode(['error' => 'Method Not Allowed']);
-            return;
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':user_id', $userId);
+            $statement->execute();
+
+            $spareparts = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json');
+            echo json_encode($spareparts);
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to fetch spare parts.']);
         }
-
-        $body = json_decode(file_get_contents('php://input'), true);
-
-        $requiredFields = [
-            'id', 'vehicle', 'serial_no', 'type', 'manufacturer', 'price', 'manufactured_date', 'waranty_period'
-        ];
-
-        $errors = [];
-
-        foreach ($requiredFields as $field) {
-            if (empty($body[$field])) {
-                $errors[$field][] = ucfirst(str_replace('_', ' ', $field)) . ' is required.';
-            }
-        }
-
-        if (!empty($errors)) {
-            $response->setStatusCode(400);
-            echo json_encode(['errors' => $errors]);
-            return;
-        }
-
-        $sparePart = MechanicSparePart::findOne(['id' => $body['id']]);
-        if (!$sparePart) {
-            $response->setStatusCode(404);
-            echo json_encode(['error' => 'Spare part not found']);
-            return;
-        }
-
-        // Check if vehicle exists by license_plate_no
-        $vehicle = null;
-        if (!empty($body['vehicle'])) {
-            $vehicle = \app\models\Vehicle::findOne(['license_plate_no' => $body['vehicle']]);
-            if (!$vehicle) {
-                $response->setStatusCode(400);
-                echo json_encode(['error' => 'Vehicle with license plate number "' . htmlspecialchars($body['vehicle']) . '" does not exist.']);
-                return;
-            }
-        }
-
-        $sparePart->vehicle_license_plate_no = $body['vehicle'];
-        $sparePart->serial_no = $body['serial_no'];
-        $sparePart->type = $body['type'];
-        $sparePart->manufacturer = $body['manufacturer'];
-        $sparePart->price = $body['price'];
-        $sparePart->manufactured_date = $body['manufactured_date'];
-        $sparePart->waranty_period = $body['waranty_period'];
-
-        if (!$sparePart->validate()) {
-            $response->setStatusCode(400);
-            echo json_encode(['errors' => $sparePart->errors]);
-            return;
-        }
-
-        if ($sparePart->update()) {
-            echo json_encode(['success' => true]);
-        } else {
-            $response->setStatusCode(500);
-            echo json_encode(['error' => 'Failed to update spare part']);
-        }
-    }
-
-    public function deleteSparePart(Request $request, Response $response)
-    {
-        if (!$request->isPost()) {
-            $response->setStatusCode(405);
-            echo json_encode(['error' => 'Method Not Allowed']);
-            return;
-        }
-
-        $body = json_decode(file_get_contents('php://input'), true);
-        if (empty($body['id'])) {
-            $response->setStatusCode(400);
-            echo json_encode(['error' => 'ID is required']);
-            return;
-        }
-
-        $sparePart = MechanicSparePart::findOne(['id' => $body['id']]);
-        if (!$sparePart) {
-            $response->setStatusCode(404);
-            echo json_encode(['error' => 'Spare part not found']);
-            return;
-        }
-
-        if ($sparePart->delete()) {
-            echo json_encode(['success' => true]);
-        } else {
-            $response->setStatusCode(500);
-            echo json_encode(['error' => 'Failed to delete spare part']);
-        }
+        return;
     }
 }

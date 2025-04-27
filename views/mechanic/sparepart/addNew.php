@@ -1,26 +1,19 @@
 <?php
-use gearguard\phpmvc\Application;
 
-// Fetch vehicles from the database
-$vehicles = [];
-try {
-    $statement = Application::$app->db->pdo->query("SELECT id, license_plate_no FROM gg_vehicle ORDER BY license_plate_no ASC");
-    $vehicles = $statement->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    $vehicles = [];
-    // Log error or handle as needed
-}
+/** @var $model  \app\models\SparePart */
+/** @var $garages array */
+/** @var $vehicles array */
+
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Add New Spare Part</title>
     <style>
-        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         :root {
             --text: #f5f5f5;
@@ -40,7 +33,7 @@ try {
 
         body {
             background: var(--background);
-            font-family: "Inter", sans-serif;
+            font-family: 'Inter', sans-serif;
             color: var(--text);
             line-height: 1.6;
             padding: 20px;
@@ -126,9 +119,9 @@ try {
             margin-left: 0.25rem;
         }
 
-        input[type="text"],
-        input[type="number"],
-        input[type="date"],
+        input[type='text'],
+        input[type='number'],
+        input[type='date'],
         select {
             width: 100%;
             padding: 0.75rem;
@@ -140,16 +133,16 @@ try {
             transition: all 0.2s ease;
         }
 
-        input[type="text"]:hover,
-        input[type="number"]:hover,
-        input[type="date"]:hover,
+        input[type='text']:hover,
+        input[type='number']:hover,
+        input[type='date']:hover,
         select:hover {
             border-color: var(--accent);
         }
 
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        input[type="date"]:focus,
+        input[type='text']:focus,
+        input[type='number']:focus,
+        input[type='date']:focus,
         select:focus {
             border-color: var(--accent);
             outline: none;
@@ -196,21 +189,6 @@ try {
             background: var(--hover-bg);
         }
 
-        #popup-message {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #ddffdd;
-        color: #3c763d;
-        border: 1px solid #3c763d;
-        padding: 15px 25px;
-        border-radius: 5px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        font-weight: 600;
-        z-index: 1000;
-        display: none;
-    }
-
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -248,116 +226,89 @@ try {
 </head>
 
 <body>
-    <nav class="navMenu">
-
-        <a href="/mechanic/sparepart/addNew" class="active">Add New Spare Part</a>
-        <a href="/mechanic/sparepart/viewAll">View All Spare Parts</a>
-
+    <nav class='navMenu'>
+        <a href='#' class='active'>Add New Spare Part</a>
+        <a href='/mechanic/sparepart/viewAll' target='_self'>View All Spare Parts</a>
     </nav>
 
-    <div class="spare-part-form">
-        <h2 class="title">Add New Spare Part</h2>
-        <?php if (!empty($errors)) : ?>
-            <div style="background-color: #ffdddd; color: #a94442; border: 1px solid #a94442; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
-                <ul>
-                    <?php foreach ($errors as $fieldErrors) : ?>
-                        <?php foreach ($fieldErrors as $error) : ?>
-                            <li><?= htmlspecialchars($error) ?></li>
-                        <?php endforeach; ?>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
+    <div class='spare-part-form'>
+        <h2 class='title'>Add New Spare Part</h2>
+        <?php
 
-        <?php if (!empty($success)) : ?>
-            <div style="background-color: #ddffdd; color: #3c763d; border: 1px solid #3c763d; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
-                <?= htmlspecialchars($success) ?>
-            </div>
-        <?php endif; ?>
-        <form action="/mechanic/sparepart/addNew" method="POST">
-            <div class="form-column">
-                <div class="form-group">
-                    <label for="Vehicle">Vehicle<span class="required-dot">*</span></label>
-                    <select id="Vehicle" name="Vehicle" required>
-                        <option value="" disabled selected>Select a vehicle</option>
-                        <?php foreach ($vehicles as $vehicle) : ?>
-                            <option value="<?= htmlspecialchars($vehicle['license_plate_no']) ?>"><?= htmlspecialchars($vehicle['license_plate_no']) ?></option>
+        use gearguard\phpmvc\form\Form;
+
+        $form = Form::begin('/mechanic/sparepart/addNew', 'post') ?>
+        <div class='form-row'>
+            <div class='form-column'>
+                <div class='form-group'>
+                    <label for='vehicle_id'>Vehicle<span class='required-dot'>*</span></label>
+                    <select id='vehicle_id' name='vehicle_id' required>
+                        <option value=''>Select Vehicle</option>
+                        <?php foreach ($vehicles as $id => $plate): ?>
+                            <option value="<?= $id ?>"><?= $plate ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="serial-no">Serial Number<span class="required-dot">*</span></label>
-                        <input type="text" id="serial-no" name="serial_no" required placeholder="Enter serial number" />
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="type">Type<span class="required-dot">*</span></label>
-                        <input type="text" id="type" name="type" required placeholder="Enter spare part type" />
-                    </div>
+            <div class='form-column'>
+                <div class='form-group'>
+                    <label for='serial_no'>Serial Number<span class='required-dot'>*</span></label>
+                    <input type='text' id='serial_no' name='serial_no' required placeholder='Enter serial number'>
                 </div>
             </div>
+        </div>
 
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="manufacturer">Manufacturer<span class="required-dot">*</span></label>
-                        <input type="text" id="manufacturer" name="manufacturer" required placeholder="Enter manufacturer" />
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="price">Price<span class="required-dot">*</span></label>
-                        <input type="number" id="price" name="price" step="0.01" required placeholder="Enter price" />
-                    </div>
+        <div class='form-row'>
+            <div class='form-column'>
+                <label for='type'>Spare Part Type<span class='required-dot'>*</span></label>
+                <input type='text' id='type' name='type' required placeholder='Enter spare part type'>
+            </div>
+            <div class='form-column'>
+                <div class='form-group'>
+                    <label for='price'>Price<span class='required-dot'>*</span></label>
+                    <input type='number' id='price' name='price' required placeholder='Enter manufacturer'>
                 </div>
             </div>
+        </div>
 
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="manufactured-date">Manufactured Date<span class="required-dot">*</span></label>
-                        <input type="date" id="manufactured-date" name="manufactured_date" required />
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="waranty-period">Warranty Period<span class="required-dot">*</span></label>
-                        <input type="date" id="waranty-period" name="waranty_period" required placeholder="Enter warranty period" />
-                    </div>
+        <div class='form-row'>
+            <div class='form-column'>
+                <div class='form-group'>
+                    <label for='manufactured_date'>Manufactured Date<span class='required-dot'>*</span></label>
+                    <input type='date' id='manufactured_date' name='manufactured_date' step='0.01' required
+                        placeholder='Enter price'>
                 </div>
             </div>
+            <div class='form-column'>
+                <div class='form-group'>
+                    <label for='manufacturer'>Manufacturer<span class='required-dot'>*</span></label>
+                    <input type='text' id='manufacturer' name='manufacturer' required
+                        placeholder='Enter spare part type'>
+                </div>
+            </div>
+        </div>
 
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="add-button">Add Spare Part</button>
+        <div class='form-row'>
+            <div class='form-column'>
+                <div class='form-group'>
+                    <label for='installed-date'>Installed Date<span class='required-dot'>*</span></label>
+                    <input type='date' id='installed-date' name='installed_date' required>
+                </div>
             </div>
-        </form>
+            <div class='form-column'>
+                <div class='form-group'>
+                    <label for='waranty_period'>Warranty Period<span class='required-dot'>*</span></label>
+                    <input type='date' id='waranty_period' name='waranty_period' required>
+                </div>
+            </div>
+        </div>
+
+        <div class='button-container'>
+            <button type='reset' class='clear-button'>Clear</button>
+            <button type='submit' class='add-button'>Add Spare Part</button>
+        </div>
+        <?php Form::end() ?>
     </div>
-
-<div id="popup-message">Spare part added successfully </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === '1') {
-            const popup = document.getElementById('popup-message');
-            popup.style.display = 'block';
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 4000);
-            // Remove success param from URL without reloading
-            if (window.history.replaceState) {
-                const url = new URL(window.location);
-                url.searchParams.delete('success');
-                window.history.replaceState({}, document.title, url.toString());
-            }
-        }
-    });
-</script>
 </body>
 
 </html>

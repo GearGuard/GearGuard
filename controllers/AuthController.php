@@ -984,8 +984,26 @@ class AuthController extends Controller
     public function mechanicSparePartAddNew(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
+            // Fetch vehicles for the logged-in mechanic
+            $userId = Application::$app->user->id;
+            $vehicles = [];
+
+            // Assuming a method to get vehicles accessible by mechanic, else fetch all vehicles
+            $sql = "SELECT v.id, v.license_plate_no FROM gg_vehicle v
+                    JOIN gg_user_owner uo ON v.id = uo.vehicle_id
+                    WHERE uo.user_id = :user_id";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':user_id', $userId);
+            $statement->execute();
+            $vehiclesData = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($vehiclesData as $vehicle) {
+                $vehicles[$vehicle['id']] = $vehicle['license_plate_no'];
+            }
+
             return $this->render('mechanic/sparepart/addNew', [
-                'title' => 'Add Spare Part'
+                'title' => 'Add Spare Part',
+                'vehicles' => $vehicles
             ]);
         }
 
