@@ -465,6 +465,14 @@
                     </svg>
                     Print History
                 </button>
+                <button id="btnExportCsv" class="btn btn-outline">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export as CSV
+                </button>
             </div>
         </div>
 
@@ -524,408 +532,508 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load service history data from API
-            fetchServiceHistory();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load service history data from API
+        fetchServiceHistory();
 
-            // Event listeners for modal
-            document.querySelector('.modal-close').addEventListener('click', closeModal);
-            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-            document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
-            document.getElementById('btnPrint').addEventListener('click', printHistory);
+        // Event listeners for modal
+        document.querySelector('.modal-close').addEventListener('click', closeModal);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
+        document.getElementById('btnPrint').addEventListener('click', printHistory);
+        document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
 
-            // Filter change event
-            document.getElementById('filterVehicle').addEventListener('change', function() {
-                filterServices(this.value);
-            });
-
-            // Close modal when clicking outside
-            window.onclick = function(event) {
-                if (event.target == document.getElementById('serviceDetailsModal')) {
-                    closeModal();
-                }
-            };
+        // Filter change event
+        document.getElementById('filterVehicle').addEventListener('change', function() {
+            filterServices(this.value);
         });
 
-        // Fetch service history data from the API
-        async function fetchServiceHistory() {
-            try {
-                const response = await fetch('/customer/vehicle/service_history_all');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch service history');
-                }
-
-                const data = await response.json();
-                displayServiceHistory(data);
-                populateVehicleFilter(data);
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('serviceAccordion').innerHTML = `
-                    <div class="empty-state">
-                        <p>Failed to load service history. Please try again later.</p>
-                        <button class="btn" onclick="fetchServiceHistory()">Retry</button>
-                    </div>
-                `;
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('serviceDetailsModal')) {
+                closeModal();
             }
-        }
+        };
+    });
 
-        // Populate the service accordion with data
-        function displayServiceHistory(services) {
-            const accordionElement = document.getElementById('serviceAccordion');
-
-            if (!services || services.length === 0 || (services.error && services.error.length > 0)) {
-                accordionElement.innerHTML = `
-                    <div class="empty-state">
-                        <p>No service records found for your vehicles.</p>
-                        <a href="/customer/appointment/appoint" class="btn">Schedule a Service</a>
-                    </div>
-                `;
-                return;
+    // Fetch service history data from the API
+    async function fetchServiceHistory() {
+        try {
+            const response = await fetch('/customer/vehicle/service_history_all');
+            if (!response.ok) {
+                throw new Error('Failed to fetch service history');
             }
 
-            // Sort services by date descending (newest first)
-            services.sort((a, b) => new Date(b['Service Start Date']) - new Date(a['Service Start Date']));
-
-            let accordionHTML = '';
-
-            services.forEach((service, index) => {
-                const serviceDate = new Date(service['Service Start Date']).toLocaleDateString();
-                const servicePart = service['Replaced Part'] || 'No parts replaced';
-                const warrantyDate = service['Warranty Expiry Date'] ?
-                    new Date(service['Warranty Expiry Date']).toLocaleDateString() :
-                    'N/A';
-
-                // Check if warranty is active
-                let warrantyStatus = '';
-                if (service['Warranty Expiry Date']) {
-                    const today = new Date();
-                    const expiry = new Date(service['Warranty Expiry Date']);
-                    warrantyStatus = today <= expiry ?
-                        '<span class="badge badge-active">Active</span>' :
-                        '<span class="badge badge-expired">Expired</span>';
-                }
-
-                accordionHTML += `
-                    <div class="accordion-item" data-vehicle="${service['Vehicle Model']}">
-                        <div class="accordion-header" onclick="toggleAccordion(this)">
-                            <div class="left">
-                                <span class="accordion-title">${service['Vehicle Model']}</span>
-                                <span class="accordion-subtitle">${service['Number Plate']}</span>
-                            </div>
-                            <div class="right">
-                                <span class="accordion-title">${service['Service Done']}</span>
-                                <span class="accordion-subtitle">${serviceDate}</span>
-                            </div>
-                            <svg class="accordion-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                        </div>
-                        <div class="accordion-content">
-                            <div class="service-grid">
-                                <div class="service-info-group">
-                                    <h4 class="service-info-heading">Vehicle Details</h4>
-                                    <div class="service-info-item">
-                                        <strong>Model:</strong>
-                                        <span>${service['Vehicle Model']}</span>
-                                    </div>
-                                    <div class="service-info-item">
-                                        <strong>Number Plate:</strong>
-                                        <span>${service['Number Plate']}</span>
-                                    </div>
-                                </div>
-                                <div class="service-info-group">
-                                    <h4 class="service-info-heading">Service Details</h4>
-                                    <div class="service-info-item">
-                                        <strong>Service Type:</strong>
-                                        <span>${service['Service Done']}</span>
-                                    </div>
-                                    <div class="service-info-item">
-                                        <strong>Garage:</strong>
-                                        <span>${service['Garage Name']}</span>
-                                    </div>
-                                    <div class="service-info-item">
-                                        <strong>Cost:</strong>
-                                        <span>Rs${service['Cost']}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="service-info-group">
-                                <h4 class="service-info-heading">Timeline</h4>
-                                <div class="service-info-item">
-                                    <strong>Start Date:</strong>
-                                    <span>${new Date(service['Service Start Date']).toLocaleString()}</span>
-                                </div>
-                                <div class="service-info-item">
-                                    <strong>End Date:</strong>
-                                    <span>${new Date(service['Service End Date']).toLocaleString()}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="service-info-group">
-                                <h4 class="service-info-heading">Parts & Warranty</h4>
-                                <div class="service-info-item">
-                                    <strong>Replaced Part:</strong>
-                                    <span>${servicePart}</span>
-                                </div>
-                                <div class="service-info-item">
-                                    <strong>Warranty Expiry:</strong>
-                                    <span>${warrantyDate} ${warrantyStatus}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="service-actions">
-                                <button class="btn btn-outline" onclick="showDetails(
-                                    '${service.id}',
-                                    '${service['Vehicle Model']}',
-                                    '${service['Number Plate']}',
-                                    '${service['Service Done']}',
-                                    '${service['Garage Name']}',
-                                    '$${service['Cost']}',
-                                    '${servicePart}',
-                                    '${new Date(service['Service Start Date']).toLocaleString()}',
-                                    '${new Date(service['Service End Date']).toLocaleString()}',
-                                    '${warrantyDate}', 
-                                    '${service['Service Notes'] || 'No notes available.'}',
-                                    '${service['Service Description'] || 'No description available.'}'
-                                )">
-                                    View Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            accordionElement.innerHTML = accordionHTML;
-        }
-
-        // Populate vehicle filter dropdown
-        function populateVehicleFilter(services) {
-            if (!services || services.length === 0) return;
-
-            const filterElement = document.getElementById('filterVehicle');
-            const uniqueVehicles = [...new Set(services.map(service => service['Vehicle Model']))];
-
-            let optionsHTML = '<option value="all">All Vehicles</option>';
-            uniqueVehicles.forEach(vehicle => {
-                optionsHTML += `<option value="${vehicle}">${vehicle}</option>`;
-            });
-
-            filterElement.innerHTML = optionsHTML;
-        }
-
-        // Filter services by vehicle
-        function filterServices(vehicle) {
-            const accordionItems = document.querySelectorAll('.accordion-item');
-
-            accordionItems.forEach(item => {
-                if (vehicle === 'all' || item.dataset.vehicle === vehicle) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        // Toggle accordion visibility
-        function toggleAccordion(header) {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('.accordion-icon');
-
-            // Close all accordions
-            document.querySelectorAll('.accordion-content').forEach(item => {
-                if (item !== content) {
-                    item.style.maxHeight = null;
-                    item.style.display = 'none';
-                    item.previousElementSibling.querySelector('.accordion-icon').classList.remove('rotate');
-                }
-            });
-
-            // Toggle current accordion
-            if (content.style.display === 'block') {
-                content.style.maxHeight = null;
-                content.style.display = 'none';
-                icon.classList.remove('rotate');
-            } else {
-                content.style.display = 'block';
-                content.style.maxHeight = content.scrollHeight + 'px';
-                icon.classList.add('rotate');
-            }
-        }
-
-        // Show service details modal
-        function showDetails(id, vehicle, plate, service, garage, cost, part, start, end, warranty, notes, description) {
-            document.getElementById('modal-vehicle').textContent = vehicle;
-            document.getElementById('modal-plate').textContent = plate;
-            document.getElementById('modal-service').textContent = service;
-            document.getElementById('modal-garage').textContent = garage;
-            document.getElementById('modal-cost').textContent = cost;
-            document.getElementById('modal-part').textContent = part;
-            document.getElementById('modal-start').textContent = start;
-            document.getElementById('modal-end').textContent = end;
-            document.getElementById('modal-warranty').textContent = warranty;
-            document.getElementById('modal-notes').textContent = notes;
-            document.getElementById('modal-description').textContent = description;
-
-            document.getElementById('serviceDetailsModal').style.display = 'block';
-        }
-
-        // Close the modal
-        function closeModal() {
-            document.getElementById('serviceDetailsModal').style.display = 'none';
-        }
-
-        // Print service history
-        function printHistory() {
-            const filterValue = document.getElementById('filterVehicle').value;
-            const filterText = document.getElementById('filterVehicle').options[document.getElementById('filterVehicle').selectedIndex].text;
-
-            // Get all visible service items
-            const accordionItems = document.querySelectorAll('.accordion-item');
-            let printContent = `<h2>${filterValue === 'all' ? 'All Vehicles' : filterText} - Service History</h2>`;
-
-            accordionItems.forEach(item => {
-                if (filterValue === 'all' || item.dataset.vehicle === filterValue) {
-                    const header = item.querySelector('.accordion-header');
-                    const content = item.querySelector('.accordion-content');
-
-                    const vehicleModel = header.querySelector('.left .accordion-title').textContent;
-                    const plateNumber = header.querySelector('.left .accordion-subtitle').textContent;
-                    const serviceType = header.querySelector('.right .accordion-title').textContent;
-                    const serviceDate = header.querySelector('.right .accordion-subtitle').textContent;
-
-                    printContent += `
-                        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div>
-                                    <h3 style="margin: 0;">${vehicleModel}</h3>
-                                    <p style="margin: 0; color: #666;">${plateNumber}</p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <h3 style="margin: 0;">${serviceType}</h3>
-                                    <p style="margin: 0; color: #666;">${serviceDate}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
-            const originalContent = document.body.innerHTML;
-            document.body.innerHTML = `
-                <div style="padding: 20px; font-family: Arial, sans-serif;">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h1>Vehicle Service History</h1>
-                        <p>Generated on ${new Date().toLocaleDateString()}</p>
-                    </div>
-                    ${printContent}
+            const data = await response.json();
+            displayServiceHistory(data);
+            populateVehicleFilter(data);
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('serviceAccordion').innerHTML = `
+                <div class="empty-state">
+                    <p>Failed to load service history. Please try again later.</p>
+                    <button class="btn" onclick="fetchServiceHistory()">Retry</button>
                 </div>
             `;
+        }
+    }
 
-            window.print();
-            document.body.innerHTML = originalContent;
+    // Populate the service accordion with data
+    function displayServiceHistory(services) {
+        const accordionElement = document.getElementById('serviceAccordion');
 
-            // Reattach event listeners
-            document.querySelector('.modal-close').addEventListener('click', closeModal);
-            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-            document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
-            document.getElementById('btnPrint').addEventListener('click', printHistory);
-            document.getElementById('filterVehicle').addEventListener('change', function() {
-                filterServices(this.value);
-            });
+        if (!services || services.length === 0 || (services.error && services.error.length > 0)) {
+            accordionElement.innerHTML = `
+                <div class="empty-state">
+                    <p>No service records found for your vehicles.</p>
+                    <a href="/customer/appointment/appoint" class="btn">Schedule a Service</a>
+                </div>
+            `;
+            return;
         }
 
-        // Print service details
-        function printServiceDetails() {
-            const vehicle = document.getElementById('modal-vehicle').textContent;
-            const plate = document.getElementById('modal-plate').textContent;
-            const service = document.getElementById('modal-service').textContent;
-            const garage = document.getElementById('modal-garage').textContent;
-            const cost = document.getElementById('modal-cost').textContent;
-            const part = document.getElementById('modal-part').textContent;
-            const start = document.getElementById('modal-start').textContent;
-            const end = document.getElementById('modal-end').textContent;
-            const warranty = document.getElementById('modal-warranty').textContent;
-            const notes = document.getElementById('modal-notes').textContent;
-            const description = document.getElementById('modal-description').textContent;
+        // Sort services by date descending (newest first)
+        services.sort((a, b) => new Date(b['Service Start Date']) - new Date(a['Service Start Date']));
 
-            const originalContent = document.body.innerHTML;
+        let accordionHTML = '';
 
-            document.body.innerHTML = `
-                <div style="padding: 20px; font-family: Arial, sans-serif;">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h1>Service Details Report</h1>
-                        <p>Generated on ${new Date().toLocaleDateString()}</p>
+        services.forEach((service, index) => {
+            const serviceDate = new Date(service['Service Start Date']).toLocaleDateString();
+            const servicePart = service['Replaced Part'] || 'No parts replaced';
+            const warrantyDate = service['Warranty Expiry Date'] ?
+                new Date(service['Warranty Expiry Date']).toLocaleDateString() :
+                'N/A';
+
+            // Check if warranty is active
+            let warrantyStatus = '';
+            if (service['Warranty Expiry Date']) {
+                const today = new Date();
+                const expiry = new Date(service['Warranty Expiry Date']);
+                warrantyStatus = today <= expiry ?
+                    '<span class="badge badge-active">Active</span>' :
+                    '<span class="badge badge-expired">Expired</span>';
+            }
+
+            accordionHTML += `
+                <div class="accordion-item" data-vehicle="${service['Vehicle Model']}">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <div class="left">
+                            <span class="accordion-title">${service['Vehicle Model']}</span>
+                            <span class="accordion-subtitle">${service['Number Plate']}</span>
+                        </div>
+                        <div class="right">
+                            <span class="accordion-title">${service['Service Done']}</span>
+                            <span class="accordion-subtitle">${serviceDate}</span>
+                        </div>
+                        <svg class="accordion-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                     </div>
-                    
-                    <div style="max-width: 800px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 5px;">
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                    <div class="accordion-content">
+                        <div class="service-grid">
+                            <div class="service-info-group">
+                                <h4 class="service-info-heading">Vehicle Details</h4>
+                                <div class="service-info-item">
+                                    <strong>Model:</strong>
+                                    <span>${service['Vehicle Model']}</span>
+                                </div>
+                                <div class="service-info-item">
+                                    <strong>Number Plate:</strong>
+                                    <span>${service['Number Plate']}</span>
+                                </div>
+                            </div>
+                            <div class="service-info-group">
+                                <h4 class="service-info-heading">Service Details</h4>
+                                <div class="service-info-item">
+                                    <strong>Service Type:</strong>
+                                    <span>${service['Service Done']}</span>
+                                </div>
+                                <div class="service-info-item">
+                                    <strong>Garage:</strong>
+                                    <span>${service['Garage Name']}</span>
+                                </div>
+                                <div class="service-info-item">
+                                    <strong>Cost:</strong>
+                                    <span>Rs${service['Cost']}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-info-group">
+                            <h4 class="service-info-heading">Timeline</h4>
+                            <div class="service-info-item">
+                                <strong>Start Date:</strong>
+                                <span>${new Date(service['Service Start Date']).toLocaleString()}</span>
+                            </div>
+                            <div class="service-info-item">
+                                <strong>End Date:</strong>
+                                <span>${new Date(service['Service End Date']).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="service-info-group">
+                            <h4 class="service-info-heading">Parts & Warranty</h4>
+                            <div class="service-info-item">
+                                <strong>Replaced Part:</strong>
+                                <span>${servicePart}</span>
+                            </div>
+                            <div class="service-info-item">
+                                <strong>Warranty Expiry:</strong>
+                                <span>${warrantyDate} ${warrantyStatus}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="service-actions">
+                            <button class="btn btn-outline" onclick="showDetails(
+                                '${service.id}',
+                                '${service['Vehicle Model']}',
+                                '${service['Number Plate']}',
+                                '${service['Service Done']}',
+                                '${service['Garage Name']}',
+                                '$${service['Cost']}',
+                                '${servicePart}',
+                                '${new Date(service['Service Start Date']).toLocaleString()}',
+                                '${new Date(service['Service End Date']).toLocaleString()}',
+                                '${warrantyDate}', 
+                                '${service['Service Notes'] || 'No notes available.'}',
+                                '${service['Service Description'] || 'No description available.'}'
+                            )">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        accordionElement.innerHTML = accordionHTML;
+    }
+
+    // Populate vehicle filter dropdown
+    function populateVehicleFilter(services) {
+        if (!services || services.length === 0) return;
+
+        const filterElement = document.getElementById('filterVehicle');
+        const uniqueVehicles = [...new Set(services.map(service => service['Vehicle Model']))];
+
+        let optionsHTML = '<option value="all">All Vehicles</option>';
+        uniqueVehicles.forEach(vehicle => {
+            optionsHTML += `<option value="${vehicle}">${vehicle}</option>`;
+        });
+
+        filterElement.innerHTML = optionsHTML;
+    }
+
+    // Filter services by vehicle
+    function filterServices(vehicle) {
+        const accordionItems = document.querySelectorAll('.accordion-item');
+
+        accordionItems.forEach(item => {
+            if (vehicle === 'all' || item.dataset.vehicle === vehicle) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Toggle accordion visibility
+    function toggleAccordion(header) {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.accordion-icon');
+
+        // Close all accordions
+        document.querySelectorAll('.accordion-content').forEach(item => {
+            if (item !== content) {
+                item.style.maxHeight = null;
+                item.style.display = 'none';
+                item.previousElementSibling.querySelector('.accordion-icon').classList.remove('rotate');
+            }
+        });
+
+        // Toggle current accordion
+        if (content.style.display === 'block') {
+            content.style.maxHeight = null;
+            content.style.display = 'none';
+            icon.classList.remove('rotate');
+        } else {
+            content.style.display = 'block';
+            content.style.maxHeight = content.scrollHeight + 'px';
+            icon.classList.add('rotate');
+        }
+    }
+
+    // Show service details modal
+    function showDetails(id, vehicle, plate, service, garage, cost, part, start, end, warranty, notes, description) {
+        document.getElementById('modal-vehicle').textContent = vehicle;
+        document.getElementById('modal-plate').textContent = plate;
+        document.getElementById('modal-service').textContent = service;
+        document.getElementById('modal-garage').textContent = garage;
+        document.getElementById('modal-cost').textContent = cost;
+        document.getElementById('modal-part').textContent = part;
+        document.getElementById('modal-start').textContent = start;
+        document.getElementById('modal-end').textContent = end;
+        document.getElementById('modal-warranty').textContent = warranty;
+        document.getElementById('modal-notes').textContent = notes;
+        document.getElementById('modal-description').textContent = description;
+
+        document.getElementById('serviceDetailsModal').style.display = 'block';
+    }
+
+    // Close the modal
+    function closeModal() {
+        document.getElementById('serviceDetailsModal').style.display = 'none';
+    }
+
+    // Print service history
+    function printHistory() {
+        const filterValue = document.getElementById('filterVehicle').value;
+        const filterText = document.getElementById('filterVehicle').options[document.getElementById('filterVehicle').selectedIndex].text;
+
+        // Get all visible service items
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        let printContent = `<h2>${filterValue === 'all' ? 'All Vehicles' : filterText} - Service History</h2>`;
+
+        accordionItems.forEach(item => {
+            if (filterValue === 'all' || item.dataset.vehicle === filterValue) {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+
+                const vehicleModel = header.querySelector('.left .accordion-title').textContent;
+                const plateNumber = header.querySelector('.left .accordion-subtitle').textContent;
+                const serviceType = header.querySelector('.right .accordion-title').textContent;
+                const serviceDate = header.querySelector('.right .accordion-subtitle').textContent;
+
+                printContent += `
+                    <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                             <div>
-                                <h2 style="margin: 0;">${vehicle}</h2>
-                                <p style="margin: 5px 0; color: #666;">${plate}</p>
+                                <h3 style="margin: 0;">${vehicleModel}</h3>
+                                <p style="margin: 0; color: #666;">${plateNumber}</p>
                             </div>
                             <div style="text-align: right;">
-                                <h3 style="margin: 0;">${service}</h3>
-                                <p style="margin: 5px 0; color: #666;">${start}</p>
+                                <h3 style="margin: 0;">${serviceType}</h3>
+                                <p style="margin: 0; color: #666;">${serviceDate}</p>
                             </div>
                         </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Service Information</h3>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                                <p><strong>Garage:</strong> ${garage}</p>
-                                <p><strong>Cost:</strong> ${cost}</p>
-                                <p><strong>Start Date:</strong> ${start}</p>
-                                <p><strong>End Date:</strong> ${end}</p>
-                            </div>
+                    </div>
+                `;
+            }
+        });
+
+        const originalContent = document.body.innerHTML;
+        document.body.innerHTML = `
+            <div style="padding: 20px; font-family: Arial, sans-serif;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1>Vehicle Service History</h1>
+                    <p>Generated on ${new Date().toLocaleDateString()}</p>
+                </div>
+                ${printContent}
+            </div>
+        `;
+
+        window.print();
+        document.body.innerHTML = originalContent;
+
+        // Reattach event listeners
+        document.querySelector('.modal-close').addEventListener('click', closeModal);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
+        document.getElementById('btnPrint').addEventListener('click', printHistory);
+        document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
+        document.getElementById('filterVehicle').addEventListener('change', function() {
+            filterServices(this.value);
+        });
+    }
+
+    // Print service details
+    function printServiceDetails() {
+        const vehicle = document.getElementById('modal-vehicle').textContent;
+        const plate = document.getElementById('modal-plate').textContent;
+        const service = document.getElementById('modal-service').textContent;
+        const garage = document.getElementById('modal-garage').textContent;
+        const cost = document.getElementById('modal-cost').textContent;
+        const part = document.getElementById('modal-part').textContent;
+        const start = document.getElementById('modal-start').textContent;
+        const end = document.getElementById('modal-end').textContent;
+        const warranty = document.getElementById('modal-warranty').textContent;
+        const notes = document.getElementById('modal-notes').textContent;
+        const description = document.getElementById('modal-description').textContent;
+
+        const originalContent = document.body.innerHTML;
+
+        document.body.innerHTML = `
+            <div style="padding: 20px; font-family: Arial, sans-serif;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1>Service Details Report</h1>
+                    <p>Generated on ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                <div style="max-width: 800px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 5px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                        <div>
+                            <h2 style="margin: 0;">${vehicle}</h2>
+                            <p style="margin: 5px 0; color: #666;">${plate}</p>
                         </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Parts & Warranty</h3>
-                            <div style="margin-top: 10px;">
-                                <p><strong>Replaced Part:</strong> ${part}</p>
-                                <p><strong>Warranty Expiry:</strong> ${warranty}</p>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Service Notes</h3>
-                            <div style="margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
-                                <p>${notes}</p>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Service Description</h3>
-                            <div style="margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
-                                <p>${description}</p>
-                            </div>
+                        <div style="text-align: right;">
+                            <h3 style="margin: 0;">${service}</h3>
+                            <p style="margin: 5px 0; color: #666;">${start}</p>
                         </div>
                     </div>
                     
-                    <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
-                        <p>This is a computer-generated document. No signature is required.</p>
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Service Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                            <p><strong>Garage:</strong> ${garage}</p>
+                            <p><strong>Cost:</strong> ${cost}</p>
+                            <p><strong>Start Date:</strong> ${start}</p>
+                            <p><strong>End Date:</strong> ${end}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Parts & Warranty</h3>
+                        <div style="margin-top: 10px;">
+                            <p><strong>Replaced Part:</strong> ${part}</p>
+                            <p><strong>Warranty Expiry:</strong> ${warranty}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Service Notes</h3>
+                        <div style="margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+                            <p>${notes}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Service Description</h3>
+                        <div style="margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+                            <p>${description}</p>
+                        </div>
                     </div>
                 </div>
-            `;
+                
+                <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
+                    <p>This is a computer-generated document. No signature is required.</p>
+                </div>
+            </div>
+        `;
 
-            window.print();
-            document.body.innerHTML = originalContent;
+        window.print();
+        document.body.innerHTML = originalContent;
 
-            // Reattach event listeners
-            document.querySelector('.modal-close').addEventListener('click', closeModal);
-            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-            document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
-            document.getElementById('btnPrint').addEventListener('click', printHistory);
-            document.getElementById('filterVehicle').addEventListener('change', function() {
-                filterServices(this.value);
+        // Reattach event listeners
+        document.querySelector('.modal-close').addEventListener('click', closeModal);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
+        document.getElementById('btnPrint').addEventListener('click', printHistory);
+        document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
+        document.getElementById('filterVehicle').addEventListener('change', function() {
+            filterServices(this.value);
+        });
+
+        // Show modal again after printing
+        document.getElementById('serviceDetailsModal').style.display = 'block';
+    }
+
+    // Export service history as CSV
+    function exportServiceHistoryAsCSV() {
+        const filterValue = document.getElementById('filterVehicle').value;
+        const filterText = document.getElementById('filterVehicle').options[document.getElementById('filterVehicle').selectedIndex].text;
+        
+        // Get all visible service items
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        let csvData = [];
+        
+        // CSV Header
+        csvData.push(["Vehicle Model", "Number Plate", "Service Type", "Service Date", "Service Start", "Service End", "Garage", "Cost", "Replaced Part", "Warranty Expiry", "Notes", "Description"]);
+        
+        accordionItems.forEach(item => {
+            if (filterValue === 'all' || item.dataset.vehicle === filterValue) {
+                const header = item.querySelector('.accordion-header');
+                
+                // Basic data from header
+                const vehicleModel = header.querySelector('.left .accordion-title').textContent.trim();
+                const plateNumber = header.querySelector('.left .accordion-subtitle').textContent.trim();
+                const serviceType = header.querySelector('.right .accordion-title').textContent.trim();
+                const serviceDate = header.querySelector('.right .accordion-subtitle').textContent.trim();
+                
+                // Get all service info items from the accordion content
+                const infoItems = item.querySelectorAll('.service-info-item');
+                
+                // Initialize variables to extract
+                let serviceStart = '', serviceEnd = '', garageName = '', serviceCost = '', 
+                    replacedPart = '', warrantyExpiry = '', serviceNotes = '', serviceDescription = '';
+                
+                // Extract data from service info items
+                infoItems.forEach(infoItem => {
+                    const label = infoItem.querySelector('strong')?.textContent;
+                    const value = infoItem.querySelector('span')?.textContent || '';
+                    
+                    if (label) {
+                        if (label === 'Start Date:') serviceStart = value.trim();
+                        else if (label === 'End Date:') serviceEnd = value.trim();
+                        else if (label === 'Garage:') garageName = value.trim();
+                        else if (label === 'Cost:') serviceCost = value.trim();
+                        else if (label === 'Replaced Part:') replacedPart = value.trim();
+                        else if (label === 'Warranty Expiry:') {
+                            // Extract just the date part without the status badge text
+                            warrantyExpiry = value.trim().split(' ')[0];
+                        }
+                    }
+                });
+                
+                // Try to find service notes and description if available
+                const serviceNotesElement = item.querySelector('.service-notes p');
+                if (serviceNotesElement) serviceNotes = serviceNotesElement.textContent.trim();
+                
+                // Check if there's a second service notes section for description
+                const serviceNotesSections = item.querySelectorAll('.service-notes');
+                if (serviceNotesSections.length > 1) {
+                    const descElement = serviceNotesSections[1].querySelector('p');
+                    if (descElement) serviceDescription = descElement.textContent.trim();
+                }
+                
+                // Add data row
+                csvData.push([
+                    vehicleModel, plateNumber, serviceType, serviceDate, 
+                    serviceStart, serviceEnd, garageName, serviceCost,
+                    replacedPart, warrantyExpiry, serviceNotes, serviceDescription
+                ]);
+            }
+        });
+        
+        // Create CSV content
+        let csvContent = "data:text/csv;charset=utf-8,";
+        
+        csvData.forEach(row => {
+            // Properly escape and format each cell
+            const formattedRow = row.map(cell => {
+                // Quote cells with commas, double quotes, or newlines
+                if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+                    // Escape double quotes by doubling them
+                    return `"${cell.replace(/"/g, '""')}"`;
+                }
+                return cell;
             });
-
-            // Show modal again after printing
-            document.getElementById('serviceDetailsModal').style.display = 'block';
-        }
-    </script>
+            csvContent += formattedRow.join(',') + '\n';
+        });
+        
+        // Create filename with date stamp
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+        const filename = `service-history-${filterValue === 'all' ? 'all-vehicles' : filterValue.toLowerCase().replace(/\s+/g, '-')}-${timestamp}.csv`;
+        
+        // Create download link and trigger download
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
 </body>
 
 </html>
