@@ -190,12 +190,11 @@
             padding: 2rem;
         }
 
-        label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text);
-            margin-bottom: 0.5rem;
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
         }
 
         .required-dot {
@@ -260,6 +259,21 @@
             background: var(--hover-bg);
         }
 
+        .view-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
         .success-msg {
             color: #4ade80;
             text-align: center;
@@ -285,12 +299,12 @@
     <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-<nav class="navMenu">
+<!-- <nav class="navMenu">
         <a href="/mechanic/services/addService" target="_self">Assign New Service</a>
         <a href="#" class="active">All Services</a>
         <a href="/mechanic/services/editService" target="_self">Edit Services</a>
         <a href="/mechanic/services/deleteService" target="_self">Delete Services</a>
-    </nav>
+    </nav> -->
 
     <div class="radioContainer">
         <label><input type="radio" name="searchType" value="appointment" checked> Appointment</label>
@@ -455,31 +469,65 @@
         const loader = document.getElementById('loader');
 
         function viewDetails(appointment) {
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-            modal.style.display = 'flex';
-            modal.style.justifyContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.zIndex = '1000';
+            // Hide appointment table and show the form
+            document.getElementById('appointmentTableContainer').style.display = 'none';
+            document.getElementById('directCustomerForm').style.display = 'block';
 
-            const content = document.createElement('div');
-            content.style.backgroundColor = '#25272d';
-            content.style.padding = '20px';
-            content.style.borderRadius = '8px';
-            content.style.color = '#f5f5f5';
+            // Set vehicle select field based on license_plate_no from appointment
+            const vehicleSelect = document.querySelector('select[name="vehicle_id"]');
+            if (vehicleSelect) {
+                // Find option with text matching license_plate_no and select it
+                let found = false;
+                for (let option of vehicleSelect.options) {
+                    if (option.text === appointment.license_plate_no) {
+                        option.selected = true;
+                        found = true;
+                    } else {
+                        option.selected = false;
+                    }
+                }
+                if (!found) {
+                    vehicleSelect.selectedIndex = 0; // default to first option
+                }
+            }
 
-            content.innerHTML = `<h2>${appointment.license_plate_no}</h2>
-                                 <p>Vehicle Model: ${appointment.vehicle_model}</p>
-                                 <p>Notes: ${appointment.notes}</p>
-                                 <button onclick="this.parentElement.parentElement.remove()">Close</button>`;
+            // Set service select field based on service_type from appointment
+            const serviceSelect = document.querySelector('select[name="service_id"]');
+            if (serviceSelect) {
+                let found = false;
+                for (let option of serviceSelect.options) {
+                    if (option.text === appointment.service_type) {
+                        option.selected = true;
+                        found = true;
+                    } else {
+                        option.selected = false;
+                    }
+                }
+                if (!found) {
+                    serviceSelect.selectedIndex = 0;
+                }
+            }
 
-            modal.appendChild(content);
-            document.body.appendChild(modal);
+            // Clear other fields: mechanic, begin_timestamp, end_timestamp, notes
+            const mechanicSelect = document.querySelector('select[name="mechanic_id"]');
+            if (mechanicSelect) {
+                mechanicSelect.selectedIndex = 0;
+            }
+            const beginInput = document.querySelector('input[name="begin_timestamp"]');
+            if (beginInput) {
+                beginInput.value = '';
+            }
+            const endInput = document.querySelector('input[name="end_timestamp"]');
+            if (endInput) {
+                endInput.value = '';
+            }
+            const notesTextarea = document.querySelector('textarea[name="notes"]');
+            if (notesTextarea) {
+                notesTextarea.value = '';
+            }
+
+            // Scroll to form
+            document.getElementById('directCustomerForm').scrollIntoView({ behavior: 'smooth' });
         }
 
         function loadAppointments() {
@@ -501,7 +549,7 @@
                             <td>${appointment.license_plate_no}</td>
                             <td>${appointment.service_type}</td>
                             <td>${appointment.date_time}</td>
-                            <td><button onclick='viewDetails(${JSON.stringify(appointment)})'>View</button></td>
+                            <td><button class="view-button" onclick='viewDetails(${JSON.stringify(appointment)})'>View</button></td>
                             <td></td>
                         `;
                         tbody.appendChild(tr);
