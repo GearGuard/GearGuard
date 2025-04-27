@@ -995,7 +995,7 @@ class AuthController extends Controller
             $part->loadData($request->getBody());
 
             if ($part->save()) {
-                $response->redirect('/mechanic/sparepart');
+                $response->redirect('/mechanic/sparepart/viewAll?success=1');
                 return;
             } else {
                 return $this->render('mechanic/sparepart/addNew', [
@@ -1004,13 +1004,13 @@ class AuthController extends Controller
                 ]);
             }
         }
-        $response->redirect('/mechanic/sparepart');
+        $response->redirect('/mechanic/sparepart/viewAll?success=1');
     }
 
     public function mechanicSparePartViewAll(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
-            $sql = "SELECT sp.*, v.license_plate_no 
+            $sql = "SELECT sp.*, v.license_plate_no AS vehicle_license_plate_no
                     FROM gg_sparepart sp
                     LEFT JOIN gg_vehicle v ON sp.vehicle_license_plate_no = v.license_plate_no";
             $statement = Application::$app->db->prepare($sql);
@@ -1024,9 +1024,15 @@ class AuthController extends Controller
             }
             $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
+            $success = null;
+            if (isset($_GET['success']) && $_GET['success'] == '1') {
+                $success = 'Spare part added successfully.';
+            }
+
             return $this->render('mechanic/sparepart/viewAll', [
                 'name' => 'The GearGuard',
-                'spareParts' => $spareParts
+                'spareParts' => $spareParts,
+                'success' => $success
             ]);
         }
         throw new NotFoundException();

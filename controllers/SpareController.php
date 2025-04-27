@@ -71,8 +71,8 @@ class SpareController extends Controller
             }
 
             if ($sparePart->save()) {
-                // Redirect or render success message
-                $response->redirect('/mechanic/sparepart/viewAll');
+                // Redirect to viewAll with success query param
+                $response->redirect('/mechanic/sparepart/viewAll?success=1');
                 return;
             } else {
                 $errors['save'][] = 'Failed to save spare part. Please try again.';
@@ -95,8 +95,14 @@ class SpareController extends Controller
         $statement->execute();
         $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
+        $success = null;
+        if (isset($_GET['success']) && $_GET['success'] == '1') {
+            $success = 'Spare part added successfully.';
+        }
+
         return $this->render('mechanic/sparepart/viewAll', [
-            'spareParts' => $spareParts
+            'spareParts' => $spareParts,
+            'success' => $success
         ]);
     }
 

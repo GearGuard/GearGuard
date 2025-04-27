@@ -232,6 +232,18 @@ ini_set('display_errors', 1);
             cursor: pointer;
         }
 
+        .success-message {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            padding: 1rem;
+            margin: 1rem auto 2rem;
+            border-radius: 8px;
+            text-align: center;
+            width: 50%;
+            border: 1px solid #22c55e;
+            font-weight: 500;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -276,6 +288,13 @@ ini_set('display_errors', 1);
 
     </nav>
 
+
+    <?php if (!empty($success)) : ?>
+        <div class="success-message">
+            <?= htmlspecialchars($success) ?>
+        </div>
+    <?php endif; ?>
+
     <div class="spare-parts-table">
         <h2 class="title">All Spare Parts</h2>
         <table>
@@ -310,7 +329,6 @@ ini_set('display_errors', 1);
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
 
     <div id="viewModal" class="modal">
         <div class="modal-content">

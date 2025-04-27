@@ -239,6 +239,12 @@
                 </ul>
             </div>
         <?php endif; ?>
+
+        <?php if (!empty($success)) : ?>
+            <div style="background-color: #ddffdd; color: #3c763d; border: 1px solid #3c763d; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                <?= htmlspecialchars($success) ?>
+            </div>
+        <?php endif; ?>
 <form action="/mechanic/sparepart/addNew" method="POST">
             <div class="form-column">
                     <div class="form-group">
