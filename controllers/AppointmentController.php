@@ -32,8 +32,30 @@ class AppointmentController extends Controller
 		}
 
 		// Fetch appointments for the current user
-		$sql = 'SELECT a.id, a.date, a.time, a.notes, v.license_plate_no, vm.model AS vehicle_model, vman.name AS vehicle_manufacturer, vt.type AS vehicle_type, g.name AS garage_name, gs.type AS service_type, gs.price AS service_price, gs.duration AS service_duration, s.status
-		FROM gg_vehicle_service_appointment a JOIN gg_vehicle v ON a.vehicle_id = v.id JOIN gg_vehicle_model vm ON v.model_id = vm.id JOIN gg_vehicle_manufacturer vman ON vm.manufacturer_id = vman.id JOIN gg_vehicle_type vt ON v.vehicle_type_id = vt.id JOIN gg_garage_service gs ON a.service_id = gs.id JOIN gg_garage g ON gs.garage_id = g.id JOIN gg_status s ON a.status_id = s.id JOIN gg_user_owner uo ON v.id = uo.vehicle_id WHERE uo.user_id = :user_id ORDER BY a.date DESC, a.time ASC;';
+		$sql = 'SELECT a.id, a.date, a.time, a.notes, 
+		v.license_plate_no, 
+		vm.model AS vehicle_model, 
+		vman.name AS vehicle_manufacturer, 
+		vt.type AS vehicle_type, 
+		g.name AS garage_name, 
+		gs.type AS service_type, 
+		gs.price AS service_price, 
+		gs.duration AS service_duration, 
+		s.status
+ FROM gg_vehicle_service_appointment a 
+ JOIN gg_vehicle v ON a.vehicle_id = v.id 
+ JOIN gg_vehicle_model vm ON v.model_id = vm.id 
+ JOIN gg_vehicle_manufacturer vman ON vm.manufacturer_id = vman.id 
+ JOIN gg_vehicle_type vt ON v.vehicle_type_id = vt.id 
+ JOIN gg_garage_service gs ON a.service_id = gs.id 
+ JOIN gg_garage g ON gs.garage_id = g.id 
+ JOIN gg_status s ON a.status_id = s.id 
+ JOIN gg_user_owner uo ON v.id = uo.vehicle_id 
+ WHERE uo.user_id = :user_id 
+ AND a.status_id = 2
+ AND a.date >= CURDATE()
+ ORDER BY a.date ASC, a.time ASC
+ ';
 
 		$statement = Application::$app->db->prepare($sql);
 		$statement->bindValue(':user_id', $userId);
