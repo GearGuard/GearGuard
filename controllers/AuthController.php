@@ -1091,16 +1091,9 @@ class AuthController extends Controller
     public function loadAppointments(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
-            $sql = "SELECT a.id, v.type AS vehicle_type, u.name AS client_name, u.contact_number, v.license_plate_no, gs.type AS service_type, 
-                           CONCAT(a.date, ' ', a.time) AS date_time, a.notes, a.status
-                    FROM gg_appointment a
-                    JOIN gg_vehicle v ON a.vehicle_id = v.id
-                    JOIN gg_user u ON v.owner_id = u.id
-                    JOIN gg_garage_service gs ON a.service_id = gs.id
-                    ORDER BY a.date DESC, a.time DESC
-                    LIMIT 100";
-
+            $sql = "select gvsa.*, coalesce (gv.current_user_id, guo.user_id) as current_user_id, gv.license_plate_no, ggs.`type`as service_type, gu.`id` as user_id, gu.first_name, gu.last_name, gu.contact_no, gvt.`type` as vehicle_type, gvm.model as vehicle_model  from gearguard.gg_vehicle_service_appointment gvsa left join gearguard.gg_vehicle gv on gvsa.vehicle_id = gv.`id` left join gearguard.gg_garage_service ggs on gvsa.service_id = ggs.`id` left join gearguard.gg_user_owner guo on gvsa.vehicle_id = guo.vehicle_id left join gearguard.gg_user gu on gu.`id` = coalesce (gv.current_user_id, guo.user_id) left join gearguard.gg_vehicle_type gvt on gv.vehicle_type_id = gvt.`id`  left join gearguard.gg_vehicle_model gvm on gv.model_id = gvm.`id` where gvsa.service_id in (select gsmp.service_id from gearguard.gg_service_mechanic_perform gsmp where gsmp.mechanic_id = :mech_id);";
             $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':mech_id', Application::$app->user->id?: Application::$app->session->get('user'));
             $statement->execute();
             $appointments = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
