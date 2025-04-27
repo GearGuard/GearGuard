@@ -14,6 +14,7 @@ use app\controllers\AppointmentController;
 use app\controllers\WarrentyController;
 use gearguard\phpmvc\Application;
 use app\controllers\ServicePerformController;
+use app\controllers\CustomrtDashboardController;
 
 
 
@@ -59,7 +60,22 @@ $app->router->get('/community', [SiteController::class, 'community']);
 $app->router->get('/logout', [SiteController::class, 'logout']);
 
 $app->router->get('/home', [AuthController::class, 'customer']);
+
 $app->router->get('/customer/dashboard', [AuthController::class, 'dashboard']);
+$app->router->get('/customer/viewappointment', [CustomrtDashboardController::class, 'viewNextAppointment']);
+$app->router->get('/customer/viewWarrenty', [CustomrtDashboardController::class, 'viewWarrentyExpireFirst']);
+$app->router->get('/customer/viewService', [CustomrtDashboardController::class, 'ViewLastServiceDone']);
+$app->router->get('/customer/tips', [CustomrtDashboardController::class, 'getMaintenanceTip']);
+$app->router->get('/customer/logedinUser', [CustomrtDashboardController::class, 'logedinUser']);
+$app->router->get('/customer/vehicleCount', [CustomrtDashboardController::class, 'vehicleCount']);
+$app->router->get('/customer/upcomingServices', [CustomrtDashboardController::class, 'upcmingServicesCount']);
+$app->router->get('/customer/nonExpire', [CustomrtDashboardController::class, 'nonExpire']);
+
+
+
+$app->router->get('/customer/my_profile', [AuthController::class, 'myProfile']);
+$app->router->post('/customer/my_profile', [CustomrtDashboardController::class, 'myProfilePost']);
+$app->router->get('/customer/my_profile_view', [CustomrtDashboardController::class, 'viewMyProfile']);
 $app->router->get('/customer/settings', [AuthController::class, 'settings']);
 $app->router->get('/customer/appointment/appoint', [AuthController::class, 'newAppointments']);
 $app->router->post('/customer/appointment/appoint', [AuthController::class, 'newAppointmentsPost']);
@@ -82,7 +98,8 @@ $app->router->post('/customer/vehicle/delete', [VehicleController::class, 'delet
 
 //Vehicle/Service History
 $app->router->get('/customer/appointment/service_history_customer', [ServicePerformController::class, 'viewServicePerformanceCustomer']);
-
+$app->router->get('/customer/appointment/delete_service_history', [ServicePerformController::class, 'deleteServicePerformance']);
+$app->router->post('/customer/appointment/delete_service_history', [ServicePerformController::class, 'deleteServicePerformance']);
 $app->router->post('/customer/appointment/vehicle_service_history', [ServicePerformController::class, 'viewVehicleServiceHistory']);
 $app->router->get('/customer/appointment/get_vehicle_service_history', [ServicePerformController::class, 'getVehicleServiceHistory']);
 
@@ -92,6 +109,7 @@ $app->router->get('/customer/vehicle/register', [AuthController::class, 'addVehi
 $app->router->post('/customer/vehicle/register', [AuthController::class, 'addVehiclePost']);
 
 $app->router->get('/customer/vehicle/service_history', [AuthController::class, 'vehicleServiceHistory']);
+$app->router->get('/customer/vehicle/service_history_all', [ServicePerformController::class, 'viewServicePerformanceAllCustomer']);
 $app->router->get('/customer/appointment/my_appointment', [AuthController::class, 'appointments']);
 $app->router->get('/customer/vehicleTransfer/transfer', [AuthController::class, 'transferVehicle']);
 $app->router->get('/customer/vehicleTransfer/instruction', [AuthController::class, 'transferInstructions']);
