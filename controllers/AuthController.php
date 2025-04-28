@@ -33,6 +33,7 @@ class AuthController extends Controller
         $this->registerMiddleware(new AuthMiddleware(['settings']));
     }
 
+
     public function login(Request $request, Response $response)
     {
         $loginForm = new LoginForm();
@@ -669,6 +670,57 @@ class AuthController extends Controller
 
     public function viewServicesByMechanic(Request $request, Response $response)
     {
+        $message = '';
+        if ($request->isPost()) {
+            $body = $request->getBody();
+            $vehicle_id = $body['vehicle_id'] ?? null;
+            $service_id = $body['service_id'] ?? null;
+            $mechanic_id = $body['mechanic_id'] ?? null;
+            $begin = $body['begin_timestamp'] ?? null;
+            $end = $body['end_timestamp'] ?? null;
+            $notes = $body['notes'] ?? null;
+
+            if ($vehicle_id && $service_id && $mechanic_id && $begin && $end) {
+                $startTime = new \DateTime($begin);
+                $endTime = new \DateTime($end);
+                $interval = $startTime->diff($endTime);
+                $duration = $interval->format('%H:%I:%S');
+                $durationFormatted = "2000-01-01 $duration";
+
+                $model = \app\models\MechanicService::initializeVehicleService(
+                    $vehicle_id,
+                    $service_id,
+                    $mechanic_id,
+                    $begin,
+                    $end,
+                    $durationFormatted,
+                    $notes
+                );
+                $model->save();
+                $message = "<p class='success-msg'>✅ Record inserted successfully!</p>";
+            } else {
+                $message = "<p class='error-msg'>❌ Missing required fields.</p>";
+            }
+        }
+
+        // Fetch vehicles for dropdown
+        $vehiclesSql = "SELECT id, license_plate_no FROM gg_vehicle";
+        $vehiclesStmt = Application::$app->db->prepare($vehiclesSql);
+        $vehiclesStmt->execute();
+        $vehicles = $vehiclesStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Fetch services for dropdown
+        $servicesSql = "SELECT id, type FROM gg_garage_service";
+        $servicesStmt = Application::$app->db->prepare($servicesSql);
+        $servicesStmt->execute();
+        $services = $servicesStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Fetch mechanics for dropdown
+        $mechanicsSql = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM gg_garage_mechanic";
+        $mechanicsStmt = Application::$app->db->prepare($mechanicsSql);
+        $mechanicsStmt->execute();
+        $mechanics = $mechanicsStmt->fetchAll(\PDO::FETCH_ASSOC);
+
         $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
                        CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
                        vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
@@ -684,7 +736,11 @@ class AuthController extends Controller
 
         $params = [
             'name' => "The GearGurd",
-            'serviceAssignments' => $serviceAssignments
+            'serviceAssignments' => $serviceAssignments,
+            'message' => $message,
+            'vehicles' => $vehicles,
+            'services' => $services,
+            'mechanics' => $mechanics
         ];
         return $this->render('mechanic/services/viewService', $params);
     }
@@ -697,17 +753,6 @@ class AuthController extends Controller
                 'name' => 'The GearGuard',
                 'garage_id' => Application::$app->session->get('user'),
                 'model' => $model
-            ]);
-        }
-
-        throw new NotFoundException();
-    }
-
-    public function MechanicDeleteServices(Request $request, Response $response)
-    {
-        if (Application::$app->user instanceof Mechanic) {
-            return $this->render('mechanic/services/deleteService', [
-                'name' => 'The GearGuard',
             ]);
         }
 
@@ -744,9 +789,34 @@ class AuthController extends Controller
     public function mechanicServiceHistoryEdit(Request $request, Response $response)
     {
         if (Application::$app->user instanceof \app\models\Mechanic) {
+            $license_plate_no = $_GET['license_plate_no'] ?? null;
+            $record = null;
+
+            if ($license_plate_no) {
+                $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                               vst.begin_timestamp, vst.end_timestamp, vst.notes
+                        FROM gg_vehicle_service_take vst
+                        JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                        JOIN gg_garage_service gs ON vst.service_id = gs.id
+                        WHERE v.license_plate_no = :license_plate_no
+                        ORDER BY vst.begin_timestamp DESC
+                        LIMIT 1";
+
+                $statement = Application::$app->db->prepare($sql);
+                $statement->bindValue(':license_plate_no', $license_plate_no);
+                $statement->execute();
+                $record = $statement->fetch(\PDO::FETCH_ASSOC);
+
+                if (!$record) {
+                    $response->setStatusCode(404);
+                    // Continue to render the view with no record to show "not found" message
+                }
+            }
+
             $this->setLayout('garage_layout');
             return $this->render('mechanic/serviceHistory/edit', [
-                'title' => 'Edit Vehicle Service'
+                'title' => 'Edit Vehicle Service',
+                'record' => $record
             ]);
         }
         throw new NotFoundException();
@@ -784,9 +854,109 @@ class AuthController extends Controller
         throw new NotFoundException();
     }
 
+    public function mechanicServiceHistoryDeleteConfirm(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $body = $request->getBody();
+            $id = $body['id'] ?? null;
+
+            if (!$id) {
+                $response->setStatusCode(400);
+                return $response->redirect('/mechanic/serviceHistory/delete?error=Missing+ID');
+            }
+
+            $sql = "DELETE FROM gg_vehicle_service_take WHERE id = :id";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':id', $id);
+
+            try {
+                $statement->execute();
+                // Redirect to the delete page with success message or to viewAll
+                return $response->redirect('/mechanic/serviceHistory/delete?success=Record+deleted');
+            } catch (\Exception $e) {
+                $response->setStatusCode(500);
+                return $response->redirect('/mechanic/serviceHistory/delete?error=' . urlencode($e->getMessage()));
+            }
+        }
+        throw new NotFoundException();
+    }
+
+    public function mechanicServiceHistoryDelete(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $license_plate_no = $_GET['license_plate_no'] ?? null;
+            $record = null;
+            $error = $_GET['error'] ?? null;
+            $success = $_GET['success'] ?? null;
+
+            if ($license_plate_no) {
+                $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                               vst.begin_timestamp, vst.end_timestamp, vst.notes
+                        FROM gg_vehicle_service_take vst
+                        JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                        JOIN gg_garage_service gs ON vst.service_id = gs.id
+                        WHERE v.license_plate_no = :license_plate_no
+                        ORDER BY vst.begin_timestamp DESC
+                        LIMIT 1";
+
+                $statement = Application::$app->db->prepare($sql);
+                $statement->bindValue(':license_plate_no', $license_plate_no);
+                $statement->execute();
+                $record = $statement->fetch(\PDO::FETCH_ASSOC);
+
+                if (!$record) {
+                    $response->setStatusCode(404);
+                    // Continue to render the view with no record to show "not found" message
+                }
+            }
+
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/delete', [
+                'title' => 'Delete Vehicle Service',
+                'record' => $record,
+                'error' => $error,
+                'success' => $success,
+                'license_plate_no' => $license_plate_no
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
+    public function mechanicServiceHistorySearch(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/search', [
+                'title' => 'Search Vehicle Service'
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
+    public function getDropdownData(Request $request, Response $response)
+    {
+        if (Application::$app->user) {
+            $userId = Application::$app->user->id;
+            $vehicles = (new \app\models\Vehicle())->getVehiclesByOwner($userId);
+            $mechanics = (new \app\models\Mechanic())->getAllMechanics();
+            $services = (new \app\models\ServicePerform())->getServicesByGarage();
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'vehicles' => $vehicles,
+                'mechanics' => $mechanics,
+                'services' => $services
+            ]);
+            exit;
+        }
+
+        throw new NotFoundException();
+    }
+
+
     public function mechanicSparePart(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User || Application::$app->user instanceof Mechanic) {
+        if (Application::$app->user instanceof Mechanic) {
             return $this->render('mechanic/sparepart/addNew', [
                 'title' => 'Add Spare Part'
             ]);
@@ -813,7 +983,7 @@ class AuthController extends Controller
             $part->loadData($request->getBody());
 
             if ($part->save()) {
-                $response->redirect('/mechanic/sparepart');
+                $response->redirect('/mechanic/sparepart/viewAll?success=1');
                 return;
             } else {
                 return $this->render('mechanic/sparepart/addNew', [
@@ -822,20 +992,35 @@ class AuthController extends Controller
                 ]);
             }
         }
-        $response->redirect('/mechanic/sparepart');
+        $response->redirect('/mechanic/sparepart/viewAll?success=1');
     }
 
     public function mechanicSparePartViewAll(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
-            $sql = "SELECT * FROM gg_sparepart";
+            $sql = "SELECT sp.*, v.license_plate_no AS vehicle_license_plate_no
+                    FROM gg_sparepart sp
+                    LEFT JOIN gg_vehicle v ON sp.vehicle_license_plate_no = v.license_plate_no";
             $statement = Application::$app->db->prepare($sql);
-            $statement->execute();
+            try {
+                $statement->execute();
+            } catch (\PDOException $e) {
+                // If vehicle_license_plate_no column does not exist, fallback to no join
+                $sql = "SELECT * FROM gg_sparepart sp";
+                $statement = Application::$app->db->prepare($sql);
+                $statement->execute();
+            }
             $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            $success = null;
+            if (isset($_GET['success']) && $_GET['success'] == '1') {
+                $success = 'Spare part added successfully.';
+            }
 
             return $this->render('mechanic/sparepart/viewAll', [
                 'name' => 'The GearGuard',
-                'spareParts' => $spareParts
+                'spareParts' => $spareParts,
+                'success' => $success
             ]);
         }
         throw new NotFoundException();
@@ -900,16 +1085,9 @@ class AuthController extends Controller
     public function loadAppointments(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
-            $sql = "SELECT a.id, v.type AS vehicle_type, u.name AS client_name, u.contact_number, v.license_plate_no, gs.type AS service_type, 
-                           CONCAT(a.date, ' ', a.time) AS date_time, a.notes, a.status
-                    FROM gg_appointment a
-                    JOIN gg_vehicle v ON a.vehicle_id = v.id
-                    JOIN gg_user u ON v.owner_id = u.id
-                    JOIN gg_garage_service gs ON a.service_id = gs.id
-                    ORDER BY a.date DESC, a.time DESC
-                    LIMIT 100";
-
+            $sql = "select gvsa.*, coalesce (gv.current_user_id, guo.user_id) as current_user_id, gv.license_plate_no, ggs.`type`as service_type, gu.`id` as user_id, gu.first_name, gu.last_name, gu.contact_no, gvt.`type` as vehicle_type, gvm.model as vehicle_model  from gearguard.gg_vehicle_service_appointment gvsa left join gearguard.gg_vehicle gv on gvsa.vehicle_id = gv.`id` left join gearguard.gg_garage_service ggs on gvsa.service_id = ggs.`id` left join gearguard.gg_user_owner guo on gvsa.vehicle_id = guo.vehicle_id left join gearguard.gg_user gu on gu.`id` = coalesce (gv.current_user_id, guo.user_id) left join gearguard.gg_vehicle_type gvt on gv.vehicle_type_id = gvt.`id`  left join gearguard.gg_vehicle_model gvm on gv.model_id = gvm.`id` where gvsa.service_id in (select gsmp.service_id from gearguard.gg_service_mechanic_perform gsmp where gsmp.mechanic_id = :mech_id);";
             $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':mech_id', Application::$app->user->id?: Application::$app->session->get('user'));
             $statement->execute();
             $appointments = $statement->fetchAll(\PDO::FETCH_ASSOC);
 

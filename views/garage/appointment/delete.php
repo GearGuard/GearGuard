@@ -459,7 +459,7 @@ $this->title = 'Search Appointments';
 
                     let result = await response.text();
 
-                    if (result && result === 'success') {
+                    if (result && result !== 'success') {
                         showPopup('Success', 'Appointment deleted successfully.');
                         document.getElementById(`table-row-id-${appointmentID}`).remove();
                         closeModal();

@@ -39,6 +39,34 @@ use app\models\Mechanic;
             padding: 20px;
         }
 
+        .services-button {
+            background: var(--accent);
+              color: var(--text);
+              border: none;
+              padding: 0.4rem;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              width: 12rem;
+              margin: 0.2rem;
+        }
+
+        .services-button.disabled {
+            background: var(--border);
+              color: var(--text);
+              border: none;
+              padding: 0.4rem;
+              border-radius: 5px;
+              cursor: default;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              width: 12rem;
+              margin: 0.2rem;
+        }
+
         .navMenu {
             background-color: var(--secondary);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -126,7 +154,8 @@ use app\models\Mechanic;
         input[type="text"],
         input[type="email"],
         input[type="password"],
-        input[type="date"] {
+        input[type="date"],
+        input[type="tel"] {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -192,12 +221,82 @@ use app\models\Mechanic;
             border: 1px solid var(--border);
         }
 
+
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background-color: #33363f;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            resize: vertical;
+        }
+
+        .form-input:hover,
+        .form-textarea:hover {
+            border-color: var(--accent);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
+        }
+
+        .form-input.is-invalid,
+        .form-textarea.is-invalid {
+            border-color: #ef4444;
+        }
+
+        .form-input[type="password"] {
+            letter-spacing: 0.2em;
+        }
+
+        .invalid-feedback {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .edit-button {
+            background: var(--edit-color);
+            color: var(--text);
+            border: none;
+        }
+
+        .delete-button {
+            background: var(--delete-color);
+            color: var(--text);
+        }
+
+        .clear-button {
+            background: var(--secondary);
+            color: var(--text);
+            border: solid 1px white;
+        }
+
         .search-button:hover,
         .edit-button:hover,
         .delete-button:hover,
-        .clear-button:hover {
+        .clear-button:hover,
+        .services-button:hover {
             transform: translateY(-1px);
             opacity: 0.9;
+        }
+
+        .services-button.disabled:hover {
+            transform: none;
+            opacity: 1;
         }
 
         .popup-overlay {
@@ -266,6 +365,32 @@ use app\models\Mechanic;
             opacity: 0.9;
         }
 
+        .table-container {
+            width: 30rem;
+            height: 10rem;
+            overflow-y: auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            user-select: none;
+          }
+
+          tr.selected td {
+            background-color: #007BFF;
+            color: white;
+          }
+
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -304,7 +429,9 @@ use app\models\Mechanic;
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $this->username = $this->form->field($model, 'username')->required(true); ?>
+                <?php $this->username = $this->form->field($model, 'username')->required(true);
+                    echo $this->username->readonly(true);
+                ?>
             </div>
         </div>
         <div class="form-row">
@@ -328,7 +455,24 @@ use app\models\Mechanic;
         <?php $this->address = new gearguard\phpmvc\form\TextAreaField($model, 'address');
         echo $this->address->required(true)->rows(3);
         ?>
-        <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmAdd()">Add</button></div>
+        <div style="margin: 1rem;">Select the services the mechanic will perform</div>
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="table-container">
+                      <table id="services-table">
+                        <tbody>
+
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <?php echo $this->services = new gearguard\phpmvc\form\DropDownField($servicesModel, 'services', $serviceOptions); ?>
+                    <button type="button" id="addServicesBtn" class="services-button disabled">Add Service</button>
+                    <button type="button" id="removeServicesBtn" class="services-button disabled">Remove Service</button>
+                </div>
+            </div>
+        <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmEdit()">Edit</button></div>
         </form>
         </div>
         <script>
@@ -336,6 +480,30 @@ use app\models\Mechanic;
             address = document.getElementById('address');
             address.classList.add('form-textarea');
             document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
+
+
+            document.getElementById('services').addEventListener('change', () => {
+                document.getElementById('addServicesBtn').classList.remove('disabled');
+                document.getElementById('addServicesBtn').addEventListener('click', () => {
+                    const serviceSelector = document.getElementById('services');
+
+                    if (serviceSelector.options[serviceSelector.selectedIndex].disabled) {
+                        return;
+                    }
+
+                    const table = document.querySelector('#services-table tbody');
+                    const selectedService = serviceSelector.options[serviceSelector.selectedIndex].text;
+                    const newRow = document.createElement('tr');
+                    const rowData = document.createElement('td');
+                    rowData.textContent = selectedService;
+                    newRow.appendChild(rowData);
+
+                    newRow.addEventListener('click', () => {selectRow(newRow)});
+
+                    table.appendChild(newRow);
+                    serviceSelector.options[serviceSelector.selectedIndex].setAttribute('disabled', 'true');
+                });
+            });
         </script>
     </div>
     <div class="popup-overlay" id="popupOverlay">
@@ -359,7 +527,7 @@ use app\models\Mechanic;
             }
 
             try {
-                const response = await fetch(`/garage/mechanic/search?username=${searchName}`);
+                const response = await fetch(`/api/garage/mechanic/getMechanic?username=${searchName}`);
 
                 if (!response.ok) {
                     showPopup("Sorry", "Something went wrong. Please try again later.");
@@ -368,15 +536,27 @@ use app\models\Mechanic;
 
                 const result = await response.json();
 
+                if (!result) {
+                    showPopup("Sorry", "We couldn't find that mechanic!");
+                    return;
+                }
+
                 if (result.success) {
                     document.getElementById('first_name').value = result.mechanic.first_name;
                     document.getElementById('last_name').value = result.mechanic.last_name;
                     document.getElementById('nic').value = result.mechanic.nic;
-                    document.getElementById('contact').value = result.mechanic.contact;
+                    document.getElementById('contact_no').value = result.mechanic.contact;
                     document.getElementById('email').value = result.mechanic.email;
-                    document.getElementById('date_employed').value = result.mechanic.date_employeed;
+                    document.getElementById('date_employeed').value = result.mechanic.date_employed;
                     document.getElementById('address').value = result.mechanic.address;
                     document.getElementById('username').value = result.mechanic.username;
+
+                    result.mechanic.services.forEach(service => {
+                        document.getElementById('services').value = service;
+                        addServiceRow();
+                    })
+
+                    document.getElementById('services').value = "";
 
                     document.getElementById('form-wrapper').style.display = 'inline-block';
 
@@ -391,11 +571,63 @@ use app\models\Mechanic;
         }
 
         function confirmEdit() {
-            showPopup('Confirm Edit', 'Are you sure you want to edit this record?', () => {
-                // Perform edit operation
-                showPopup('Success', 'Record updated successfully', () => {});
-            });
+            const form = document.getElementById('mechanicForm');
+            if (form.reportValidity()) {
+                showPopup('Please wait...', 'We are editing the mechanic of your garage.', true);
+                editMechanic();
+            }
         }
+
+        async function editMechanic() {
+                    const form = document.getElementById('mechanicForm');
+                    const formData = new FormData(form);
+
+                    const data = {};
+
+                    formData.forEach((value, key) => {
+                        data[key] = value;
+                    });
+
+                    const services = [];
+                    document.querySelectorAll('#services-table tbody tr').forEach(row => {
+                        const serviceSelector = document.getElementById('services');
+                        serviceSelector.childNodes.forEach(option => {
+                            if (option.text === row.textContent.trim()) {
+                                if (!Number.isNaN(option.value))
+                                    services.push(Number.parseInt(option.value));
+                            }
+                        });
+                    });
+
+                    data['services'] = JSON.stringify(services);
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams(data),
+                        });
+
+                        if (!response.ok) {
+                            showPopup('Sorry', 'We encountered an error while adding the mechanic. Please try again.');
+                            return;
+                        }
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showPopup('Success', 'Mechanic updated successfully!');
+                            clearForm();
+                        } else {
+                            showPopup('Error', result.message);
+                        }
+                    } catch (error) {
+                        showPopup('Sorry', 'We encountered an error while adding the mechanic. Please try again.');
+                        console.error('There was a problem with the fetch operation:', error);
+                    }
+                }
 
         function confirmDelete() {
             showPopup('Confirm Delete', 'Are you sure you want to delete this record?', () => {
@@ -410,6 +642,59 @@ use app\models\Mechanic;
             document.getElementById('search_mechanic').value = '';
             document.getElementById('mechanicForm').reset();
         }
+
+        function removeSelection(row) {
+            const selectedService = row.textContent.trim();
+            const serviceSelector = document.getElementById('services');
+
+            for (let i = 0; i < serviceSelector.options.length; i++) {
+                if (serviceSelector.options[i].text === selectedService) {
+                serviceSelector.options[i].removeAttribute('disabled');
+                break;
+                }
+            }
+
+            row.remove();
+        }
+
+        function selectRow(row) {
+            document.querySelectorAll('#services-table tbody tr').forEach(r => {
+                r.classList.remove('selected');
+            })
+
+            document.getElementById('removeServicesBtn').classList.remove('disabled');
+
+            row.classList.add('selected');
+
+            const button = document.getElementById('removeServicesBtn').cloneNode(true);
+            document.getElementById('removeServicesBtn').parentNode.replaceChild(button, document.getElementById('removeServicesBtn'));
+
+            document.getElementById('removeServicesBtn').addEventListener('click', () => {
+                removeSelection(row);
+                document.getElementById('removeServicesBtn').classList.add('disabled');
+            });
+        }
+
+        function addServiceRow() {
+            const serviceSelector = document.getElementById('services');
+
+                if (serviceSelector.options[serviceSelector.selectedIndex].disabled) {
+                    return;
+                }
+
+                const table = document.querySelector('#services-table tbody');
+                const selectedService = serviceSelector.options[serviceSelector.selectedIndex].text;
+                const newRow = document.createElement('tr');
+                const rowData = document.createElement('td');
+                rowData.textContent = selectedService;
+                newRow.appendChild(rowData);
+
+                newRow.addEventListener('click', () => {selectRow(newRow)});
+
+                table.appendChild(newRow);
+                serviceSelector.options[serviceSelector.selectedIndex].setAttribute('disabled', 'true');
+        }
+
     </script>
 </body>
 

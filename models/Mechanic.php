@@ -7,6 +7,7 @@ use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
 use app\utilities\EscapeAttributes;
+use Ratchet\App;
 
 class Mechanic extends UserModel
 {
@@ -28,6 +29,7 @@ class Mechanic extends UserModel
 	public int $status_id = self::STATUS_ACTIVE;
 	public int $garage_id;
 	public string $passwordConfirm = '';
+    public array $mechanicServices = [];
 
 	public function tableName(): string
 	{
@@ -47,15 +49,47 @@ class Mechanic extends UserModel
 
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
 			
-		return parent::save();
+		if (parent::save()) {
+            $this->id = Application::$app->db->pdo->lastInsertId();
+            if (!empty($this->mechanicServices)) {
+                return $this->addServicesToMechanic();
+            }
+        }
 	}
+
+    private function addServicesToMechanic() {
+        $sql = "INSERT IGNORE INTO gearguard.gg_service_mechanic_perform (service_id, mechanic_id) VALUES ";
+        $services = "";
+        foreach ($this->mechanicServices as $service) {
+            $services .= "(" . $service . ", " . $this->id . "), ";
+        }
+        $services = rtrim($services, ", ");
+        $sql .= $services;
+        return (bool)Application::$app->db->pdo->exec($sql);
+    }
+
+    private function updateServicesToMechanic() {
+        $sql = "DELETE FROM gearguard.gg_service_mechanic_perform WHERE mechanic_id = :mechanic_id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':mechanic_id', $this->id);
+        $statement->execute();
+
+        $sql = "INSERT IGNORE INTO gearguard.gg_service_mechanic_perform (service_id, mechanic_id) VALUES ";
+        $services = "";
+        foreach ($this->mechanicServices as $service) {
+            $services .= "(" . $service . ", " . $this->id . "), ";
+        }
+        $services = rtrim($services, ", ");
+        $sql .= $services;
+        return (bool)Application::$app->db->pdo->exec($sql);
+    }
 
 	public function rules(): array
 	{
 		return [
 			'first_name' => [self::RULE_REQUIRED],
 			'last_name' => [self::RULE_REQUIRED],
-			'email' => [self::RULE_REQUIRED, self::RULE_EMAIL, [self::RULE_UNIQUE, 'class' => self::class]],
+			'email' => [self::RULE_REQUIRED],
 			'nic' => [self::RULE_REQUIRED],
 			'address' => [self::RULE_REQUIRED],
 			'contact_no' => [self::RULE_REQUIRED],
@@ -162,7 +196,7 @@ class Mechanic extends UserModel
 			$shouldValidateUsername = true;
 		}
 
-		if (!$overrideValidations && !$this->validate($updateData, $shouldValidateUsername, $shouldValidatePassword, false, false, false, false)) {
+		if (!$overrideValidations && !$this->validate($updateData, $shouldValidateUsername, $shouldValidatePassword, false, false, false, false, useFrameworkValidations: false)) {
 			throw new \Exception(array_values($this->errors)[0][0], 400);
 		}
 
@@ -170,7 +204,11 @@ class Mechanic extends UserModel
 			$updateData['password'] = password_hash($updateData['password'], PASSWORD_DEFAULT);
 		}
 
-		return parent::update($updateData);
+		if (parent::update($updateData)) {
+            if (!empty($this->mechanicServices)) {
+                return $this->updateServicesToMechanic();
+            }
+        }
 	}
 
 	public static function with(UserModel $model) : Mechanic
@@ -321,6 +359,14 @@ class Mechanic extends UserModel
         $statement->bindValue(':id', $id);
         $statement->execute();
         return (bool)$statement->fetch();
+    }
+
+    public static function getMechanicServices(int $id) {
+        $sql = "SELECT gsmp.service_id FROM gearguard.gg_service_mechanic_perform gsmp WHERE gsmp.mechanic_id = :id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':id', $id);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_COLUMN, 0);
     }
 
 }
