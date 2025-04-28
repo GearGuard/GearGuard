@@ -344,7 +344,8 @@
         /* Additional styles for accessibility */
         .form-input:focus,
         .form-textarea:focus {
-            outline: 2px solid #1b4ebd; /* Improved focus outline for accessibility */
+            outline: 2px solid #1b4ebd;
+            /* Improved focus outline for accessibility */
         }
 
         @media (max-width: 768px) {
@@ -358,6 +359,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Flash Notification -->
     <div id="flashNotification" class="flash-notification">
@@ -387,7 +389,7 @@
                 <h1>User Profile</h1>
                 <p>View and edit your personal information</p>
             </div>
-            <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post', 'userProfileForm') ?>
+            <?php $form = \gearguard\phpmvc\form\Form::begin('/customer/my_profile', 'post', 'userProfileForm') ?>
             <div class="form-grid">
                 <?php
                 echo $this->first_name = $form->field($model, 'first_name')->required();
@@ -486,7 +488,7 @@
                 flashMessage.textContent = message;
                 flashNotification.className = 'flash-notification ' + type;
                 flashNotification.classList.add('visible');
-                
+
                 // Auto close after 5 seconds
                 setTimeout(() => {
                     closeFlash();
@@ -581,14 +583,14 @@
                 event.stopPropagation();
                 // Collect form data
                 showPopup('Hold on!', 'Saving changes...');
-                
+
                 const formData = new FormData(form);
                 const data = {};
 
                 formData.forEach((value, key) => {
                     data[key] = value;
                 });
-                
+
                 // Add action identifier
                 data['_action'] = 'updateProfile';
 

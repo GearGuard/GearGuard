@@ -307,4 +307,185 @@ AND v.status_id = 2;
             ]);
         }
     }
+
+    public function myProfileUpdate(Request $request, Response $response)
+    {
+        try {
+            // Log to help debug
+            error_log("Profile update initiated");
+
+            // Check content type and parse request body accordingly
+            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+            error_log("Content-Type: " . $contentType);
+
+            if (strpos($contentType, 'application/json') !== false) {
+                // Get the raw POST data and decode it from JSON
+                $rawData = file_get_contents('php://input');
+                error_log("Raw POST data: " . $rawData);
+                $data = json_decode($rawData, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    error_log("JSON decode error: " . json_last_error_msg());
+                }
+            } else {
+                // For form data
+                $data = $request->getBody();
+                error_log("Form data: " . print_r($data, true));
+            }
+
+            $action = $data['_action'] ?? null;
+            error_log("Action: " . ($action ?? 'none'));
+
+            header('Content-Type: application/json'); // Set response content type to JSON
+
+            if (!Application::$app->user) {
+                $response->setStatusCode(401);
+                error_log("Error: Unauthorized access");
+                echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+                return;
+            }
+
+            $user_id = Application::$app->user->id;
+            error_log("User ID: " . $user_id);
+
+            // Handle different actions
+            if ($action === 'updateProfile') {
+                error_log("Processing profile update");
+                // Update user profile information
+                $userModel = new \app\models\User();
+                $user = $userModel->findOne(['id' => $user_id]);
+
+                if (!$user) {
+                    $response->setStatusCode(404);
+                    error_log("Error: User not found");
+                    echo json_encode(['success' => false, 'message' => 'User not found']);
+                    return;
+                }
+
+                // Log current and new values for debugging
+                error_log("Current first_name: " . $user->first_name . ", New: " . ($data['first_name'] ?? 'not provided'));
+                error_log("Current last_name: " . $user->last_name . ", New: " . ($data['last_name'] ?? 'not provided'));
+
+                // Update fields with values from request
+                $user->first_name = $data['first_name'] ?? $user->first_name;
+                $user->last_name = $data['last_name'] ?? $user->last_name;
+                $user->nic = $data['nic'] ?? $user->nic;
+                $user->address = $data['address'] ?? $user->address;
+                $user->email = $data['email'] ?? $user->email;
+                $user->contact_no = $data['contact_no'] ?? $user->contact_no;
+                $user->username = $data['username'] ?? $user->username;
+
+                // Check if email is already taken by another user
+                if (isset($data['email']) && $user->email !== $data['email']) {
+                    $existingUser = $userModel->findOne(['email' => $data['email']]);
+                    if ($existingUser && $existingUser->id != $user_id) {
+                        error_log("Error: Email already in use");
+                        echo json_encode(['success' => false, 'message' => 'Email is already in use']);
+                        return;
+                    }
+                }
+
+                // Check if username is already taken by another user
+                if (isset($data['username']) && $user->username !== $data['username']) {
+                    $existingUser = $userModel->findOne(['username' => $data['username']]);
+                    if ($existingUser && $existingUser->id != $user_id) {
+                        error_log("Error: Username already in use");
+                        echo json_encode(['success' => false, 'message' => 'Username is already in use']);
+                        return;
+                    }
+                }
+
+                // Save to database
+                $tableName = 'gg_user';
+                $sql = "UPDATE $tableName SET 
+                        first_name = :first_name, 
+                        last_name = :last_name, 
+                        nic = :nic, 
+                        address = :address, 
+                        email = :email, 
+                        contact_no = :contact_no, 
+                        username = :username 
+                        WHERE id = :id";
+
+                error_log("Executing SQL: $sql");
+
+                $stmt = Application::$app->db->prepare($sql);
+                $stmt->bindValue(':first_name', $user->first_name);
+                $stmt->bindValue(':last_name', $user->last_name);
+                $stmt->bindValue(':nic', $user->nic);
+                $stmt->bindValue(':address', $user->address);
+                $stmt->bindValue(':email', $user->email);
+                $stmt->bindValue(':contact_no', $user->contact_no);
+                $stmt->bindValue(':username', $user->username);
+                $stmt->bindValue(':id', $user_id);
+
+                if ($stmt->execute()) {
+                    error_log("Profile update successful");
+                    echo json_encode(['success' => true]);
+                } else {
+                    error_log("Error: SQL update failed: " . print_r($stmt->errorInfo(), true));
+                    echo json_encode(['success' => false, 'message' => 'Update failed']);
+                }
+            } elseif ($action === 'changePassword') {
+                error_log("Processing password change");
+                // Handle password change
+                $currentPassword = $data['currentPassword'] ?? '';
+                $newPassword = $data['newPassword'] ?? ''; // Note: frontend sends 'newPassword', not 'password'
+                $passwordConfirm = $data['confirmPassword'] ?? ''; // Note: frontend sends 'confirmPassword', not 'passwordConfirm'
+
+                error_log("Current password provided: " . (!empty($currentPassword) ? 'Yes' : 'No'));
+                error_log("New password provided: " . (!empty($newPassword) ? 'Yes' : 'No'));
+                error_log("Confirm password provided: " . (!empty($passwordConfirm) ? 'Yes' : 'No'));
+
+                // Validate password confirmation
+                if ($newPassword !== $passwordConfirm) {
+                    error_log("Error: Passwords do not match");
+                    echo json_encode(['success' => false, 'message' => 'New password and confirmation do not match']);
+                    return;
+                }
+
+                // Get current user data to verify password
+                $userModel = new \app\models\User();
+                $user = $userModel->findOne(['id' => $user_id]);
+
+                if (!$user) {
+                    $response->setStatusCode(404);
+                    error_log("Error: User not found");
+                    echo json_encode(['success' => false, 'message' => 'User not found']);
+                    return;
+                }
+
+                // Verify current password
+                if (!password_verify($currentPassword, $user->password)) {
+                    error_log("Error: Current password incorrect");
+                    echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
+                    return;
+                }
+
+                // Hash new password
+                $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+                // Update password in database
+                $tableName = 'gg_user';
+                $sql = "UPDATE $tableName SET password = :password WHERE id = :id";
+                $stmt = Application::$app->db->prepare($sql);
+                $stmt->bindValue(':password', $hashedPassword);
+                $stmt->bindValue(':id', $user_id);
+
+                if ($stmt->execute()) {
+                    error_log("Password change successful");
+                    echo json_encode(['success' => true]);
+                } else {
+                    error_log("Error: Password update failed: " . print_r($stmt->errorInfo(), true));
+                    echo json_encode(['success' => false, 'message' => 'Password update failed']);
+                }
+            } else {
+                $response->setStatusCode(400);
+                error_log("Error: Invalid action: " . ($action ?? 'none'));
+                echo json_encode(['success' => false, 'message' => 'Invalid action']);
+            }
+        } catch (\Exception $e) {
+            error_log("Exception in myProfileUpdate: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
+        }
+    }
 }
