@@ -336,7 +336,7 @@ $this->title = 'Spare Part Warranty';
                         <div class="warranty-details">
                             <div class="detail-group">
                                 <span class="detail-label">Installed At</span>
-                                <span class="detail-value">${part.vehicle_id || 'N/A'}</span>
+                                <span class="detail-value">${part.installed_by || 'N/A'}</span>
                             </div>
                             <div class="detail-group">
                                 <span class="detail-label">Installation Date</span>
