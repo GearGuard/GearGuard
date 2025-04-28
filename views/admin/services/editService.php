@@ -242,31 +242,32 @@ $this->title = 'Customer Appointment';
 
     <div class="appointment-form">
     <h2 class="title">Edit Service</h2>
-    <form action="/submit-service" method="POST">
+    <form action="/admin/editservice" method="POST">
         <div class="form-row">
             <div class="form-column">
                 <div class="form-group">
-                    <input type="text" id="service-id" name="service_id" required placeholder="Search service by ID">
+                    <input type="text" id="service-id" name="service_id" required placeholder="Search service by ID" value="<?= htmlspecialchars($service['id'] ?? '') ?>">
                 </div>
             </div>
             <div class="form-column">
                 <div class="form-group">
-                    <button type="submit" class="book-button">Search Service</button>
+                    <button type="submit" class="book-button" name="action" value="search">Search Service</button>
                 </div>
             </div>
         </div>
 
+        <?php if (!empty($service)): ?>
         <div class="form-row">
             <div class="form-column">
                 <div class="form-group">
                     <label for="service-name">Service Name<span class="required-dot">*</span></label>
-                    <input type="text" id="service-name" name="service_name" required placeholder="Enter service name" value="Oil Change">
+                    <input type="text" id="service-name" name="service_name" required placeholder="Enter service name" value="<?= htmlspecialchars($service['type'] ?? '') ?>">
                 </div>
             </div>
             <div class="form-column">
                 <div class="form-group">
                     <label for="service-description">Description<span class="required-dot">*</span></label>
-                    <textarea id="service-description" name="service_description" required placeholder="Enter service description">Replacing old oil with new oil to ensure engine efficiency.</textarea>
+                    <textarea id="service-description" name="service_description" required placeholder="Enter service description"><?= htmlspecialchars($service['description'] ?? '') ?></textarea>
                 </div>
             </div>
         </div>
@@ -275,26 +276,27 @@ $this->title = 'Customer Appointment';
             <div class="form-column">
                 <div class="form-group">
                     <label for="service-price">Price ($)<span class="required-dot">*</span></label>
-                    <input type="text" id="service-price" name="service_price" required placeholder="Enter service price" value="50">
+                    <input type="text" id="service-price" name="service_price" required placeholder="Enter service price" value="<?= htmlspecialchars($service['price'] ?? '') ?>">
                 </div>
             </div>
             <div class="form-column">
                 <div class="form-group">
                     <label for="service-duration">Duration<span class="required-dot">*</span></label>
-                    <input type="text" id="service-duration" name="service_duration" required placeholder="Enter service duration (e.g., 30 minutes)" value="30 minutes">
+                    <input type="number" step="any" id="service-duration" name="service_duration" required placeholder="Enter service duration in hours (e.g., 1.5)" value="<?= htmlspecialchars($service['duration'] ?? '') ?>" title="Please enter a valid number">
                 </div>
             </div>
         </div>
 
         <div class="form-group">
             <label for="garage">Garage<span class="required-dot">*</span></label>
-            <input type="text" id="garage" name="garage" required placeholder="Enter garage name" value="Downtown Garage">
+            <input type="text" id="garage" name="garage" required placeholder="Enter garage name" value="<?= htmlspecialchars($service['garage_name'] ?? '') ?>">
         </div>
 
         <div class="button-container">
             <button type="reset" class="clear-button">Clear</button>
-            <button type="submit" class="book-button">Update Service</button>
+            <button type="submit" class="book-button" name="action" value="update">Update Service</button>
         </div>
+        <?php endif; ?>
     </form>
 </div>
 </body>

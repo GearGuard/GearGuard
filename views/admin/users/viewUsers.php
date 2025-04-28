@@ -256,54 +256,29 @@ $this->title = 'Customer Appointment';
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Arishana chandimal</td>
-                        <td>arishan@gmail.com</td>
-                        <td>Customer</td>
-                        <td>+94728472932</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Kavinda Dewmith</td>
-                        <td>kavinda@gmail.com</td>
-                        <td>Customer</td>
-                        <td>+94776283966</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Isuru Naveen</td>
-                        <td>isuru@gmail.com</td>
-                        <td>Manager</td>
-                        <td>+94777721655</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Malith Kariyawasam</td>
-                        <td>malith@gmail.com</td>
-                        <td>Chef</td>
-                        <td>+94762937632</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
+                    <?php if (!empty($users)) : ?>
+                        <?php foreach ($users as $user) : ?>
+                            <tr>
+                                <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
+                                <td><?= htmlspecialchars($user['email']) ?></td>
+                                <td><?= htmlspecialchars($user['user_role'] ?? 'N/A') ?></td>
+                                <td><?= htmlspecialchars($user['contact_no']) ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/admin/edituser?id=<?= htmlspecialchars($user['id']) ?>" class="edit-button" style="background-color: green; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none;">Edit</a>
+                                        <form action="/admin/deleteuser" method="POST" style="display:inline;">
+                                            <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?>">
+                                            <button type="submit" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <tr>
+                            <td colspan="5">No users found.</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

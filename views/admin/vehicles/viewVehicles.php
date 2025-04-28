@@ -257,64 +257,33 @@ $this->title = 'Customer Appointment';
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+            <tbody>
+                <?php if (!empty($vehicles)): ?>
+                    <?php foreach ($vehicles as $vehicle): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($vehicle['owner_name'] ?? 'N/A') ?></td>
+                            <td><?= htmlspecialchars($vehicle['manufacturer'] ?? 'N/A') ?></td>
+                            <td><?= htmlspecialchars($vehicle['model'] ?? 'N/A') ?></td>
+                            <td><?= htmlspecialchars($vehicle['year_manufactured'] ?? 'N/A') ?></td>
+                            <td><?= htmlspecialchars($vehicle['license_plate_no'] ?? 'N/A') ?></td>
+                            <td><?= htmlspecialchars($vehicle['insurance_no'] ?? 'N/A') ?></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="/admin/editvehicle?id=<?= htmlspecialchars($vehicle['id']) ?>" class="btn btn-primary">Edit</a>
+                                    <form action="/admin/deletevehicle" method="POST" style="display:inline;">
+                                        <input type="hidden" name="id" value="<?= htmlspecialchars($vehicle['id']) ?>">
+                                        <button type="submit" onclick="return confirm('Are you sure you want to delete this vehicle?');">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <tr>
-                        <td>Arishana Chandimal</td>
-                        <td>Toyota</td>
-                        <td>Camry</td>
-                        <td>2020</td>
-                        <td>ABC1234</td>
-                        <td>Downtown Garage</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
+                        <td colspan="7">No vehicles found.</td>
                     </tr>
-                    <tr>
-                        <td>Kavinda Dewmith</td>
-                        <td>Honda</td>
-                        <td>Accord</td>
-                        <td>2019</td>
-                        <td>XYZ5678</td>
-                        <td>Main Street Garage</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Isuru Naveen</td>
-                        <td>Ford</td>
-                        <td>Focus</td>
-                        <td>2018</td>
-                        <td>LMN9101</td>
-                        <td>City Auto Repair</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Malith Kariyawasam</td>
-                        <td>Chevrolet</td>
-                        <td>Malibu</td>
-                        <td>2021</td>
-                        <td>OPQ2345</td>
-                        <td>Quick Fix Garage</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button>Edit</button>
-                                <button>Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
+                <?php endif; ?>
+            </tbody>
             </table>
         </div>
     </div>

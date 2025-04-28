@@ -275,7 +275,14 @@ $this->title = 'Customer Appointment';
 
         <div class="form-group">
             <label for="garage">Garage<span class="required-dot">*</span></label>
-            <input type="text" id="garage" name="garage" required placeholder="Enter garage name">
+            <select id="garage" name="garage" required>
+                <option value="" disabled selected>Select a garage</option>
+                <?php if (!empty($garages)): ?>
+                    <?php foreach ($garages as $garage): ?>
+                        <option value="<?= htmlspecialchars($garage['id']) ?>"><?= htmlspecialchars($garage['name']) ?></option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </select>
         </div>
 
         <div class="button-container">

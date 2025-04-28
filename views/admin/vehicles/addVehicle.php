@@ -242,18 +242,32 @@ $this->title = 'Customer Appointment';
 
     <div class="appointment-form">
     <h2 class="title">Add New Vehicle</h2>
-    <form action="/submit-vehicle" method="POST">
+    <form action="/admin/addvehiclepost" method="POST">
         <div class="form-row">
             <div class="form-column">
                 <div class="form-group">
                     <label for="owner-name">Owner Name<span class="required-dot">*</span></label>
-                    <input type="text" id="owner-name" name="owner_name" required placeholder="Enter owner name">
+                    <select id="owner-name" name="owner_id" required>
+                        <option value="">Select Vehicle Owner</option>
+                        <?php if (!empty($owners)): ?>
+                            <?php foreach ($owners as $owner): ?>
+                                <option value="<?= htmlspecialchars($owner['user_id']) ?>"><?= htmlspecialchars($owner['first_name'] . ' ' . $owner['last_name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
                 </div>
             </div>
             <div class="form-column">
                 <div class="form-group">
                     <label for="vehicle-make">Vehicle Make<span class="required-dot">*</span></label>
-                    <input type="text" id="vehicle-make" name="vehicle_make" required placeholder="Enter vehicle make">
+                    <select id="vehicle-make" name="manufacturer_id" required>
+                        <option value="">Select Vehicle Make</option>
+                        <?php if (!empty($manufacturers)): ?>
+                            <?php foreach ($manufacturers as $manufacturer): ?>
+                                <option value="<?= htmlspecialchars($manufacturer['id']) ?>"><?= htmlspecialchars($manufacturer['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
                 </div>
             </div>
         </div>
@@ -262,13 +276,20 @@ $this->title = 'Customer Appointment';
             <div class="form-column">
                 <div class="form-group">
                     <label for="vehicle-model">Vehicle Model<span class="required-dot">*</span></label>
-                    <input type="text" id="vehicle-model" name="vehicle_model" required placeholder="Enter vehicle model">
+                    <select id="vehicle-model" name="model_id" required>
+                        <option value="">Select Vehicle Model</option>
+                        <?php if (!empty($models)): ?>
+                            <?php foreach ($models as $model): ?>
+                                <option value="<?= htmlspecialchars($model['id']) ?>"><?= htmlspecialchars($model['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
                 </div>
             </div>
             <div class="form-column">
                 <div class="form-group">
-                    <label for="vehicle-year">Year<span class="required-dot">*</span></label>
-                    <input type="text" id="vehicle-year" name="vehicle_year" required placeholder="Enter vehicle year">
+                    <label for="vehicle-year">Year Manufactured<span class="required-dot">*</span></label>
+                    <input type="date" id="vehicle-year" name="year_manufactured" required placeholder="Enter vehicle year">
                 </div>
             </div>
         </div>
@@ -277,13 +298,109 @@ $this->title = 'Customer Appointment';
             <div class="form-column">
                 <div class="form-group">
                     <label for="license-plate">License Plate<span class="required-dot">*</span></label>
-                    <input type="text" id="license-plate" name="license_plate" required placeholder="Enter license plate">
+                    <input type="text" id="license-plate" name="license_plate_no" required placeholder="Enter license plate">
                 </div>
             </div>
             <div class="form-column">
                 <div class="form-group">
-                    <label for="garage">Garage<span class="required-dot">*</span></label>
-                    <input type="text" id="garage" name="garage" required placeholder="Enter garage name">
+                    <label for="bodytype">Vehicle Shape<span class="required-dot">*</span></label>
+                    <select id="bodytype" name="bodytype_id" required>
+                        <option value="">Select Vehicle Shape</option>
+                        <?php if (!empty($shapes)): ?>
+                            <?php foreach ($shapes as $shape): ?>
+                                <option value="<?= htmlspecialchars($shape['id']) ?>"><?= htmlspecialchars($shape['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="class">Vehicle Class<span class="required-dot">*</span></label>
+                    <select id="class" name="class_id" required>
+                        <option value="">Select Vehicle Class</option>
+                        <?php if (!empty($classes)): ?>
+                            <?php foreach ($classes as $class): ?>
+                                <option value="<?= htmlspecialchars($class['id']) ?>"><?= htmlspecialchars($class['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="engine-capacity">Engine Capacity<span class="required-dot">*</span></label>
+                    <select id="engine-capacity" name="engine_capacity_id" required>
+                        <option value="">Select Engine Capacity</option>
+                        <?php if (!empty($engineCapacities)): ?>
+                            <?php foreach ($engineCapacities as $engineCapacity): ?>
+                                <option value="<?= htmlspecialchars($engineCapacity['id']) ?>"><?= htmlspecialchars($engineCapacity['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="fuel-type">Fuel Type<span class="required-dot">*</span></label>
+                    <select id="fuel-type" name="fuel_type_id" required>
+                        <option value="">Select Fuel Type</option>
+                        <?php if (!empty($fuelTypes)): ?>
+                            <?php foreach ($fuelTypes as $fuelType): ?>
+                                <option value="<?= htmlspecialchars($fuelType['id']) ?>"><?= htmlspecialchars($fuelType['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="insurance-no">Insurance Number</label>
+                    <input type="text" id="insurance-no" name="insurance_no" placeholder="Enter insurance number">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="engine-no">Engine Number<span class="required-dot">*</span></label>
+                    <input type="text" id="engine-no" name="engine_no" required placeholder="Enter engine number">
+                </div>
+            </div>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
+                    <select id="vehicle-type" name="vehicle_type_id" required>
+                        <option value="">Select Vehicle Type</option>
+                        <?php if (!empty($vehicleTypes)): ?>
+                            <?php foreach ($vehicleTypes as $vehicleType): ?>
+                                <option value="<?= htmlspecialchars($vehicleType['id']) ?>"><?= htmlspecialchars($vehicleType['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="status">Vehicle Status<span class="required-dot">*</span></label>
+                    <select id="status" name="status_id" required>
+                        <option value="">Select Vehicle Status</option>
+                        <?php if (!empty($statuses)): ?>
+                            <?php foreach ($statuses as $status): ?>
+                                <option value="<?= htmlspecialchars($status['id']) ?>"><?= htmlspecialchars($status['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
                 </div>
             </div>
         </div>
