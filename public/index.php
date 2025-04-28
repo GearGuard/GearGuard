@@ -70,6 +70,7 @@ $app->router->get('/customer/logedinUser', [CustomrtDashboardController::class, 
 $app->router->get('/customer/vehicleCount', [CustomrtDashboardController::class, 'vehicleCount']);
 $app->router->get('/customer/upcomingServices', [CustomrtDashboardController::class, 'upcmingServicesCount']);
 $app->router->get('/customer/nonExpire', [CustomrtDashboardController::class, 'nonExpire']);
+$app->router->get('/customer/sparepart/distribution', [CustomrtDashboardController::class, 'getSparePartDistribution']);
 
 
 

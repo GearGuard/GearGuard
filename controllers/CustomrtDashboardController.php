@@ -488,4 +488,64 @@ AND v.status_id = 2;
             echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
         }
     }
+
+    public function getSparePartDistribution()
+    {
+        $userId = Application::$app->user->id ?? null;
+        header('Content-Type: application/json');
+
+        if (!$userId) {
+            echo json_encode(['labels' => [], 'values' => []]);
+            exit;
+        }
+
+        try {
+            // Get spare parts types distribution for the logged in user
+            $sql = "
+                SELECT sp.type, COUNT(*) as count
+                FROM gg_sparepart_vehicleuser_vehicle_install svi
+                JOIN gg_sparepart sp ON svi.sparepart_id = sp.id
+                WHERE svi.user_id = :userId
+                GROUP BY sp.type
+                ORDER BY count DESC
+            ";
+
+            $stmt = Application::$app->db->prepare($sql);
+            $stmt->bindValue(':userId', $userId);
+            $stmt->execute();
+
+            $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            // If no data, return sample data with placeholder text
+            if (empty($results)) {
+                echo json_encode([
+                    'labels' => ['No Spare Parts Found'],
+                    'values' => [100]
+                ]);
+                return;
+            }
+
+            // Process results into labels and values arrays
+            $labels = [];
+            $values = [];
+
+            foreach ($results as $row) {
+                $labels[] = $row['type'];
+                $values[] = (int)$row['count'];
+            }
+
+            echo json_encode([
+                'labels' => $labels,
+                'values' => $values
+            ]);
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Failed to fetch spare part distribution data',
+                'details' => $e->getMessage(),
+                'labels' => ['Error Loading Data'],
+                'values' => [100]
+            ]);
+        }
+    }
 }
