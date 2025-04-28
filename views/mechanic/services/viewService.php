@@ -495,11 +495,11 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${appointment.vehicle_type}</td>
-                    <td>${appointment.client_name}</td>
-                    <td>${appointment.contact_number}</td>
+                    <td>${appointment.first_name} ${appointment.last_name}</td>
+                    <td>${appointment.contact_no}</td>
                     <td>${appointment.license_plate_no}</td>
                     <td>${appointment.service_type}</td>
-                    <td>${appointment.date_time}</td>
+                    <td>${appointment.date} ${appointment.time}</td>
                     <td><button class="view-button" onclick='viewDetails(${JSON.stringify(appointment)})'>View</button></td>
                     <td></td>
                 `;
