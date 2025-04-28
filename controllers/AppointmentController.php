@@ -12,10 +12,8 @@ class AppointmentController extends Controller
 {
 	public function appointment()
 	{
-		// Fetch appointments from database or other source
 		$appointment = $this->getAllAppointments();
 
-		// Pass data to the view
 		return $this->render('myAppointment', [
 			'appointment' => $appointment
 		]);
@@ -25,13 +23,11 @@ class AppointmentController extends Controller
 		$userId = Application::$app->user->id ?? null;
 
 		if (!$userId) {
-			// Return empty array if user is not logged in
 			header('Content-Type: application/json');
 			echo json_encode([]);
 			exit;
 		}
 
-		// Fetch appointments for the current user
 		$sql = 'SELECT a.id, a.date, a.time, a.notes, 
 		v.license_plate_no, 
 		vm.model AS vehicle_model, 
@@ -62,7 +58,6 @@ class AppointmentController extends Controller
 		$statement->execute();
 		$appointments = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-		// Return the appointments as JSON
 		header('Content-Type: application/json');
 		echo json_encode($appointments);
 		exit;
@@ -105,10 +100,8 @@ class AppointmentController extends Controller
 
 	public function deleteAppointment(Request $request, Response $response)
 	{
-		// Extract the ID from the request parameters or body
 		$id = $request->getBody()['id'] ?? null;
 
-		// Validate the ID
 		if (!$id || !is_numeric($id)) {
 			$response->setStatusCode(400);
 			echo json_encode(['success' => false, 'message' => 'Invalid appointment ID']);
@@ -116,10 +109,9 @@ class AppointmentController extends Controller
 		}
 
 		try {
-			// Use the correct table name for your database
 			$sql = 'DELETE FROM gg_vehicle_service_appointment WHERE id = :id';
 			$statement = Application::$app->db->prepare($sql);
-			$statement->bindValue(':id', $id, \PDO::PARAM_INT); // Bind the extracted ID value
+			$statement->bindValue(':id', $id, \PDO::PARAM_INT); 
 
 			if ($statement->execute()) {
 				Application::$app->response->redirect('/customer/appointment/my_appointment');
