@@ -237,7 +237,7 @@
 
         use gearguard\phpmvc\form\Form;
 
-        $form = Form::begin('/customer/sparepart/add_sparepart', 'post') ?>
+        $form = Form::begin('/customer/sparepart/add_sparepart', 'post', ['onsubmit' => 'return validateDates()']) ?>
         <div class='form-row'>
             <div class='form-column'>
                 <div class='form-group'>
@@ -273,7 +273,7 @@
                 <div class='form-group'>
                     <label for='manufactured_date'>Manufactured Date<span class='required-dot'>*</span></label>
                     <input type='date' id='manufactured_date' name='manufactured_date' step='0.01' required
-                        placeholder='Enter price'>
+                        placeholder='Enter price' onchange="updateInstalledDateMin()">
                 </div>
             </div>
             <div class='form-column'>
@@ -288,8 +288,9 @@
         <div class='form-row'>
             <div class='form-column'>
                 <div class='form-group'>
-                    <label for='installed-date'>Installed Date<span class='required-dot'>*</span></label>
+                    <label for='installed-date'>Installed Date<span class='required-dot'>*</span> (must be after Manufactured Date)</label>
                     <input type='date' id='installed-date' name='installed_date' required>
+                    <p id="date-error" style="color: #ef4444; font-size: 0.8rem; margin-top: 0.25rem; display: none;">Installed date must be after manufactured date</p>
                 </div>
             </div>
             <div class='form-column'>
@@ -306,6 +307,47 @@
         </div>
         <?php Form::end() ?>
     </div>
+
+    <script>
+        function updateInstalledDateMin() {
+            const manufacturedDate = document.getElementById('manufactured_date').value;
+            const installedDateInput = document.getElementById('installed-date');
+
+            if (manufacturedDate) {
+                installedDateInput.min = manufacturedDate;
+            }
+
+            // Validate if the current installed date is valid
+            validateInstalledDate();
+        }
+
+        function validateInstalledDate() {
+            const manufacturedDate = document.getElementById('manufactured_date').value;
+            const installedDate = document.getElementById('installed-date').value;
+            const dateError = document.getElementById('date-error');
+
+            if (manufacturedDate && installedDate && new Date(installedDate) < new Date(manufacturedDate)) {
+                dateError.style.display = 'block';
+                return false;
+            } else {
+                dateError.style.display = 'none';
+                return true;
+            }
+        }
+
+        function validateDates() {
+            return validateInstalledDate();
+        }
+
+        // Initialize validation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up validation for installed date when it changes
+            document.getElementById('installed-date').addEventListener('change', validateInstalledDate);
+
+            // Initial setup
+            updateInstalledDateMin();
+        });
+    </script>
 </body>
 
 </html>
