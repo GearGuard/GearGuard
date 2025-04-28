@@ -1,10 +1,5 @@
 <?php
-// This view file does not require direct database connection or query execution.
-// The data should be passed from the controller to the view for rendering.
 
-// Handle form submission and data processing should be done in the controller.
-
-// The form and UI logic remain unchanged below.
 ?>
 
 <!DOCTYPE html>
@@ -279,7 +274,7 @@
         <?php if (!empty($message)) echo $message; ?>
 
         <form method="POST" action="/mechanic/services/viewService">
-            <!-- Vehicle (Full width) -->
+            
             <div class="form-row">
                 <div class="form-column full-width">
                     <div class="form-group">
@@ -298,7 +293,7 @@
                 </div>
             </div>
 
-            <!-- Service & Mechanic -->
+           
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
                     <label for="service_id">Service</label>
@@ -328,13 +323,13 @@
                 </div>
             </div>
 
-            <!-- Cost -->
+           
             <div class="form-group" style="margin-top: 1rem;">
                 <label for="cost">Cost</label>
                 <input type="number" name="cost" step="0.01" min="0" placeholder="Enter cost" required>
             </div>
 
-            <!-- Begin & End Timestamp -->
+            
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                 <div class="form-group">
                     <label for="begin_timestamp">Begin Time</label>
@@ -346,7 +341,7 @@
                 </div>
             </div>
 
-            <!-- Notes -->
+           
             <div class="form-row">
                 <div class="form-column">
                     <div class="form-group">
@@ -356,7 +351,7 @@
                 </div>
             </div>
 
-            <!-- Submit -->
+            
             <div class="button-container">
                 <button type="reset" class="clear-button">Clear</button>
                 <button type="submit" class="add-button">Add Service</button>
@@ -379,7 +374,6 @@
             });
         });
 
-        // Ensure the correct container is visible on page load based on selected radio button
         window.addEventListener('DOMContentLoaded', () => {
             const selectedValue = document.querySelector('input[name="searchType"]:checked')?.value;
             const appointmentTable = document.getElementById('appointmentTableContainer');
@@ -391,12 +385,10 @@
                 appointmentTable.style.display = 'none';
                 directCustomerForm.style.display = 'block';
             } else {
-                // Default: hide all if no radio button is selected
                 appointmentTable.style.display = 'none';
                 directCustomerForm.style.display = 'none';
             }
         
-            // Load data for appointment table only
             loadAppointments();
         });
 
@@ -416,14 +408,11 @@
         const loader = document.getElementById('loader');
 
         function viewDetails(appointment) {
-            // Hide appointment table and show the form
             document.getElementById('appointmentTableContainer').style.display = 'none';
             document.getElementById('directCustomerForm').style.display = 'block';
 
-            // Set vehicle select field based on license_plate_no from appointment
             const vehicleSelect = document.querySelector('select[name="vehicle_id"]');
             if (vehicleSelect) {
-                // Find option with text matching license_plate_no and select it
                 let found = false;
                 for (let option of vehicleSelect.options) {
                     if (option.text === appointment.license_plate_no) {
@@ -438,7 +427,6 @@
                 }
             }
 
-            // Set service select field based on service_type from appointment
             const serviceSelect = document.querySelector('select[name="service_id"]');
             if (serviceSelect) {
                 let found = false;
@@ -455,7 +443,6 @@
                 }
             }
 
-            // Clear other fields: mechanic, begin_timestamp, end_timestamp, notes
             const mechanicSelect = document.querySelector('select[name="mechanic_id"]');
             if (mechanicSelect) {
                 mechanicSelect.selectedIndex = 0;
@@ -473,10 +460,8 @@
                 notesTextarea.value = '';
             }
 
-            // Scroll to form
             document.getElementById('directCustomerForm').scrollIntoView({ behavior: 'smooth' });
         }
-        // Function to load and display appointments from the server
         function loadAppointments() {
             fetch('/mechanic/services/loadAppointments')
             .then(response => response.json())
@@ -484,13 +469,11 @@
                 const tbody = document.querySelector('#appointmentTable tbody');
                 tbody.innerHTML = '';
                 
-                // Display message if no appointments found
                 if (data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="no-results">❌ No appointments found.</td></tr>';
                 return;
                 }
 
-                // Create table rows for each appointment
                 data.forEach(appointment => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -513,7 +496,6 @@
             });
         }
 
-        // Function to load and display service assignments from the server
         function loadServiceAssignments() {
             fetch('/mechanic/services/loadServiceAssignments')
             .then(response => response.json())
@@ -521,13 +503,11 @@
                 const tbody = document.querySelector('#timeTable tbody');
                 tbody.innerHTML = '';
                 
-                // Display message if no service assignments found
                 if (data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="no-results">❌ No service assignments found.</td></tr>';
                 return;
                 }
 
-                // Create table rows for each service assignment
                 data.forEach(assignment => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
