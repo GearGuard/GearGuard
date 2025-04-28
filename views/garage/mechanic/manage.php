@@ -1,3 +1,8 @@
+<?php
+/** @var $model \app\models\Mechanic */
+use app\models\Mechanic;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,6 +37,34 @@
             color: var(--text);
             line-height: 1.6;
             padding: 20px;
+        }
+
+        .services-button {
+            background: var(--accent);
+              color: var(--text);
+              border: none;
+              padding: 0.4rem;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              width: 12rem;
+              margin: 0.2rem;
+        }
+
+        .services-button.disabled {
+            background: var(--border);
+              color: var(--text);
+              border: none;
+              padding: 0.4rem;
+              border-radius: 5px;
+              cursor: default;
+              font-size: 0.875rem;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              width: 12rem;
+              margin: 0.2rem;
         }
 
         .navMenu {
@@ -121,7 +154,8 @@
         input[type="text"],
         input[type="email"],
         input[type="password"],
-        input[type="date"] {
+        input[type="date"],
+        input[type="tel"] {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -187,12 +221,82 @@
             border: 1px solid var(--border);
         }
 
+
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background-color: #33363f;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            resize: vertical;
+        }
+
+        .form-input:hover,
+        .form-textarea:hover {
+            border-color: var(--accent);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.2);
+        }
+
+        .form-input.is-invalid,
+        .form-textarea.is-invalid {
+            border-color: #ef4444;
+        }
+
+        .form-input[type="password"] {
+            letter-spacing: 0.2em;
+        }
+
+        .invalid-feedback {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .edit-button {
+            background: var(--edit-color);
+            color: var(--text);
+            border: none;
+        }
+
+        .delete-button {
+            background: var(--delete-color);
+            color: var(--text);
+        }
+
+        .clear-button {
+            background: var(--secondary);
+            color: var(--text);
+            border: solid 1px white;
+        }
+
         .search-button:hover,
         .edit-button:hover,
         .delete-button:hover,
-        .clear-button:hover {
+        .clear-button:hover,
+        .services-button:hover {
             transform: translateY(-1px);
             opacity: 0.9;
+        }
+
+        .services-button.disabled:hover {
+            transform: none;
+            opacity: 1;
         }
 
         .popup-overlay {
@@ -261,6 +365,32 @@
             opacity: 0.9;
         }
 
+        .table-container {
+            width: 30rem;
+            height: 10rem;
+            overflow-y: auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            user-select: none;
+          }
+
+          tr.selected td {
+            background-color: #007BFF;
+            color: white;
+          }
+
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -285,44 +415,96 @@
     <div class="manage-form">
         <h2 class="title">Manage Mechanic</h2>
         <div class="search-section">
-            <div class="form-group"> <label for="search_mechanic">Search Mechanic</label> <input type="text" id="search_mechanic" name="search_mechanic" placeholder="Enter mechanic name"> </div> <button type="button" class="search-button" onclick="searchMechanic()"> <i class="fas fa-search"></i> Search </button>
+            <div class="form-group"> <label for="search_mechanic">Search Mechanic</label> <input type="text" id="search_mechanic" name="search_mechanic" placeholder="Enter mechanic username"> </div> <button type="button" class="search-button" onclick="searchMechanic()"> <i class="fas fa-search"></i> Search </button>
         </div>
-        <form id="mechanicForm">
+        <div id="form-wrapper" style="display: none">
+        <?php $this->form = gearguard\phpmvc\form\Form::begin('', 'post', 'mechanicForm'); ?>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $this->fname = $this->form->field($model, 'first_name')->required(true); ?>
+            </div>
+            <div class="form-column">
+                <?php echo $this->lname = $this->form->field($model, 'last_name')->required(true); ?>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php $this->username = $this->form->field($model, 'username')->required(true);
+                    echo $this->username->readonly(true);
+                ?>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $this->nic = $this->form->field($model, 'nic')->required(true); ?>
+            </div>
+            <div class="form-column">
+                <?php echo $this->contact = $this->form->field($model, 'contact_no')->required(true)->type('tel'); ?>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php echo $this->email = $this->form->field($model, 'email')->required(true)->type('email'); ?>
+            </div>
+            <div class="form-column">
+                <?php $this->demployed = new gearguard\phpmvc\form\DateField($model, "date_employeed");
+                echo $this->demployed->required(true)->max(date('Y-m-d'));
+                ?>
+            </div>
+        </div>
+        <?php $this->address = new gearguard\phpmvc\form\TextAreaField($model, 'address');
+        echo $this->address->required(true)->rows(3);
+        ?>
+        <div style="margin: 1rem;">Select the services the mechanic will perform</div>
             <div class="form-row">
                 <div class="form-column">
-                    <div class="form-group"> <label for="first_name">First Name<span class="required-dot">*</span></label> <input type="text" id="first_name" name="first_name" required placeholder="Enter first name"> </div>
+                    <div class="table-container">
+                      <table id="services-table">
+                        <tbody>
+
+                        </tbody>
+                      </table>
+                    </div>
                 </div>
                 <div class="form-column">
-                    <div class="form-group"> <label for="last_name">Last Name<span class="required-dot">*</span></label> <input type="text" id="last_name" name="last_name" required placeholder="Enter last name"> </div>
+                    <?php echo $this->services = new gearguard\phpmvc\form\DropDownField($servicesModel, 'services', $serviceOptions); ?>
+                    <button type="button" id="addServicesBtn" class="services-button disabled">Add Service</button>
+                    <button type="button" id="removeServicesBtn" class="services-button disabled">Remove Service</button>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="nic">NIC<span class="required-dot">*</span></label> <input type="text" id="nic" name="nic" required placeholder="Enter NIC"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="contact">Contact Number<span class="required-dot">*</span></label> <input type="text" id="contact" name="contact" required placeholder="Enter contact number"> </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="email">Email<span class="required-dot">*</span></label> <input type="email" id="email" name="email" required placeholder="Enter email"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="date_employed">Date Employed<span class="required-dot">*</span></label> <input type="date" id="date_employed" name="date_employed" required> </div>
-                </div>
-            </div>
-            <div class="form-group"> <label for="address">Address<span class="required-dot">*</span></label> <input type="text" id="address" name="address" required placeholder="Enter address"> </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group"> <label for="username">Username<span class="required-dot">*</span></label> <input type="text" id="username" name="username" required placeholder="Enter username"> </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group"> <label for="password">Password<span class="required-dot">*</span></label> <input type="password" id="password" name="password" required placeholder="Enter password"> </div>
-                </div>
-            </div>
-            <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmEdit()">Edit</button> <button type="button" class="delete-button" onclick="confirmDelete()">Delete</button> </div>
+        <div class="button-container"> <button type="button" class="clear-button" onclick="clearForm()">Clear</button> <button type="button" class="edit-button" onclick="confirmEdit()">Edit</button></div>
         </form>
+        </div>
+        <script>
+            document.querySelectorAll('.form-group textarea').forEach(e => e.parentElement.classList.add('full-width'))
+            address = document.getElementById('address');
+            address.classList.add('form-textarea');
+            document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
+
+
+            document.getElementById('services').addEventListener('change', () => {
+                document.getElementById('addServicesBtn').classList.remove('disabled');
+                document.getElementById('addServicesBtn').addEventListener('click', () => {
+                    const serviceSelector = document.getElementById('services');
+
+                    if (serviceSelector.options[serviceSelector.selectedIndex].disabled) {
+                        return;
+                    }
+
+                    const table = document.querySelector('#services-table tbody');
+                    const selectedService = serviceSelector.options[serviceSelector.selectedIndex].text;
+                    const newRow = document.createElement('tr');
+                    const rowData = document.createElement('td');
+                    rowData.textContent = selectedService;
+                    newRow.appendChild(rowData);
+
+                    newRow.addEventListener('click', () => {selectRow(newRow)});
+
+                    table.appendChild(newRow);
+                    serviceSelector.options[serviceSelector.selectedIndex].setAttribute('disabled', 'true');
+                });
+            });
+        </script>
     </div>
     <div class="popup-overlay" id="popupOverlay">
         <div class="popup" id="popup">
@@ -336,45 +518,116 @@
     </div>
 
     <script>
-        function searchMechanic() {
+        async function searchMechanic() {
             const searchName = document.getElementById('search_mechanic').value;
-            // Simulated API call - replace with actual API call in production
-            if (searchName === 'sandhavi w') {
-                document.getElementById('first_name').value = searchName.split(' ')[0];
-                document.getElementById('last_name').value = searchName.split(' ')[1] || '';
-                document.getElementById('nic').value = '123456789V';
-                document.getElementById('contact').value = '0771234567';
-                document.getElementById('email').value = searchName.toLowerCase().replace(' ', '.') + '@example.com';
-                document.getElementById('date_employed').value = '2023-01-01';
-                document.getElementById('address').value = '123 Main St, Colombo';
-                document.getElementById('username').value = searchName.toLowerCase().replace(' ', '');
-                document.getElementById('password').value = '********';
+
+            if (!searchName) {
+                showPopup("Wait!", "We need a username to search!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/garage/mechanic/getMechanic?username=${searchName}`);
+
+                if (!response.ok) {
+                    showPopup("Sorry", "Something went wrong. Please try again later.");
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (!result) {
+                    showPopup("Sorry", "We couldn't find that mechanic!");
+                    return;
+                }
+
+                if (result.success) {
+                    document.getElementById('first_name').value = result.mechanic.first_name;
+                    document.getElementById('last_name').value = result.mechanic.last_name;
+                    document.getElementById('nic').value = result.mechanic.nic;
+                    document.getElementById('contact_no').value = result.mechanic.contact;
+                    document.getElementById('email').value = result.mechanic.email;
+                    document.getElementById('date_employeed').value = result.mechanic.date_employed;
+                    document.getElementById('address').value = result.mechanic.address;
+                    document.getElementById('username').value = result.mechanic.username;
+
+                    result.mechanic.services.forEach(service => {
+                        document.getElementById('services').value = service;
+                        addServiceRow();
+                    })
+
+                    document.getElementById('services').value = "";
+
+                    document.getElementById('form-wrapper').style.display = 'inline-block';
+
+                } else {
+                    showPopup("Sorry", "We couldn't find that mechanic!");
+                    return;
+                }
+            } catch (error) {
+                showPopup("Sorry", "Something went wrong. Please try again later.");
+                console.log("Error: ", error);
             }
         }
 
-        function showPopup(title, message, confirmCallback) {
-            document.getElementById('popupTitle').textContent = title;
-            document.getElementById('popupMessage').textContent = message;
-            document.getElementById('popupOverlay').style.display = 'block';
-
-            document.getElementById('popupConfirm').onclick = () => {
-                hidePopup();
-                confirmCallback();
-            };
-
-            document.getElementById('popupCancel').onclick = hidePopup;
-        }
-
-        function hidePopup() {
-            document.getElementById('popupOverlay').style.display = 'none';
-        }
-
         function confirmEdit() {
-            showPopup('Confirm Edit', 'Are you sure you want to edit this record?', () => {
-                // Perform edit operation
-                showPopup('Success', 'Record updated successfully', () => {});
-            });
+            const form = document.getElementById('mechanicForm');
+            if (form.reportValidity()) {
+                showPopup('Please wait...', 'We are editing the mechanic of your garage.', true);
+                editMechanic();
+            }
         }
+
+        async function editMechanic() {
+                    const form = document.getElementById('mechanicForm');
+                    const formData = new FormData(form);
+
+                    const data = {};
+
+                    formData.forEach((value, key) => {
+                        data[key] = value;
+                    });
+
+                    const services = [];
+                    document.querySelectorAll('#services-table tbody tr').forEach(row => {
+                        const serviceSelector = document.getElementById('services');
+                        serviceSelector.childNodes.forEach(option => {
+                            if (option.text === row.textContent.trim()) {
+                                if (!Number.isNaN(option.value))
+                                    services.push(Number.parseInt(option.value));
+                            }
+                        });
+                    });
+
+                    data['services'] = JSON.stringify(services);
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams(data),
+                        });
+
+                        if (!response.ok) {
+                            showPopup('Sorry', 'We encountered an error while adding the mechanic. Please try again.');
+                            return;
+                        }
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showPopup('Success', 'Mechanic updated successfully!');
+                            clearForm();
+                        } else {
+                            showPopup('Error', result.message);
+                        }
+                    } catch (error) {
+                        showPopup('Sorry', 'We encountered an error while adding the mechanic. Please try again.');
+                        console.error('There was a problem with the fetch operation:', error);
+                    }
+                }
 
         function confirmDelete() {
             showPopup('Confirm Delete', 'Are you sure you want to delete this record?', () => {
@@ -389,6 +642,59 @@
             document.getElementById('search_mechanic').value = '';
             document.getElementById('mechanicForm').reset();
         }
+
+        function removeSelection(row) {
+            const selectedService = row.textContent.trim();
+            const serviceSelector = document.getElementById('services');
+
+            for (let i = 0; i < serviceSelector.options.length; i++) {
+                if (serviceSelector.options[i].text === selectedService) {
+                serviceSelector.options[i].removeAttribute('disabled');
+                break;
+                }
+            }
+
+            row.remove();
+        }
+
+        function selectRow(row) {
+            document.querySelectorAll('#services-table tbody tr').forEach(r => {
+                r.classList.remove('selected');
+            })
+
+            document.getElementById('removeServicesBtn').classList.remove('disabled');
+
+            row.classList.add('selected');
+
+            const button = document.getElementById('removeServicesBtn').cloneNode(true);
+            document.getElementById('removeServicesBtn').parentNode.replaceChild(button, document.getElementById('removeServicesBtn'));
+
+            document.getElementById('removeServicesBtn').addEventListener('click', () => {
+                removeSelection(row);
+                document.getElementById('removeServicesBtn').classList.add('disabled');
+            });
+        }
+
+        function addServiceRow() {
+            const serviceSelector = document.getElementById('services');
+
+                if (serviceSelector.options[serviceSelector.selectedIndex].disabled) {
+                    return;
+                }
+
+                const table = document.querySelector('#services-table tbody');
+                const selectedService = serviceSelector.options[serviceSelector.selectedIndex].text;
+                const newRow = document.createElement('tr');
+                const rowData = document.createElement('td');
+                rowData.textContent = selectedService;
+                newRow.appendChild(rowData);
+
+                newRow.addEventListener('click', () => {selectRow(newRow)});
+
+                table.appendChild(newRow);
+                serviceSelector.options[serviceSelector.selectedIndex].setAttribute('disabled', 'true');
+        }
+
     </script>
 </body>
 

@@ -34,9 +34,8 @@ class NotificationServer implements MessageComponentInterface
                 $uid = $msg['uid'];
                 unset($msg['uid']);
 
-                if (is_array($uid))
-                {
-                    foreach($this->clients as $client) {
+                if (is_array($uid)) {
+                    foreach ($this->clients as $client) {
                         foreach ($uid as $userId) {
                             if ($this->clients[$client] === $userId) {
                                 $client->send(json_encode($msg));
@@ -44,7 +43,7 @@ class NotificationServer implements MessageComponentInterface
                         }
                     }
                 } elseif (is_numeric($uid)) {
-                    foreach($this->clients as $client) {
+                    foreach ($this->clients as $client) {
                         if ($this->clients[$client] === $uid) {
                             $client->send(json_encode($msg));
                         }
@@ -73,7 +72,6 @@ class NotificationServer implements MessageComponentInterface
                 echo "Invalid token!\n";
                 $conn->close();
             }
-
         } else {
             echo "No token provided!\n";
             $conn->close();
@@ -93,10 +91,7 @@ class NotificationServer implements MessageComponentInterface
         $conn->close();
     }
 
-    function onMessage(ConnectionInterface $from, $msg)
-    {
-
-    }
+    function onMessage(ConnectionInterface $from, $msg) {}
 }
 
 $loop = Loop::get();

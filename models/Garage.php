@@ -438,5 +438,27 @@ class Garage extends UserModel
     {
         return JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT($this->id), $this->secretKey);
     }
+
+    public function getAllGarageServiceTypesForDropDown() {
+        $sql = "SELECT ggs.id, ggs.type FROM gearguard.gg_garage_service ggs WHERE ggs.garage_id = :garage_id AND ggs.status_id = 2 order by ggs.id";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    public function getMechanicByUsername(string $username) : ?Mechanic
+    {
+        $sql = "SELECT gm.* FROM gearguard.gg_garage_mechanic gm WHERE gm.username = :username AND gm.garage_id = :garage_id LIMIT 1";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':username', $username);
+        $statement->bindValue(':garage_id', $this->id);
+        $statement->execute();
+        $result = $statement->fetchObject(Mechanic::class);
+        if ($result)
+            return $result;
+
+        return null;
+    }
 	
 }

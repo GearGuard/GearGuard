@@ -133,7 +133,9 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof User) {
             return $this->render('customer/my_Profile', [
-                'title' => 'My Profile'
+                'title' => 'My Profile',
+                'model' => Application::$app->user
+                
             ]);
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
@@ -534,12 +536,14 @@ class AuthController extends Controller
             $date = $body['date'] ?? '';
             $time = $body['time'] ?? '';
             $notes = $body['notes'] ?? '';
+            $garage_id = $body['garage_id'] ?? '';
             $model = Appointment::initialize(
                 ($service_id),
                 ($vehicle_id),
                 ($date),
                 ($time),
-                ($notes)
+                ($notes),
+                $garage_id
             );
             if ($model->validate() && $model->save()) {
                 return $this->render('customer/appointment/myAppointment', [

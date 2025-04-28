@@ -233,12 +233,12 @@
                 </a>
             </li>
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>
-            </li>
+            </li> -->
 
             <li class="nav-item">
                 <a href="/customer/my_profile" class="nav-link">
@@ -246,12 +246,12 @@
                     <span class="nav-text">Profile</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="/customer/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a href="/notifications" class="nav-link">
                     <span class="wrapper">
@@ -285,7 +285,8 @@
         <div id="notification-card" style="width: 25em; height: 10em; background-color: #454545; border: none; border-radius: 1em; z-index: 1000;position: relative;display: flex;flex-direction: column;">
             <button style="position: relative;cursor: pointer;top: 0.5em;fill: transparent;background: transparent;border: transparent;color: white;text-align: right;right: 0.5em;">✖</button>
             <h3 id="notification-header" style="margin-top: 0.1em;margin-bottom: 0.1em;font-family: 'Calibri';padding-left: 0.5em;color: white;"></h3>
-            <p id="notification-content" style="color: white;font-family: 'arial';padding-left: 1.1em;width: 23em;overflow-wrap: break-word;margin-top: 0.2em;"></p></div>
+            <p id="notification-content" style="color: white;font-family: 'arial';padding-left: 1.1em;width: 23em;overflow-wrap: break-word;margin-top: 0.2em;"></p>
+        </div>
     </div>
 
     <script>

@@ -81,7 +81,7 @@ class Appointment extends DbModel
                     $this->{$key} = $value;
             }
 
-            if ($validateVehicleID && (!in_array($this->vehicle_id, array_column(Application::$app->user->getAccessAvailableVehiclesList(), 'id')) || !in_array($this->vehicle_id, array_column(Application::$app->user->getOwnedVehiclesList(), 'id')))){
+            if ($validateVehicleID && (!in_array($this->vehicle_id, array_column(Application::$app->user->getAccessAvailableVehiclesList(), 'id')) && !in_array($this->vehicle_id, array_column(Application::$app->user->getOwnedVehiclesList(), 'id')))){
                 $this->addError('vehicle_id', 'You don\'t own or have access to this vehicle.');
             }
             if ($validateGarageID && (!Garage::verifyGarageExistance($this->garage_id))) {
@@ -177,7 +177,7 @@ class Appointment extends DbModel
         return $options;
     }
 
-    public static function initialize(int $service_id, int $vehicle_id,  $date,  $time, string $note): Appointment
+    public static function initialize(int $service_id, int $vehicle_id,  $date,  $time, string $note, int $garage_id = 0): Appointment
     {
         $object = new Appointment();
         $object->service_id = $service_id;
@@ -186,6 +186,7 @@ class Appointment extends DbModel
         $object->time = $time;
         $object->notes = $note;
         $object->status_id = 2;
+        $object->garage_id = $garage_id;
         return $object;
     }
 

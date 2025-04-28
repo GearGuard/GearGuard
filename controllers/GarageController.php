@@ -9,11 +9,13 @@ use app\models\Notification;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
+use gearguard\phpmvc\Model;
 use gearguard\phpmvc\Response;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\middlewares\ExtendedMiddleware;
 use app\models\Garage;
 use app\utilities\EscapeAttributes;
+use Ratchet\App;
 
 class GarageController extends Controller
 {
@@ -60,13 +62,66 @@ class GarageController extends Controller
 
     public function manageMechanic(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof Garage) {
-            return $this->render('garage/mechanic/manage', [
-                'name' => 'The GearGuard',
-            ]);
-        }
+        $model = new Mechanic();
+        $servicesModel = new class extends Model {
+            public $services = [];
 
-        throw new NotFoundException();
+            public function rules(): array
+            {
+                return [];
+            }
+
+            public function labels(): array
+            {
+                return [
+                    'services' => 'Services',
+                ];
+            }
+        };
+        return $this->render('garage/mechanic/manage', [
+            'name' => 'The GearGuard',
+            'model' => $model,
+            'servicesModel' => $servicesModel,
+            'serviceOptions' => Application::$app->user->getAllGarageServiceTypesForDropDown(),
+        ]);
+
+    }
+
+    public function mechanicSearch(Request $request, Response $response)
+    {
+        $username = $request->getBody()['username'] ?? '';
+        if ($username === '') throw new NotFoundException();
+
+        header('Content-Type: application/json;');
+        $mechanic = new class ($username){
+            public $username = '';
+            public $first_name = '';
+            public $last_name = '';
+            public $email = '';
+            public $contact = '';
+            public $nic = '';
+            public $date_employed = '';
+            public $address = '';
+            public $services = [];
+
+            public function __construct($username) {
+                $mech = Application::$app->user->getMechanicByUsername($username);
+                if ($mech) {
+                    $this->username = $mech->username;
+                    $this->first_name = $mech->first_name;
+                    $this->last_name = $mech->last_name;
+                    $this->email = $mech->email;
+                    $this->contact = $mech->contact_no;
+                    $this->nic = $mech->nic;
+                    $this->date_employed = $mech->date_employeed;
+                    $this->address = $mech->address;
+                    $this->services = Mechanic::getMechanicServices($mech->id);
+                }
+            }
+        };
+        return json_encode([
+            'success' => true,
+            'mechanic' => $mechanic]);
     }
 
     public function getAppointments(Request $request, Response $response)
@@ -281,8 +336,11 @@ class GarageController extends Controller
             ];
             Application::$app->user->getServiceByID((int) $id)->update($toUpdate, true);
 
-            return $this->render('garage/services/viewAll', [
-                'name' => 'The GearGuard',
+            header('Content-Type: application/json;');
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Service deleted successfully',
             ]);
         }
 
@@ -292,9 +350,26 @@ class GarageController extends Controller
     public function addMechanic(Request $request, Response $response)
     {
         $model = new Mechanic();
+        $servicesModel = new class extends Model {
+            public $services = [];
+
+            public function rules(): array
+            {
+                return [];
+            }
+
+            public function labels(): array
+            {
+                return [
+                    'services' => 'Services',
+                ];
+            }
+        };
         return $this->render('garage/mechanic/add', [
             'name' => 'The GearGuard',
             'model' => $model,
+            'servicesModel' => $servicesModel,
+            'serviceOptions' => Application::$app->user->getAllGarageServiceTypesForDropDown(),
         ]);
     }
 
@@ -306,10 +381,107 @@ class GarageController extends Controller
         $model->garage_id = Application::$app->user->id?: Application::$app->session->get('user');
         $model->status_id = Mechanic::STATUS_ACTIVE;
 
+        if (isset($request->getBody()['services'])) {
+            $services = json_decode(($request->getBody())['services']);
+            $servicesAllowed = Application::$app->user->getAllGarageServiceTypesForDropDown();
+            $servicesNumeric = [];
+
+            foreach ($servicesAllowed as $key => $value) {
+                $servicesNumeric[] = (int)$key;
+            }
+
+            foreach ($services as $service) {
+                if (is_numeric($service)) {
+                    if (in_array($service, $servicesNumeric)) {
+                        $model->mechanicServices[] = (int)$service;
+                    } else {
+                        echo json_encode([
+                            'success' => false,
+                            'message' => 'Invalid service type',
+                        ]);
+                        return;
+                    }
+                } else {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Invalid service type',
+                    ]);
+                    return;
+                }
+            }
+        }
+
         if ($model->validate(validatePassword: false, useFrameworkValidations: false) && $model->save()) {
             echo json_encode([
                 'success' => true,
                 'message' => 'Mechanic added successfully',
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => array_values($model->errors)[0][0] ?? '',
+            ]);
+        }
+    }
+
+    public function manageMechanicPost(Request $request, Response $response)
+    {
+        if (!isset($request->getBody()['username']) || $request->getBody()['username'] == '') throw new NotFoundException();
+        $model =  Application::$app->user->getMechanicByUsername($request->getBody()['username']);
+        if ($model == null) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Mechanic not found',
+            ]);
+            return;
+        }
+        $model->loadData($body = $request->getBody());
+        $model->garage_id = Application::$app->user->id?: Application::$app->session->get('user');
+        $model->status_id = Mechanic::STATUS_ACTIVE;
+
+        if (isset($request->getBody()['services'])) {
+            $services = json_decode(($request->getBody())['services']);
+            $servicesAllowed = Application::$app->user->getAllGarageServiceTypesForDropDown();
+            $servicesNumeric = [];
+
+            foreach ($servicesAllowed as $key => $value) {
+                $servicesNumeric[] = (int)$key;
+            }
+
+            foreach ($services as $service) {
+                if (is_numeric($service)) {
+                    if (in_array($service, $servicesNumeric)) {
+                        $model->mechanicServices[] = (int)$service;
+                    } else {
+                        echo json_encode([
+                            'success' => false,
+                            'message' => 'Invalid service type',
+                        ]);
+                        return;
+                    }
+                } else {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Invalid service type',
+                    ]);
+                    return;
+                }
+            }
+        }
+
+        if ($model->validate(validatePassword: false, useFrameworkValidations: false, validateUsername: false) && $model->update([
+            'first_name' => $body['first_name'],
+            'last_name' => $body['last_name'],
+            'email' => $body['email'],
+            'contact_no' => $body['contact_no'],
+            'nic' => $body['nic'],
+            'address' => $body['address'],
+            'date_employeed' => $body['date_employeed'],
+                'username' => $body['username'],
+            ])) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Mechanic updated successfully',
             ]);
         } else {
             echo json_encode([

@@ -93,9 +93,11 @@ class SparePartController extends Controller
 
 
     // EDIT SPARE PART (POST)
+    // EDIT SPARE PART (POST)
     public function editSparepartPostCustomer(Request $request, Response $response)
     {
-        $id = $request->getBody()['id'] ?? null;
+        $data = $request->getBody(); // Get all form data
+        $id = $data['id'] ?? null;
 
         if (!$id || !is_numeric($id)) {
             $response->setStatusCode(400);
@@ -107,7 +109,7 @@ class SparePartController extends Controller
         $stmt = Application::$app->db->prepare(
             "SELECT * FROM gg_sparepart_vehicleuser_vehicle_install WHERE sparepart_id = :sparepart_id AND user_id = :user_id"
         );
-        $sparepart_id = $request->getBody()['id'] ?? null; // Extract the spare part ID from the request
+        $sparepart_id = $id; // Use the ID from request data
         $stmt->bindValue(':sparepart_id', $sparepart_id);
         $user_id = Application::$app->user->id ?? null; // Get the current logged-in user's ID
         $stmt->bindValue(':user_id', $user_id);
@@ -118,13 +120,13 @@ class SparePartController extends Controller
         }
 
         $sparePartModel = new SparePart();
-        $sparePart = $sparePartModel->findOne(['sparepart_id' => $sparepart_id]);
+        $sparePart = $sparePartModel->findOne(['id' => $sparepart_id]); // Use 'id' instead of 'sparepart_id'
         if (!$sparePart) {
             echo json_encode(['success' => false, 'error' => 'Not found']);
             return;
         }
 
-        // Update fields
+        // Update fields with values from request
         $sparePart->serial_no = $data['serial_no'] ?? $sparePart->serial_no;
         $sparePart->type = $data['type'] ?? $sparePart->type;
         $sparePart->manufacturer = $data['manufacturer'] ?? $sparePart->manufacturer;
