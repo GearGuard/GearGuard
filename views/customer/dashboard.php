@@ -336,12 +336,122 @@
                 </div>
 
             </div>
+        </div>
+
+        <!-- Spare Parts Replacement Chart Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie card-icon"></i>
+                <h2 class="card-title">Spare Parts Distribution</h2>
+            </div>
+            <div class="card-content">
+                <div class="chart-container" style="position: relative; height:250px;">
+                    <canvas id="sparePartsChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
+    </div>
 
+    <!-- Include Chart.js -->
+    <script src="/assets/js/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Spare Parts Chart
+            const sparePartsChart = document.getElementById('sparePartsChart').getContext('2d');
+
+            // Define chart colors
+            const chartColors = [
+                '#4a7fff', // Accent secondary
+                '#34eb77', // Success
+                '#eba834', // Warning
+                '#eb4034', // Error
+                '#9d4aff', // Purple
+                '#ff4a9d', // Pink
+                '#1e88e5', // Blue
+                '#43a047', // Green
+                '#fb8c00', // Orange
+                '#d81b60' // Pink/Red
+            ];
+
+            // Initialize with loading state
+            let myPieChart = new Chart(sparePartsChart, {
+                type: 'pie',
+                data: {
+                    labels: ['Loading...'],
+                    datasets: [{
+                        data: [100],
+                        backgroundColor: ['#4a7fff'],
+                        borderWidth: 1,
+                        borderColor: '#1e2329'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e6e6e6', // text-primary
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 12
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 35, 41, 0.9)', // background-card with opacity
+                            titleFont: {
+                                family: "'Inter', sans-serif",
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                family: "'Inter', sans-serif",
+                                size: 13
+                            },
+                            borderColor: '#2c3036', // border-color
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    const dataset = tooltipItem.dataset;
+                                    const total = dataset.data.reduce((acc, data) => acc + data, 0);
+                                    const currentValue = dataset.data[tooltipItem.dataIndex];
+                                    const percentage = Math.round((currentValue / total) * 100);
+                                    return ` ${tooltipItem.label}: ${currentValue} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Fetch spare part distribution data from the API
+            fetch('/customer/sparepart/distribution')
+                .then(response => response.json())
+                .then(data => {
+                    // Check if we have data
+                    if (data.labels && data.labels.length > 0) {
+                        // Prepare background colors array
+                        const backgroundColors = data.labels.map((_, i) =>
+                            chartColors[i % chartColors.length]);
+
+                        // Update chart with real data
+                        myPieChart.data.labels = data.labels;
+                        myPieChart.data.datasets[0].data = data.values;
+                        myPieChart.data.datasets[0].backgroundColor = backgroundColors;
+                        myPieChart.update();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching spare part distribution data:', error);
+                    myPieChart.data.labels = ['Error Loading Data'];
+                    myPieChart.data.datasets[0].data = [100];
+                    myPieChart.data.datasets[0].backgroundColor = ['#eb4034']; // Error color
+                    myPieChart.update();
+                });
 
             // Load user name from API
             fetch('/customer/logedinUser')
@@ -513,7 +623,8 @@
                     document.getElementById('nextTip').style.display = 'block';
                     console.error('Error fetching maintenance tip:', error);
                 });
-                
+
+
 
             // Load pending payments (would typically come from a backend API)
             const pendingPayments = [{
