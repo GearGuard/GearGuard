@@ -311,15 +311,12 @@ AND v.status_id = 2;
     public function myProfileUpdate(Request $request, Response $response)
     {
         try {
-            // Log to help debug
             error_log("Profile update initiated");
 
-            // Check content type and parse request body accordingly
             $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
             error_log("Content-Type: " . $contentType);
 
             if (strpos($contentType, 'application/json') !== false) {
-                // Get the raw POST data and decode it from JSON
                 $rawData = file_get_contents('php://input');
                 error_log("Raw POST data: " . $rawData);
                 $data = json_decode($rawData, true);
@@ -327,7 +324,7 @@ AND v.status_id = 2;
                     error_log("JSON decode error: " . json_last_error_msg());
                 }
             } else {
-                // For form data
+
                 $data = $request->getBody();
                 error_log("Form data: " . print_r($data, true));
             }
@@ -335,7 +332,7 @@ AND v.status_id = 2;
             $action = $data['_action'] ?? null;
             error_log("Action: " . ($action ?? 'none'));
 
-            header('Content-Type: application/json'); // Set response content type to JSON
+            header('Content-Type: application/json'); 
 
             if (!Application::$app->user) {
                 $response->setStatusCode(401);
@@ -347,10 +344,9 @@ AND v.status_id = 2;
             $user_id = Application::$app->user->id;
             error_log("User ID: " . $user_id);
 
-            // Handle different actions
             if ($action === 'updateProfile') {
                 error_log("Processing profile update");
-                // Update user profile information
+              
                 $userModel = new \app\models\User();
                 $user = $userModel->findOne(['id' => $user_id]);
 
@@ -361,11 +357,9 @@ AND v.status_id = 2;
                     return;
                 }
 
-                // Log current and new values for debugging
                 error_log("Current first_name: " . $user->first_name . ", New: " . ($data['first_name'] ?? 'not provided'));
                 error_log("Current last_name: " . $user->last_name . ", New: " . ($data['last_name'] ?? 'not provided'));
 
-                // Update fields with values from request
                 $user->first_name = $data['first_name'] ?? $user->first_name;
                 $user->last_name = $data['last_name'] ?? $user->last_name;
                 $user->nic = $data['nic'] ?? $user->nic;
@@ -374,7 +368,6 @@ AND v.status_id = 2;
                 $user->contact_no = $data['contact_no'] ?? $user->contact_no;
                 $user->username = $data['username'] ?? $user->username;
 
-                // Check if email is already taken by another user
                 if (isset($data['email']) && $user->email !== $data['email']) {
                     $existingUser = $userModel->findOne(['email' => $data['email']]);
                     if ($existingUser && $existingUser->id != $user_id) {
@@ -384,7 +377,6 @@ AND v.status_id = 2;
                     }
                 }
 
-                // Check if username is already taken by another user
                 if (isset($data['username']) && $user->username !== $data['username']) {
                     $existingUser = $userModel->findOne(['username' => $data['username']]);
                     if ($existingUser && $existingUser->id != $user_id) {
@@ -394,7 +386,6 @@ AND v.status_id = 2;
                     }
                 }
 
-                // Save to database
                 $tableName = 'gg_user';
                 $sql = "UPDATE $tableName SET 
                         first_name = :first_name, 
@@ -427,23 +418,21 @@ AND v.status_id = 2;
                 }
             } elseif ($action === 'changePassword') {
                 error_log("Processing password change");
-                // Handle password change
+              
                 $currentPassword = $data['currentPassword'] ?? '';
-                $newPassword = $data['newPassword'] ?? ''; // Note: frontend sends 'newPassword', not 'password'
-                $passwordConfirm = $data['confirmPassword'] ?? ''; // Note: frontend sends 'confirmPassword', not 'passwordConfirm'
+                $newPassword = $data['newPassword'] ?? ''; 
+                $passwordConfirm = $data['confirmPassword'] ?? ''; 
 
                 error_log("Current password provided: " . (!empty($currentPassword) ? 'Yes' : 'No'));
                 error_log("New password provided: " . (!empty($newPassword) ? 'Yes' : 'No'));
                 error_log("Confirm password provided: " . (!empty($passwordConfirm) ? 'Yes' : 'No'));
 
-                // Validate password confirmation
                 if ($newPassword !== $passwordConfirm) {
                     error_log("Error: Passwords do not match");
                     echo json_encode(['success' => false, 'message' => 'New password and confirmation do not match']);
                     return;
                 }
 
-                // Get current user data to verify password
                 $userModel = new \app\models\User();
                 $user = $userModel->findOne(['id' => $user_id]);
 
@@ -454,17 +443,14 @@ AND v.status_id = 2;
                     return;
                 }
 
-                // Verify current password
                 if (!password_verify($currentPassword, $user->password)) {
                     error_log("Error: Current password incorrect");
                     echo json_encode(['success' => false, 'message' => 'Current password is incorrect']);
                     return;
                 }
 
-                // Hash new password
                 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-                // Update password in database
                 $tableName = 'gg_user';
                 $sql = "UPDATE $tableName SET password = :password WHERE id = :id";
                 $stmt = Application::$app->db->prepare($sql);
@@ -500,7 +486,6 @@ AND v.status_id = 2;
         }
 
         try {
-            // Get spare parts types distribution for the logged in user
             $sql = "
                 SELECT sp.type, COUNT(*) as count
                 FROM gg_sparepart_vehicleuser_vehicle_install svi
@@ -516,7 +501,6 @@ AND v.status_id = 2;
 
             $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-            // If no data, return sample data with placeholder text
             if (empty($results)) {
                 echo json_encode([
                     'labels' => ['No Spare Parts Found'],
@@ -525,7 +509,6 @@ AND v.status_id = 2;
                 return;
             }
 
-            // Process results into labels and values arrays
             $labels = [];
             $values = [];
 

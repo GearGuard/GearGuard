@@ -88,9 +88,6 @@ $app->router->post('/customer/appointment/update', [AppointmentController::class
 $app->router->post('/customer/appointment/delete', [app\controllers\AppointmentController::class, 'deleteAppointment']);
 $app->router->get('/customer/warrenty', [WarrentyController::class, 'actionIndex']);
 
-
-// $app->router->post('/customer/vehicle/register', [VehicleController::class, 'addVehiclePost']);
-//$app->router->get('/customer/vehicle/all', [AuthController::class, 'viewAllVehicle']);
 $app->router->get('/customer/vehicle/all', [VehicleController::class, 'viewAllVehicle']);
 
 $app->router->get('/customer/vehicle/my', [VehicleController::class, 'viewMyVehicleDetails']);
@@ -98,7 +95,6 @@ $app->router->post('/customer/vehicle/update', [VehicleController::class, 'updat
 $app->router->post('/customer/vehicle/delete', [VehicleController::class, 'deleteVehicle']);
 
 
-//Vehicle/Service History
 $app->router->get('/customer/appointment/service_history_customer', [ServicePerformController::class, 'viewServicePerformanceCustomer']);
 $app->router->get('/customer/appointment/delete_service_history', [ServicePerformController::class, 'deleteServicePerformance']);
 $app->router->post('/customer/appointment/delete_service_history', [ServicePerformController::class, 'deleteServicePerformance']);
@@ -118,7 +114,6 @@ $app->router->get('/customer/vehicleTransfer/instruction', [AuthController::clas
 $app->router->get('/customer/appointment/service_history', [AuthController::class, 'serviceHistory']);
 $app->router->get('/customer/appointment/spareparts_warranty', [AuthController::class, 'sparepartsWarranty']);
 
-// Spare Part
 $app->router->get('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparePart']);
 $app->router->post('/customer/sparepart/add_sparepart', [SparePartController::class, 'addSparePartCustomer']);
 $app->router->get('/customer/sparepart/getMySpareParts', [SparePartController::class, 'getMySpareParts']);
@@ -127,7 +122,6 @@ $app->router->post('/customer/sparepart/edit_sparepart', [SparePartController::c
 $app->router->get('/customer/sparepart/delete_sparepart', [SparePartController::class, 'deleteSparepartPostCustomer']);
 $app->router->post('/customer/sparepart/delete_sparepart', [SparePartController::class, 'deleteSparepartPostCustomer']);
 
-//$app->router->post('/customer/sparepart/add_sparepart', [AuthController::class, 'newSparepartPost']);
 $app->router->get('/customer/sparepart/view_sparepart', [AuthController::class, 'viewSparepart']);
 
 $app->router->get('/customer/profile', [AuthController::class, 'myProfile']);
@@ -172,7 +166,6 @@ $app->router->get('/appointment/getServices', [SiteController::class, 'getServic
 $app->router->get('/customer/addsparepart', [SiteController::class, 'addSparepart']);
 $app->router->get('/customer/viewsparepart', [SiteController::class, 'viewSparepart']);
 
-//spare pats
 $app->router->post('/sparepart/add', [SparepartController::class, 'addSparePart']);
 $app->router->get('/sparepart/get', [SparepartController::class, 'getSparePart']);
 $app->router->post('/sparepart/delete', [SparepartController::class, 'deleteSparePart']);
@@ -204,10 +197,6 @@ $app->router->get('/api/garage/getCustomerVehicles', [GarageController::class, '
 $app->router->get('/api/garage/mechanic/getMechanic', [GarageController::class, 'mechanicSearch']);
 
 
-
-//mechanic
-
-// $app->router->get('/mechanic', [SiteController::class, 'mechanic']);
 $app->router->get('/mechanic/register', [AuthController::class, 'mechanicSignup']);
 $app->router->post('/mechanic/register', [AuthController::class, 'mechanicSignup']);
 $app->router->get('/mechanic/login', [AuthController::class, 'mechanicLogin']);

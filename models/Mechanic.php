@@ -94,7 +94,7 @@ class Mechanic extends UserModel
 
 	public function getDisplayPassword(): string 
 	{
-		return str_repeat('*', 8); // Return 8 asterisks for security
+		return str_repeat('*', 8); 
 	}
 
 	public function getServiceByType(string $type) : ?MechanicService

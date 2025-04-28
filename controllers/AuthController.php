@@ -26,7 +26,6 @@ use Ratchet\App;
 
 class AuthController extends Controller
 {
-    // public string $layout = 'customer'; 
     public function __construct()
     {
         $this->registerMiddleware(new AuthMiddleware(['dashboard']));
@@ -272,8 +271,6 @@ class AuthController extends Controller
             if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 $model = new Appointment();
 
-
-                // Fetch garages from the database
                 $garages = $this->getGarages();
                 $vehicles_list = $this->getVehiclesListForDropDown();
 
@@ -374,7 +371,6 @@ class AuthController extends Controller
 
     public function serviceHistory(Request $request, Response $response)
     {
-        // TODO: Check for vehicles
         if (Application::$app->user instanceof User) {
             return $this->render('customer/appointment/serviceHistory', ['name' => 'The GearGuard']);
         }
@@ -384,7 +380,6 @@ class AuthController extends Controller
 
     public function sparepartsWarranty(Request $request, Response $response)
     {
-        // TODO: Complete
         if (Application::$app->user instanceof User) {
             return $this->render('customer/appointment/warrenty', ['name' => 'The GearGuard']);
         }
@@ -420,8 +415,6 @@ class AuthController extends Controller
         if (!(Application::$app->user instanceof User)) {
             throw new NotFoundException();
         }
-
-        // Create a new Vehicle model instance
         $model = new Vehicle();
 
 
@@ -475,8 +468,6 @@ class AuthController extends Controller
         return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 
-    // end of the newAppointment page in the customer section
-
     public function newPost(Request $request, Response $response)
     {
         if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
@@ -498,20 +489,6 @@ class AuthController extends Controller
 
         throw new NotFoundException();
     }
-
-    //    public function viewAllVehicle(Request $request, Response $response)
-    //    {
-    //        if (Application::$app->user instanceof User)
-    //            if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
-    //                return $this->render('customer/vehicle/viewAll', [
-    //                    'name' => 'The GearGuard',
-    //                ]);
-    //            } else {
-    //                return $this->render('customer/noVehicles', ['name' => 'The GearGuard']);
-    //            }
-    //
-    //        throw new NotFoundException();
-    //    }
 
     public function vehicleServiceHistory(Request $request, Response $response)
     {
@@ -577,7 +554,7 @@ class AuthController extends Controller
             $model->loadData($body);
             $model->year_manufactured = $body['year_manufactured'] . '-01-01';
             if ($model->validate() && $model->save()) {
-                // Application::$app->session->setFlash('success', 'Vehicle added successfully');
+
                 Application::$app->response->redirect('/customer/vehicle/all');
                 return;
             }
@@ -588,9 +565,6 @@ class AuthController extends Controller
         }
         throw new NotFoundException();
     }
-
-    //mechanic
-
     public function mechanicSignup(Request $request, Response $response)
     {
         $errors = [];

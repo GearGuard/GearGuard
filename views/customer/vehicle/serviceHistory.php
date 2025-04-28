@@ -455,7 +455,7 @@
             <div class="header-controls">
                 <select id="filterVehicle" class="filter-select">
                     <option value="all">All Vehicles</option>
-                    <!-- Vehicle options will be populated dynamically -->
+                    
                 </select>
                 <button id="btnPrint" class="btn btn-outline">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -483,7 +483,6 @@
         </div>
     </div>
 
-    <!-- Service Details Modal -->
     <div id="serviceDetailsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -532,89 +531,81 @@
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Load service history data from API
-        fetchServiceHistory();
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchServiceHistory();
 
-        // Event listeners for modal
-        document.querySelector('.modal-close').addEventListener('click', closeModal);
-        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-        document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
-        document.getElementById('btnPrint').addEventListener('click', printHistory);
-        document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
+            document.querySelector('.modal-close').addEventListener('click', closeModal);
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
+            document.getElementById('btnPrint').addEventListener('click', printHistory);
+            document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
 
-        // Filter change event
-        document.getElementById('filterVehicle').addEventListener('change', function() {
-            filterServices(this.value);
+            document.getElementById('filterVehicle').addEventListener('change', function() {
+                filterServices(this.value);
+            });
+
+            window.onclick = function(event) {
+                if (event.target == document.getElementById('serviceDetailsModal')) {
+                    closeModal();
+                }
+            };
         });
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('serviceDetailsModal')) {
-                closeModal();
-            }
-        };
-    });
+        async function fetchServiceHistory() {
+            try {
+                const response = await fetch('/customer/vehicle/service_history_all');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch service history');
+                }
 
-    // Fetch service history data from the API
-    async function fetchServiceHistory() {
-        try {
-            const response = await fetch('/customer/vehicle/service_history_all');
-            if (!response.ok) {
-                throw new Error('Failed to fetch service history');
-            }
-
-            const data = await response.json();
-            displayServiceHistory(data);
-            populateVehicleFilter(data);
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('serviceAccordion').innerHTML = `
+                const data = await response.json();
+                displayServiceHistory(data);
+                populateVehicleFilter(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('serviceAccordion').innerHTML = `
                 <div class="empty-state">
                     <p>Failed to load service history. Please try again later.</p>
                     <button class="btn" onclick="fetchServiceHistory()">Retry</button>
                 </div>
             `;
+            }
         }
-    }
 
-    // Populate the service accordion with data
-    function displayServiceHistory(services) {
-        const accordionElement = document.getElementById('serviceAccordion');
+        function displayServiceHistory(services) {
+            const accordionElement = document.getElementById('serviceAccordion');
 
-        if (!services || services.length === 0 || (services.error && services.error.length > 0)) {
-            accordionElement.innerHTML = `
+            if (!services || services.length === 0 || (services.error && services.error.length > 0)) {
+                accordionElement.innerHTML = `
                 <div class="empty-state">
                     <p>No service records found for your vehicles.</p>
                     <a href="/customer/appointment/appoint" class="btn">Schedule a Service</a>
                 </div>
             `;
-            return;
-        }
-
-        // Sort services by date descending (newest first)
-        services.sort((a, b) => new Date(b['Service Start Date']) - new Date(a['Service Start Date']));
-
-        let accordionHTML = '';
-
-        services.forEach((service, index) => {
-            const serviceDate = new Date(service['Service Start Date']).toLocaleDateString();
-            const servicePart = service['Replaced Part'] || 'No parts replaced';
-            const warrantyDate = service['Warranty Expiry Date'] ?
-                new Date(service['Warranty Expiry Date']).toLocaleDateString() :
-                'N/A';
-
-            // Check if warranty is active
-            let warrantyStatus = '';
-            if (service['Warranty Expiry Date']) {
-                const today = new Date();
-                const expiry = new Date(service['Warranty Expiry Date']);
-                warrantyStatus = today <= expiry ?
-                    '<span class="badge badge-active">Active</span>' :
-                    '<span class="badge badge-expired">Expired</span>';
+                return;
             }
 
-            accordionHTML += `
+            services.sort((a, b) => new Date(b['Service Start Date']) - new Date(a['Service Start Date']));
+
+            let accordionHTML = '';
+
+            services.forEach((service, index) => {
+                const serviceDate = new Date(service['Service Start Date']).toLocaleDateString();
+                const servicePart = service['Replaced Part'] || 'No parts replaced';
+                const warrantyDate = service['Warranty Expiry Date'] ?
+                    new Date(service['Warranty Expiry Date']).toLocaleDateString() :
+                    'N/A';
+
+                let warrantyStatus = '';
+                if (service['Warranty Expiry Date']) {
+                    const today = new Date();
+                    const expiry = new Date(service['Warranty Expiry Date']);
+                    warrantyStatus = today <= expiry ?
+                        '<span class="badge badge-active">Active</span>' :
+                        '<span class="badge badge-expired">Expired</span>';
+                }
+
+                accordionHTML += `
                 <div class="accordion-item" data-vehicle="${service['Vehicle Model']}">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
                         <div class="left">
@@ -704,107 +695,98 @@
                     </div>
                 </div>
             `;
-        });
+            });
 
-        accordionElement.innerHTML = accordionHTML;
-    }
-
-    // Populate vehicle filter dropdown
-    function populateVehicleFilter(services) {
-        if (!services || services.length === 0) return;
-
-        const filterElement = document.getElementById('filterVehicle');
-        const uniqueVehicles = [...new Set(services.map(service => service['Vehicle Model']))];
-
-        let optionsHTML = '<option value="all">All Vehicles</option>';
-        uniqueVehicles.forEach(vehicle => {
-            optionsHTML += `<option value="${vehicle}">${vehicle}</option>`;
-        });
-
-        filterElement.innerHTML = optionsHTML;
-    }
-
-    // Filter services by vehicle
-    function filterServices(vehicle) {
-        const accordionItems = document.querySelectorAll('.accordion-item');
-
-        accordionItems.forEach(item => {
-            if (vehicle === 'all' || item.dataset.vehicle === vehicle) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    }
-
-    // Toggle accordion visibility
-    function toggleAccordion(header) {
-        const content = header.nextElementSibling;
-        const icon = header.querySelector('.accordion-icon');
-
-        // Close all accordions
-        document.querySelectorAll('.accordion-content').forEach(item => {
-            if (item !== content) {
-                item.style.maxHeight = null;
-                item.style.display = 'none';
-                item.previousElementSibling.querySelector('.accordion-icon').classList.remove('rotate');
-            }
-        });
-
-        // Toggle current accordion
-        if (content.style.display === 'block') {
-            content.style.maxHeight = null;
-            content.style.display = 'none';
-            icon.classList.remove('rotate');
-        } else {
-            content.style.display = 'block';
-            content.style.maxHeight = content.scrollHeight + 'px';
-            icon.classList.add('rotate');
+            accordionElement.innerHTML = accordionHTML;
         }
-    }
 
-    // Show service details modal
-    function showDetails(id, vehicle, plate, service, garage, cost, part, start, end, warranty, notes, description) {
-        document.getElementById('modal-vehicle').textContent = vehicle;
-        document.getElementById('modal-plate').textContent = plate;
-        document.getElementById('modal-service').textContent = service;
-        document.getElementById('modal-garage').textContent = garage;
-        document.getElementById('modal-cost').textContent = cost;
-        document.getElementById('modal-part').textContent = part;
-        document.getElementById('modal-start').textContent = start;
-        document.getElementById('modal-end').textContent = end;
-        document.getElementById('modal-warranty').textContent = warranty;
-        document.getElementById('modal-notes').textContent = notes;
-        document.getElementById('modal-description').textContent = description;
+        function populateVehicleFilter(services) {
+            if (!services || services.length === 0) return;
 
-        document.getElementById('serviceDetailsModal').style.display = 'block';
-    }
+            const filterElement = document.getElementById('filterVehicle');
+            const uniqueVehicles = [...new Set(services.map(service => service['Vehicle Model']))];
 
-    // Close the modal
-    function closeModal() {
-        document.getElementById('serviceDetailsModal').style.display = 'none';
-    }
+            let optionsHTML = '<option value="all">All Vehicles</option>';
+            uniqueVehicles.forEach(vehicle => {
+                optionsHTML += `<option value="${vehicle}">${vehicle}</option>`;
+            });
 
-    // Print service history
-    function printHistory() {
-        const filterValue = document.getElementById('filterVehicle').value;
-        const filterText = document.getElementById('filterVehicle').options[document.getElementById('filterVehicle').selectedIndex].text;
+            filterElement.innerHTML = optionsHTML;
+        }
 
-        // Get all visible service items
-        const accordionItems = document.querySelectorAll('.accordion-item');
-        let printContent = `<h2>${filterValue === 'all' ? 'All Vehicles' : filterText} - Service History</h2>`;
+        function filterServices(vehicle) {
+            const accordionItems = document.querySelectorAll('.accordion-item');
 
-        accordionItems.forEach(item => {
-            if (filterValue === 'all' || item.dataset.vehicle === filterValue) {
-                const header = item.querySelector('.accordion-header');
-                const content = item.querySelector('.accordion-content');
+            accordionItems.forEach(item => {
+                if (vehicle === 'all' || item.dataset.vehicle === vehicle) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
 
-                const vehicleModel = header.querySelector('.left .accordion-title').textContent;
-                const plateNumber = header.querySelector('.left .accordion-subtitle').textContent;
-                const serviceType = header.querySelector('.right .accordion-title').textContent;
-                const serviceDate = header.querySelector('.right .accordion-subtitle').textContent;
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.accordion-icon');
 
-                printContent += `
+            document.querySelectorAll('.accordion-content').forEach(item => {
+                if (item !== content) {
+                    item.style.maxHeight = null;
+                    item.style.display = 'none';
+                    item.previousElementSibling.querySelector('.accordion-icon').classList.remove('rotate');
+                }
+            });
+
+            if (content.style.display === 'block') {
+                content.style.maxHeight = null;
+                content.style.display = 'none';
+                icon.classList.remove('rotate');
+            } else {
+                content.style.display = 'block';
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.classList.add('rotate');
+            }
+        }
+
+        function showDetails(id, vehicle, plate, service, garage, cost, part, start, end, warranty, notes, description) {
+            document.getElementById('modal-vehicle').textContent = vehicle;
+            document.getElementById('modal-plate').textContent = plate;
+            document.getElementById('modal-service').textContent = service;
+            document.getElementById('modal-garage').textContent = garage;
+            document.getElementById('modal-cost').textContent = cost;
+            document.getElementById('modal-part').textContent = part;
+            document.getElementById('modal-start').textContent = start;
+            document.getElementById('modal-end').textContent = end;
+            document.getElementById('modal-warranty').textContent = warranty;
+            document.getElementById('modal-notes').textContent = notes;
+            document.getElementById('modal-description').textContent = description;
+
+            document.getElementById('serviceDetailsModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('serviceDetailsModal').style.display = 'none';
+        }
+
+        function printHistory() {
+            const filterValue = document.getElementById('filterVehicle').value;
+            const filterText = document.getElementById('filterVehicle').options[document.getElementById('filterVehicle').selectedIndex].text;
+
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            let printContent = `<h2>${filterValue === 'all' ? 'All Vehicles' : filterText} - Service History</h2>`;
+
+            accordionItems.forEach(item => {
+                if (filterValue === 'all' || item.dataset.vehicle === filterValue) {
+                    const header = item.querySelector('.accordion-header');
+                    const content = item.querySelector('.accordion-content');
+
+                    const vehicleModel = header.querySelector('.left .accordion-title').textContent;
+                    const plateNumber = header.querySelector('.left .accordion-subtitle').textContent;
+                    const serviceType = header.querySelector('.right .accordion-title').textContent;
+                    const serviceDate = header.querySelector('.right .accordion-subtitle').textContent;
+
+                    printContent += `
                     <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                             <div>
@@ -818,11 +800,11 @@
                         </div>
                     </div>
                 `;
-            }
-        });
+                }
+            });
 
-        const originalContent = document.body.innerHTML;
-        document.body.innerHTML = `
+            const originalContent = document.body.innerHTML;
+            document.body.innerHTML = `
             <div style="padding: 20px; font-family: Arial, sans-serif;">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h1>Vehicle Service History</h1>
@@ -832,37 +814,35 @@
             </div>
         `;
 
-        window.print();
-        document.body.innerHTML = originalContent;
+            window.print();
+            document.body.innerHTML = originalContent;
 
-        // Reattach event listeners
-        document.querySelector('.modal-close').addEventListener('click', closeModal);
-        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-        document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
-        document.getElementById('btnPrint').addEventListener('click', printHistory);
-        document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
-        document.getElementById('filterVehicle').addEventListener('change', function() {
-            filterServices(this.value);
-        });
-    }
+            document.querySelector('.modal-close').addEventListener('click', closeModal);
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
+            document.getElementById('btnPrint').addEventListener('click', printHistory);
+            document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
+            document.getElementById('filterVehicle').addEventListener('change', function() {
+                filterServices(this.value);
+            });
+        }
 
-    // Print service details
-    function printServiceDetails() {
-        const vehicle = document.getElementById('modal-vehicle').textContent;
-        const plate = document.getElementById('modal-plate').textContent;
-        const service = document.getElementById('modal-service').textContent;
-        const garage = document.getElementById('modal-garage').textContent;
-        const cost = document.getElementById('modal-cost').textContent;
-        const part = document.getElementById('modal-part').textContent;
-        const start = document.getElementById('modal-start').textContent;
-        const end = document.getElementById('modal-end').textContent;
-        const warranty = document.getElementById('modal-warranty').textContent;
-        const notes = document.getElementById('modal-notes').textContent;
-        const description = document.getElementById('modal-description').textContent;
+        function printServiceDetails() {
+            const vehicle = document.getElementById('modal-vehicle').textContent;
+            const plate = document.getElementById('modal-plate').textContent;
+            const service = document.getElementById('modal-service').textContent;
+            const garage = document.getElementById('modal-garage').textContent;
+            const cost = document.getElementById('modal-cost').textContent;
+            const part = document.getElementById('modal-part').textContent;
+            const start = document.getElementById('modal-start').textContent;
+            const end = document.getElementById('modal-end').textContent;
+            const warranty = document.getElementById('modal-warranty').textContent;
+            const notes = document.getElementById('modal-notes').textContent;
+            const description = document.getElementById('modal-description').textContent;
 
-        const originalContent = document.body.innerHTML;
+            const originalContent = document.body.innerHTML;
 
-        document.body.innerHTML = `
+            document.body.innerHTML = `
             <div style="padding: 20px; font-family: Arial, sans-serif;">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h1>Service Details Report</h1>
@@ -920,120 +900,122 @@
             </div>
         `;
 
-        window.print();
-        document.body.innerHTML = originalContent;
+            window.print();
+            document.body.innerHTML = originalContent;
 
-        // Reattach event listeners
-        document.querySelector('.modal-close').addEventListener('click', closeModal);
-        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-        document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
-        document.getElementById('btnPrint').addEventListener('click', printHistory);
-        document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
-        document.getElementById('filterVehicle').addEventListener('change', function() {
-            filterServices(this.value);
-        });
-
-        // Show modal again after printing
-        document.getElementById('serviceDetailsModal').style.display = 'block';
-    }
-
-    // Export service history as CSV
-    function exportServiceHistoryAsCSV() {
-        const filterValue = document.getElementById('filterVehicle').value;
-        const filterText = document.getElementById('filterVehicle').options[document.getElementById('filterVehicle').selectedIndex].text;
-        
-        // Get all visible service items
-        const accordionItems = document.querySelectorAll('.accordion-item');
-        let csvData = [];
-        
-        // CSV Header
-        csvData.push(["Vehicle Model", "Number Plate", "Service Type", "Service Date", "Service Start", "Service End", "Garage", "Cost", "Replaced Part", "Warranty Expiry", "Notes", "Description"]);
-        
-        accordionItems.forEach(item => {
-            if (filterValue === 'all' || item.dataset.vehicle === filterValue) {
-                const header = item.querySelector('.accordion-header');
-                
-                // Basic data from header
-                const vehicleModel = header.querySelector('.left .accordion-title').textContent.trim();
-                const plateNumber = header.querySelector('.left .accordion-subtitle').textContent.trim();
-                const serviceType = header.querySelector('.right .accordion-title').textContent.trim();
-                const serviceDate = header.querySelector('.right .accordion-subtitle').textContent.trim();
-                
-                // Get all service info items from the accordion content
-                const infoItems = item.querySelectorAll('.service-info-item');
-                
-                // Initialize variables to extract
-                let serviceStart = '', serviceEnd = '', garageName = '', serviceCost = '', 
-                    replacedPart = '', warrantyExpiry = '', serviceNotes = '', serviceDescription = '';
-                
-                // Extract data from service info items
-                infoItems.forEach(infoItem => {
-                    const label = infoItem.querySelector('strong')?.textContent;
-                    const value = infoItem.querySelector('span')?.textContent || '';
-                    
-                    if (label) {
-                        if (label === 'Start Date:') serviceStart = value.trim();
-                        else if (label === 'End Date:') serviceEnd = value.trim();
-                        else if (label === 'Garage:') garageName = value.trim();
-                        else if (label === 'Cost:') serviceCost = value.trim();
-                        else if (label === 'Replaced Part:') replacedPart = value.trim();
-                        else if (label === 'Warranty Expiry:') {
-                            // Extract just the date part without the status badge text
-                            warrantyExpiry = value.trim().split(' ')[0];
-                        }
-                    }
-                });
-                
-                // Try to find service notes and description if available
-                const serviceNotesElement = item.querySelector('.service-notes p');
-                if (serviceNotesElement) serviceNotes = serviceNotesElement.textContent.trim();
-                
-                // Check if there's a second service notes section for description
-                const serviceNotesSections = item.querySelectorAll('.service-notes');
-                if (serviceNotesSections.length > 1) {
-                    const descElement = serviceNotesSections[1].querySelector('p');
-                    if (descElement) serviceDescription = descElement.textContent.trim();
-                }
-                
-                // Add data row
-                csvData.push([
-                    vehicleModel, plateNumber, serviceType, serviceDate, 
-                    serviceStart, serviceEnd, garageName, serviceCost,
-                    replacedPart, warrantyExpiry, serviceNotes, serviceDescription
-                ]);
-            }
-        });
-        
-        // Create CSV content
-        let csvContent = "data:text/csv;charset=utf-8,";
-        
-        csvData.forEach(row => {
-            // Properly escape and format each cell
-            const formattedRow = row.map(cell => {
-                // Quote cells with commas, double quotes, or newlines
-                if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
-                    // Escape double quotes by doubling them
-                    return `"${cell.replace(/"/g, '""')}"`;
-                }
-                return cell;
+            document.querySelector('.modal-close').addEventListener('click', closeModal);
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            document.getElementById('printDetailsBtn').addEventListener('click', printServiceDetails);
+            document.getElementById('btnPrint').addEventListener('click', printHistory);
+            document.getElementById('btnExportCsv').addEventListener('click', exportServiceHistoryAsCSV);
+            document.getElementById('filterVehicle').addEventListener('change', function() {
+                filterServices(this.value);
             });
-            csvContent += formattedRow.join(',') + '\n';
-        });
-        
-        // Create filename with date stamp
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
-        const filename = `service-history-${filterValue === 'all' ? 'all-vehicles' : filterValue.toLowerCase().replace(/\s+/g, '-')}-${timestamp}.csv`;
-        
-        // Create download link and trigger download
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", filename);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-</script>
+
+            document.getElementById('serviceDetailsModal').style.display = 'block';
+        }
+
+        function exportServiceHistoryAsCSV() {
+            const filterValue = document.getElementById('filterVehicle').value;
+            const filterText = document.getElementById('filterVehicle').options[document.getElementById('filterVehicle').selectedIndex].text;
+
+
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            let csvData = [];
+
+
+            csvData.push(["Vehicle Model", "Number Plate", "Service Type", "Service Date", "Service Start", "Service End", "Garage", "Cost", "Replaced Part", "Warranty Expiry", "Notes", "Description"]);
+
+            accordionItems.forEach(item => {
+                if (filterValue === 'all' || item.dataset.vehicle === filterValue) {
+                    const header = item.querySelector('.accordion-header');
+
+
+                    const vehicleModel = header.querySelector('.left .accordion-title').textContent.trim();
+                    const plateNumber = header.querySelector('.left .accordion-subtitle').textContent.trim();
+                    const serviceType = header.querySelector('.right .accordion-title').textContent.trim();
+                    const serviceDate = header.querySelector('.right .accordion-subtitle').textContent.trim();
+
+
+                    const infoItems = item.querySelectorAll('.service-info-item');
+
+
+                    let serviceStart = '',
+                        serviceEnd = '',
+                        garageName = '',
+                        serviceCost = '',
+                        replacedPart = '',
+                        warrantyExpiry = '',
+                        serviceNotes = '',
+                        serviceDescription = '';
+
+                    infoItems.forEach(infoItem => {
+                        const label = infoItem.querySelector('strong')?.textContent;
+                        const value = infoItem.querySelector('span')?.textContent || '';
+
+                        if (label) {
+                            if (label === 'Start Date:') serviceStart = value.trim();
+                            else if (label === 'End Date:') serviceEnd = value.trim();
+                            else if (label === 'Garage:') garageName = value.trim();
+                            else if (label === 'Cost:') serviceCost = value.trim();
+                            else if (label === 'Replaced Part:') replacedPart = value.trim();
+                            else if (label === 'Warranty Expiry:') {
+
+                                warrantyExpiry = value.trim().split(' ')[0];
+                            }
+                        }
+                    });
+
+
+                    const serviceNotesElement = item.querySelector('.service-notes p');
+                    if (serviceNotesElement) serviceNotes = serviceNotesElement.textContent.trim();
+
+
+                    const serviceNotesSections = item.querySelectorAll('.service-notes');
+                    if (serviceNotesSections.length > 1) {
+                        const descElement = serviceNotesSections[1].querySelector('p');
+                        if (descElement) serviceDescription = descElement.textContent.trim();
+                    }
+
+
+                    csvData.push([
+                        vehicleModel, plateNumber, serviceType, serviceDate,
+                        serviceStart, serviceEnd, garageName, serviceCost,
+                        replacedPart, warrantyExpiry, serviceNotes, serviceDescription
+                    ]);
+                }
+            });
+
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+
+            csvData.forEach(row => {
+
+                const formattedRow = row.map(cell => {
+
+                    if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+
+                        return `"${cell.replace(/"/g, '""')}"`;
+                    }
+                    return cell;
+                });
+                csvContent += formattedRow.join(',') + '\n';
+            });
+
+
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+            const filename = `service-history-${filterValue === 'all' ? 'all-vehicles' : filterValue.toLowerCase().replace(/\s+/g, '-')}-${timestamp}.csv`;
+
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </body>
 
 </html>

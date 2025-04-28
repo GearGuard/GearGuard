@@ -149,7 +149,7 @@ class Appointment extends DbModel
 
     public static function getGarages()
     {
-        $sql = "SELECT id, name FROM gg_garage WHERE status_id = 2"; // Assuming 2 is the status for active garages
+        $sql = "SELECT id, name FROM gg_garage WHERE status_id = 2";
         $statement = self::prepare($sql);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
@@ -157,7 +157,7 @@ class Appointment extends DbModel
 
     public static function getServicesByGarage($garageId)
     {
-        $sql = "SELECT id, type FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2"; // Assuming 2 is the status for active services
+        $sql = "SELECT id, type FROM gg_garage_service WHERE garage_id = :garage_id AND status_id = 2"; 
         $statement = self::prepare($sql);
         $statement->bindValue(':garage_id', $garageId);
         $statement->execute();

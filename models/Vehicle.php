@@ -9,9 +9,9 @@ use gearguard\phpmvc\Model;
 
 class Vehicle extends DbModel
 {
-    public const STATUS_ACTIVE = 2; // Based on your gg_status table where 'active' has id 2
-    public const STATUS_INACTIVE = 1; // Based on your gg_status table where 'Inactive' has id 1
-    public const STATUS_DELETED = 3; // Based on your gg_status table where 'deleted' has id 3
+    public const STATUS_ACTIVE = 2; 
+    public const STATUS_INACTIVE = 1; 
+    public const STATUS_DELETED = 3; 
 
     public ?int $id = null;
     public string $vin = '';
@@ -28,7 +28,7 @@ class Vehicle extends DbModel
     public int $status_id = self::STATUS_ACTIVE;
     public int $vehicle_type_id = 0;
 
-    // For form use only
+
     public string $model = '';
 
     public function tableName(): string

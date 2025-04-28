@@ -57,10 +57,8 @@ ORDER BY vst.begin_timestamp DESC
 
     public function deleteServicePerformance(Request $request, Response $response)
     {
-        // Extract the ID from the request parameters or body
         $id = $request->getBody()['id'] ?? null;
 
-        // Validate the ID
         if (!$id || !is_numeric($id)) {
             $response->setStatusCode(400);
             echo json_encode(['success' => false, 'message' => 'Invalid Service ID']);

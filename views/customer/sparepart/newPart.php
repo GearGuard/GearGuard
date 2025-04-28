@@ -317,7 +317,6 @@
                 installedDateInput.min = manufacturedDate;
             }
 
-            // Validate if the current installed date is valid
             validateInstalledDate();
         }
 
@@ -339,12 +338,12 @@
             return validateInstalledDate();
         }
 
-        // Initialize validation on page load
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Set up validation for installed date when it changes
+
             document.getElementById('installed-date').addEventListener('change', validateInstalledDate);
 
-            // Initial setup
+
             updateInstalledDateMin();
         });
     </script>

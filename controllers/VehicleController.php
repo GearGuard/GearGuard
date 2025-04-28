@@ -24,9 +24,7 @@ class VehicleController extends Controller
 	/**
 	 * @throws NotFoundException
 	 */
-	/**
-	 * Show vehicle registration form
-	 */
+
 	public function addVehicle(Request $request, Response $response)
 	{
 		if (!(Application::$app->user instanceof User)) {
@@ -35,7 +33,7 @@ class VehicleController extends Controller
 
 		$model = new Vehicle();
 
-		// Get dropdown data from database
+		
 		$fuelTypes = $this->getFuelTypes();
 		$vehicleTypes = $this->getVehicleTypes();
 		$bodyTypes = $this->getBodyTypes();
@@ -53,12 +51,12 @@ class VehicleController extends Controller
 	}
 
 	/**
-	 * Process vehicle registration form submission
+	 * 
 	 * @throws NotFoundException
 	 */
 	public function addVehiclePost(Request $request, Response $response)
 	{
-		// save vehicle data to database
+		
 		if (!(Application::$app->user instanceof User)) {
 			throw new NotFoundException();
 		}
@@ -76,13 +74,10 @@ class VehicleController extends Controller
 		$vehicle->license_plate_no = $data['license_plate_no'] ?? null;
 		$vehicle->insurance_no = $data['insurance_no'] ?? null;
 
-
-		// Validate vehicle data
 		if (!$vehicle->validate()) {
 			Application::$app->session->setFlash('error', 'Please fill in all required fields.');
 			return $this->redirectToVehicleForm($response, $data, $vehicle);
 		}
-		// Check if vehicle already exists
 		$stmt = Application::$app->db->prepare('SELECT COUNT(*) FROM gg_vehicle WHERE license_plate_no = :license_plate_no AND status_id = :status_id');
 		$stmt->bindValue(':license_plate_no', $vehicle->license_plate_no);
 		$stmt->bindValue(':status_id', Vehicle::STATUS_ACTIVE);
@@ -93,7 +88,7 @@ class VehicleController extends Controller
 			Application::$app->session->setFlash('error', 'Vehicle with this license plate number already exists.');
 			return $this->redirectToVehicleForm($response, $data, $vehicle);
 		}
-		// Insert vehicle data into database
+		
 		$stmt = Application::$app->db->prepare('
 			INSERT INTO gg_vehicle (user_id, model_id, fuel_type_id, vehicle_type_id, bodytype_id, engine_capacity_id, class_id, license_plate_no, insurance_no, status_id, created_at, updated_at)
 			VALUES (:user_id, :model_id, :fuel_type_id, :vehicle_type_id, :bodytype_id, :engine_capacity_id, :class_id, :license_plate_no, :insurance_no, :status_id, :created_at, :updated_at)
@@ -112,10 +107,10 @@ class VehicleController extends Controller
 		$stmt->execute();
 		$stmt->closeCursor();
 
-		// Get the last inserted vehicle ID
+		
 		$vehicleId = Application::$app->db->pdo->lastInsertId();
 		if ($vehicleId) {
-			// Insert into gg_user_owner table
+			
 			$stmt = Application::$app->db->prepare('
 				INSERT INTO gg_user_owner (user_id, vehicle_id, registration_date)
 				VALUES (:user_id, :vehicle_id, NOW())
@@ -131,9 +126,6 @@ class VehicleController extends Controller
 		return;
 	}
 
-	/**
-	 * Helper method to redirect back to vehicle form with data
-	 */
 	private function redirectToVehicleForm(Response $response, array $data, ?Vehicle $model = null)
 	{
 		if (!$model) {
@@ -144,13 +136,11 @@ class VehicleController extends Controller
 				}
 			}
 
-			// Handle model name separately
 			if (isset($data['model'])) {
 				$model->model = $data['model'];
 			}
 		}
 
-		// Get dropdown data from database
 		$fuelTypes = $this->getFuelTypes();
 		$vehicleTypes = $this->getVehicleTypes();
 		$bodyTypes = $this->getBodyTypes();
@@ -167,9 +157,7 @@ class VehicleController extends Controller
 		]);
 	}
 
-	/**
-	 * Get fuel types for dropdown
-	 */
+
 	private function getFuelTypes()
 	{
 		$stmt = Application::$app->db->prepare('SELECT id, fueltype FROM gg_vehicle_fueltype');
@@ -177,9 +165,6 @@ class VehicleController extends Controller
 		return $stmt->fetchAll(\PDO::FETCH_OBJ);
 	}
 
-	/**
-	 * Get vehicle types for dropdown
-	 */
 	private function getVehicleTypes()
 	{
 		$stmt = Application::$app->db->prepare('SELECT id, type FROM gg_vehicle_type');
@@ -187,9 +172,7 @@ class VehicleController extends Controller
 		return $stmt->fetchAll(\PDO::FETCH_OBJ);
 	}
 
-	/**
-	 * Get body types for dropdown
-	 */
+	
 	private function getBodyTypes()
 	{
 		$stmt = Application::$app->db->prepare('SELECT id, bodytype FROM gg_vehicle_bodytype');
@@ -197,9 +180,6 @@ class VehicleController extends Controller
 		return $stmt->fetchAll(\PDO::FETCH_OBJ);
 	}
 
-	/**
-	 * Get engine capacities for dropdown
-	 */
 	private function getEngineCapacities()
 	{
 		$stmt = Application::$app->db->prepare('SELECT id, capacity FROM gg_vehicle_engine_capacity');
@@ -207,9 +187,6 @@ class VehicleController extends Controller
 		return $stmt->fetchAll(\PDO::FETCH_OBJ);
 	}
 
-	/**
-	 * Get vehicle classes for dropdown
-	 */
 	private function getVehicleClasses()
 	{
 		$stmt = Application::$app->db->prepare('SELECT id, class FROM gg_vehicle_class');
@@ -269,9 +246,6 @@ class VehicleController extends Controller
 		]);
 	}
 
-	/**
-	 * Get vehicle data for editing
-	 */
 	public function getVehicleData(Request $request, Response $response)
 	{
 		if (!(Application::$app->user instanceof User)) {
@@ -286,7 +260,6 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Get vehicle details
 		$stmt = Application::$app->db->prepare('
             SELECT v.*, vm.model as model_name, vf.fueltype as fuel_type
             FROM gg_vehicle v
@@ -306,12 +279,12 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Get fuel types for dropdown
+		
 		$fuelTypesStmt = Application::$app->db->prepare('SELECT id, fueltype FROM gg_vehicle_fueltype');
 		$fuelTypesStmt->execute();
 		$fuelTypes = $fuelTypesStmt->fetchAll(\PDO::FETCH_OBJ);
 
-		// Store vehicle data in session for the edit form
+		
 		Application::$app->session->set('edit_vehicle', [
 			'id' => $vehicle->id,
 			'model_name' => $vehicle->model_name,
@@ -321,13 +294,10 @@ class VehicleController extends Controller
 			'fuel_types' => $fuelTypes
 		]);
 
-		// Redirect back to the edit form
+		
 		$response->redirect('/customer/vehicle/edit/' . $vehicleId);
 	}
 
-	/**
-	 * Show edit form
-	 */
 	public function editVehicle(Request $request, Response $response)
 	{
 		if (!(Application::$app->user instanceof User)) {
@@ -341,7 +311,6 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Get vehicle details
 		$stmt = Application::$app->db->prepare('
             SELECT v.*, vm.model as model_name, vf.fueltype as fuel_type
             FROM gg_vehicle v
@@ -361,7 +330,6 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Get fuel types for dropdown
 		$fuelTypesStmt = Application::$app->db->prepare('SELECT id, fueltype FROM gg_vehicle_fueltype');
 		$fuelTypesStmt->execute();
 		$fuelTypes = $fuelTypesStmt->fetchAll(\PDO::FETCH_OBJ);
@@ -372,9 +340,6 @@ class VehicleController extends Controller
 		]);
 	}
 
-	/**
-	 * Update vehicle
-	 */
 	public function updateVehicle(Request $request, Response $response)
 	{
 		if (!(Application::$app->user instanceof User)) {
@@ -391,7 +356,6 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Verify ownership
 		$ownershipStmt = Application::$app->db->prepare('
         SELECT COUNT(*) FROM gg_user_owner 
         WHERE vehicle_id = :vehicleId AND user_id = :userId
@@ -406,7 +370,6 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Get current vehicle data
 		$vehicleStmt = Application::$app->db->prepare('
         SELECT * FROM gg_vehicle WHERE id = :vehicleId
     ');
@@ -420,7 +383,6 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Update vehicle data
 		$updateStmt = Application::$app->db->prepare('
         UPDATE gg_vehicle SET 
             license_plate_no = :license_plate_no,
@@ -443,9 +405,6 @@ class VehicleController extends Controller
 		$response->redirect('/customer/vehicle/all');
 	}
 
-	/**
-	 * Delete vehicle
-	 */
 	public function deleteVehicle(Request $request, Response $response)
 	{
 		if (!(Application::$app->user instanceof User)) {
@@ -462,7 +421,6 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Verify ownership
 		$ownershipStmt = Application::$app->db->prepare('
         SELECT COUNT(*) FROM gg_user_owner 
         WHERE vehicle_id = :vehicleId AND user_id = :userId
@@ -477,7 +435,6 @@ class VehicleController extends Controller
 			return;
 		}
 
-		// Soft delete by updating status
 		$deleteStmt = Application::$app->db->prepare('
         UPDATE gg_vehicle SET status_id = :status_id WHERE id = :id
     ');

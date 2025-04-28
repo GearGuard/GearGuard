@@ -380,7 +380,6 @@ use gearguard\phpmvc\Application;
         </div>
     </div>
 
-    <!-- Edit Vehicle Modal -->
     <div id="editModal" class="modal" style="display: none;">
         <div class="modal-content">
             <h2 class="modal-title">Edit Vehicle</h2>
@@ -406,14 +405,13 @@ use gearguard\phpmvc\Application;
                     <label class="modal-label" for="fuelTypeId">Fuel Type</label>
                     <select class="modal-select" id="fuelTypeId" name="fuel_type_id" required>
                         <?php
-                        // Get fuel types from database
+
                         $fuelTypes = [];
                         try {
                             $stmt = Application::$app->db->prepare('SELECT id, fueltype FROM gg_vehicle_fueltype');
                             $stmt->execute();
                             $fuelTypes = $stmt->fetchAll(\PDO::FETCH_OBJ);
                         } catch (Exception $e) {
-                            // Handle error
                         }
 
                         foreach ($fuelTypes as $fuelType):
@@ -431,7 +429,7 @@ use gearguard\phpmvc\Application;
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+
     <div id="deleteModal" class="modal" style="display: none;">
         <div class="modal-content" style="max-width: 400px;">
             <h2 class="modal-title">Confirm Deletion</h2>
@@ -448,7 +446,6 @@ use gearguard\phpmvc\Application;
     </div>
 
     <script>
-        // Edit vehicle function
         function editVehicle(id, model, license, insurance, fuelTypeId) {
             document.getElementById('vehicleId').value = id;
             document.getElementById('modelName').value = model;
@@ -459,23 +456,19 @@ use gearguard\phpmvc\Application;
             document.getElementById('editModal').style.display = 'flex';
         }
 
-        // Close edit modal
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
         }
 
-        // Delete vehicle function
         function deleteVehicle(id) {
             document.getElementById('deleteVehicleId').value = id;
             document.getElementById('deleteModal').style.display = 'flex';
         }
 
-        // Close delete modal
         function closeDeleteModal() {
             document.getElementById('deleteModal').style.display = 'none';
         }
 
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const editModal = document.getElementById('editModal');
             const deleteModal = document.getElementById('deleteModal');

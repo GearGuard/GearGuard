@@ -128,7 +128,6 @@ class User extends UserModel
 		return $statement->fetchColumn();
 	}
 
-	// TODO:check if the user is a vehicle owner @PasinduRavimal pls check this :)
 	public function isGarage()
 
 	{
@@ -148,21 +147,6 @@ class User extends UserModel
     public function updateOwnedVehiclesList() {
         $this->vehicleOwner->updateVehicleList();
     }
-	
-//	public function getOwnedVehiclesList(): array
-//	{
-//		// Ensure $this->vehicleOwner exists and is a valid object
-//		if ($this->vehicleOwner && method_exists($this->vehicleOwner, 'getOwnedVehiclesList')) {
-//			$vehicles = $this->vehicleOwner->getOwnedVehiclesList();
-//
-//			// Convert arrays to objects if needed
-//			return array_map(function($vehicle) {
-//				return is_array($vehicle) ? (object)$vehicle : $vehicle;
-//			}, $vehicles);
-//		}
-//
-//		return [];
-//	}
 
 
     public function getAccessAvailableVehiclesList() : array

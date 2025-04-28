@@ -301,7 +301,7 @@
         </div>
 
         <div class="dashboard-grid">
-            <!-- Next Appointment Card -->
+            
             <div class="dashboard-card">
                 <div class="card-header">
                     <i class="fas fa-calendar-alt card-icon"></i>
@@ -313,7 +313,6 @@
 
             </div>
 
-            <!-- Warranty Expiration Card -->
             <div class="dashboard-card">
                 <div class="card-header">
                     <i class="fas fa-shield-alt card-icon"></i>
@@ -325,7 +324,6 @@
 
             </div>
 
-            <!-- Latest Service Card -->
             <div class="dashboard-card">
                 <div class="card-header">
                     <i class="fas fa-wrench card-icon"></i>
@@ -338,7 +336,6 @@
             </div>
         </div>
 
-        <!-- Spare Parts Replacement Chart Card -->
         <div class="dashboard-card">
             <div class="card-header">
                 <i class="fas fa-chart-pie card-icon"></i>
@@ -353,28 +350,25 @@
     </div>
     </div>
 
-    <!-- Include Chart.js -->
     <script src="/assets/js/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Spare Parts Chart
+      
             const sparePartsChart = document.getElementById('sparePartsChart').getContext('2d');
 
-            // Define chart colors
             const chartColors = [
-                '#4a7fff', // Accent secondary
-                '#34eb77', // Success
-                '#eba834', // Warning
-                '#eb4034', // Error
-                '#9d4aff', // Purple
-                '#ff4a9d', // Pink
-                '#1e88e5', // Blue
-                '#43a047', // Green
-                '#fb8c00', // Orange
-                '#d81b60' // Pink/Red
+                '#4a7fff', 
+                '#34eb77', 
+                '#eba834', 
+                '#eb4034', 
+                '#9d4aff', 
+                '#ff4a9d', 
+                '#1e88e5', 
+                '#43a047', 
+                '#fb8c00', 
+                '#d81b60' 
             ];
 
-            // Initialize with loading state
             let myPieChart = new Chart(sparePartsChart, {
                 type: 'pie',
                 data: {
@@ -393,7 +387,7 @@
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#e6e6e6', // text-primary
+                                color: '#e6e6e6',
                                 font: {
                                     family: "'Inter', sans-serif",
                                     size: 12
@@ -402,7 +396,7 @@
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(30, 35, 41, 0.9)', // background-card with opacity
+                            backgroundColor: 'rgba(30, 35, 41, 0.9)',
                             titleFont: {
                                 family: "'Inter', sans-serif",
                                 size: 14,
@@ -412,7 +406,7 @@
                                 family: "'Inter', sans-serif",
                                 size: 13
                             },
-                            borderColor: '#2c3036', // border-color
+                            borderColor: '#2c3036', 
                             borderWidth: 1,
                             callbacks: {
                                 label: function(tooltipItem) {
@@ -428,17 +422,16 @@
                 }
             });
 
-            // Fetch spare part distribution data from the API
             fetch('/customer/sparepart/distribution')
                 .then(response => response.json())
                 .then(data => {
-                    // Check if we have data
+                    
                     if (data.labels && data.labels.length > 0) {
-                        // Prepare background colors array
+                       
                         const backgroundColors = data.labels.map((_, i) =>
                             chartColors[i % chartColors.length]);
 
-                        // Update chart with real data
+                        
                         myPieChart.data.labels = data.labels;
                         myPieChart.data.datasets[0].data = data.values;
                         myPieChart.data.datasets[0].backgroundColor = backgroundColors;
@@ -449,11 +442,10 @@
                     console.error('Error fetching spare part distribution data:', error);
                     myPieChart.data.labels = ['Error Loading Data'];
                     myPieChart.data.datasets[0].data = [100];
-                    myPieChart.data.datasets[0].backgroundColor = ['#eb4034']; // Error color
+                    myPieChart.data.datasets[0].backgroundColor = ['#eb4034']; 
                     myPieChart.update();
                 });
 
-            // Load user name from API
             fetch('/customer/logedinUser')
                 .then(response => response.json())
                 .then(data => {
@@ -468,7 +460,6 @@
                     document.getElementById('username').textContent = 'User';
                 });
 
-            // Load vehicle count from API
             fetch('/customer/vehicleCount')
                 .then(response => response.json())
                 .then(data => {
@@ -483,7 +474,6 @@
                     document.getElementById('vehicleCount').textContent = '0';
                 });
 
-            // Load upcoming services count from API
             fetch('/customer/upcomingServices')
                 .then(response => response.json())
                 .then(data => {
@@ -498,7 +488,6 @@
                     document.getElementById('upcomingServices').textContent = '0';
                 });
 
-            // Load warranty items count from API
             fetch('/customer/nonExpire')
                 .then(response => response.json())
                 .then(data => {
@@ -513,8 +502,6 @@
                     document.getElementById('warrantyItems').textContent = '0';
                 });
 
-
-            // Load next appointment data
             fetch('/customer/viewappointment')
                 .then(response => response.json())
                 .then(data => {
@@ -547,7 +534,6 @@
                     console.error('Error fetching appointment data:', error);
                 });
 
-            // Load warranty data
             fetch('/customer/viewWarrenty')
                 .then(response => response.json())
                 .then(data => {
@@ -581,7 +567,6 @@
                     console.error('Error fetching warranty data:', error);
                 });
 
-            // Load latest service data
             fetch('/customer/viewService')
                 .then(response => response.json())
                 .then(data => {
@@ -609,7 +594,6 @@
                     console.error('Error fetching service data:', error);
                 });
 
-            // Load maintenance tip
             fetch('/customer/tips')
                 .then(response => response.text())
                 .then(data => {
@@ -624,9 +608,6 @@
                     console.error('Error fetching maintenance tip:', error);
                 });
 
-
-
-            // Load pending payments (would typically come from a backend API)
             const pendingPayments = [{
                     service: 'Oil Change',
                     amount: 4000,
@@ -650,7 +631,6 @@
                 document.getElementById('noPendingPayments').style.display = 'block';
             }
 
-            // Load recommended services (would typically come from a backend API)
             const recommendedServices = [{
                     service: 'Air Filter Replacement',
                     due: '500 km'
@@ -676,8 +656,6 @@
                 document.getElementById('noRecommendedServices').style.display = 'block';
             }
 
-
-            // Helper function to format dates
             function formatDate(date) {
                 const options = {
                     year: 'numeric',
@@ -687,7 +665,6 @@
                 return date.toLocaleDateString('en-US', options);
             }
 
-            // Function to load a new maintenance tip
             function loadNewMaintenanceTip() {
                 document.getElementById('maintenanceTipContent').innerHTML = '<div class="loading-spinner"></div>';
                 fetch('/customer-dashboard/get-maintenance-tip')

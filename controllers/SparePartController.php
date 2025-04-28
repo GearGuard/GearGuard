@@ -58,12 +58,10 @@ class SparepartController extends Controller
         echo json_encode($partData);
     }
 
-    //review deletion
     public function deleteSparepartPostCustomer(Request $request, Response $response)
     {
         $id = $request->getBody()['id'] ?? null;
 
-        // Validate the ID
         if (!$id || !is_numeric($id)) {
             $response->setStatusCode(400);
             echo json_encode(['success' => false, 'message' => 'Invalid Spare Part ID']);
@@ -71,10 +69,9 @@ class SparepartController extends Controller
         }
 
         try {
-            // Use the correct table name for your database
             $sql = 'DELETE FROM gg_sparepart_vehicleuser_vehicle_install WHERE sparepart_id = :sparepart_id';
             $statement = Application::$app->db->prepare($sql);
-            $statement->bindValue(':sparepart_id', $id, \PDO::PARAM_INT); // Bind the extracted ID value
+            $statement->bindValue(':sparepart_id', $id, \PDO::PARAM_INT);
 
             if ($statement->execute()) {
                 Application::$app->response->redirect('/customer/sparepart/getMySpareParts');
@@ -91,12 +88,9 @@ class SparepartController extends Controller
         error_log('Request body: ' . print_r($request->getBody(), true));
     }
 
-
-    // EDIT SPARE PART (POST)
-    // EDIT SPARE PART (POST)
     public function editSparepartPostCustomer(Request $request, Response $response)
     {
-        $data = $request->getBody(); // Get all form data
+        $data = $request->getBody();
         $id = $data['id'] ?? null;
 
         if (!$id || !is_numeric($id)) {
@@ -105,13 +99,12 @@ class SparepartController extends Controller
             return;
         }
 
-        // Check ownership
         $stmt = Application::$app->db->prepare(
             "SELECT * FROM gg_sparepart_vehicleuser_vehicle_install WHERE sparepart_id = :sparepart_id AND user_id = :user_id"
         );
-        $sparepart_id = $id; // Use the ID from request data
+        $sparepart_id = $id; 
         $stmt->bindValue(':sparepart_id', $sparepart_id);
-        $user_id = Application::$app->user->id ?? null; // Get the current logged-in user's ID
+        $user_id = Application::$app->user->id ?? null; 
         $stmt->bindValue(':user_id', $user_id);
         $stmt->execute();
         if (!$stmt->fetch()) {
@@ -120,13 +113,12 @@ class SparepartController extends Controller
         }
 
         $sparePartModel = new SparePart();
-        $sparePart = $sparePartModel->findOne(['id' => $sparepart_id]); // Use 'id' instead of 'sparepart_id'
+        $sparePart = $sparePartModel->findOne(['id' => $sparepart_id]);
         if (!$sparePart) {
             echo json_encode(['success' => false, 'error' => 'Not found']);
             return;
         }
 
-        // Update fields with values from request
         $sparePart->serial_no = $data['serial_no'] ?? $sparePart->serial_no;
         $sparePart->type = $data['type'] ?? $sparePart->type;
         $sparePart->manufacturer = $data['manufacturer'] ?? $sparePart->manufacturer;
@@ -134,7 +126,6 @@ class SparepartController extends Controller
         $sparePart->manufactured_date = $data['manufactured_date'] ?? $sparePart->manufactured_date;
         $sparePart->waranty_period = $data['waranty_period'] ?? $sparePart->waranty_period;
 
-        // Save
         $tableName = $sparePart->tableName();
         $sql = "UPDATE $tableName SET serial_no = :serial_no, type = :type, manufacturer = :manufacturer, price = :price, manufactured_date = :manufactured_date, waranty_period = :waranty_period WHERE id = :id";
         $stmt = Application::$app->db->prepare($sql);
@@ -165,13 +156,12 @@ class SparepartController extends Controller
             $manufactured_date = $data['manufactured_date'] ?? null;
             $waranty_period = $data['waranty_period'] ?? '';
             $vehicle_id = $data['vehicle_id'] ?? null;
-            $installed_date = $data['installed_date'] ?? date('Y-m-d'); // Default to current date
+            $installed_date = $data['installed_date'] ?? date('Y-m-d'); 
 
-            // Start transaction to ensure data consistency
             Application::$app->db->pdo->beginTransaction();
 
             try {
-                // Create and save spare part
+               
                 $sparepart = SparePart::initialize([
                     'serial_no' => $serial_no,
                     'type' => $type,
@@ -182,13 +172,13 @@ class SparepartController extends Controller
                 ]);
 
                 if ($sparepart->save()) {
-                    // Get the newly inserted spare part ID
+                    
                     $sparepart_id = Application::$app->db->pdo->lastInsertId();
 
-                    // Get the current logged-in user's ID
+                    
                     $user_id = Application::$app->user->id;
 
-                    // Insert record into the installation table
+                    
                     $sql = "INSERT INTO gg_sparepart_vehicleuser_vehicle_install 
                         (vehicle_id, user_id, sparepart_id, installed_date) 
                         VALUES (:vehicle_id, :user_id, :sparepart_id, :installed_date)";
@@ -200,23 +190,23 @@ class SparepartController extends Controller
                     $statement->bindValue(':installed_date', $installed_date);
 
                     if ($statement->execute()) {
-                        // Commit transaction if everything is successful
+                       
                         Application::$app->db->pdo->commit();
                         $response->redirect('/customer/sparepart/view_sparepart');
                         echo 'SparePart added successfully';
                         return;
                     } else {
-                        // Rollback if installation record fails
+                        
                         Application::$app->db->pdo->rollBack();
                         echo 'Failed to associate spare part with vehicle. Please try again.';
                     }
                 } else {
-                    // Rollback if spare part save fails
+                    
                     Application::$app->db->pdo->rollBack();
                     echo 'Failed to save spare part. Please check your input and try again.';
                 }
             } catch (\Exception $e) {
-                // Rollback on any exception
+                
                 Application::$app->db->pdo->rollBack();
                 echo 'An error occurred: ' . $e->getMessage();
             }

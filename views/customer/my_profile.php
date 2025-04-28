@@ -361,7 +361,7 @@
 </head>
 
 <body>
-    <!-- Flash Notification -->
+   
     <div id="flashNotification" class="flash-notification">
         <div class="flash-content">
             <span id="flashMessage"></span>
@@ -369,7 +369,7 @@
         <button class="flash-close" onclick="closeFlash()">×</button>
     </div>
 
-    <!-- Popup Window -->
+    
     <div id="popupOverlay" class="popup-overlay"></div>
     <div id="popupWindow" class="popup-window">
         <div class="popup-header">
@@ -417,7 +417,6 @@
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
     <div id="confirmationModal" class="modal">
         <div class="modal-content">
             <h2>Confirm Changes</h2>
@@ -429,7 +428,6 @@
         </div>
     </div>
 
-    <!-- Change Password Modal -->
     <div id="changePasswordModal" class="modal">
         <div class="modal-content">
             <h2>Change Password</h2>
@@ -470,7 +468,6 @@
             const flashNotification = document.getElementById('flashNotification');
             const flashMessage = document.getElementById('flashMessage');
 
-            // Popup window functions
             function showPopup(title, message) {
                 popupTitle.textContent = title;
                 popupMessage.textContent = message;
@@ -483,13 +480,11 @@
                 popupWindow.classList.remove('active');
             }
 
-            // Flash notification functions
             function showFlash(message, type = 'success') {
                 flashMessage.textContent = message;
                 flashNotification.className = 'flash-notification ' + type;
                 flashNotification.classList.add('visible');
 
-                // Auto close after 5 seconds
                 setTimeout(() => {
                     closeFlash();
                 }, 5000);
@@ -499,11 +494,9 @@
                 flashNotification.classList.remove('visible');
             }
 
-            // Add click event to popup close button
             popupClose.addEventListener('click', closePopup);
             popupOverlay.addEventListener('click', closePopup);
 
-            // Make closeFlash function available globally
             window.closeFlash = closeFlash;
 
             btnShowChangePassword.addEventListener('click', function() {
@@ -565,11 +558,9 @@
                 changePasswordModal.style.display = 'none';
             });
 
-            // Prevent default form submission and show modal
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                // Validate form before showing modal
                 if (this.checkValidity()) {
                     confirmationModal.style.display = 'flex';
                 } else {
@@ -578,10 +569,8 @@
                 }
             });
 
-            // Confirm button clicks
             confirmButton.addEventListener('click', async function(event) {
                 event.stopPropagation();
-                // Collect form data
                 showPopup('Hold on!', 'Saving changes...');
 
                 const formData = new FormData(form);
@@ -591,7 +580,6 @@
                     data[key] = value;
                 });
 
-                // Add action identifier
                 data['_action'] = 'updateProfile';
 
                 try {
@@ -628,16 +616,13 @@
                     showFlash('An error occurred while updating the profile', 'error');
                 }
 
-                // Close the modal
                 confirmationModal.style.display = 'none';
             });
 
-            // Cancel button closes the modal
             cancelButton.addEventListener('click', function() {
                 confirmationModal.style.display = 'none';
             });
 
-            // Close modal if clicking outside of it
             confirmationModal.addEventListener('click', function(e) {
                 if (e.target === confirmationModal) {
                     confirmationModal.style.display = 'none';

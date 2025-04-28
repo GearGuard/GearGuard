@@ -187,12 +187,10 @@
 </head>
 
 <body>
-    <!-- Toggle Button -->
     <button class="toggle-btn" id="toggleBtn">
         <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-container">
@@ -233,12 +231,6 @@
                 </a>
             </li>
 
-            <!-- <li class="nav-item">
-                <a href="community" class="nav-link">
-                    <i class="fas fa-comments"></i>
-                    <span class="nav-text">Community</span>
-                </a>
-            </li> -->
 
             <li class="nav-item">
                 <a href="/customer/my_profile" class="nav-link">
@@ -246,12 +238,7 @@
                     <span class="nav-text">Profile</span>
                 </a>
             </li>
-            <!-- <li class="nav-item">
-                <a href="/customer/settings" class="nav-link">
-                    <i class="fas fa-gear"></i>
-                    <span class="nav-text">Settings</span>
-                </a>
-            </li> -->
+ 
             <li class="nav-item">
                 <a href="/notifications" class="nav-link">
                     <span class="wrapper">
@@ -274,7 +261,6 @@
         </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <iframe id="content-iframe" location="relative" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
     </div>

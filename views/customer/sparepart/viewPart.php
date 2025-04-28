@@ -448,7 +448,7 @@ $this->title = 'Spare Parts Management';
             const notification = document.createElement('div');
             notification.classList.add('notification', type);
 
-            // Add icon based on notification type
+           
             let icon = 'check-circle';
             if (type === 'error') icon = 'exclamation-circle';
             if (type === 'warning') icon = 'exclamation-triangle';
@@ -457,7 +457,7 @@ $this->title = 'Spare Parts Management';
 
             notificationContainer.appendChild(notification);
 
-            // Remove notification after animation completes
+            
             setTimeout(() => {
                 notification.remove();
             }, 5000);
@@ -608,7 +608,6 @@ $this->title = 'Spare Parts Management';
             document.body.appendChild(modal);
         }
 
-        // Fix for the submitEditForm function
         function submitEditForm(event, id) {
             event.preventDefault();
 
@@ -627,13 +626,13 @@ $this->title = 'Spare Parts Management';
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: new URLSearchParams(data) // Send all form data, not just the ID
+                    body: new URLSearchParams(data)
                 })
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) {
                         showNotification('Spare part updated successfully!', 'success');
-                        fetchSpareParts(); // Refresh the list
+                        fetchSpareParts(); 
                     } else {
                         showNotification('Failed to update: ' + (result.message || 'Unknown error'), 'error');
                     }
@@ -690,9 +689,9 @@ $this->title = 'Spare Parts Management';
                             showNotification('Spare part deleted successfully!', 'success');
                             fetchSpareParts();
                         } else {
-                            // Keeping your original behavior here where it shows success even on failure
+                             
                             showNotification('Spare part deleted successfully!', 'success');
-                            fetchSpareParts(); // Refresh the list
+                            fetchSpareParts(); 
                         }
                         closeModal();
                     })

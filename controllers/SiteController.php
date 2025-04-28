@@ -23,12 +23,11 @@ class SiteController extends Controller
         return $this->render('home', $params);
     }
 
-    // Used for the newAppointment page in the customer section
     public function common(Request $request, Response $response)
     {
         $model = new Appointment();
 
-        // Fetch garages from the database
+        
         $garages = $this->getGarages();
 
         return $this->render('common', [
@@ -66,9 +65,6 @@ class SiteController extends Controller
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
-
-    // end of the newAppointment page in the customer section
-
 
     public function contact(Request $request, Response $response)
     {
@@ -122,15 +118,12 @@ class SiteController extends Controller
         return $this->render('community/allPosts', ['name' => 'The GearGuard']);
     }
 
-
-    // Admin section-------------------------------
     public function admin(Request $request, Response $response)
     {
         $this->setLayout('admin_navbar');
         return $this->render('admin');
     }
 
-    // Admin users section
     public function viewUsers(Request $request, Response $response)
     {
         $this->setLayout('admin_navbar');
@@ -147,7 +140,6 @@ class SiteController extends Controller
         return $this->render('admin/users/editUser');
     }
 
-    // Admin services section
     public function viewServices(Request $request, Response $response)
     {
         $this->setLayout('admin_navbar');
@@ -164,7 +156,6 @@ class SiteController extends Controller
         return $this->render('admin/services/editService');
     }
 
-    // Admin vehicles section
     public function viewVehiclesByAdmin(Request $request, Response $response)
     {
         $this->setLayout('admin_navbar');
@@ -181,7 +172,6 @@ class SiteController extends Controller
         return $this->render('admin/vehicles/editvehicle');
     }
 
-    // Admin transactions section
     public function admin_transaction(Request $request, Response $response)
     {
         $this->setLayout('admin_navbar');
@@ -200,8 +190,6 @@ class SiteController extends Controller
         return $this->render('admin/q&a');
     }
 
-
-    //Add spare parts
     public function addSparepart(Request $request, Response $response)
     {
         $this->setLayout('admin_navbar');
@@ -226,9 +214,6 @@ class SiteController extends Controller
         ]);
     }
 
-
-
-//mechanic
 public function mechanicDashboard(Request $request, Response $response)
 {
     $params = [
@@ -244,15 +229,6 @@ public function mechanicSidebar(Request $request, Response $response)
     ];
     return $this->render('mechanic/sidebar', $params);
 }
-
-// private function getServicesListByMechanic()
-// {
-//     $sql = "SELECT id, type FROM gg_garage_service WHERE status_id = 1 AND mechanic_id = :mechanic_id";
-//     $statement = Application::$app->db->prepare($sql);
-//     $statement->bindValue(':mechanic_id', Application::$app->session->get('mechanic_id'));
-//     $statement->execute();
-//     return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
-// }
 
 public function addServices(Request $request, Response $response)
 {
@@ -311,26 +287,6 @@ public function mechanicProfileUpdate(Request $request, Response $response)
         ];
         return $this->render('mechanic/profile_update', $params);
     }
-
-    
-
-
-
-    // public function mechanicservices(Request $request, Response $response)
-    // {
-    //     $params = [
-    //         'name' => "The GearGurd"
-    //     ];
-    //     return $this->render('mechanic/services', $params);
-    // } 
-
-    // public function mechanicServiceHistory(Request $request, Response $response)
-    // {
-    //     $params = [
-    //         'name' => "The GearGurd"
-    //     ];
-    //     return $this->render('mechanic/service_history', $params);
-    // }
 
 public function mechanicSparePart(Request $request, Response $response)
     {

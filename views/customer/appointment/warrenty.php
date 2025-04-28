@@ -251,7 +251,7 @@ $this->title = 'Spare Part Warranty';
     <div class="warranty-container">
         <h1 class="title">My Spare Parts Warranty</h1>
         <div id="warranty-list">
-            <!-- Content will be injected here -->
+           
         </div>
     </div>
 

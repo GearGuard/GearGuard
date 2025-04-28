@@ -10,7 +10,6 @@ class WarrentyController extends Controller
 {
     public function actionIndex()
     {
-        // Ensure user is logged in
         $userId = Application::$app->user->id ?? null;
         if (!$userId) {
             Application::$app->session->setFlash('error', 'You must be logged in to view this page.');
@@ -18,7 +17,6 @@ class WarrentyController extends Controller
             return;
         }
 
-        // Fetch user's spare parts with installation and warranty info
         $sql = 'SELECT sp.id, sp.serial_no, sp.type, sp.manufacturer, sp.price, sp.manufactured_date, sp.waranty_period,
             COALESCE(svi.installed_date, ssvi.installed_date) as installed_date,
             COALESCE(svi.vehicle_id, ssvi.vehicle_id) as vehicle_id,
@@ -58,7 +56,6 @@ class WarrentyController extends Controller
         $statement->execute();
         $spareparts = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Render the view and pass data
         return $this->render('warrenty', [
             'spareparts' => $spareparts
         ]);
@@ -66,13 +63,12 @@ class WarrentyController extends Controller
 
     public function actionGetMySpareParts()
     {
-        // Ensure user is logged in
+       
         $userId = Application::$app->user->id ?? null;
         if (!$userId) {
             return json_encode([]);
         }
 
-        // Fetch user's spare parts with detailed info including vehicle and garage details
         $sql = 'SELECT sp.id, sp.serial_no, sp.type, sp.manufacturer, sp.price, sp.manufactured_date, sp.waranty_period,
             COALESCE(svi.installed_date, ssvi.installed_date) as installed_date,
             v.license_plate_no,
@@ -112,7 +108,6 @@ class WarrentyController extends Controller
         $statement->execute();
         $spareparts = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Return as JSON
         header('Content-Type: application/json');
         echo json_encode($spareparts);
         exit;

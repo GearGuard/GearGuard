@@ -10,7 +10,6 @@ $this->title = 'Spare Parts Management';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spare Parts Management</title>
-    <!-- Adding FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
@@ -597,7 +596,6 @@ $this->title = 'Spare Parts Management';
             const notification = document.createElement('div');
             notification.classList.add('notification', type);
 
-            // Add icon based on notification type
             let icon = 'check-circle';
             if (type === 'error') icon = 'exclamation-circle';
             if (type === 'warning') icon = 'exclamation-triangle';
@@ -606,7 +604,6 @@ $this->title = 'Spare Parts Management';
 
             notificationContainer.appendChild(notification);
 
-            // Remove notification after animation completes
             setTimeout(() => {
                 notification.remove();
             }, 5000);
@@ -659,7 +656,7 @@ $this->title = 'Spare Parts Management';
         function viewServicePerform(service) {
             const modal = document.createElement('div');
             modal.classList.add('modal');
-            modal.style.display = 'block'; // Make modal visible
+            modal.style.display = 'block'; 
 
             const content = document.createElement('div');
             content.classList.add('modal-content');
@@ -724,7 +721,7 @@ $this->title = 'Spare Parts Management';
         function deleteServicePerform(id) {
             const modal = document.createElement('div');
             modal.classList.add('modal');
-            modal.style.display = 'block'; // Make modal visible
+            modal.style.display = 'block'; 
 
             const content = document.createElement('div');
             content.classList.add('modal-content');
@@ -753,13 +750,13 @@ $this->title = 'Spare Parts Management';
         }
 
         function confirmDelete(id, element) {
-            // First close the modal
+            
             closeModal(element);
 
-            // Store deletion state in localStorage
+            
             localStorage.setItem('serviceDeleted', 'true');
 
-            // Then submit the form
+            
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/customer/appointment/delete_service_history';
@@ -768,11 +765,11 @@ $this->title = 'Spare Parts Management';
             form.submit();
         }
 
-        // Add this to your document ready or window.onload function
+        
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if we need to show a deletion notification
+            
             if (localStorage.getItem('serviceDeleted') === 'true') {
-                // Create notification container if it doesn't exist
+                
                 let notificationContainer = document.getElementById('notificationContainer');
                 if (!notificationContainer) {
                     notificationContainer = document.createElement('div');
@@ -781,10 +778,10 @@ $this->title = 'Spare Parts Management';
                     document.body.appendChild(notificationContainer);
                 }
 
-                // Show notification
+               
                 showNotification('Service record deleted successfully!', 'success');
 
-                // Clear the deletion state
+               
                 localStorage.removeItem('serviceDeleted');
             }
         });

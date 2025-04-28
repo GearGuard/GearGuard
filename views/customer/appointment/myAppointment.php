@@ -337,7 +337,7 @@ $this->title = 'Appointment';
                 </tr>
             </thead>
             <tbody id="appointmentTableBody">
-                <!-- Appointments will be loaded here via JavaScript -->
+
             </tbody>
         </table>
         <div id="loader" style="text-align: center; display: block; margin-top: 0.3em;">Loading appointments...</div>
@@ -424,7 +424,6 @@ $this->title = 'Appointment';
             const content = document.createElement('div');
             content.classList.add('modal-content');
 
-            // Add custom styles for date and time inputs
             const customStyles = `
                 <style>
                     .custom-date-input::-webkit-calendar-picker-indicator,
@@ -484,7 +483,6 @@ $this->title = 'Appointment';
             });
 
             document.getElementById('yesButton').addEventListener('click', function() {
-                // Create a form and submit it (standard POST, not AJAX)
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/customer/appointment/delete`;
@@ -493,12 +491,11 @@ $this->title = 'Appointment';
                 document.body.appendChild(form);
                 form.submit();
                 modal.remove();
-                // Optionally, refresh the appointments list after deletion
+                
                 setTimeout(fetchAppointments, 500);
             });
         }
 
-        // Load appointments when the page loads
         document.addEventListener('DOMContentLoaded', fetchAppointments);
     </script>
 </body>
