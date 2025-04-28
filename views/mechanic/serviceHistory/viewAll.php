@@ -271,6 +271,7 @@
                 <p><strong>End Time:</strong> ${record.end_timestamp}</p>
                 <p><strong>Duration:</strong> ${record.duration}</p>
                 <p><strong>Notes:</strong> ${record.notes}</p>
+                <p><strong>Cost:</strong> ${record.cost}</p>
             </div>
             <button onclick="this.parentElement.parentElement.remove()" 
                     style="background: var(--accent); 

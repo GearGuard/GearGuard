@@ -679,6 +679,7 @@ class AuthController extends Controller
             $begin = $body['begin_timestamp'] ?? null;
             $end = $body['end_timestamp'] ?? null;
             $notes = $body['notes'] ?? null;
+            $cost = isset($body['cost']) ? floatval($body['cost']) : null;
 
             if ($vehicle_id && $service_id && $mechanic_id && $begin && $end) {
                 $startTime = new \DateTime($begin);
@@ -694,7 +695,8 @@ class AuthController extends Controller
                     $begin,
                     $end,
                     $durationFormatted,
-                    $notes
+                    $notes,
+                    $cost
                 );
                 $model->save();
                 $message = "<p class='success-msg'>✅ Record inserted successfully!</p>";
@@ -765,7 +767,7 @@ class AuthController extends Controller
         if (Application::$app->user instanceof \app\models\Mechanic) {
             $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
                            CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
-                           vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
+                           vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes, vst.cost
                     FROM gg_vehicle_service_take vst
                     JOIN gg_vehicle v ON vst.vehicle_id = v.id
                     JOIN gg_garage_service gs ON vst.service_id = gs.id
@@ -794,7 +796,7 @@ class AuthController extends Controller
 
             if ($license_plate_no) {
                 $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
-                               vst.begin_timestamp, vst.end_timestamp, vst.notes
+                               vst.begin_timestamp, vst.end_timestamp, vst.notes, vst.cost
                         FROM gg_vehicle_service_take vst
                         JOIN gg_vehicle v ON vst.vehicle_id = v.id
                         JOIN gg_garage_service gs ON vst.service_id = gs.id
@@ -830,17 +832,19 @@ class AuthController extends Controller
             $begin_timestamp = $body['begin_timestamp'] ?? null;
             $end_timestamp = $body['end_timestamp'] ?? null;
             $notes = $body['notes'] ?? null;
+            $cost = $body['cost'] ?? null;
 
             if (!$id || !$begin_timestamp || !$end_timestamp) {
                 $response->setStatusCode(400);
                 return json_encode(['success' => false, 'message' => 'Missing required fields']);
             }
 
-            $sql = "UPDATE gg_vehicle_service_take SET begin_timestamp = :begin_timestamp, end_timestamp = :end_timestamp, notes = :notes WHERE id = :id";
+            $sql = "UPDATE gg_vehicle_service_take SET begin_timestamp = :begin_timestamp, end_timestamp = :end_timestamp, notes = :notes, cost = :cost WHERE id = :id";
             $statement = Application::$app->db->prepare($sql);
             $statement->bindValue(':begin_timestamp', $begin_timestamp);
             $statement->bindValue(':end_timestamp', $end_timestamp);
             $statement->bindValue(':notes', $notes);
+            $statement->bindValue(':cost', $cost);
             $statement->bindValue(':id', $id);
 
             try {
@@ -968,8 +972,26 @@ class AuthController extends Controller
     public function mechanicSparePartAddNew(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
+            // Fetch vehicles for the logged-in mechanic
+            $userId = Application::$app->user->id;
+            $vehicles = [];
+
+            // Assuming a method to get vehicles accessible by mechanic, else fetch all vehicles
+            $sql = "SELECT v.id, v.license_plate_no FROM gg_vehicle v
+                    JOIN gg_user_owner uo ON v.id = uo.vehicle_id
+                    WHERE uo.user_id = :user_id";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':user_id', $userId);
+            $statement->execute();
+            $vehiclesData = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($vehiclesData as $vehicle) {
+                $vehicles[$vehicle['id']] = $vehicle['license_plate_no'];
+            }
+
             return $this->render('mechanic/sparepart/addNew', [
-                'title' => 'Add Spare Part'
+                'title' => 'Add Spare Part',
+                'vehicles' => $vehicles
             ]);
         }
 
@@ -1091,7 +1113,7 @@ class AuthController extends Controller
             $statement->execute();
             $appointments = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-            header('Content-Type: application/json; charset=utf-8');
+            header('Content-Type: application/json');
             echo json_encode($appointments);
         } else {
             $response->setStatusCode(403);

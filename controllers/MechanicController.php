@@ -276,8 +276,24 @@ class MechanicController extends Controller
     public function mechanicSparePartAddNew(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Mechanic) {
+            $model = new \app\models\SparePart();
+            
+            // Fetch all vehicles
+            $sql = "SELECT v.id, v.license_plate_no 
+                    FROM gg_vehicle v";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $vehiclesData = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            
+            $vehicles = [];
+            foreach ($vehiclesData as $vehicle) {
+                $vehicles[$vehicle['id']] = $vehicle['license_plate_no'];
+            }
+
             return $this->render('mechanic/sparepart/addNew', [
-                'title' => 'Add Spare Part'
+                'title' => 'Add Spare Part',
+                'model' => $model,
+                'vehicles' => $vehicles
             ]);
         }
 

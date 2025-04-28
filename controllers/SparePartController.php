@@ -11,7 +11,7 @@ use gearguard\phpmvc\middlewares\ExtendedMiddleware;
 use gearguard\phpmvc\Request;
 use gearguard\phpmvc\Response;
 
-class SparepartController extends Controller
+class SparePartController extends Controller
 {
     public static function isCustomer(): bool
     {
@@ -240,5 +240,107 @@ class SparepartController extends Controller
             echo json_encode(['error' => 'Failed to fetch spare parts.']);
         }
         return;
+    }
+
+    public function getSpareParts(Request $request, Response $response)
+    {
+        try {
+            // First try to delete any orphaned records
+            $cleanupSql = "DELETE FROM gg_sparepart_vehicleuser_vehicle_install 
+                           WHERE sparepart_id NOT IN (SELECT id FROM gg_sparepart)";
+            Application::$app->db->prepare($cleanupSql)->execute();
+
+            // Then fetch the spare parts with vehicle info
+            $sql = "SELECT sp.*, v.license_plate_no, svi.installed_date 
+                    FROM gg_sparepart sp
+                    LEFT JOIN gg_sparepart_vehicleuser_vehicle_install svi ON sp.id = svi.sparepart_id 
+                    LEFT JOIN gg_vehicle v ON svi.vehicle_id = v.id 
+                    ORDER BY sp.id DESC";
+            
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $spareParts = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            
+            if (empty($spareParts)) {
+                echo json_encode(['success' => true, 'data' => []]);
+                return;
+            }
+
+            echo json_encode(['success' => true, 'data' => $spareParts]);
+        } catch (\PDOException $e) {
+            error_log('Database error: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Database error']);
+        }
+    }
+
+    public function edit_sparepart(Request $request, Response $response)
+    {
+        if (!$request->isPost()) {
+            return;
+        }
+
+        $body = $request->getBody();
+        $id = $body['id'] ?? null;
+
+        if (!$id) {
+            echo json_encode(['success' => false, 'message' => 'Invalid ID']);
+            return;
+        }
+
+        try {
+            $sql = "UPDATE gg_sparepart SET 
+                    serial_no = :serial_no,
+                    type = :type,
+                    manufacturer = :manufacturer,
+                    price = :price,
+                    manufactured_date = :manufactured_date,
+                    waranty_period = :waranty_period
+                    WHERE id = :id";
+            
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':id', $id);
+            $statement->bindValue(':serial_no', $body['serial_no'] ?? '');
+            $statement->bindValue(':type', $body['type'] ?? '');
+            $statement->bindValue(':manufacturer', $body['manufacturer'] ?? '');
+            $statement->bindValue(':price', $body['price'] ?? 0);
+            $statement->bindValue(':manufactured_date', $body['manufactured_date'] ?? null);
+            $statement->bindValue(':waranty_period', $body['waranty_period'] ?? null);
+
+            if ($statement->execute()) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Update failed']);
+            }
+        } catch (\PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Database error']);
+        }
+    }
+
+    public function delete_sparepart(Request $request, Response $response)
+    {
+        if (!$request->isPost()) {
+            return;
+        }
+
+        $id = $request->getBody()['id'] ?? null;
+
+        if (!$id) {
+            echo json_encode(['success' => false, 'message' => 'Invalid ID']);
+            return;
+        }
+
+        try {
+            $sql = "DELETE FROM gg_sparepart WHERE id = :id";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':id', $id);
+
+            if ($statement->execute()) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Delete failed']);
+            }
+        } catch (\PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Database error']);
+        }
     }
 }

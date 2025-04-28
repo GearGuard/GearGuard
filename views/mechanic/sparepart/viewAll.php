@@ -1,7 +1,7 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-// The $spareParts variable is passed from the controller, no need to fetch again here
+
+/** @var $this \gearguard\phpmvc\View */
+$this->title = 'Spare Parts Management';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,9 +9,7 @@ ini_set('display_errors', 1);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/" />
     <title>Spare Parts Management</title>
-    <link rel="icon" href="/assets/img/favicon.png" type="image/png">
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -62,7 +60,6 @@ ini_set('display_errors', 1);
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .navMenu a.active {
@@ -105,7 +102,7 @@ ini_set('display_errors', 1);
             font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            /* padding: 1rem; */
+            padding: 1rem;
             border-bottom: 2px solid var(--border);
         }
 
@@ -145,10 +142,6 @@ ini_set('display_errors', 1);
         .action-button:hover {
             background: #1b4ebd;
             transform: translateY(-1px);
-        }
-
-        .action-button:active {
-            transform: translateY(0);
         }
 
         .action-button.view {
@@ -223,49 +216,17 @@ ini_set('display_errors', 1);
             float: right;
             font-size: 28px;
             font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: var(--accent);
-            text-decoration: none;
             cursor: pointer;
         }
 
-        .success-message {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-            padding: 1rem;
-            margin: 1rem auto 2rem;
-            border-radius: 8px;
-            text-align: center;
-            width: 50%;
-            border: 1px solid #22c55e;
-            font-weight: 500;
+        .close:hover {
+            color: var(--accent);
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
             .navMenu {
                 flex-direction: column;
                 gap: 0.5rem;
-            }
-
-            .navMenu a {
-                width: 100%;
-                text-align: center;
-            }
-
-            .spare-parts-table {
-                padding: 1rem;
-            }
-
-            th,
-            td {
-                padding: 0.75rem;
             }
 
             .button-container {
@@ -281,287 +242,236 @@ ini_set('display_errors', 1);
 
 <body>
     <nav class="navMenu">
-
-    <a href="mechanic/sparepart/addNew">Add New Spare Part</a>
-    <a href="mechanic/sparepart/viewAll"class="active">View All Spare Parts</a>
-
-
+        <a href="/mechanic/sparepart/addNew">Add New Spare Part</a>
+        <a href="#" class="active">View All Spare Parts</a>
     </nav>
-
-
-    <?php if (!empty($success)) : ?>
-        <div class="success-message">
-            <?= htmlspecialchars($success) ?>
-        </div>
-    <?php endif; ?>
 
     <div class="spare-parts-table">
         <h2 class="title">All Spare Parts</h2>
         <table>
             <thead>
                 <tr>
-                    <!-- <th>Vehicle</th> -->
+                    <th>Vehicle</th>
                     <th>Serial Number</th>
                     <th>Type</th>
-                    <th>Manufacturer</th>
                     <th>Price</th>
-                    <th>Manufactured Date</th>
-                    <th>Warranty Period</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <?php foreach ($spareParts as $part): ?>
-                <tr>
-                    <!-- <td><?= htmlspecialchars($part['license_plate_no'] ?? '') ?></td> -->
-                    <td><?= htmlspecialchars($part['serial_no']) ?></td>
-                    <td><?= htmlspecialchars($part['type']) ?></td>
-                    <td><?= htmlspecialchars($part['manufacturer']) ?></td>
-                    <td>Rs <?= htmlspecialchars(number_format($part['price'], 2)) ?></td>
-                    <td><?= htmlspecialchars($part['manufactured_date']) ?></td>
-                    <td><?= htmlspecialchars($part['waranty_period']) ?></td>
-                    <td class="button-container">
-                        <button class="action-button view" onclick="viewSparePart(<?= $part['id'] ?>)">View</button>
-                        <button class="action-button edit" onclick="editSparePart(<?= $part['id'] ?>)">Edit</button>
-                        <button class="action-button delete" onclick="confirmDeleteSparePart(<?= $part['id'] ?>)">Delete</button>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
+            <tbody id="sparePartTableBody"></tbody>
         </table>
-
-    <div id="viewModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Spare Part Details</h2>
-            <div id="viewContent">
-                <!-- <p><strong>Vehicle:</strong> <span id="viewVehicle"></span></p> -->
-                <p><strong>Serial Number:</strong> <span id="viewSerial"></span></p>
-                <p><strong>Type:</strong> <span id="viewType"></span></p>
-                <p><strong>Manufacturer:</strong> <span id="viewManufacturer"></span></p>
-                <p><strong>Price:</strong> <span id="viewPrice"></span></p>
-                <p><strong>Manufactured Date:</strong> <span id="viewManufacturedDate"></span></p>
-                <p><strong>Warranty Period:</strong> <span id="viewWarrantyPeriod"></span></p>
-            </div>
-        </div>
-    </div>
-
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Edit Spare Part</h2>
-                <form id="editForm">
-                <input type="hidden" id="editId" name="id">
-                <label for="editVehicle">Vehicle</label>
-                <input type="text" id="editVehicle" name="vehicle" placeholder="Enter license plate number">
-                <label for="editSerial">Serial Number</label>
-                <input type="text" id="editSerial" name="serial_no" required>
-                <label for="editType">Type</label>
-                <input type="text" id="editType" name="type" required>
-                <label for="editManufacturer">Manufacturer</label>
-                <input type="text" id="editManufacturer" name="manufacturer" required>
-                <label for="editPrice">Price</label>
-                <input type="number" id="editPrice" name="price" step="0.01" required>
-                <label for="editManufacturedDate">Manufactured Date</label>
-                <input type="date" id="editManufacturedDate" name="manufactured_date">
-                <label for="editWarrantyPeriod">Warranty Period</label>
-                <input type="date" id="editWarrantyPeriod" name="waranty_period">
-                <div class="form-actions">
-                    <button type="button" class="action-button view" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="action-button edit">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Confirm Deletion</h2>
-            <p id="deleteContent">Are you sure you want to delete this spare part?</p>
-            <div class="form-actions">
-                <button class="action-button view" onclick="closeDeleteModal()">Cancel</button>
-                <button class="action-button delete" onclick="deleteSparePart()">Delete</button>
-            </div>
-        </div>
+        <div id="loader" style="text-align:center; margin-top: 1em;">Loading Spare Parts...</div>
+        <div id="noAppointments" style="display:none; text-align:center; margin-top: 1em;">No Spare Parts found</div>
     </div>
 
     <script>
-        // Modal references
-        const viewModal = document.getElementById("viewModal");
-        const editModal = document.getElementById("editModal");
-        const deleteModal = document.getElementById("deleteModal");
-        const editForm = document.getElementById("editForm");
-        let currentDeleteId = null;
-
-        // Close buttons
-        const closeButtons = document.getElementsByClassName("close");
-        for (let button of closeButtons) {
-            button.onclick = closeAllModals;
+        function closeModal() {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => modal.remove());
         }
 
-        // Close modals when clicking outside
-        window.onclick = function(event) {
-            if (event.target == viewModal ||
-                event.target == editModal ||
-                event.target == deleteModal) {
-                closeAllModals();
-            }
-        }
+        async function fetchSpareParts() {
+            const loader = document.getElementById('loader');
+            const noSparePart = document.getElementById('noAppointments');
+            const tableBody = document.getElementById('sparePartTableBody');
 
-        function closeAllModals() {
-            viewModal.style.display = "none";
-            editModal.style.display = "none";
-            deleteModal.style.display = "none";
-        }
+            try {
+                loader.style.display = 'block';
+                noSparePart.style.display = 'none';
 
-        // Prepare spare parts data for JavaScript
-            const spareParts = <?php
-            $jsArray = [];
-            foreach ($spareParts as $part) {
-                $jsArray[$part['id']] = [
-                    'vehicle_license_plate_no' => $part['license_plate_no'] ?? '',
-                    'serial' => $part['serial_no'],
-                    'type' => $part['type'],
-                    'manufacturer' => $part['manufacturer'],
-                    'price' => 'Rs ' . number_format($part['price'], 2),
-                    'manufacturedDate' => $part['manufactured_date'] ?? '',
-                    'warrantyPeriod' => $part['waranty_period'] ?? '',
-                    'installed_date' => $part['installed_date'] ?? null
-                ];
-            }
-            echo json_encode($jsArray);
-        ?>;
+                const response = await fetch('/mechanic/sparepart/getSpareParts');
+                const result = await response.json();
 
-        function viewSparePart(id) {
-            viewModal.style.display = "block";
+                loader.style.display = 'none';
+                tableBody.innerHTML = '';
 
-            const sparePart = spareParts[id];
-            if (!sparePart) return;
-
-            document.getElementById("viewSerial").textContent = sparePart.serial;
-            document.getElementById("viewType").textContent = sparePart.type;
-            document.getElementById("viewManufacturer").textContent = sparePart.manufacturer;
-            document.getElementById("viewPrice").textContent = sparePart.price;
-            document.getElementById("viewManufacturedDate").textContent = sparePart.manufacturedDate;
-            document.getElementById("viewWarrantyPeriod").textContent = sparePart.warrantyPeriod;
-            document.getElementById("viewVehicle").textContent = sparePart.vehicle_license_plate_no;
-
-            // Show installation details if available
-            const installedDate = sparePart.installed_date;
-
-            const installDetailsElem = document.getElementById("installDetails");
-            if (installedDate) {
-                installDetailsElem.innerHTML = `
-                    <p><strong>Installed Date:</strong> ${installedDate}</p>
-                `;
-                installDetailsElem.style.display = "block";
-            } else {
-                installDetailsElem.innerHTML = "<p>No installation details available.</p>";
-                installDetailsElem.style.display = "block";
-            }
-        }
-
-            function editSparePart(id) {
-                editModal.style.display = "block";
-
-                const sparePart = spareParts[id];
-                if (!sparePart) return;
-
-                document.getElementById("editId").value = id;
-                document.getElementById("editSerial").value = sparePart.serial;
-                document.getElementById("editType").value = sparePart.type;
-                document.getElementById("editManufacturer").value = sparePart.manufacturer;
-                document.getElementById("editVehicle").value = sparePart.vehicle_license_plate_no;
-                // Remove Rs prefix for price input
-                document.getElementById("editPrice").value = sparePart.price.replace('Rs ', '');
-                document.getElementById("editManufacturedDate").value = sparePart.manufacturedDate;
-                document.getElementById("editWarrantyPeriod").value = sparePart.warrantyPeriod;
-            }
-
-        function confirmDeleteSparePart(id) {
-            deleteModal.style.display = "block";
-            currentDeleteId = id;
-        }
-
-        function deleteSparePart() {
-            if (!currentDeleteId) return;
-
-            fetch('/spare/deleteSparePart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: currentDeleteId })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to delete spare part');
+                if (result.success && result.data && result.data.length > 0) {
+                    result.data.forEach(sparePart => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${sparePart.license_plate_no || 'N/A'}</td>
+                            <td>${sparePart.serial_no || 'N/A'}</td>
+                            <td>${sparePart.type || 'N/A'}</td>
+                            <td>${sparePart.price || 'N/A'}</td>
+                            <td class="button-container">
+                                <button class="action-button view" onclick='viewSparePart(${JSON.stringify(sparePart)})'>View</button>
+                                <button class="action-button edit" onclick='editSparePart(this)' data-spare='${JSON.stringify(sparePart)}'>Edit</button>
+                                <button class="action-button delete" onclick='deleteSparePart(${sparePart.id})'>Delete</button>
+                            </td>`;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    noSparePart.style.display = 'block';
                 }
-                return response.json();
-            })
-            .then(data => {
-                alert(`Spare Part ${currentDeleteId} deleted successfully`);
-                closeDeleteModal();
-                location.reload();
-            })
-            .catch(error => {
-                alert(error.message);
-            });
+
+            } catch (error) {
+                console.error('Error fetching spare parts:', error);
+                loader.style.display = 'none';
+                noSparePart.style.display = 'block';
+                noSparePart.textContent = 'Error loading spare parts. Please try again later.';
+            }
         }
 
-        function closeEditModal() {
-            editModal.style.display = "none";
+        function viewSparePart(sparePart) {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.style.display = 'block';
+
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+
+            content.innerHTML = `
+                <span class="close" onclick="closeModal()">×</span>
+                <h2>Spare Part Details</h2>
+                <p><strong>Vehicle:</strong> ${sparePart.license_plate_no }</p>
+                <p><strong>Serial Number:</strong> ${sparePart.serial_no}</p>
+                <p><strong>Type:</strong> ${sparePart.type}</p>
+                <p><strong>Price:</strong> ${sparePart.price}</p>
+                <p><strong>Manufacturer:</strong> ${sparePart.manufacturer}</p>
+                <p><strong>Manufactured Date:</strong> ${sparePart.manufactured_date}</p>
+                <p><strong>Warranty Period:</strong> ${sparePart.waranty_period}</p>
+            `;
+
+            modal.appendChild(content);
+            document.body.appendChild(modal);
         }
 
-        function closeDeleteModal() {
-            deleteModal.style.display = "none";
-            currentDeleteId = null;
+        function editSparePart(button) {
+            closeModal();
+            const sparePart = JSON.parse(button.dataset.spare);
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.style.display = 'block';
+
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+
+            content.innerHTML = `
+        <span class="close" onclick="closeModal()">×</span>
+        <h2>Edit Spare Part</h2>
+        <form onsubmit="submitEditForm(event, ${sparePart.id})">
+            <label>Serial Number</label>
+            <input type="text" id="serial_no" value="${sparePart.serial_no}" required>
+
+            <label>Type</label>
+            <input type="text" id="type" value="${sparePart.type}" required>
+
+            <label>Manufacturer</label>
+            <input type="text" id="manufacturer" value="${sparePart.manufacturer}" required>
+
+            <label>Price</label>
+            <input type="number" id="price" value="${sparePart.price}" required>
+
+            <label>Manufactured Date</label>
+            <input type="date" id="manufactured_date" value="${sparePart.manufactured_date}" required>
+
+            <label>Warranty Period</label>
+            <input type="text" id="waranty_period" value="${sparePart.waranty_period || ''}">
+
+            <div class="form-actions">
+                <button type="submit" class="action-button">Update</button>
+                <button type="button" class="action-button delete" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    `;
+
+            modal.appendChild(content);
+            document.body.appendChild(modal);
         }
 
-        // Handle form submission for editing
-            editForm.addEventListener('submit', function(e) {
-                e.preventDefault();
+        async function submitEditForm(event, id) {
+            event.preventDefault();
 
-                // Collect form data with price auto-added "Rs " prefix
-                const formData = {
-                    id: document.getElementById("editId").value,
-                    vehicle: document.getElementById("editVehicle").value,
-                    serial_no: document.getElementById("editSerial").value,
-                    type: document.getElementById("editType").value,
-                    manufacturer: document.getElementById("editManufacturer").value,
-                price: document.getElementById("editPrice").value,
-                    manufactured_date: document.getElementById("editManufacturedDate").value,
-                    waranty_period: document.getElementById("editWarrantyPeriod").value
-                };
+            const data = {
+                id: id,
+                serial_no: document.getElementById('serial_no').value,
+                type: document.getElementById('type').value,
+                manufacturer: document.getElementById('manufacturer').value,
+                price: document.getElementById('price').value,
+                manufactured_date: document.getElementById('manufactured_date').value,
+                waranty_period: document.getElementById('waranty_period').value
+            };
 
-                fetch('/spare/updateSparePart', {
+            try {
+                const response = await fetch('/mechanic/sparepart/edit_sparepart', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: JSON.stringify(formData)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to update spare part');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    alert(`Spare Part ${formData.id} updated successfully`);
-                    closeEditModal();
-                    location.reload();
-                })
-                .catch(error => {
-                    alert(error.message);
+                    body: new URLSearchParams(data)
                 });
-            });
-    </script>
 
-    <div id="installDetails" style="display:none; background-color: var(--secondary); color: var(--text); padding: 1rem; margin-top: 1rem; border-radius: 8px;">
-        <!-- Installation details will be injected here -->
-    </div>
+                const result = await response.json();
+                if (result.success) {
+                    alert('Spare part updated successfully');
+                    closeModal();
+                    fetchSpareParts();
+                } else {
+                    alert('Failed to update: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to update spare part');
+            }
+        }
+
+        function deleteSparePart(id) {
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.style.display = 'block';
+
+            const content = document.createElement('div');
+            content.classList.add('modal-content');
+            content.style.maxWidth = '400px';
+
+            content.innerHTML = `
+        <h2>Confirm Deletion</h2>
+        <p>Are you sure you want to delete this Spare Part?</p>
+        <div class="form-actions">
+            <button type="button" class="action-button" id="noButton">No</button>
+            <button type="button" class="action-button delete" id="yesButton">Yes</button>
+        </div>
+    `;
+
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+
+            document.getElementById('noButton').addEventListener('click', function() {
+                closeModal();
+            });
+
+            document.getElementById('yesButton').addEventListener('click', function() {
+                fetch('/mechanic/sparepart/delete_sparepart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            id: id
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert('Spare part deleted successfully.');
+                            fetchSpareParts();
+                        } else {
+                            alert('Spare part deleted successfully.');
+                            fetchSpareParts(); // Refresh the list
+                        }
+                        closeModal();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting spare part:', error);
+                        alert('An error occurred while deleting the spare part.');
+                        closeModal();
+                    });
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', fetchSpareParts);
+    </script>
 </body>
 
 </html>

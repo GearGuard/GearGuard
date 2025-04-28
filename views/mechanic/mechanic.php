@@ -270,12 +270,12 @@
         <span class="nav-text">Community</span> 
     </a> 
 </li> -->
-<li class="nav-item"> 
+<!-- <li class="nav-item"> 
             <a href="/mechanic/messages" class="nav-link"> 
                 <i class="fas fa-envelope"></i> 
                 <span class="nav-text">Messages</span> 
             </a> 
-        </li> 
+        </li>  -->
         <!-- <li class="nav-item">
                 <a href="/mechanic/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
