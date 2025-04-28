@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Appointment;
 use app\models\GarageService;
+use app\models\Mechanic;
 use app\models\Notification;
 use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Controller;
@@ -60,8 +61,10 @@ class GarageController extends Controller
     public function manageMechanic(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
+            $model = new Mechanic();
             return $this->render('garage/mechanic/manage', [
                 'name' => 'The GearGuard',
+                'model' => $model,
             ]);
         }
 
@@ -117,6 +120,9 @@ class GarageController extends Controller
     {
         if (Application::$app->user instanceof Garage) {
             $body = $request->getBody();
+            if (!isset($body['type']) || !isset($body['price']) || !isset($body['duration']) || !isset($body['description']))
+                throw new NotFoundException();
+
             $model = GarageService::initialize(
                 $body['type'],
                 (is_numeric($body['price'])) ? $body['price'] : -1,
@@ -191,9 +197,13 @@ class GarageController extends Controller
     public function getService(Request $request, Response $response)
     {
         if (Application::$app->user instanceof Garage) {
-            if (!isset($_GET['searchQuery']))
-                echo '';
-            $data = Application::$app->user->getServiceByType($_GET['searchQuery']);
+            $body = $request->getBody();
+            if (!isset($body['searchQuery'])) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(null);
+                return;
+            }
+            $data = Application::$app->user->getServiceByType($body['searchQuery']);
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode($data);
         }
@@ -273,12 +283,45 @@ class GarageController extends Controller
             ];
             Application::$app->user->getServiceByID((int) $id)->update($toUpdate, true);
 
-            return $this->render('garage/services/viewAll', [
-                'name' => 'The GearGuard',
+            header('Content-Type: application/json;');
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Service deleted successfully',
             ]);
         }
 
         throw new NotFoundException();
+    }
+
+    public function addMechanic(Request $request, Response $response)
+    {
+        $model = new Mechanic();
+        return $this->render('garage/mechanic/add', [
+            'name' => 'The GearGuard',
+            'model' => $model,
+        ]);
+    }
+
+    public function addMechanicPost(Request $request, Response $response)
+    {
+        $model =  new Mechanic();
+        $model->loadData($body = $request->getBody());
+        $model->password = ".";
+        $model->garage_id = Application::$app->user->id?: Application::$app->session->get('user');
+        $model->status_id = Mechanic::STATUS_ACTIVE;
+
+        if ($model->validate(validatePassword: false, useFrameworkValidations: false) && $model->save()) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Mechanic added successfully',
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => array_values($model->errors)[0][0] ?? '',
+            ]);
+        }
     }
 
     public function filteredAppointments(Request $request, Response $response)

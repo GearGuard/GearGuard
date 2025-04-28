@@ -290,7 +290,7 @@
             const searchType = document.querySelector('input[name="search_type"]').value;
 
             if (!searchType) {
-                alert('Please enter the type of the service');
+                showPopup('Error', 'Please enter the type of the service');
                 return;
             }
 
@@ -299,16 +299,16 @@
 
                 if (!results.ok) {
                     serviceDetails.style.display = 'none';
-                    alert('Something went wrong. Please try again later.');
+                    showPopup('Sorry', 'Something went wrong. Please try again later.');
                     return;
                 }
 
                 const response = await results.json();
 
-                serviceDetails = document.getElementById('serviceDetails');
+                let serviceDetails = document.getElementById('serviceDetails');
                 if (response == null) {
                     serviceDetails.style.display = 'none';
-                    alert('No service found!');
+                    showPopup('Weird', 'No services found!');
                     return;
                 }
                 serviceDetails.style.display = 'block';
@@ -323,36 +323,9 @@
             } catch (error) {
                 console.log('Error:', error);
                 serviceDetails.style.display = 'none';
-                alert('Something went wrong. Please try again later.');
+                showPopup('Sorry', 'Something went wrong. Please try again later.');
                 return;
             }
-
-            /* $.ajax({
-                url: '/garage/services/search',
-                type: 'GET',
-                data: {
-                    searchQuery: searchType
-                },
-                success: function (response) {
-                    serviceDetails = document.getElementById('serviceDetails');
-                    if (response == null) {
-                        serviceDetails.style.display = 'none';
-                        alert('No service found!');
-                        return;
-                    }
-                    serviceDetails.style.display = 'block';
-
-                    // Populate form fields with dummy data (replace this with actual data from your backend)
-                    serviceId = response.id;
-                    document.getElementById('serviceType').textContent = response.type;
-                    document.getElementById('serviceDescription').textContent = response.description;
-                    document.getElementById('serviceDuration').textContent = response.duration;
-                    document.getElementById('servicePrice').textContent = response.price;
-                },
-                error: function (xhr, status, error) {
-                    console.log('Error:', error);
-                }
-            }); */
         }
 
         function showDeleteConfirmation() {
@@ -364,6 +337,13 @@
         }
 
         async function deleteService() {
+            if (!serviceId) {
+                showPopup('Error', 'No service selected for deletion');
+                return;
+            }
+
+            showPopup('Deleting', 'Deleting service...', true);
+
             try{
                 const result = await fetch('/garage/services/delete', {
                     method: 'POST',
@@ -376,7 +356,7 @@
                 });
 
                 if (!result.ok) {
-                    alert('We could not delete the service!');
+                    showPopup('Sorry', 'We could not delete the service!');
                     closeModal();
                     document.getElementById('serviceDetails').style.display = 'none';
                     document.getElementById('search_type').value = '';
@@ -384,40 +364,29 @@
                     return;
                 }
 
-                alert('Service deleted successfully. But if there are any appointments associated with this service, they will not be deleted.');
+                const response = await result.json();
+
+                if (!response || !response.success) {
+                    showPopup('Sorry', 'We could not delete the service!');
+                    closeModal();
+                    document.getElementById('serviceDetails').style.display = 'none';
+                    document.getElementById('search_type').value = '';
+                    serviceId = null;
+                    return;
+                }
+
+                showPopup('Success', 'Service deleted successfully. But if there are any appointments associated with this service, they will not be deleted.');
                 closeModal();
                 document.getElementById('serviceDetails').style.display = 'none';
                 document.getElementById('search_type').value = '';
                 serviceId = null;
             } catch (error) {
-                alert('We could not delete the service!');
+                showPopup('Sorry', 'We could not delete the service!');
                 closeModal();
                 document.getElementById('serviceDetails').style.display = 'none';
                 document.getElementById('search_type').value = '';
                 serviceId = null;
             }
-
-            /* $.ajax({
-                url: '/garage/services/delete',
-                type: 'POST',
-                data: {
-                    serviceID: serviceId
-                },
-                success: function (response) {
-                    alert('Service deleted successfully. But if there are any appointments associated with this service, they will not be deleted.');
-                    closeModal();
-                    document.getElementById('serviceDetails').style.display = 'none';
-                    document.getElementById('search_type').value = '';
-                    serviceId = null;
-                },
-                error: function (xhr, status, error) {
-                    alert('We could not delete the service!');
-                    closeModal();
-                    document.getElementById('serviceDetails').style.display = 'none';
-                    document.getElementById('search_type').value = '';
-                    serviceId = null;
-                }
-            }); */
         }
     </script>
 </body>

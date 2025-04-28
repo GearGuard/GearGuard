@@ -198,15 +198,15 @@
                 const response = await fetch(`/api/garage/getServices?page=${page}`);
 
                 if (!response.ok) {
-                    console.error('Error fetching services:', error);
-                    alert('Failed to load services. Please try again later.');
+                    console.error('Error fetching services:', response.statusText);
+                    showPopup('Sorry', 'Failed to load services. Please try again later.');
                 }
 
                 const result = await response.json();
 
                 if (!result) {
-                    console.error('Error fetching services:', error);
-                    alert('Failed to load services. Please try again later.');
+                    console.error('Error fetching services:', 'Response was not valid JSON');
+                    showPopup('Sorry', 'Failed to load services. Please try again later.');
                 }
 
                 appendRows(result);
@@ -214,17 +214,15 @@
                 if (result.length < limit) {
                     loader.textContent = '--- End of Services Table ---';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else if (result.length === 0 && loadedResults === 0) {
                     loader.textContent = 'No Services found.';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else {
                     page++;
                 }
             } catch (error) {
                 console.error('Error fetching services:', error);
-                alert('Failed to load services. Please try again later.');
+                showPopup('Sorry', 'Failed to load services. Please try again later.');
             } finally {
                 isLoading = false;
             }
@@ -256,7 +254,7 @@
 
     function handleScroll() {
         const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 5) {
+        if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
             fetchServices();
         }
     }

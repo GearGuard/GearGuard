@@ -11,7 +11,6 @@ use app\models\Vehicle;
 use app\models\LoginFormMechanic;
 use app\models\VehicleOwner;
 use app\models\SparePart;
-use Cassandra\Date;
 use gearguard\phpmvc\Controller;
 use gearguard\phpmvc\exception\NotFoundException;
 use gearguard\phpmvc\Request;
@@ -23,7 +22,7 @@ use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Response;
 use app\models\LoginForm;
 use gearguard\phpmvc\middlewares\AuthMiddleware;
-
+use Ratchet\App;
 
 class AuthController extends Controller
 {
@@ -133,7 +132,9 @@ class AuthController extends Controller
     {
         if (Application::$app->user instanceof User) {
             return $this->render('customer/my_Profile', [
-                'title' => 'My Profile'
+                'title' => 'My Profile',
+                'model' => Application::$app->user
+
             ]);
         } else if (Application::$app->user instanceof Garage) {
             $this->setLayout('garage_layout');
@@ -171,6 +172,7 @@ class AuthController extends Controller
                 'title' => 'Garage Dashboard'
             ]);
         } else if (Application::$app->user instanceof Mechanic) {
+            $this->setLayout('garage_layout');
             return $this->render('mechanic/mechanic', [
                 'title' => 'Mechanic Dashboard'
             ]);
@@ -269,6 +271,7 @@ class AuthController extends Controller
         if (Application::$app->user instanceof User) {
             if (Application::$app->user->getOwnedVehiclesList() || Application::$app->user->getAccessAvailableVehiclesList()) {
                 $model = new Appointment();
+
 
                 // Fetch garages from the database
                 $garages = $this->getGarages();
@@ -533,17 +536,34 @@ class AuthController extends Controller
             $date = $body['date'] ?? '';
             $time = $body['time'] ?? '';
             $notes = $body['notes'] ?? '';
+            $garage_id = $body['garage_id'] ?? '';
             $model = Appointment::initialize(
                 ($service_id),
                 ($vehicle_id),
                 ($date),
                 ($time),
-                ($notes)
+                ($notes),
+                $garage_id
             );
-            $model->save();
-            return $this->render('customer/appointment/myAppointment', [
-                'name' => 'The GearGuard',
 
+            if ($model->validate() && $model->save()) {
+                Notification::sendNotification(
+                    $garage_id,
+                    'ko',
+                    'New Appointment Created'
+                );
+
+                return $this->render('customer/appointment/myAppointment', [
+                    'name' => 'The GearGuard',
+
+
+                ]);
+            }
+
+
+            return $this->render('customer/appointment/newAppointment', [
+                'name' => 'The GearGuard',
+                'model' => $model,
             ]);
         }
         throw new NotFoundException();
@@ -570,7 +590,7 @@ class AuthController extends Controller
     }
 
     //mechanic
-   
+
     public function mechanicSignup(Request $request, Response $response)
     {
         $errors = [];
@@ -723,16 +743,70 @@ class AuthController extends Controller
 
     public function mechanicServiceHistory(Request $request, Response $response)
     {
-        if (Application::$app->user instanceof User) {
-            return $this->render('/mechanic/service_history', [
-                'title' => 'Service History'
-            ]);
-        } else if (Application::$app->user instanceof Garage) {
-            return $this->render('/mechanic/service_history', [
-                'title' => 'Service History'
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $sql = "SELECT vst.id, v.license_plate_no, gs.type AS service_type, 
+                           CONCAT(m.first_name, ' ', m.last_name) AS mechanic_name,
+                           vst.begin_timestamp, vst.end_timestamp, vst.duration, vst.notes
+                    FROM gg_vehicle_service_take vst
+                    JOIN gg_vehicle v ON vst.vehicle_id = v.id
+                    JOIN gg_garage_service gs ON vst.service_id = gs.id
+                    JOIN gg_garage_mechanic m ON vst.mechanic_id = m.id
+                    ORDER BY vst.begin_timestamp DESC";
+
+            $statement = Application::$app->db->prepare($sql);
+            $statement->execute();
+            $serviceRecords = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/viewAll', [
+                'serviceRecords' => $serviceRecords,
+                'title' => 'Vehicle Service Assignments'
             ]);
         }
 
+        throw new NotFoundException();
+    }
+
+    public function mechanicServiceHistoryEdit(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $this->setLayout('garage_layout');
+            return $this->render('mechanic/serviceHistory/edit', [
+                'title' => 'Edit Vehicle Service'
+            ]);
+        }
+        throw new NotFoundException();
+    }
+
+    public function updateServiceHistory(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof \app\models\Mechanic) {
+            $body = $request->getBody();
+            $id = $body['id'] ?? null;
+            $begin_timestamp = $body['begin_timestamp'] ?? null;
+            $end_timestamp = $body['end_timestamp'] ?? null;
+            $notes = $body['notes'] ?? null;
+
+            if (!$id || !$begin_timestamp || !$end_timestamp) {
+                $response->setStatusCode(400);
+                return json_encode(['success' => false, 'message' => 'Missing required fields']);
+            }
+
+            $sql = "UPDATE gg_vehicle_service_take SET begin_timestamp = :begin_timestamp, end_timestamp = :end_timestamp, notes = :notes WHERE id = :id";
+            $statement = Application::$app->db->prepare($sql);
+            $statement->bindValue(':begin_timestamp', $begin_timestamp);
+            $statement->bindValue(':end_timestamp', $end_timestamp);
+            $statement->bindValue(':notes', $notes);
+            $statement->bindValue(':id', $id);
+
+            try {
+                $statement->execute();
+                return json_encode(['success' => true]);
+            } catch (\Exception $e) {
+                $response->setStatusCode(500);
+                return json_encode(['success' => false, 'message' => $e->getMessage()]);
+            }
+        }
         throw new NotFoundException();
     }
 
@@ -871,5 +945,71 @@ class AuthController extends Controller
             $response->setStatusCode(403);
             echo json_encode(['error' => 'Unauthorized']);
         }
-    } 
+    }
+
+    public function notifications(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $this->setLayout('garage_layout');
+            $notifications = Notification::receiveNotification(Application::$app->user->id);
+            return $this->render('notifications', [
+                'name' => 'The GearGuard',
+                'notifications' => $notifications,
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
+
+    public function markNotificationAsRead(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $notificationId = $body['id'] ?? null;
+
+            if (Notification::readNotification($notificationId, Application::$app->user->id)) {
+                echo 'success';
+                return;
+            }
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    public function markAllNotificationsAsRead(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $body = $request->getBody();
+            $userId = Application::$app->user->id;
+
+            if (!isset($body['ids'])) {
+                throw new NotFoundException();
+            }
+
+            $ids = json_decode($body['ids']);
+
+            if (!$ids) {
+                throw new NotFoundException();
+            }
+
+            if (Notification::readAllNotifications($ids)) {
+                echo 'success';
+                return;
+            }
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    public function messages(Request $request, Response $response)
+    {
+        if (Application::$app->user instanceof User || Application::$app->user instanceof Garage) {
+            $this->setLayout('garage_layout');
+            return $this->render('messages', [
+                'name' => 'The GearGuard',
+            ]);
+        }
+
+        throw new NotFoundException();
+    }
 }

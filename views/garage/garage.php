@@ -252,14 +252,14 @@
                     <span class="nav-text">Customer</span>
                 </a>
             </li>
-            <li class="nav-item">
+<!--            <li class="nav-item">
                 <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>
-            </li>
+            </li>-->
             <li class="nav-item">
-                <a href="/mechanic" class="nav-link">
+                <a href="/garage/mechanic/add" class="nav-link">
                     <i class="fa fa-wrench" aria-hidden="true"></i>
                     <span class="nav-text">Mechanic</span>
                 </a>
@@ -270,19 +270,28 @@
                     <span class="nav-text">Profile</span>
                 </a>
             </li>
-            <li class="nav-item">
+<!--            <li class="nav-item">
                 <a href="/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
                 </a>
-            </li>
+            </li>-->
+            <!--<li class="nav-item">
+                <a href="/messages" class="nav-link">
+                    <i class="fas fa-message"></i>
+                    <span class="nav-text">Messages</span>
+                    <?php /*if (\gearguard\phpmvc\Application::$app->user->hasMessages()) : */?>
+                        <span id="notification-circle" class="notification-circle" style="position: relative;right: -0.8em;display: inline-block;width: 0.6em;height: 0.6em;border-radius: 50%;background-color: tomato;"></span>
+                    <?php /*endif; */?>
+                </a>
+            </li>-->
             <li class="nav-item">
                 <a href="/notifications" class="nav-link">
                     <span class="wrapper">
                         <i class="fas fa-bell"></i>
                         <span class="nav-text">Notifications</span>
                         <?php if (\gearguard\phpmvc\Application::$app->user->hasNotifications()) : ?>
-                            <span class="notification-circle" style="position: relative;right: -0.8em;display: inline-block;width: 0.6em;height: 0.6em;border-radius: 50%;background-color: tomato;"></span>
+                            <span id="notification-circle" class="notification-circle" style="position: relative;right: -0.8em;display: inline-block;width: 0.6em;height: 0.6em;border-radius: 50%;background-color: tomato;"></span>
                         <?php endif; ?>
                     </span>
                 </a>
@@ -354,11 +363,12 @@
 
         document.getElementsByClassName('nav-link active')[0].click();
 
-        const socket = new WebSocket('ws://localhost:8080?token=<?php echo \gearguard\phpmvc\Application::$app->user->getToken() ?>');
+        const socket = new WebSocket('ws://localhost:56780?token=<?php echo \gearguard\phpmvc\Application::$app->user->getToken() ?>');
         socket.onmessage = (e) => {
             console.log(e);
             data = JSON.parse(e.data);
             showNotification(data.title, data.description);
+            document.getElementById('notification-circle').style.display = 'inline-block';
         };
 
         function showNotification(title, message) {

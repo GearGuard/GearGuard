@@ -8,6 +8,8 @@ use gearguard\phpmvc\Model;
 use gearguard\phpmvc\DbModel;
 use gearguard\phpmvc\UserModel;
 use app\utilities\EscapeAttributes;
+use http\Env\Request;
+use http\Env\Response;
 
 class Garage extends UserModel
 {
@@ -154,7 +156,7 @@ class Garage extends UserModel
                 $this->addError('username', 'Username can not be empty.');
             } elseif (strlen($this->username) < 3 || strlen($this->username) > 30) {
                 $this->addError('username', 'Username must be between 3 and 30 characters.');
-            } elseif (Garage::isUsernameAvailable($this->username)) {
+            } elseif (!Garage::isUsernameAvailable($this->username)) {
                 $this->addError('username', 'Username already exists.');
             }
         }
@@ -187,12 +189,10 @@ class Garage extends UserModel
             }
         }
         if ($validateContactNo) {
-            $contactTemp = str_replace(' ', '', $this->contact_no);
-            $contactTemp = str_replace('-', '', $contactTemp);
-            $contactTemp = str_replace('+', '', $contactTemp);
-            $contactTemp = str_replace('(', '', $contactTemp);
-            $contactTemp = str_replace(')', '', $contactTemp);
-
+            if (!preg_match('/^\+?(?:\d+[-\s]?)*\d+$|^\+?[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?$|^\+?(?:\d*[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?(?:\d+[-\s]?)*\d+)+$|^\+?(?:(?:\d+[-\s]?)*\d+[-\s]?\((?:\d+[-\s]?)*\d+\)[-\s]?\d*)+$/', $this->contact_no)) {
+                $this->addError('contact_no', 'Contact Number is not valid.');
+            }
+            $contactTemp = str_replace([' ', '-', '+', '(', ')'], '', $this->contact_no);
             if (empty($this->contact_no)) {
                 $this->addError('contact_no', 'Contact Number can not be empty.');
             } elseif (!preg_match('/^\d{7,20}$/', $contactTemp)) {
@@ -353,6 +353,12 @@ class Garage extends UserModel
             case 'rejected':
                 $status_id = 3;
                 break;
+            case 'completed':
+                $status_id = 4;
+                break;
+            case 'cancelled':
+                $status_id = 5;
+                break;
             default:
                 $status_id = 2;
         }
@@ -391,7 +397,7 @@ class Garage extends UserModel
     }
 
     public function getCustomersFiltered($first_name, $last_name, $email, int $page) : array {
-        $sql = "SELECT gu.id, gu.first_name, gu.last_name, gu.contact_no, gu.email, gu.address FROM gearguard.gg_user gu left JOIN gearguard.gg_vehicle gv ON gu.id = coalesce(gv.current_user_id, (select guo.user_id from gearguard.gg_user_owner guo where guo.vehicle_id = gv.`id`)) WHERE gv.id IN (SELECT gvsa.vehicle_id FROM gearguard.gg_vehicle_service_appointment gvsa right JOIN gearguard.gg_garage_service ggs ON gvsa.service_id = ggs.id WHERE ggs.garage_id = :garage_id UNION SELECT gvst.vehicle_id FROM gearguard.gg_vehicle_service_take gvst right JOIN gearguard.gg_garage_service ggs ON gvst.service_id = ggs.id WHERE ggs.garage_id = :garage_id) and gu.first_name like :firstName and gu.last_name like :last_name and gu.email like :email order by gu.id limit 25 offset :offset;";
+        $sql = "SELECT gu.id, gu.first_name, gu.last_name, gu.contact_no, gu.email, gu.address FROM gearguard.gg_user gu left JOIN gearguard.gg_vehicle gv ON gu.id = coalesce(gv.current_user_id, (select guo.user_id from gearguard.gg_user_owner guo where guo.vehicle_id = gv.`id`)) WHERE gv.id IN (SELECT gvsa.vehicle_id FROM gearguard.gg_vehicle_service_appointment gvsa right JOIN gearguard.gg_garage_service ggs ON gvsa.service_id = ggs.id WHERE ggs.garage_id = :garage_id UNION SELECT gvst.vehicle_id FROM gearguard.gg_vehicle_service_take gvst right JOIN gearguard.gg_garage_service ggs ON gvst.service_id = ggs.id WHERE ggs.garage_id = :garage_id) and (gu.first_name like :firstName or gu.last_name like :last_name or gu.email like :email) order by gu.id limit 25 offset :offset;";
         $statement = Application::$app->db->prepare($sql);
         $statement->bindValue(':garage_id', $this->id, \PDO::PARAM_INT);
         $offset = ($page - 1) * 25;
@@ -421,6 +427,11 @@ class Garage extends UserModel
             return true;
 
         return false;
+    }
+
+    public function hasMessages(): bool
+    {
+        return Message::hasMessages($this->id);
     }
 
     public function getToken()

@@ -12,6 +12,8 @@ class Appointment extends DbModel
     const STATUS_INACTIVE = 1;
     const STATUS_ACTIVE = 2;
     const STATUS_DELETED = 3;
+    const STATUS_DONE = 4;
+    const STATUS_CANCELLED = 5;
 
     public int $id;
     public int $vehicle_id = 0;
@@ -63,8 +65,12 @@ class Appointment extends DbModel
         ];
     }
 
-    public function validate($valueUpdates = [], $validateVehicleID = true, $validateGarageID = true, $validateServiceID = true, $validateAppointmentDateAndTime = true, $validateInternals = false) : bool
+    public function validate($valueUpdates = [], $validateVehicleID = true, $validateGarageID = true, $validateServiceID = true, $validateAppointmentDateAndTime = true, $validateInternals = false, $useFrameworkValidations = false) : bool
     {
+        if ($useFrameworkValidations) {
+            return parent::validate();
+        }
+
         if ($validateInternals && ($this->status_id < 1 || $this->status_id > 3)) {
             $this->addError('status_id', 'Status ID must be between 1 and 3.');
         }
@@ -75,7 +81,7 @@ class Appointment extends DbModel
                     $this->{$key} = $value;
             }
 
-            if ($validateVehicleID && (!in_array($this->vehicle_id, array_column(Application::$app->user->getAccessAvailableVehiclesList(), 'id')) || !in_array($this->vehicle_id, array_column(Application::$app->user->getOwnedVehiclesList(), 'id')))){
+            if ($validateVehicleID && (!in_array($this->vehicle_id, array_column(Application::$app->user->getAccessAvailableVehiclesList(), 'id')) && !in_array($this->vehicle_id, array_column(Application::$app->user->getOwnedVehiclesList(), 'id')))){
                 $this->addError('vehicle_id', 'You don\'t own or have access to this vehicle.');
             }
             if ($validateGarageID && (!Garage::verifyGarageExistance($this->garage_id))) {
@@ -113,8 +119,8 @@ class Appointment extends DbModel
                 if ((isset($this->id) && $this->id < 0)) {
                     $this->addError('id', 'Internal Error: Please contact an administrator.');
                 }
-                if ($this->status_id < 1 || $this->status_id > 3) {
-                    $this->addError('status_id', 'Status ID must be between 1 and 3.');
+                if ($this->status_id < 1 || $this->status_id > 5) {
+                    $this->addError('status_id', 'Status ID must be between 1 and 5.');
                 }
 
                 if (empty($this->errors)) {
@@ -171,19 +177,7 @@ class Appointment extends DbModel
         return $options;
     }
 
-  
-
-    public function getAppointmentDetails(int $id)
-    {
-        $sql = "SELECT * FROM gg_vehicle_service_appointment LEFT JOIN  WHERE id = :id";
-        $statement = Application::$app->db->prepare($sql);
-        $statement->bindValue(':id', $id);
-        $statement->execute();
-
-        return $statement->fetchObject(Appointment::class);
-    }
-
-    public static function initialize(int $service_id, int $vehicle_id,  $date,  $time, string $note): Appointment
+    public static function initialize(int $service_id, int $vehicle_id,  $date,  $time, string $note, int $garage_id = 0): Appointment
     {
         $object = new Appointment();
         $object->service_id = $service_id;
@@ -192,6 +186,7 @@ class Appointment extends DbModel
         $object->time = $time;
         $object->notes = $note;
         $object->status_id = 2;
+        $object->garage_id = $garage_id;
         return $object;
     }
 

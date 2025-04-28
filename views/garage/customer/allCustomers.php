@@ -144,6 +144,21 @@
             background-color: #25272d;
         }
 
+        .search-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -176,7 +191,6 @@
     <nav class="navMenu">
         <a href="#" class="active">All Customers</a>
         <a href="/garage/customers/search" target="_self">Search Customers</a>
-        <a href="/garage/customers/send_message" target="_self">Send Messages</a>
     </nav>
     <div class="customers-container">
         <h2 class="title">All Customers</h2>
@@ -221,14 +235,14 @@
                 const response = await fetch(`/api/garage/getCustomers?page=${page}`);
 
                 if (!response.ok) {
-                    console.error('Error fetching customers:', error);
+                    console.error('Error fetching customers:', response.statusText);
                     loader.textContent = 'Error loading customers. Please try again.';
                 }
 
                 const result = await response.json();
 
                 if (!result) {
-                    console.error('Error fetching customers:', error);
+                    console.error('Error fetching customers:', 'Response was not valid JSON');
                     loader.textContent = 'Error loading customers. Please try again.';
                 }
 
@@ -237,11 +251,9 @@
                 if (result.length < limit) {
                     loader.textContent = '--- End of Customers Table ---';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else if (result.length === 0 && loadedResults === 0) {
                     loader.textContent = 'No customers found.';
                     hasMoreData = false;
-                    window.removeEventListener('scroll', handleScroll);
                 } else {
                     page++;
                 }
@@ -281,7 +293,7 @@
 
     function handleScroll() {
         const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 5) {
+        if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
             fetchCustomers();
         }
     }
@@ -306,7 +318,7 @@
 
             if (!response.ok) {
                 console.error('Error fetching vehicle details:', error);
-                alert('Could not load vehicle details!');
+                showPopup('Sorry', 'We could not load vehicle details!');
                 return;
             }
 
@@ -314,7 +326,7 @@
 
             if (!vehicles) {
                 console.error('Error fetching vehicle details:', error);
-                alert('Could not load vehicle details!');
+                showPopup('Sorry', 'We could not load vehicle details!');
                 return;
             }
 
@@ -344,7 +356,7 @@
                 </div>`;
         } catch (error) {
             console.error('Error fetching vehicle details:', error);
-            alert('Could not load vehicle details!');
+            showPopup('Sorry', 'Could not load vehicle details!');
         }
     }
 
