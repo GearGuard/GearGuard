@@ -164,30 +164,7 @@ class Vehicle extends DbModel
 
         return $stmt->fetchAll(\PDO::FETCH_CLASS, self::class);
     }
-    /*public function findOne(array $where): ?self
-    {
-        $tableName = $this->tableName();
-        $sql = "SELECT * FROM $tableName WHERE " . implode(' AND ', array_map(fn($k) => "$k = :$k", array_keys($where)));
-        $stmt = Application::$app->db->prepare($sql);
-        foreach ($where as $key => $value) {
-            $stmt->bindValue(":$key", $value);
-        }
-        $stmt->execute();
-
-        if ($stmt->rowCount() === 0) {
-            return null;
-        }
-
-        $vehicleData = $stmt->fetch(\PDO::FETCH_ASSOC);
-        $vehicle = new self();
-        foreach ($vehicleData as $key => $value) {
-            if (property_exists($vehicle, $key)) {
-                $vehicle->{$key} = $value;
-            }
-        }
-
-        return $vehicle;
-    }*/
+   
 
     public static function getAllVehicleModelsWithIDs() {
         $sql = "SELECT gvm.id, gvm.model FROM gearguard.gg_vehicle_model gvm order by gvm.id";
@@ -234,10 +211,10 @@ class Vehicle extends DbModel
 
     /**
      * @param int $vehicleId
-     * @return array contains id, vin, model, manufacturer, year_manufactured, license_plate_no, class, capacity, fueltype, bodytype, insurance_no, engine_no, vehicle_user, type and status_id.
+     * @return array 
      */
     public static function getVehicleDetails(int $vehicleId): array {
-        $sql = "select gv.id, gv.vin, gvm.model, gvm2.name as manufacturer, gv.year_manufactured, gv.license_plate_no, gvc.class, gvec.capacity, gvf.fueltype, gvb.bodytype, gv.insurance_no, gv.engine_no, coalesce (gv.current_user_id, guo.user_id) as vehicle_user, gvt.`type` , gv.status_id from gearguard.gg_vehicle gv left join gearguard.gg_user_owner guo on gv.`id` = guo.vehicle_id left join gearguard.gg_vehicle_model gvm on gv.model_id = gvm.`id` left join gearguard.gg_vehicle_class gvc on gv.class_id = gvc.`id` left join gearguard.gg_vehicle_engine_capacity gvec on gv.engine_capacity_id = gvec.`id` left join gearguard.gg_vehicle_fueltype gvf on gv.fuel_type_id = gvf.`id` left join gearguard.gg_vehicle_bodytype gvb on gv.bodytype_id = gvb.`id` left join gearguard.gg_vehicle_type gvt on gv.vehicle_type_id = gvt.`id` left join gearguard.gg_vehicle_manufacturer gvm2 on gvm.manufacturer_id = gvm2.`id` WHERE gv.id = :vehicle_id;";
+        $sql = "select gv.id, gv.vin, gvm.model, gvm2.name as manufacturer, gv.year_manufactured, gv.license_plate_no, gvc.class, gvec.capacity, gvf.fueltype, gvb.bodytype, gv.insurance_no, gv.engine_no, coalesce (gv.current_user_id, guo.user_id) as vehicle_user, gvt.`type` , gv.status_id from gearguard.gg_vehicle gv left join gearguard.gg_user_owner guo on gv.`id` = guo.vehicle_id left join gearguard.gg_vehicle_model gvm on gv.model_id = gvm.`id` left join gearguard.gg_vehicle_class gvc on gv.class_id = gvc.`id` left join gearguard.gg_vehicle_engine_capacity gvec on gv.engine_capacity_id = gvec.`id` left join gearguard.gg_vehicle_fueltype gvf on gv.fuel_type_id = gvf.`id` left join gearguard.gg_vehicle_bodytype gvb on gv.bodytype_id = gvb.`id` left join gearguard.gg_vehicle_type gvt on gv.vehicle_type_id = gvt.`id` left join gearguard.gg_vehicle_manufacturer gvm2 on gvm.manufacturer_id = gvm2.`id` WHERE gv.id = :vehicle_id where status;";
         $statement = \gearguard\phpmvc\Application::$app->db->prepare($sql);
         $statement->bindValue(':vehicle_id', $vehicleId);
         $statement->execute();
