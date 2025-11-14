@@ -228,76 +228,120 @@
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
-    <nav class="navMenu">
-        <a href="/garage/services/add" target="_self">Add New Service</a>
-        <a href="/garage/services/view" target="_self">All Services</a>
-        <a href="#" class="active">Edit Services</a>
-        <a href="/garage/services/delete" target="_self">Delete Services</a>
-    </nav>
-    <div class="service-form">
-        <h2 class="title">Edit Garage Service</h2>
-        <?php
+<nav class="navMenu">
+    <a href="/garage/services/add" target="_self">Add New Service</a>
+    <a href="/garage/services/view" target="_self">All Services</a>
+    <a href="#" class="active">Edit Services</a>
+    <a href="/garage/services/delete" target="_self">Delete Services</a>
+</nav>
+<div class="service-form">
+    <h2 class="title">Edit Garage Service</h2>
+    <?php
 
-        use gearguard\phpmvc\form\Form;
-        use gearguard\phpmvc\form\TextAreaField;
+    use gearguard\phpmvc\form\Form;
+    use gearguard\phpmvc\form\TextAreaField;
 
-        $form = Form::begin('', "post");
-        ?>
+    $form = Form::begin('', "post");
+    ?>
+
+    <div class="form-row">
+        <div class="form-column">
+            <input type="text" name="search_type" placeholder="Please enter the type of the service"/>
+        </div>
+        <div class="form-column" style="display: flex; align-items: flex-end;">
+            <button type="button" class="search-button" onclick="searchService()" autofocus>Search</button>
+        </div>
+    </div>
+    <?php if (isset($error)) {
+        echo '<span id="errors" style="color: #ef4444;text-align: center;display: inline-block;width: 100%;">';
+        echo $error;
+        echo '</span><script>document.getElementById("errors").scrollIntoView()</script>';
+    } ?>
+
+    <div id="editForm" style="display: none;">
+        <input type="hidden" name="id" value="">
 
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field($model, 'type') ?>
+                <?php $this->fieldType = $form->field($model, 'type') ?>
+                <?php $this->fieldType->required(); echo $this->fieldType; ?>
             </div>
-            <div class="form-column" style="display: flex; align-items: flex-end;">
-                <button type="button" class="search-button" onclick="searchService()">Search</button>
+
+        </div>
+        <div class="form-row">
+            <div class="form-column">
+                <?php $form->priceField = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
+                <?php $form->priceField->min(0.01)->required(true)->step(0.01); echo $form->priceField ?>
+            </div>
+            <div class="form-column">
+                <?php $form->durationField = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
+                <?php $form->durationField->min(0.1)->required(true)->step(0.1); echo $form->durationField ?>
             </div>
         </div>
-
-        <div id="editForm" style="display: none;">
-            <input type="hidden" name="garage_id" value="<?php echo htmlspecialchars($garage_id); ?>">
-
-            <div class="form-row">
-                <div class="form-column">
-                    <?php echo $form->field($model, 'type') ?>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-column">
-                    <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
-                </div>
-                <div class="form-column">
-                    <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
-                </div>
-            </div>
-            <div class="form-group">
-                <?php echo new TextAreaField($model, 'description'); ?>
-            </div>
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="edit-button">Update Service</button>
-            </div>
+        <div class="form-group">
+            <?php echo new TextAreaField($model, 'description'); ?>
         </div>
-
-        <?php echo Form::end(); ?>
+        <div class="button-container">
+            <button type="reset" class="clear-button">Clear</button>
+            <button id="updateButton" type="submit" class="edit-button" disabled="disabled">Update Service</button>
+        </div>
     </div>
 
-    <script>
-        function searchService() {
-            const searchType = document.querySelector('input[name="search_type"]').value;
-            // Here you would typically make an AJAX call to your backend to fetch the service details
-            // For this example, we'll just show the form and populate it with dummy data
-            document.getElementById('editForm').style.display = 'block';
+    <?php echo Form::end(); ?>
+</div>
 
-            // Populate form fields with dummy data (replace this with actual data from your backend)
-            document.querySelector('input[name="type"]').value = searchType;
-            document.querySelector('input[name="price"]').value = '100';
-            document.querySelector('input[name="duration"]').value = '2';
-            document.querySelector('textarea[name="description"]').value = 'This is a sample description for ' + searchType;
+<script>
+    async function searchService() {
+        const searchType = document.querySelector('input[name="search_type"]').value;
+
+        if (!searchType) {
+            showPopup('Wait!', 'Please enter the type of the service');
+            return;
         }
-    </script>
+
+        try {
+            const results = await fetch(`/garage/services/search?searchQuery=${searchType}`);
+
+            if (!results.ok) {
+                document.getElementById('updateButton').setAttribute('disabled', true);
+                document.getElementById('editForm').style.display = 'none';
+                showPopup('Sorry', 'Something went wrong. Please try again later.');
+                return;
+            }
+
+            const response = await results.json();
+
+            if (response == null) {
+                document.getElementById('updateButton').setAttribute('disabled', true);
+                document.getElementById('editForm').style.display = 'none';
+                showPopup('Weird!', 'Service not found!');
+                return;
+            }
+
+            document.getElementById('editForm').style.display = 'block';
+            document.getElementById('updateButton').removeAttribute('disabled');
+            document.querySelector('input[name="id"]').value = response.id;
+            document.querySelector('input[name="type"]').value = response.type;
+            document.querySelector('input[name="price"]').value = response.price;
+            document.querySelector('input[name="duration"]').value = response.duration;
+            document.querySelector('textarea[name="description"]').value = response.description;
+
+            document.querySelector('#updateButton').removeAttribute('disabled');
+
+        } catch (error) {
+            console.log('Error:', error);
+            document.getElementById('editForm').style.display = 'none';
+            document.getElementById('updateButton').setAttribute('disabled', true);
+            showPopup('Sorry', 'Something went wrong. Please try again later.');
+        }
+
+    }
+
+</script>
 </body>
 
 </html>

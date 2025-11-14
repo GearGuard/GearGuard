@@ -8,7 +8,7 @@ use gearguard\phpmvc\form\Form;
 use gearguard\phpmvc\form\TextAreaField;
 use gearguard\phpmvc\form\DateField;
 use gearguard\phpmvc\form\TimeField;
-use gearguard\phpmvc\form\DropDownField
+use gearguard\phpmvc\form\DropDownField;
 ?>
 
 
@@ -253,17 +253,37 @@ use gearguard\phpmvc\form\DropDownField
             }
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
             const minDate = new Date(today.setDate(today.getDate() + 3));
             const maxDate = new Date(today.setDate(today.getDate() + 30));
-            const dateInput = document.getElementById('appointment_date');
+            const dateInput = document.getElementById('date');
+            const serviceField = document.getElementById('service_id');
             dateInput.min = minDate.toISOString().split('T')[0];
             dateInput.max = maxDate.toISOString().split('T')[0];
 
-            $('#garage_id').change(function() {
+            serviceField.innerHTML = '<option value="">Select Garage first</option>';
+
+            document.getElementById('garage_id').addEventListener('change', async function() {
+                const garageId = this.value;
+                if (garageId) {
+                    const result = await fetch('/appointment/getServices?garage_id=' + garageId);
+
+                    if (!result.ok) {
+                        alert('We could not fetch services. Please try again later.');
+                        console.error('Error fetching services:', result.statusText);
+                        return;
+                    }
+
+                    serviceField.innerHTML = await result.text();
+
+                } else {
+                    serviceField.innerHTML = '<option value="">Select Garage first</option>';
+                }
+            });
+
+/*            $('#garage_id').change(function() {
                 var garageId = $(this).val();
                 if (garageId) {
                     $.ajax({
@@ -279,10 +299,10 @@ use gearguard\phpmvc\form\DropDownField
                 } else {
                     $('#service_id').html('<option value="">Select Service Type</option>');
                 }
-            });
+            });*/
         });
 
-        $(document).ready(function() {
+        /*$(document).ready(function() {
             $('#garage_id').change(function() {
                 var garageId = $(this).val();
                 if (garageId) {
@@ -300,7 +320,7 @@ use gearguard\phpmvc\form\DropDownField
                     $('#service_id').html('<option value="">Select Garage first</option>');
                 }
             });
-        });
+        });*/
     </script>
 </head>
 
@@ -313,26 +333,31 @@ use gearguard\phpmvc\form\DropDownField
     </nav>
     <div class="appointment-form">
         <h2 class="title">Book Your Appointment</h2>
-        <?php $form = Form::begin('', "post") ?>
+        <?php $form = Form::begin('/customer/appointment/appoint', "post") ?>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles)?>
+                <?php $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles);
+                        echo $form->field->required() ?>
             </div>
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages)?>
+                <?php $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages);
+                        echo $form->field->required() ?>
             </div>
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', [])?>
+                <?php $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', []);
+                        echo $form->field->required() ?>
             </div>
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'appointment_date') ?>
+                <?php $form->field = new \gearguard\phpmvc\form\DateField($model, 'date');
+                        echo $form->field->required() ?>
             </div>
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'appointment_time') ?>
+                <?php $form->field = new \gearguard\phpmvc\form\TimeField($model, 'time');
+                        echo $form->field->required() ?>
             </div>
         </div>
         <div class="form-group">

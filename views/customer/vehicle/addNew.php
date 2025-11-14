@@ -1,9 +1,22 @@
+<?php
+
+use gearguard\phpmvc\Application;
+use gearguard\phpmvc\form\Form;
+
+/** @var $model \app\models\Vehicle */
+/** @var $fuelTypes array */
+/** @var $vehicleTypes array */
+/** @var $bodyTypes array */
+/** @var $engineCapacities array */
+/** @var $vehicleClasses array */
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
     <style>
-        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         :root {
             --text: #f5f5f5;
@@ -23,7 +36,7 @@
 
         body {
             background: var(--background);
-            font-family: "Inter", sans-serif;
+            font-family: 'Inter', sans-serif;
             color: var(--text);
             line-height: 1.6;
             padding: 10px;
@@ -110,48 +123,31 @@
             margin-left: 0.25rem;
         }
 
-        input[type="text"],
-        input[type="date"],
+        input[type='text'],
+        input[type='date'],
         select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
             border-radius: 8px;
-            background-color: #fff;
-            color: var(--primary);
+            background-color: var(--secondary);
+            color: var(--text);
             font-size: 0.95rem;
             transition: all 0.2s ease;
-            background-color: var(--secondary);
         }
 
-        input[type="text"]:hover,
-        input[type="date"]:hover,
+        input[type='text']:hover,
+        input[type='date']:hover,
         select:hover {
             border-color: #94a3b8;
         }
 
-        input[type="text"]:focus,
-        input[type="date"]:focus,
+        input[type='text']:focus,
+        input[type='date']:focus,
         select:focus {
             border-color: var(--accent);
             outline: none;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 1rem;
-            height: 1rem;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            margin-bottom: 6px;
         }
 
         .button-container {
@@ -199,6 +195,16 @@
             color: var(--text);
         }
 
+        .invalid-feedback {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .is-invalid {
+            border-color: #ef4444 !important;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -237,96 +243,134 @@
 </head>
 
 <body>
-    <nav class="navMenu">
-        <a href="#" class="active">New Vehicle</a>
-        <a href="/customer/vehicle/all" target="_self">My Vehicle</a>
-        <a href="/customer/vehicle/service_history" target="_self">Service History</a>
+    <nav class='navMenu'>
+        <a href='#' class='active'>New Vehicle</a>
+        <a href='/customer/vehicle/all' target='_self'>My Vehicle</a>
+        <a href='/customer/vehicle/service_history' target='_self'>Service History</a>
     </nav>
 
-    <div class="vehicle-form">
-        <h2 class="title">Register New Vehicle</h2>
+    <div class='vehicle-form'>
+        <h2 class='title'>Register New Vehicle</h2>
 
-        <form action="/register-vehicle" method="POST" id="vehicleForm">
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="brand">Vehicle Brand<span class="required-dot">*</span></label>
-                        <input type="text" id="brand" name="brand" required placeholder="Enter vehicle brand">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="vehicle-type">Vehicle Type<span class="required-dot">*</span></label>
-                        <select id="vehicle-type" name="vehicle_type" required>
-                            <option value="">Select Vehicle Type</option>
-                            <option value="car">Car</option>
-                            <option value="motorcycle">Motorcycle</option>
-                            <option value="truck">Truck</option>
-                            <option value="van">Van</option>
-                            <option value="suv">SUV</option>
-                        </select>
-                    </div>
+        <?php $form = Form::begin('/customer/vehicle/register', 'post'); ?>
+
+        <div class="form-row">
+            <div class="form-column">
+                <?php $form->vehicleModelField = new \gearguard\phpmvc\form\DropDownField($model, 'model_id', \app\models\Vehicle::getAllVehicleModelsWithIDs());
+                echo $form->vehicleModelField->required();
+                ?>
+
+            </div>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="vin">VIN (Vehicle Identification Number)<span class="required-dot">*</span></label>
+                    <input type="text" id="vin" name="vin" value="<?= $model->vin ?? '' ?>" required placeholder="Enter VIN" class="<?= $model->hasError('vin') ? 'is-invalid' : '' ?>">
+                    <?php if ($model->hasError('vin')): ?>
+                        <div class="invalid-feedback"><?= $model->getFirstError('vin') ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
+        </div>
 
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="year">Manufactured Year<span class="required-dot">*</span></label>
-                        <select id="year" name="year" required>
-                            <option value="">Select Year</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="plate-number">Number Plate<span class="required-dot">*</span></label>
-                        <input type="text" id="plate-number" name="plate_number" required placeholder="Enter plate number">
-                    </div>
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="license_plate_no">License Plate Number<span class="required-dot">*</span></label>
+                    <input type="text" id="license_plate_no" name="license_plate_no" value="<?= $model->license_plate_no ?? '' ?>"
+                        required placeholder="Format: ABC-1234 or AB-1234"
+                        pattern="^[A-Z]{2,3}-[0-9]{4}$"
+                        title="Enter 2-3 capital letters, followed by a hyphen, followed by 4 digits (e.g., ABC-1234)"
+                        class="<?= $model->hasError('license_plate_no') ? 'is-invalid' : '' ?>">
+                    <?php if ($model->hasError('license_plate_no')): ?>
+                        <div class="invalid-feedback"><?= $model->getFirstError('license_plate_no') ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="nic">Registered NIC<span class="required-dot">*</span></label>
-                        <input type="text" id="nic" name="nic" required placeholder="Enter NIC number">
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="nickname">Vehicle Nickname</label>
-                        <input type="text" id="nickname" name="nickname" placeholder="Enter nickname for your vehicle">
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="fuel-type">Fuel Type<span class="required-dot">*</span></label>
-                        <select id="fuel-type" name="fuel_type" required>
-                            <option value="">Select Vehicle Fuel Type</option>
-                            <option value="car">Petrol</option>
-                            <option value="motorcycle">Diesel</option>
-                            <option value="truck">Electric</option>
-
-                        </select>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="registration-date">Registration Date<span class="required-dot">*</span></label>
-                        <input type="date" id="registration-date" name="registration_date" required>
-                    </div>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="year_manufactured">Year Manufactured<span class="required-dot">*</span></label>
+                    <select id="year_manufactured" name="year_manufactured" required class="<?= $model->hasError('year_manufactured') ? 'is-invalid' : '' ?>">
+                        <option value="">Select Year</option>
+                        <?php for ($i = date('Y'); $i >= 1980; $i--): ?>
+                            <option value="<?= $i ?>" <?= (isset($model->year_manufactured) && date('Y', strtotime($model->year_manufactured)) == $i) ? 'selected' : '' ?>><?= $i ?></option>
+                        <?php endfor; ?>
+                    </select>
+                    <?php if ($model->hasError('year_manufactured')): ?>
+                        <div class="invalid-feedback"><?= $model->getFirstError('year_manufactured') ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
+        </div>
 
-            <div class="button-container">
-                <button type="reset" class="clear-button">Clear</button>
-                <button type="submit" class="submit-button">Register Vehicle</button>
+        <div class="form-row">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="engine_no">Engine Number<span class="required-dot">*</span></label>
+                    <input type="text" id="engine_no" name="engine_no" value="<?= $model->engine_no ?? '' ?>" required placeholder="Enter engine number" class="<?= $model->hasError('engine_no') ? 'is-invalid' : '' ?>">
+                    <?php if ($model->hasError('engine_no')): ?>
+                        <div class="invalid-feedback"><?= $model->getFirstError('engine_no') ?></div>
+                    <?php endif; ?>
+                </div>
             </div>
-        </form>
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="insurance_no">Insurance Number</label>
+                    <input type="text" id="insurance_no" name="insurance_no" value="<?= $model->insurance_no ?? '' ?>" placeholder="Enter insurance number" class="<?= $model->hasError('insurance_no') ? 'is-invalid' : '' ?>">
+                    <?php if ($model->hasError('insurance_no')): ?>
+                        <div class="invalid-feedback"><?= $model->getFirstError('insurance_no') ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-column">
+                <?php $form->vehicleFuelField = new \gearguard\phpmvc\form\DropDownField($model, 'fuel_type_id', \app\models\Vehicle::getAllVehicleFuelTypesWithID());
+                echo $form->vehicleFuelField->required();
+                ?>
+
+            </div>
+            <div class="form-column">
+                <?php $form->vehicleTypeField = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_type_id', \app\models\Vehicle::getAllVehicleTypesWithID());
+                echo $form->vehicleTypeField->required();
+                ?>
+
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-column">
+                <?php $form->vehicleBodyField = new \gearguard\phpmvc\form\DropDownField($model, 'bodytype_id', \app\models\Vehicle::getAllVehicleBodyTypesWithID());
+                echo $form->vehicleBodyField->required();
+                ?>
+               
+            </div>
+            <div class="form-column">
+                <?php $form->vehicleEngineCapacityField = new \gearguard\phpmvc\form\DropDownField($model, 'engine_capacity_id', \app\models\Vehicle::getAllVehicleEngineCapacitiesWithID());
+                echo $form->vehicleEngineCapacityField->required();
+                ?>
+
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-column">
+                <?php
+                $form->vehicleClassField = new \gearguard\phpmvc\form\DropDownField($model, 'class_id', \app\models\Vehicle::getAllVehicleClassesWithID());
+                echo $form->vehicleClassField->required();
+                ?>
+
+            </div>
+            <div class="form-column">
+
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button type="reset" class="clear-button">Clear</button>
+            <button type="submit" class="submit-button">Register Vehicle</button>
+        </div>
+        <?php Form::end(); ?>
     </div>
 </body>
 

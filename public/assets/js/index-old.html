@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Custom Chart</title>
+    <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<h1>Custom Chart</h1>
+<div id="chartContainer"></div>
+<table id="dataTable"></table>
+<script src="./graphics.js"></script>
+<script src="./math.js"></script>
+<script src="./chart.js"></script>
+<script>
+    const N = 1000;
+    const samples = [];
+
+    for (let i = 1; i <= N; i++) {
+        const type = Math.random() < 0.5 ? "basic" : "sport";
+        const km = math.lerp(3000, 300000, Math.random());
+        const price = math.remap(3000, 300000, 9000, 900, km) + math.lerp(-2000, 2000, Math.random()) + (type === "basic" ? 0 : 5000);
+
+        samples.push ({
+            id: i,
+            label: type,
+            point: [km, price]
+        });
+    }
+
+    const options = {
+        size: 250,
+        axesLabels: ["Kilometers", "Price"],
+        styles: {
+            basic: {color:'blue', text:'🚗', size:20 },
+            sport: {color:'gray', text:'🏎️', size:20 }
+        },
+        icon: "image",
+        transparency: 0.5,
+    };
+    graphics.generateImages(options.styles);
+
+    let chart;
+    setTimeout(() => {
+        chart = new Chart(
+            chartContainer,
+            samples,
+            options,
+            handleClick,
+        );
+    }, 100);
+
+    const header = dataTable.createTHead();
+    const tr = header.insertRow();
+    tr.insertCell().innerHTML = "ID";
+    tr.insertCell().innerHTML = "Type";
+    tr.insertCell().innerHTML = "Km";
+    tr.insertCell().innerHTML = "Price";
+
+    const body = dataTable.createTBody();
+
+    for (const sample of samples) {
+        const tr = body.insertRow();
+        tr.id = "sample_"+sample.id;
+        tr.onclick = () => handleClick(sample, false);
+        tr.insertCell().innerHTML = sample.id;
+        tr.insertCell().innerHTML = sample.label;
+        tr.insertCell().innerHTML = math.formatNumber(sample.point[0]);
+        tr.insertCell().innerHTML = math.formatNumber(sample.point[1]);
+    }
+
+    function handleClick(sample, doScroll = true) {
+        if (sample == null) {
+            [...document.querySelectorAll('.emphasize')].forEach((el) => {
+                el.classList.remove('emphasize');
+            });
+            return;
+        }
+
+        const element = document.getElementById("sample_"+sample.id);
+        if (element.classList.contains("emphasize")) {
+            element.classList.remove("emphasize");
+            chart.selectSample(null);
+            return;
+        }
+
+        [...document.querySelectorAll('.emphasize')].forEach((el) => {
+            el.classList.remove('emphasize');
+        });
+        element.classList.add("emphasize");
+        if (doScroll) {
+            element.scrollIntoView({behavior: "auto", block: "center"});
+        }
+        chart.selectSample(sample);
+    }
+</script>
+</body>
+</html>

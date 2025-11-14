@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <title>Admin Panel - Save Vehicle Data</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GearGuard - Vehicle Transfer Upload</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -17,12 +15,7 @@
             --accent: #2463eb;
             --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --box-shadow: 0 6px 24px rgba(36, 99, 235, 0.10), 0 1.5px 6px rgba(0,0,0,0.22);
         }
 
         body {
@@ -30,417 +23,248 @@
             font-family: "Inter", sans-serif;
             color: var(--text);
             line-height: 1.6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 32px;
         }
 
-        .upload-container {
-            background: var(--secondary);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 1200px;
-            padding: 2.5rem;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .title {
+        .admin-panel-title {
             color: var(--primary);
-            font-size: 1.8rem;
+            font-size: 2.4rem;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .title i {
-            color: var(--accent);
-        }
-
-        .file-upload-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .section-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .section-title {
-            grid-column: 1 / -1;
-            color: var(--accent);
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 2.5rem;
-            width: 100%;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-label {
-            background: var(--background);
-            border: 2px dashed var(--border);
-            color: var(--text);
-            padding: 2rem;
             text-align: center;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            margin-bottom: 2.5rem;
+            letter-spacing: 1px;
+        }
+
+        .admin-fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .admin-box {
+            background: var(--secondary);
+            border-radius: 18px;
+            box-shadow: var(--box-shadow);
+            padding: 2.5rem 2.2rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
+            align-items: flex-start;
+            min-height: 260px;
+            position: relative;
+            transition: transform 0.18s, box-shadow 0.18s;
+        }
+        .admin-box:hover {
+            transform: translateY(-3px) scale(1.015);
+            box-shadow: 0 12px 32px rgba(36,99,235,0.14), 0 2px 8px rgba(0,0,0,0.28);
         }
 
-        .file-label i {
-            font-size: 2rem;
+        .box-icon {
+            font-size: 2.2rem;
             color: var(--accent);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.7rem;
         }
 
-        .file-label:hover {
-            border-color: var(--accent);
-            background: var(--hover-bg);
-        }
-
-        .file-name {
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
+        .box-title {
             color: var(--primary);
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
+            font-size: 1.35rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            margin-bottom: 1.3rem;
+            letter-spacing: 0.5px;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .btn-submit {
+        .admin-input-row {
+            width: 100%;
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 1.15rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background-color: #33363f;
+            color: var(--text);
+            font-size: 1.12rem;
+            font-weight: 500;
+            transition: all 0.22s;
+            box-shadow: 0 1.5px 6px rgba(36,99,235,0.03);
+        }
+        input[type="text"]:hover,
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(36, 99, 235, 0.13);
+        }
+
+        .save-btn {
+            background: var(--accent);
+            color: var(--text);
+            padding: 1.08rem 2.1rem;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(36,99,235,0.09);
+            transition: background 0.18s, transform 0.15s;
+            letter-spacing: 0.2px;
+        }
+        .save-btn:hover {
+            background: #1b4ebd;
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        /* Popup styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(24,26,32,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .popup-content {
+            background: var(--secondary);
+            color: var(--primary);
+            border-radius: 12px;
+            padding: 2.5rem 3.2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(36,99,235,0.18);
+            text-align: center;
+        }
+        .popup-content button {
+            margin-top: 2rem;
             background: var(--accent);
             color: var(--text);
             border: none;
-        }
-
-        .btn-submit:hover {
-            background: #1b4ebd;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-reset {
-            background: transparent;
-            border: 2px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-reset:hover {
-            background: var(--hover-bg);
-        }
-
-        .navMenu {
-            background-color: var(--secondary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 70%;
-            padding: 1rem;
-            margin: 0 auto 2rem;
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-        }
-
-        .navMenu a {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            padding: 0.75rem 1.25rem;
             border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
+            padding: 0.85rem 2.2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(36,99,235,0.08);
+        }
+        .popup-content button:hover {
+            background: #1b4ebd;
         }
 
-        .navMenu a.active {
-            color: var(--accent);
-            background: var(--hover-bg);
-        }
-
-        .navMenu a:hover {
-            color: var(--accent);
-            background: var(--hover-bg);
-        }
-
-
-        @media (max-width: 768px) {
-            .upload-container {
-                padding: 1.5rem;
-            }
-
-            .section-wrapper {
+        @media (max-width: 900px) {
+            .admin-fields-grid {
                 grid-template-columns: 1fr;
+                gap: 1.4rem;
+            }
+            .admin-box {
+                padding: 1.6rem 1rem;
+                min-height: 180px;
             }
         }
     </style>
 </head>
-
 <body>
-    <nav class="navMenu">
-        <a href="/customer/vehicleTransfer/instruction">Instruction</a>
-        <a href="/customer/vehicleTransfer/tranferForm" class="active" target='_self'>Transfer Form</a>
-    </nav>
-    <div class="upload-container">
-        <div class="header">
-            <h1 class="title">
-                <i class="fas fa-car-alt"></i>
-                Vehicle Transfer Upload
-            </h1>
+    <h2 class="admin-panel-title">Admin Panel: Save Vehicle Data</h2>
+    <div class="admin-fields-grid">
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🚗</span>Vehicle Model</div>
+            <div class="admin-input-row">
+                <input type="text" id="vehicle_model" placeholder="Enter Vehicle Model">
+                <button class="save-btn" onclick="saveField('vehicle_model')">Save</button>
+            </div>
         </div>
-
-        <form enctype="multipart/form-data">
-            <div class="file-upload-section">
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Vehicle Documentation</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="digicard" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="digicard" class="file-label">
-                                <i class="fas fa-file-invoice"></i>
-                                Registration Certificate
-                                <span class="file-name" id="digicard-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="revenue_license" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="revenue_license" class="file-label">
-                                <i class="fas fa-file-alt"></i>
-                                Revenue License
-                                <span class="file-name" id="revenue_license-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Vehicle Insurance</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="insurance_certificate" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="insurance_certificate" class="file-label">
-                                <i class="fas fa-shield-alt"></i>
-                                Insurance Certificate
-                                <span class="file-name" id="insurance_certificate-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="insurance_transfer" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="insurance_transfer" class="file-label">
-                                <i class="fas fa-exchange-alt"></i>
-                                Insurance Transfer Doc
-                                <span class="file-name" id="insurance_transfer-name">No file chosen</span>
-                            </label>
-                        </div
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Transfer Forms</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="mta6" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="mta6" class="file-label">
-                                <i class="fas fa-file-signature"></i>
-                                MTA 6 Transfer Form
-                                <span class="file-name" id="mta6-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="mta8" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="mta8" class="file-label">
-                                <i class="fas fa-file-contract"></i>
-                                MTA 8 Notification Form
-                                <span class="file-name" id="mta8-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Identification Documents</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="seller_nic" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="seller_nic" class="file-label">
-                                <i class="fas fa-id-card"></i>
-                                Seller's NIC
-                                <span class="file-name" id="seller_nic-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="buyer_nic" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="buyer_nic" class="file-label">
-                                <i class="fas fa-id-badge"></i>
-                                Buyer's NIC
-                                <span class="file-name" id="buyer_nic-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Transaction Proof</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="sale_agreement" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="sale_agreement" class="file-label">
-                                <i class="fas fa-file-contract"></i>
-                                Bill of Sale
-                                <span class="file-name" id="sale_agreement-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="transaction_proof" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="transaction_proof" class="file-label">
-                                <i class="fas fa-receipt"></i>
-                                Payment Proof
-                                <span class="file-name" id="transaction_proof-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Vehicle Condition</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="emission_test" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="emission_test" class="file-label">
-                                <i class="fas fa-wind"></i>
-                                Emission Test Certificate
-                                <span class="file-name" id="emission_test-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="vehicle_condition" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="vehicle_condition" class="file-label">
-                                <i class="fas fa-car"></i>
-                                Vehicle Condition Report
-                                <span class="file-name" id="vehicle_condition-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Financial Documents</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="loan_clearance" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="loan_clearance" class="file-label">
-                                <i class="fas fa-money-check-alt"></i>
-                                Loan Clearance Letter
-                                <span class="file-name" id="loan_clearance-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="additional_financial" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="additional_financial" class="file-label">
-                                <i class="fas fa-file-invoice-dollar"></i>
-                                Additional Financial Docs
-                                <span class="file-name" id="additional_financial-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="section-wrapper">
-                        <h3 class="section-title">Additional Documents</h3>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="vehicle_manual" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="vehicle_manual" class="file-label">
-                                <i class="fas fa-book"></i>
-                                Vehicle Manual
-                                <span class="file-name" id="vehicle_manual-name">No file chosen</span>
-                            </label>
-                        </div>
-                        <div class="file-input-wrapper">
-                            <input type="file" id="service_records" class="file-input" accept=".pdf,.jpg,.jpeg,.png">
-                            <label for="service_records" class="file-label">
-                                <i class="fas fa-history"></i>
-                                Service Records
-                                <span class="file-name" id="service_records-name">No file chosen</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">⛽</span>Fuel Type</div>
+            <div class="admin-input-row">
+                <input type="text" id="fuel_type" placeholder="Enter Fuel Type">
+                <button class="save-btn" onclick="saveField('fuel_type')">Save</button>
             </div>
-
-            <div class="button-group">
-                <button type="reset" class="btn btn-reset">
-                    <i class="fas fa-undo"></i>
-                    Reset
-                </button>
-                <button type="submit" class="btn btn-submit">
-                    <i class="fas fa-upload"></i>
-                    Upload Documents
-                </button>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🚙</span>Vehicle Type</div>
+            <div class="admin-input-row">
+                <input type="text" id="vehicle_type" placeholder="Enter Vehicle Type">
+                <button class="save-btn" onclick="saveField('vehicle_type')">Save</button>
             </div>
-        </form>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🚘</span>Body Type</div>
+            <div class="admin-input-row">
+                <input type="text" id="body_type" placeholder="Enter Body Type">
+                <button class="save-btn" onclick="saveField('body_type')">Save</button>
+            </div>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🛠️</span>Engine Capacity</div>
+            <div class="admin-input-row">
+                <input type="text" id="engine_capacity" placeholder="Enter Engine Capacity">
+                <button class="save-btn" onclick="saveField('engine_capacity')">Save</button>
+            </div>
+        </div>
+        <div class="admin-box">
+            <div class="box-title"><span class="box-icon">🏷️</span>Vehicle Class</div>
+            <div class="admin-input-row">
+                <input type="text" id="vehicle_class" placeholder="Enter Vehicle Class">
+                <button class="save-btn" onclick="saveField('vehicle_class')">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-content">
+            <div id="popupMessage">Successfully saved to the database!</div>
+            <button onclick="closePopup()">OK</button>
+        </div>
     </div>
 
     <script>
-        document.querySelectorAll('.file-input').forEach
+        function saveField(field) {
+            const value = document.getElementById(field).value.trim();
+            if (!value) {
+                showPopup('Please enter a value before saving.');
+                return;
+            }
+
+            fetch('/admin/save-field', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ field, value })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showPopup('Successfully saved to the database!');
+                    document.getElementById(field).value = '';
+                } else {
+                    showPopup('Failed to save. ' + (data.message || 'Please try again.'));
+                }
+            })
+            .catch(() => {
+                showPopup('An error occurred. Please try again.');
+            });
+        }
+
+        function showPopup(message) {
+            document.getElementById('popupMessage').textContent = message;
+            document.getElementById('popupOverlay').style.display = 'flex';
+        }
+        function closePopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\utilities\JWTGenerator;
+use gearguard\phpmvc\Application;
 use gearguard\phpmvc\Model;
 use gearguard\phpmvc\db\Database;
 use gearguard\phpmvc\db\DbModel;
@@ -13,6 +15,7 @@ class User extends UserModel
 	const STATUS_ACTIVE = 2;
 	const STATUS_DELETED = 3;
 
+    public int $id;
 	public string $first_name = '';
 	public string $last_name = '';
 	public string $email = '';
@@ -22,10 +25,13 @@ class User extends UserModel
 	public string $username = '';
 	public int $status = self::STATUS_INACTIVE;
 	public string $password = '';
-	public int $status_id = self::STATUS_INACTIVE;
+	public int $status_id = self::STATUS_ACTIVE;
 	public string $passwordConfirm = '';
 
     private VehicleOwner $vehicleOwner;
+    private ?Admin $admin = null;
+
+    private $secretKey = 'Abracadabra@Hogwarts1959';
 
     public function __construct()
     {
@@ -44,8 +50,9 @@ class User extends UserModel
 
 	public function save()
 	{
-		$this->status = self::STATUS_INACTIVE;
+		$this->status = self::STATUS_ACTIVE;
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
+        parent::validate();
 		return parent::save();
 	}
 
@@ -66,7 +73,7 @@ class User extends UserModel
 
 	public function attributes(): array
 	{
-		return ['first_name', 'last_name', 'email', 'nic', 'address', 'username', 'password', 'status', 'contact_no', 'status_id'];
+		return ['first_name', 'last_name', 'email', 'nic', 'address', 'username', 'password', 'contact_no', 'status_id'];
 	}
 
 	public function labels(): array
@@ -88,6 +95,12 @@ class User extends UserModel
 	{
 		return $this->first_name . ' ' . $this->last_name;
 	}
+
+    public function isAdmin(): bool
+    {
+        $this->admin = Admin::getInstance();
+        return $this->admin !== null;
+    }
 
 	public function getUserType(): string
 	{
@@ -115,7 +128,6 @@ class User extends UserModel
 		return $statement->fetchColumn();
 	}
 
-	// check if the user is a vehicle owner @PasinduRavimal pls check this :)
 	public function isGarage()
 
 	{
@@ -131,4 +143,45 @@ class User extends UserModel
     {
         return $this->vehicleOwner->getOwnedVehiclesList()?? [];
     }
+
+    public function updateOwnedVehiclesList() {
+        $this->vehicleOwner->updateVehicleList();
+    }
+
+
+    public function getAccessAvailableVehiclesList() : array
+    {
+        $sql = "SELECT * FROM gg_vehicle WHERE id in (select distinct vehicle_id FROM gg_vehicle_assignments WHERE user_id = :user_id OR owner_id = :user_id)";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':user_id', Application::$app->session->get('user'));
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getAppointmentsList() : array
+    {
+        $sql = "SELECT vsa.*, gs.garage_id, gv.license_plate_no, g.name AS garage_name, gs.type AS service_type FROM gg_vehicle_service_appointment vsa LEFT JOIN gg_garage_service gs ON vsa.service_id = gs.id LEFT JOIN gg_garage g ON gs.garage_id = g.id LEFT JOIN gg_vehicle gv ON vsa.vehicle_id = gv.id WHERE vsa.vehicle_id IN (SELECT DISTINCT vehicle_id FROM gg_vehicle_assignments WHERE user_id = :user_id OR owner_id = :user_id)";
+        $statement = Application::$app->db->prepare($sql);
+        $statement->bindValue(':user_id', Application::$app->session->get('user'));
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+    }
+
+    public function hasNotifications(): bool
+    {
+        if (count(Notification::receiveNotification($this->id)) > 0)
+            return true;
+
+        return false;
+    }
+
+    public function getToken()
+    {
+        return JWTGenerator::generateJWT(JWTGenerator::generatePayloadForJWT($this->id), $this->secretKey);
+    }
+
+
 }

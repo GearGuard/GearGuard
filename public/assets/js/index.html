@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chart Testing</title>
+    <script type="module">
+        import {init, initBarChart} from "./JSChartFW.js";
+        window.init = init;
+        window.initBarChart = initBarChart;
+
+        var styles = ["rgba(241, 178, 225, 0.5)", "#B1DDF3", "#FFDE89", "#E3675C", "#C2D985"];
+        var data = [3, 2, 9, 6, 10];
+        var xAxisLabels = ["David", "Ben", "Oren", "Barbara", "Belann"];
+
+        var yAxisLabels = {
+            0: "0",
+            0.1: "1",
+            0.2: "2",
+            0.3: "3",
+            0.4: "4",
+            0.5: "5",
+            0.6: "6",
+            0.7: "7",
+            0.8: "8",
+            0.9: "9",
+            1.0: "10"
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            init();
+            initBarChart(document.getElementById('barChart')).setData(data).setYAxisLabels(yAxisLabels).setXAxisLabels(xAxisLabels).setBarStyles(styles).setXAxisLabelStyle("#ff0000").setYAxisFontStyle("14pt Stencil").draw();
+        });
+    </script>
+</head>
+<body>
+<h1>How many cats do they have?</h1>
+<canvas id="barChart" width="550" height="400"></canvas>
+</body>
+</html>

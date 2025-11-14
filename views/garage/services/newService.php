@@ -16,6 +16,7 @@
             --accent: #2463eb;
             --hover-bg: rgba(36, 99, 235, 0.1);
             --border: #33363f;
+            --danger: #ef4444;
         }
 
         * {
@@ -240,29 +241,36 @@
 
         use gearguard\phpmvc\form\Form;
         use gearguard\phpmvc\form\TextAreaField;
+        use gearguard\phpmvc\form\NumberField;
 
-        $form = Form::begin('', "post");
+        $form = Form::begin('/garage/services/add', "post");
         ?>
-
-        <input type="hidden" name="garage_id" value="<?php echo htmlspecialchars($garage_id); ?>">
 
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field($model, 'type') ?>
+                <?php $this->fieldType = $form->field($model, 'type') ?>
+                <?php $this->fieldType->required(); echo $this->fieldType; ?>
             </div>
 
         </div>
         <div class="form-row">
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
+                <?php $form->priceField = new \gearguard\phpmvc\form\NumberField($model, 'price') ?>
+                <?php $form->priceField->min(0.01)->required(true)->step(0.01); echo $form->priceField ?>
             </div>
             <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
+                <?php $form->durationField = new \gearguard\phpmvc\form\NumberField($model, 'duration') ?>
+                <?php $form->durationField->min(0.1)->required(true)->step(0.1); echo $form->durationField ?>
             </div>
         </div>
         <div class="form-group">
             <?php echo new TextAreaField($model, 'description'); ?>
         </div>
+        <?php if (isset($error)) {
+            echo '<span id="errors" style="color: #ef4444;text-align: center;display: inline-block;width: 100%;">';
+            echo $error;
+            echo '</span><script>document.getElementById("errors").scrollIntoView()</script>';
+        } ?>
         <div class="button-container">
             <button type="reset" class="clear-button">Clear</button>
             <button type="submit" class="add-button">Add Service</button>

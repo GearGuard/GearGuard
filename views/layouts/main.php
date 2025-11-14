@@ -8,8 +8,9 @@ $currentRoute = Application::$app->request->getPath();
 // Function to check if user is on the /customer route
 function isOnCustomerRoute($route)
 {
-    return $route === '/customer' || strpos($route, '/customer/') === 0  || strpos($route, '/community') === 0
-        || $route === '/garage' || strpos($route, '/garage/') === 0 || $route === '/home';
+    return $route === '/customer' || strpos($route, '/customer/') === 0 || strpos($route, '/community') === 0
+        || $route === '/garage' || strpos($route, '/garage/') === 0 || $route === '/home'
+        || $route === '/mechanic' || strpos($route, '/mechanic/') === 0;
 }
 
 // Determine if the navbar should be hidden
@@ -152,7 +153,7 @@ $hideNavbar = isOnCustomerRoute($currentRoute);
                         <img src="assets/img/favicon.png" alt="GearGuard Logo">
                     </div>
                     <?php if (!Application::isGuest()): ?>
-                        <a class="nav-link welcome-message" href="/login">
+                        <a class="nav-link welcome-message" href="/typelogin">
                             Welcome <?php echo Application::$app->user->getDisplayName() ?>
                         </a>
                     <?php endif; ?>
@@ -166,7 +167,7 @@ $hideNavbar = isOnCustomerRoute($currentRoute);
                     <a href="#feedback">Feedback</a>
                     <a href="#contact">Contact</a>
                     <?php if (Application::isGuest()): ?>
-                        <a href="/login">Login</a>
+                        <a href="/typelogin">Login</a>
                     <?php else: ?>
                         <a href="/home">Dashboard</a>
                         <a href="/logout">Logout</a>

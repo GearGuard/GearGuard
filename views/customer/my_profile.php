@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Profile - GearGuard</title>
+    <title>User Profile - GearGuard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,6 +14,9 @@
             --secondary: #25272d;
             --accent: #2463eb;
             --border: #33363f;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
         }
 
         * {
@@ -154,8 +157,8 @@
             transform: translateY(-2px);
         }
 
-        /* Confirmation Modal Styles */
-        .confirmation-modal {
+        /* Modal Styles */
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -211,10 +214,138 @@
             background-color: #4a4e57;
         }
 
-        @media (max-width: 1024px) {
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+        /* Flash Notification */
+        .flash-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 400px;
+            min-width: 300px;
+            transform: translateX(150%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .flash-notification.visible {
+            transform: translateX(0);
+        }
+
+        .flash-notification.success {
+            background-color: var(--success);
+        }
+
+        .flash-notification.error {
+            background-color: var(--error);
+        }
+
+        .flash-notification.warning {
+            background-color: var(--warning);
+        }
+
+        .flash-notification .flash-content {
+            flex-grow: 1;
+        }
+
+        .flash-notification .flash-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: 10px;
+            outline: none;
+        }
+
+        /* Popup Window */
+        .popup-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background-color: var(--secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .popup-window.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-header {
+            margin-bottom: 1rem;
+        }
+
+        .popup-header h3 {
+            font-size: 1.5rem;
+            color: var(--text);
+        }
+
+        .popup-body {
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            opacity: 0.9;
+        }
+
+        .popup-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .popup-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--accent);
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .popup-button:hover {
+            background-color: #1b4ebd;
+        }
+
+        /* Additional styles for accessibility */
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: 2px solid #1b4ebd;
+            /* Improved focus outline for accessibility */
         }
 
         @media (max-width: 768px) {
@@ -230,94 +361,206 @@
 </head>
 
 <body>
-    <div class="profile-wrapper">
-        <div class="profile-form">
-            <div class="form-title">
-                <h1>Customer Profile</h1>
-                <p>View and update your personal details</p>
-            </div>
-            <form id="customerProfileForm" novalidate>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="first_name" class="form-label">First Name<span class="required-dot">*</span></label>
-                        <input type="text" id="first_name" name="first_name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="last_name" class="form-label">Last Name<span class="required-dot">*</span></label>
-                        <input type="text" id="last_name" name="last_name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" class="form-input" required>
-                    </div>
+   
+    <div id="flashNotification" class="flash-notification">
+        <div class="flash-content">
+            <span id="flashMessage"></span>
+        </div>
+        <button class="flash-close" onclick="closeFlash()">×</button>
+    </div>
 
-                    <div class="form-group full-width">
-                        <label for="address" class="form-label">Address<span class="required-dot">*</span></label>
-                        <textarea id="address" name="address" class="form-textarea" rows="3" required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="contact_no" class="form-label">Contact Number<span class="required-dot">*</span></label>
-                        <input type="tel" id="contact_no" name="contact_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="username" class="form-label">Username<span class="required-dot">*</span></label>
-                        <input type="text" id="username" name="username" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password" class="form-label">Password<span class="required-dot">*</span></label>
-                        <input type="password" id="password" name="password" class="form-input" required>
-                    </div>
-                </div>
-                <button type="submit" class="edit-button">Save Changes</button>
-            </form>
+    
+    <div id="popupOverlay" class="popup-overlay"></div>
+    <div id="popupWindow" class="popup-window">
+        <div class="popup-header">
+            <h3 id="popupTitle">Notification</h3>
+        </div>
+        <div class="popup-body">
+            <p id="popupMessage"></p>
+        </div>
+        <div class="popup-footer">
+            <button id="popupClose" class="popup-button">OK</button>
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="confirmation-modal">
+    <div class="profile-wrapper">
+        <div class="profile-form">
+            <div class="form-title">
+                <h1>User Profile</h1>
+                <p>View and edit your personal information</p>
+            </div>
+            <?php $form = \gearguard\phpmvc\form\Form::begin('/customer/my_profile', 'post', 'userProfileForm') ?>
+            <div class="form-grid">
+                <?php
+                echo $this->first_name = $form->field($model, 'first_name')->required();
+                echo $this->last_name = $form->field($model, 'last_name')->required();
+                echo $this->nic = $form->field($model, 'nic')->required();
+                echo $this->email = $form->field($model, 'email')->required()->type('email');
+                $this->address = new \gearguard\phpmvc\form\TextAreaField($model, 'address');
+                echo $this->address->required()->rows(3)->placeholder('Enter your address');
+                echo $this->tel = $form->field($model, 'contact_no')->required()->type('tel');
+                echo $this->username = $form->field($model, 'username')->required();
+                ?>
+                <script>
+                    document.querySelectorAll('.form-group textarea').forEach(e => e.parentElement.classList.add('full-width'))
+                    address = document.getElementById('address');
+                    address.classList.add('form-textarea');
+                    document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
+                </script>
+
+                <div class="form-group">
+                    <button type="button" id="btnShowChangePassword" class="edit-button" style="background-color: #ef4444;">Change password</button>
+                </div>
+            </div>
+            <button type="submit" class="edit-button">Save Changes</button>
+            <?php \gearguard\phpmvc\form\Form::end(); ?>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal">
         <div class="modal-content">
             <h2>Confirm Changes</h2>
-            <p>Are you sure you want to save the changes to your customer profile?</p>
+            <p>Are you sure you want to save the changes to your profile?</p>
             <div class="modal-buttons">
-                <button id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
-                <button id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
+                <button type="button" id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button type="button" id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <h2>Change Password</h2>
+            <div class="form-group">
+                <label for="currentPassword" class="form-label">Current Password<span class="required-dot">*</span></label>
+                <input type="password" id="currentPassword" name="currentPassword" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="newPassword" class="form-label">New Password<span class="required-dot">*</span></label>
+                <input type="password" id="newPassword" name="newPassword" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label">Confirm Password<span class="required-dot">*</span></label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" required>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" id="btnConfirmPassword" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button type="button" id="btnCancelPassword" class="modal-btn modal-btn-cancel">Cancel</button>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('customerProfileForm');
+            const form = document.getElementById('userProfileForm');
             const confirmationModal = document.getElementById('confirmationModal');
+            const changePasswordModal = document.getElementById('changePasswordModal');
             const confirmButton = document.getElementById('confirmButton');
             const cancelButton = document.getElementById('cancelButton');
+            const btnShowChangePassword = document.getElementById('btnShowChangePassword');
+            const btnConfirmPassword = document.getElementById('btnConfirmPassword');
+            const btnCancelPassword = document.getElementById('btnCancelPassword');
+            const popupWindow = document.getElementById('popupWindow');
+            const popupOverlay = document.getElementById('popupOverlay');
+            const popupTitle = document.getElementById('popupTitle');
+            const popupMessage = document.getElementById('popupMessage');
+            const popupClose = document.getElementById('popupClose');
+            const flashNotification = document.getElementById('flashNotification');
+            const flashMessage = document.getElementById('flashMessage');
 
-            // Pre-load data (replace with actual data fetching logic)
-            const customerData = {
-                first_name: "John",
-                last_name: "Doe",
-                email: "john.doe@example.com",
-                contact_no: "+1 (555) 123-4567",
-                address: "123 Main Street\nApartment 4B\nNewtown, NY 10001",
-                username: "johndoe_2024",
-                password: "customer123"
-            };
+            function showPopup(title, message) {
+                popupTitle.textContent = title;
+                popupMessage.textContent = message;
+                popupOverlay.classList.add('active');
+                popupWindow.classList.add('active');
+            }
 
-            // Populate form fields with pre-loaded data
-            Object.keys(customerData).forEach(key => {
-                const field = document.getElementById(key);
-                if (field) {
-                    field.value = customerData[key];
+            function closePopup() {
+                popupOverlay.classList.remove('active');
+                popupWindow.classList.remove('active');
+            }
+
+            function showFlash(message, type = 'success') {
+                flashMessage.textContent = message;
+                flashNotification.className = 'flash-notification ' + type;
+                flashNotification.classList.add('visible');
+
+                setTimeout(() => {
+                    closeFlash();
+                }, 5000);
+            }
+
+            function closeFlash() {
+                flashNotification.classList.remove('visible');
+            }
+
+            popupClose.addEventListener('click', closePopup);
+            popupOverlay.addEventListener('click', closePopup);
+
+            window.closeFlash = closeFlash;
+
+            btnShowChangePassword.addEventListener('click', function() {
+                changePasswordModal.style.display = 'flex';
+            });
+
+            btnConfirmPassword.addEventListener('click', async function() {
+                const currentPassword = document.getElementById('currentPassword');
+                const newPassword = document.getElementById('newPassword');
+                const confirmPassword = document.getElementById('confirmPassword');
+
+                if (newPassword.value !== confirmPassword.value) {
+                    showPopup('Wait!', 'New password and confirmation do not match.');
+                    return;
+                }
+
+                try {
+                    const result = await fetch('/customer/my_profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            currentPassword: currentPassword.value,
+                            password: newPassword.value,
+                            passwordConfirm: confirmPassword.value,
+                            _action: 'changePassword'
+                        })
+                    });
+
+                    if (!result.ok) {
+                        showPopup('Sorry', 'Could not change your password. Please try again later.');
+                        return;
+                    }
+
+                    const response = await result.json();
+
+                    if (!response) {
+                        showPopup('Sorry', 'Could not change your password. Please try again later.');
+                        return;
+                    }
+
+                    if (response.success) {
+                        showFlash('Password changed successfully!', 'success');
+                        changePasswordModal.style.display = 'none';
+                        currentPassword.value = '';
+                        newPassword.value = '';
+                        confirmPassword.value = '';
+                    } else {
+                        showPopup('Error', 'Error changing password: ' + response.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showPopup('Error', 'An error occurred while changing the password. Please try again later.');
                 }
             });
 
-            // Prevent default form submission and show modal
+            btnCancelPassword.addEventListener('click', function() {
+                changePasswordModal.style.display = 'none';
+            });
+
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                // Validate form before showing modal
                 if (this.checkValidity()) {
                     confirmationModal.style.display = 'flex';
                 } else {
@@ -326,31 +569,69 @@
                 }
             });
 
-            // Confirm button clicks
-            confirmButton.addEventListener('click', function() {
-                // Collect form data
+            confirmButton.addEventListener('click', async function(event) {
+                event.stopPropagation();
+                showPopup('Hold on!', 'Saving changes...');
+
                 const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
+                const data = {};
 
-                // Here you would typically send this data to your server
-                console.log('Updated customer profile data:', data);
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
 
-                // Close the modal
+                data['_action'] = 'updateProfile';
+
+                try {
+                    const result = await fetch('/customer/my_profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!result.ok) {
+                        showPopup('Sorry', 'Could not update your profile. Please try again later.');
+                        return;
+                    }
+
+                    const response = await result.json();
+
+                    if (!response) {
+                        showPopup('Sorry', 'Could not update your profile. Please try again later.');
+                        return;
+                    }
+
+                    closePopup();
+
+                    if (response.success) {
+                        showFlash('Profile updated successfully!', 'success');
+                    } else {
+                        showFlash('Error updating profile: ' + response.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    closePopup();
+                    showFlash('An error occurred while updating the profile', 'error');
+                }
+
                 confirmationModal.style.display = 'none';
-
-                // Show success message
-                alert('Profile updated successfully!');
             });
 
-            // Cancel button closes the modal
             cancelButton.addEventListener('click', function() {
                 confirmationModal.style.display = 'none';
             });
 
-            // Close modal if clicking outside of it
             confirmationModal.addEventListener('click', function(e) {
                 if (e.target === confirmationModal) {
                     confirmationModal.style.display = 'none';
+                }
+            });
+
+            changePasswordModal.addEventListener('click', function(e) {
+                if (e.target === changePasswordModal) {
+                    changePasswordModal.style.display = 'none';
                 }
             });
         });

@@ -185,6 +185,21 @@ $this->title = 'Search Appointments';
             margin-top: 1rem;
         }
 
+        .view-more-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
 
@@ -204,111 +219,245 @@ $this->title = 'Search Appointments';
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
-    <nav class="navMenu">
-        <a href="/garage/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
-        <a href="#" class="active">Search Appointment<span class="dot"></span></a>
-        <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
-    </nav>
+<nav class="navMenu">
+    <a href="/appointment/appointments" target="_self">All Appointments<span class="dot"></span></a>
+    <a href="#" class="active">Search Appointment<span class="dot"></span></a>
+    <a href="/garage/appointment/delete" target="_self">Delete Appointment<span class="dot"></span></a>
+</nav>
 
-    <div class="search-container">
-        <h2 class="search-title">Search Appointments</h2>
-        <form id="searchForm" onsubmit="return handleSearch()">
-            <input type="text" id="searchInput" class="search-input" placeholder="Enter Customer Name, Number Plate, or Contact Number" />
-            <button type="submit" class="search-button">Search</button>
-        </form>
-    </div>
+<div class="search-container">
+    <h2 class="search-title">Search Appointments</h2>
+    <form id="searchForm" onsubmit="handleSearch(event)">
+        <input type="text" id="firstname" class="search-input"
+               placeholder="Enter First Name"/>
+		<input name="textfield" type="text" class="search-input" id="lastname" placeholder="Enter Last Name">
+		<input name="textfield" type="text" class="search-input" id="numberplate" placeholder="Enter Number Plate">
+		<input name="tel" type="tel" class="search-input" id="contact" placeholder="Enter Contact Number">
+		<input name="date" type="date" class="search-input" id="date" placeholder="Enter Date">
+		<select name="select" class="search-input" id="condition">
+            <option value="">Select a condition for date</option>
+			<option value="before">Before</option>
+			<option value="after">After</option>
+			<option value="on">On</option>
+			<option value="on or before">On or Before</option>
+			<option value="on or after">On or After</option>
+		</select>
+		<select name="select" class="search-input" id="status">
+            <option value="">Select a status</option>
+			<option value="accepted">Accepted</option>
+			<option value="rejected">Rejected</option>
+			<option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+		</select>
+        <button type="submit" class="search-button">Search</button>
+    </form>
+</div>
 
-    <div class="results-container" id="resultsContainer" style="display: none;">
-        <table class="results-table">
-            <thead>
-                <tr>
-                    <th>Vehicle Type</th>
-                    <th>Owner's Name</th>
-                    <th>Contact Number</th>
-                    <th>Number Plate</th>
-                    <th>Vehicle Model</th>
-                    <th>Model Year</th>
-                    <th>Service Type</th>
-                    <th>Date & Time</th>
-                </tr>
-            </thead>
-            <tbody id="resultsBody">
-                <!-- Results will be injected dynamically -->
-            </tbody>
-        </table>
-        <p class="no-results" id="noResultsMessage" style="display: none;">No results found.</p>
-    </div>
+<div class="results-container" id="resultsContainer" style="display: none;">
+    <table class="results-table">
+        <thead>
+        <tr>
+            <th>Vehicle Type</th>
+            <th>Client's Name</th>
+            <th>Contact Number</th>
+            <th>Number Plate</th>
+            <th>Service Type</th>
+            <th>Date & Time</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="resultsBody">
+        <!-- Results will be injected dynamically -->
+        </tbody>
+    </table>
+    <p class="no-results" id="loader" style="display: none;">No results found.</p>
+</div>
 
-    <script>
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            const resultsContainer = document.getElementById('resultsContainer');
-            const resultsBody = document.getElementById('resultsBody');
-            const noResultsMessage = document.getElementById('noResultsMessage');
+<script>
+    let page = 1;
+    let isLoading = false;
+    let hasMoreData = true;
+    let loadedResults = 0;
+    const limit = 25;
+    const loader = document.getElementById('loader');
 
-            if (query === '') {
-                alert('Please enter a search term.');
-                return false;
-            }
+    function resetVariables() {
+        page = 1;
+        isLoading = false;
+        hasMoreData = true;
+        loadedResults = 0;
+    }
 
-            // Dummy data for demonstration
-            const data = [{
-                    type: 'SUV',
-                    name: 'John Doe',
-                    contact: '+123456789',
-                    plate: 'XYZ-1234',
-                    model: 'Toyota Highlander',
-                    year: 2022,
-                    service: 'Oil Change',
-                    datetime: '2024-11-20 10:30 AM'
-                },
-                {
-                    type: 'Sedan',
-                    name: 'Jane Smith',
-                    contact: '+987654321',
-                    plate: 'ABC-5678',
-                    model: 'Honda Accord',
-                    year: 2020,
-                    service: 'Tire Rotation',
-                    datetime: '2024-11-22 02:00 PM'
-                }
-            ];
+    document.querySelectorAll('#searchForm input, #searchForm select').forEach(a => addEventListener("input", (event) => resetVariables()));
 
-            // Filter results
-            const filteredResults = data.filter(item =>
-                item.name.toLowerCase().includes(query.toLowerCase()) ||
-                item.plate.toLowerCase().includes(query.toLowerCase()) ||
-                item.contact.includes(query)
-            );
-
-            resultsBody.innerHTML = '';
-            if (filteredResults.length > 0) {
-                filteredResults.forEach(item => {
-                    resultsBody.innerHTML += `
-                        <tr>
-                            <td>${item.type}</td>
-                            <td>${item.name}</td>
-                            <td>${item.contact}</td>
-                            <td>${item.plate}</td>
-                            <td>${item.model}</td>
-                            <td>${item.year}</td>
-                            <td>${item.service}</td>
-                            <td>${item.datetime}</td>
-                        </tr>
-                    `;
-                });
-                noResultsMessage.style.display = 'none';
-            } else {
-                noResultsMessage.style.display = 'block';
-            }
-
-            resultsContainer.style.display = 'block';
-            return false;
+    async function handleSearch(event) {
+        if (event !== null) {
+            event.preventDefault();
+            document.getElementById('resultsBody').innerHTML = '';
         }
-    </script>
+
+        const firstname = document.getElementById('firstname').value.trim();
+		const lastname = document.getElementById('lastname').value.trim();
+		const numberplate = document.getElementById('numberplate').value.trim();
+		const contact = document.getElementById('contact').value.trim();
+		const date = document.getElementById('date').value.trim();
+		const condition = document.getElementById('condition').value.trim();
+        const status = document.getElementById('status').value.trim();
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsBody = document.getElementById('resultsBody');
+        const noResultsMessage = document.getElementById('noResultsMessage');
+
+        if (isLoading || !hasMoreData) return false;
+
+        isLoading = true;
+        loader.textContent = 'Loading...';
+        loader.style.display = 'block';
+
+        try {
+            const response = await fetch(`/api/garage/getAppointmentsFiltered?firstname=${firstname}&lastname=${lastname}&numberplate=${numberplate}&contact=${contact}&date=${date}&condition=${condition}&status=${status}&page=${page}`);
+
+            if (!response.ok) {
+                showPopup('Error', 'Something went wrong. Please try again later.');
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!data) {
+                showPopup('Error', 'Something went wrong. Please try again later.');
+                return;
+            }
+
+            if (data.length === 0 && loadedResults === 0) {
+                loader.textContent = 'No appointments found.';
+                hasMoreData = false;
+            } else if (data.length < limit) {
+               loader.textContent = '--- End of Search Results ---';
+               hasMoreData = false;
+            } else {
+                page++;
+            }
+            data.forEach(item => {
+                let tablerow = `<tr id='table-row-id-${item.id}' onclick='viewDetails(${JSON.stringify(item)})' onmouseover='addBackground(this)' onmouseout='removeBackground(this)' style='cursor:pointer'>
+                    <td>${item.vehicle_type}</td>
+                    <td>${item.first_name} ${item.last_name}</td>
+                    <td>${item.contact_no}</td>
+                    <td>${item.license_plate_no}</td>
+                    <td>${item.service_type}</td>
+                    <td>${item.date} ${item.time}</td>`;
+
+                if (item.status_id === 1) {
+                    tablerow += `<td class='status-column'><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 2)">Accept</button><button class="view-more-button" onclick="handleAcceptance(event, ${item.id}, 3)">Reject</button></td>`;
+                }
+
+                tablerow += `</tr>`;
+
+                resultsBody.innerHTML += tablerow;
+                loadedResults++;
+            });
+            resultsContainer.style.display = 'block';
+            resultsContainer.scrollIntoView();
+        } catch (error) {
+            showPopup('Error', 'Something went wrong. Please try again later.');
+            console.log('Error:', error);
+        }
+        return false;
+    }
+
+    function addBackground(element) {
+        element.style.backgroundColor = '#33363f';
+    }
+
+    function removeBackground(element) {
+        element.style.backgroundColor = '';
+    }
+
+    function viewDetails(appointment) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
+
+        const content = document.createElement('div');
+        content.style.backgroundColor = '#25272d';
+        content.style.padding = '20px';
+        content.style.borderRadius = '8px';
+        content.style.color = '#f5f5f5';
+
+        content.innerHTML = `<h2>${appointment.license_plate_no}</h2>
+                         <p>Vehicle Mode: ${appointment.vehicle_model}</p>
+                         <p>Notes: ${appointment.notes}</p>
+                         <button onclick='this.parentElement.parentElement.remove()' style='padding: 10px; background: var(--accent); color: var(--text); border: none; border-radius: 5px; cursor: pointer;'>Close</button>`;
+
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+    }
+
+    async function handleAcceptance(event, appointment_id, status_id) {
+        event.stopPropagation();
+
+        try {
+            const response = await fetch('/appointment/update_status', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({appointment_id: appointment_id, status_id: status_id})
+            });
+
+            if (!response.ok) {
+                showPopup('Error', 'Something went wrong. Please try again later.');
+                return;
+            }
+
+            result = await response.text();
+
+            if (!result || result === 'success') {
+                showPopup('Error', 'Something went wrong. Please try again later.');
+                return;
+            }
+
+            alert('Appointment status updated successfully.');
+            let status;
+            if (status_id === 2) {
+                status = 'Accepted';
+            } else if (status_id === 3) {
+                status = 'Rejected';
+            } else if (status_id === 4) {
+                status = 'Completed';
+            } else if (status_id === 5) {
+                status = 'Cancelled';
+            }
+            document.querySelector('#table-row-id-' + appointment_id + '>.status-column').textContent = status;
+        } catch (error) {
+            console.log('Error:', error);
+            showPopup('Error', 'Something went wrong. Please try again later.');
+        }
+    }
+
+    function handleScroll() {
+        const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+        if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData && loadedResults > 0) {
+            handleSearch(null);
+        }
+    }
+
+    window.addEventListener('scroll', handleScroll);
+
+</script>
 </body>
 
 </html>

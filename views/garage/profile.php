@@ -227,6 +227,7 @@
             }
         }
     </style>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -236,46 +237,34 @@
                 <h1>Garage Profile</h1>
                 <p>View and edit your garage details</p>
             </div>
-            <form id="garageProfileForm" novalidate>
+            <?php $form = \gearguard\phpmvc\form\Form::begin('', 'post', 'garageProfileForm') ?>
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label for="name" class="form-label">Garage Name<span class="required-dot">*</span></label>
-                        <input type="text" id="name" name="name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registration_no" class="form-label">Business Registration Number<span class="required-dot">*</span></label>
-                        <input type="text" id="registration_no" name="registration_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email<span class="required-dot">*</span></label>
-                        <input type="email" id="email" name="email" class="form-input" required>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="address" class="form-label">Address<span class="required-dot">*</span></label>
-                        <textarea id="address" name="address" class="form-textarea" rows="3" required></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="description" class="form-label">Description<span class="required-dot">*</span></label>
-                        <textarea id="description" name="description" class="form-textarea" rows="4" required></textarea>
-                    </div>
+                    <?php
+                    echo $this->garage_name = $form->field($model, 'name')->required();
+                    echo $this->brn = $form->field($model, 'registration_no')->required();
+                    echo $this->email = $form->field($model, 'email')->required()->type('email');
+                    $this->address = new \gearguard\phpmvc\form\TextAreaField($model, 'address');
+                    echo $this->address->required()->rows(3)->placeholder('Enter the address');
+                    $this->description = new \gearguard\phpmvc\form\TextAreaField($model, 'description');
+                    echo $this->description->rows(4);
+                    echo $this->tel = $form->field($model, 'contact_no')->required()->type('tel');
+                    echo $this->username = $form->field($model, 'username')->required();
+                    ?>
+                    <script>
+                        document.querySelectorAll('.form-group textarea').forEach(e => e.parentElement.classList.add('full-width'))
+                        address = document.getElementById('address');
+                        address.classList.add('form-textarea');
+                        description = document.getElementById('description');
+                        description.classList.add('form-textarea');
+                        document.getElementById('contact_no').setAttribute('pattern', '^[0-9\\s\\-\\+\\(\\)]*$')
+                    </script>
 
                     <div class="form-group">
-                        <label for="contact_no" class="form-label">Contact Number<span class="required-dot">*</span></label>
-                        <input type="tel" id="contact_no" name="contact_no" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="username" class="form-label">Username<span class="required-dot">*</span></label>
-                        <input type="text" id="username" name="username" class="form-input" required>
+                        <button type="button" id="btnShowChangePassword" class="edit-button" style="background-color: #ef4444;">Change password</button>
                     </div>
 
-                    <div class="form-group">
-                        <label for="password" class="form-label">Password<span class="required-dot">*</span></label>
-                        <input type="password" id="password" name="password" class="form-input" required>
-                    </div>
                 </div>
-                <button type="submit" class="edit-button">Save Changes</button>
+                <button class="edit-button">Save Changes</button>
             </form>
         </div>
     </div>
@@ -286,8 +275,31 @@
             <h2>Confirm Changes</h2>
             <p>Are you sure you want to save the changes to your garage profile?</p>
             <div class="modal-buttons">
-                <button id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
-                <button id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
+                <button type="button" id="confirmButton" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button type="button" id="cancelButton" class="modal-btn modal-btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="confirmation-modal">
+        <div class="modal-content">
+            <h2>Change Password</h2>
+            <div class="form-group">
+                <label for="password" class="form-label">Current Password<span class="required-dot">*</span></label>
+                <input type="password" id="currentPassword" name="password" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">New Password<span class="required-dot">*</span></label>
+                <input type="password" id="newPassword" name="password" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Confirm Password<span class="required-dot">*</span></label>
+                <input type="password" id="confirmPassword" name="password" class="form-input" required>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" id="btnConfirmPassword" class="modal-btn modal-btn-confirm">Confirm</button>
+                <button type="button" id="btnCancelPassword" class="modal-btn modal-btn-cancel">Cancel</button>
             </div>
         </div>
     </div>
@@ -296,27 +308,93 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('garageProfileForm');
             const confirmationModal = document.getElementById('confirmationModal');
+            const changePasswordModal = document.getElementById('changePasswordModal');
             const confirmButton = document.getElementById('confirmButton');
             const cancelButton = document.getElementById('cancelButton');
+            const btnShowChangePassword = document.getElementById('btnShowChangePassword');
+            const btnConfirmPassword = document.getElementById('btnConfirmPassword');
+            const btnCancelPassword = document.getElementById('btnCancelPassword');
 
-            // Pre-load data (replace with actual data fetching logic)
-            const garageData = {
-                name: "AutoFix Garage",
-                registration_no: "BRN123456",
-                email: "info@autofixgarage.com",
-                contact_no: "+1234567890",
-                address: "123 Main St, Anytown, AT 12345\nSuite 200\nParking available at rear",
-                description: "AutoFix Garage is a full-service auto repair shop in Anytown, offering a variety of services to keep your vehicle running smoothly.\n\nWe specialize in comprehensive vehicle maintenance and repair.",
-                username: "autofix_admin",
-                password: "autofix123"
-            };
+            btnShowChangePassword.addEventListener('click', function() {
+                changePasswordModal.style.display = 'flex';
+            });
 
-            // Populate form fields with pre-loaded data
-            Object.keys(garageData).forEach(key => {
-                const field = document.getElementById(key);
-                if (field) {
-                    field.value = garageData[key];
-                }
+            btnConfirmPassword.addEventListener('click', async function() {
+               const currentPassword = document.getElementById('currentPassword');
+               const newPassword = document.getElementById('newPassword');
+               const confirmPassword = document.getElementById('confirmPassword');
+
+               if (newPassword.value !== confirmPassword.value) {
+                   showPopup('Wait!', 'New password and confirmation do not match.');
+                   return;
+               }
+
+               try {
+                    const result = await fetch('/garage/profile/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            currentPassword: currentPassword.value,
+                            password: newPassword.value,
+                            passwordConfirm: confirmPassword.value,
+                        })
+                    });
+
+                    if (!result.ok) {
+                        showPopup('Sorry', 'Could not change your password. Please try again later.');
+                        return;
+                    }
+
+                    const response = await result.json();
+
+                    if (!response) {
+                        showPopup('Sorry', 'Could not change your password. Please try again later.');
+                        return;
+                    }
+
+                    if (response.success) {
+                        showPopup('Success', 'Password changed successfully!');
+                        changePasswordModal.style.display = 'none';
+                        currentPassword.value = '';
+                        newPassword.value = '';
+                        confirmPassword.value = '';
+                    } else {
+                        showPopup('Error', 'Error changing password: ' + response.message);
+                    }
+               } catch (error) {
+                    console.error('Error:', error);
+                    showPopup('Error','An error occurred while changing the password. Please try again later.');
+               }
+
+               /* $.ajax({
+                   url: '/garage/profile/update',
+                   type: 'POST',
+                   data: {
+                       currentPassword: currentPassword.value,
+                       password: newPassword.value,
+                       passwordConfirm: confirmPassword.value,
+                   },
+                   success: function(response) {
+                       if (response.success) {
+                           alert('Password updated successfully!');
+                           changePasswordModal.style.display = 'none';
+                           currentPassword.value = '';
+                           newPassword.value = '';
+                           confirmPassword.value = '';
+                       } else {
+                           alert('Error updating password: ' + response.message);
+                       }
+                   },
+                   error: function(xhr, status, error) {
+                       alert('An error occurred: ' + xhr.error);
+                   }
+               }); */
+            });
+
+            btnCancelPassword.addEventListener('click', function() {
+                changePasswordModal.style.display = 'none';
             });
 
             // Prevent default form submission and show modal
@@ -333,19 +411,65 @@
             });
 
             // Confirm button clicks
-            confirmButton.addEventListener('click', function() {
+            confirmButton.addEventListener('click', async function(event) {
+                event.stopPropagation();
                 // Collect form data
+                showPopup('Hold on!', 'Saving changes...');
                 const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
+                const data = {};
 
-                // Here you would typically send this data to your server
-                console.log('Updated profile data:', data);
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                try {
+                    const result = await fetch('/garage/profile/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams(data)
+                    });
+
+                    if (!result.ok) {
+                        showPopup('Sorry', 'Could not update your profile. Please try again later.');
+                        return;
+                    }
+
+                    const response = await result.json();
+
+                    if (!response) {
+                        showPopup('Sorry', 'Could not update your profile. Please try again later.');
+                        return;
+                    }
+
+                    if (response.success) {
+                        showPopup('Success', 'Profile updated successfully!');
+                    } else {
+                        showPopup('Error', 'Error updating profile: ' + response.message);
+                    }
+                } catch (error) {
+                    console.log('Error:', error);
+                    showPopup('Sorry', 'An error occurred while updating the profile. Please try again later.');
+                }
+                /* $.ajax({
+                    url: '/garage/profile/update',
+                    type: 'POST',
+                    data: data,
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Profile updated successfully!');
+                        } else {
+                            alert('Error updating profile: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred: ' + xhr.error);
+                    }
+                }); */
 
                 // Close the modal
                 confirmationModal.style.display = 'none';
-
-                // Show success message
-                alert('Profile updated successfully!');
             });
 
             // Cancel button closes the modal

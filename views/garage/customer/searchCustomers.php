@@ -184,6 +184,51 @@
             margin-bottom: 0.25rem;
         }
 
+        .no-results {
+            color: var(--primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #33363f;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #25272d;
+        }
+
+        .search-button {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 5em;
+            margin: 0.2rem;
+            display: table;
+        }
+
 
         @media (max-width: 768px) {
             .search-form {
@@ -193,6 +238,16 @@
             .search-button {
                 width: 100%;
             }
+
+            .customers-container {
+                padding: 1rem;
+            }
+
+            table,
+            th,
+            td {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -201,105 +256,139 @@
     <nav class="navMenu">
         <a href="/garage/customers/view" target="_self">All Customers</a>
         <a href="#" class="active">Search Customers</a>
-        <a href="/garage/customers/send_message" target="_self">Send Messages</a>
     </nav>
     <div class="container">
         <div class="search-container">
             <h1 class="search-title">Search Customers</h1>
             <form class="search-form" onsubmit="searchCustomer(event)">
-                <input type="text" class="search-input" id="searchInput" placeholder="Enter customer name or email" required>
+                <input type="text" class="search-input" id="searchInput" placeholder="Enter customer name or email" onchange="resetVariables()" required>
                 <button type="submit" class="search-button">
                     <i class="fas fa-search"></i> Search
                 </button>
             </form>
         </div>
 
-        <div class="results-container" id="resultsContainer">
-            <div class="customer-info">
-                <h2 id="customerName"></h2>
-                <p id="customerEmail"></p>
-                <p id="customerVehicle"></p>
-            </div>
-            <div class="service-history">
-                <h3>Recent Service History</h3>
-                <div id="serviceCards"></div>
-            </div>
+        <div class="results-container" id="customersContainer">
+            <table id="customersTable">
+                <thead>
+                    <tr>
+                        <th>Fist Name</th>
+                        <th>Last Name</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Table body will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <p id="loader" class="no-results">Loading...</p>
         </div>
     </div>
 
     <script>
-        function searchCustomer(event) {
-            event.preventDefault();
+        let page = 1;
+        let isLoading = false;
+        let hasMoreData = true;
+        let loadedResults = 0;
+        const limit = 25;
+        const loader = document.getElementById('loader');
+
+        async function searchCustomer(event) {
+            if (event != null) {
+                event.preventDefault();
+                document.querySelector('#customersTable tbody').innerHTML = '';
+            }
+
+            if (isLoading || !hasMoreData) return;
+
             const searchTerm = document.getElementById('searchInput').value;
+            document.querySelector('.results-container').style.display = 'block';
 
-            // Simulated API call - replace with actual API call in production
-            setTimeout(() => {
-                const customerData = {
-                    name: "sandhavi",
-                    email: "john.doe@example.com",
-                    vehicle: "Toyota Camry 2019",
-                    serviceHistory: [{
-                            garageName: "QuickFix Auto",
-                            date: "2023-11-15",
-                            description: "Annual maintenance and oil change",
-                            totalCost: 150,
-                            spareParts: "Oil filter, Air filter"
-                        },
-                        {
-                            garageName: "Tire World",
-                            date: "2023-09-02",
-                            description: "Tire rotation and balance",
-                            totalCost: 80,
-                            spareParts: "None"
-                        },
-                        {
-                            garageName: "BrakeMax",
-                            date: "2023-06-20",
-                            description: "Brake pad replacement",
-                            totalCost: 220,
-                            spareParts: "Front brake pads"
-                        },
-                        {
-                            garageName: "QuickFix Auto",
-                            date: "2023-03-10",
-                            description: "Engine tune-up",
-                            totalCost: 180,
-                            spareParts: "Spark plugs"
-                        },
-                        {
-                            garageName: "AutoCare Plus",
-                            date: "2022-12-05",
-                            description: "Winter preparation service",
-                            totalCost: 200,
-                            spareParts: "Antifreeze, Wiper blades"
-                        }
-                    ]
-                };
+            isLoading = true;
+            loader.textContent = 'Loading...';
 
-                displayResults(customerData);
-            }, 1000); // Simulated delay
+            try {
+                const response = await fetch(`/api/garage/getCustomers?page=${page}&firstname=${searchTerm}&lastname=${searchTerm}&email=${searchTerm}`);
+
+                if (!response.ok) {
+                    console.error('Error fetching customers:', response.statusText);
+                    document.getElementById('resultsContainer').style.display = 'none';
+                    showPopup('Sorry','We could not load customers. Please try again later');
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (!result) {
+                    console.error('Error fetching customers:', 'Response was not valid JSON');
+                    document.getElementById('resultsContainer').style.display = 'none';
+                    showPopup('Sorry', 'We could not load customers. Please try again later');
+                    return;
+                }
+
+                appendRows(result);
+
+                if (result.length < limit) {
+                    loader.textContent = '--- End of Search Results ---';
+                    hasMoreData = false;
+                } else if (result.length === 0 && loadedResults === 0) {
+                    loader.textContent = 'No customers found.';
+                    hasMoreData = false;
+                } else {
+                    page++;
+                }
+
+                document.querySelector('.results-container').scrollIntoView();
+
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+                document.getElementById('resultsContainer').style.display = 'none';
+            } finally {
+                isLoading = false;
+            }
         }
 
-        function displayResults(data) {
-            document.getElementById('resultsContainer').style.display = 'block';
-            document.getElementById('customerName').textContent = data.name;
-            document.getElementById('customerEmail').textContent = `Email: ${data.email}`;
-            document.getElementById('customerVehicle').textContent = `Vehicle: ${data.vehicle}`;
-
-            const serviceCardsContainer = document.getElementById('serviceCards');
-            serviceCardsContainer.innerHTML = '';
-
-            data.serviceHistory.forEach(service => {
-                const serviceCard = document.createElement('div');
-                serviceCard.className = 'service-card';
-                serviceCard.innerHTML = `
-                    <h4>${service.garageName} - ${service.date}</h4>
-                    <p><strong>Description:</strong> ${service.description}</p>
-                    <p><strong>Total Cost:</strong> $${service.totalCost}</p>
-                    <p><strong>Spare Parts:</strong> ${service.spareParts}</p>
+        function appendRows(data) {
+            const tableBody = document.querySelector('#customersTable tbody');
+            data.forEach(customer => {
+                const row = document.createElement('tr');
+                row.addEventListener('click', () => {
+                    showVehicleDetails(customer);
+                });
+                row.style.cursor = "pointer";
+                row.onmouseover = function () {
+                    this.style.backgroundColor = "#33363f";
+                };
+                row.onmouseout = function () {
+                    this.style.backgroundColor = "";
+                };
+                row.innerHTML = `
+                    <td>${customer.first_name}</td>
+                    <td>${customer.last_name}</td>
+                    <td>${customer.contact_no}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.address}</td>
                 `;
-                serviceCardsContainer.appendChild(serviceCard);
+                tableBody.appendChild(row);
             });
+        }
+
+        function handleScroll() {
+            const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+            if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData && loadedResults > 0) {
+                searchCustomer(null);
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll);
+
+        function resetVariables() {
+            page = 1;
+            isLoading = false;
+            hasMoreData = true;
+            loadedResults = 0;
         }
     </script>
 </body>

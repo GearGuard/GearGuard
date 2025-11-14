@@ -143,6 +143,33 @@
             text-align: center;
         }
 
+        .nav-link-logout {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--primary);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link-logout:hover {
+            background-color: var(--hover-bg);
+            color: var(--accent);
+        }
+
+        .nav-link-logout.active {
+            background-color: var(--hover-bg);
+            color: var(--accent);
+        }
+
+        .nav-link-logout i {
+            width: 24px;
+            margin-right: 10px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
         .sidebar.collapsed .nav-link i {
             margin-right: 0;
         }
@@ -154,7 +181,6 @@
         /* Main Content */
         .main-content {
             margin-left: 260px;
-            padding: 30px;
             flex-grow: 1;
             width: calc(100vw - 260px);
             transition: all 0.3s ease;
@@ -203,13 +229,13 @@
         </div>
         <ul class="nav-list">
             <li class="nav-item">
-                <a href="/garage/dashboard" class="nav-link active">
+                <a href="/dashboard" class="nav-link active">
                     <i class="fas fa-gauge"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/garage/appointment/appointments" class="nav-link">
+                <a href="/appointment/appointments" class="nav-link">
                     <i class="fas fa-calendar-check"></i>
                     <span class="nav-text">Appointments</span>
                 </a>
@@ -226,28 +252,54 @@
                     <span class="nav-text">Customer</span>
                 </a>
             </li>
-            <li class="nav-item">
+<!--            <li class="nav-item">
                 <a href="community" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span class="nav-text">Community</span>
                 </a>
-            </li>
+            </li>-->
             <li class="nav-item">
-                <a href="/garage/mechanic" class="nav-link">
+                <a href="/garage/mechanic/add" class="nav-link">
                     <i class="fa fa-wrench" aria-hidden="true"></i>
                     <span class="nav-text">Mechanic</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/garage/profile" class="nav-link">
+                <a href="/profile" class="nav-link">
                     <i class="fas fa-user-circle"></i>
                     <span class="nav-text">Profile</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="/garage/settings" class="nav-link">
+<!--            <li class="nav-item">
+                <a href="/settings" class="nav-link">
                     <i class="fas fa-gear"></i>
                     <span class="nav-text">Settings</span>
+                </a>
+            </li>-->
+            <!--<li class="nav-item">
+                <a href="/messages" class="nav-link">
+                    <i class="fas fa-message"></i>
+                    <span class="nav-text">Messages</span>
+                    <?php /*if (\gearguard\phpmvc\Application::$app->user->hasMessages()) : */?>
+                        <span id="notification-circle" class="notification-circle" style="position: relative;right: -0.8em;display: inline-block;width: 0.6em;height: 0.6em;border-radius: 50%;background-color: tomato;"></span>
+                    <?php /*endif; */?>
+                </a>
+            </li>-->
+            <li class="nav-item">
+                <a href="/notifications" class="nav-link">
+                    <span class="wrapper">
+                        <i class="fas fa-bell"></i>
+                        <span class="nav-text">Notifications</span>
+                        <?php if (\gearguard\phpmvc\Application::$app->user->hasNotifications()) : ?>
+                            <span id="notification-circle" class="notification-circle" style="position: relative;right: -0.8em;display: inline-block;width: 0.6em;height: 0.6em;border-radius: 50%;background-color: tomato;"></span>
+                        <?php endif; ?>
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href= "/logout" class="nav-link-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="nav-text">Sign out</span>
                 </a>
             </li>
 
@@ -260,10 +312,23 @@
         <iframe id="content-iframe" location="relative" style="border: transparent; scroll-behavior: auto; width: inherit; height: 100vh;"></iframe>
     </div>
 
+    <div id="notification-wrapper" style="position: absolute;bottom: 1em;right: 2em;" hidden>
+    	<div style="width: 25em; height: 10em; background-color: #A3A3A3; border: none; border-radius: 1em; z-index: 999;position: relative;bottom: -11em;filter: blur(10px);right: -0.8em;" id="notification-card-shadow">
+    		</div>
+    		<div id="notification-card" style="width: 25em; height: 10em; background-color: #454545; border: none; border-radius: 1em; z-index: 1000;position: relative;display: flex;flex-direction: column;">
+    		<button style="position: relative;cursor: pointer;top: 0.5em;fill: transparent;background: transparent;border: transparent;color: white;text-align: right;right: 0.5em;">✖</button>
+        <h3 id="notification-header" style="margin-top: 0.1em;margin-bottom: 0.1em;font-family: 'Calibri';padding-left: 0.5em;color: white;"></h3>
+        <p id="notification-content" style="color: white;font-family: 'arial';padding-left: 1.1em;width: 23em;overflow-wrap: break-word;margin-top: 0.2em;"></p></div>
+    </div>
+
     <script>
         const toggleBtn = document.getElementById('toggleBtn');
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
+        const notificationHeader = document.getElementById('notification-header');
+        const notificationContent = document.getElementById('notification-content');
+        const notificationCardWrapper = document.getElementById('notification-wrapper');
+        let data;
 
         toggleBtn.addEventListener('click', () => {
             const isMobile = window.innerWidth <= 768;
@@ -297,6 +362,23 @@
         });
 
         document.getElementsByClassName('nav-link active')[0].click();
+
+        const socket = new WebSocket('ws://localhost:56780?token=<?php echo \gearguard\phpmvc\Application::$app->user->getToken() ?>');
+        socket.onmessage = (e) => {
+            console.log(e);
+            data = JSON.parse(e.data);
+            showNotification(data.title, data.description);
+            document.getElementById('notification-circle').style.display = 'inline-block';
+        };
+
+        function showNotification(title, message) {
+            notificationHeader.innerText = title;
+            notificationContent.innerText = message;
+            notificationCardWrapper.removeAttribute("hidden");
+            setTimeout(() => {
+                notificationCardWrapper.setAttribute("hidden", true);
+            }, 5000);
+        }
     </script>
 </body>
 

@@ -170,7 +170,7 @@
 <body>
     <div class="container">
         <div class="settings-grid">
-            <!-- Data & Privacy Section -->
+         
             <div class="settings-section">
                 <div class="settings-section-header">
                     <h2><i class="fas fa-shield-alt icon"></i> Data & Privacy</h2>
@@ -204,7 +204,6 @@
                 </div>
             </div>
 
-            <!-- Appearance & Themes Section -->
             <div class="settings-section">
                 <div class="settings-section-header">
                     <h2><i class="fas fa-palette icon"></i> Appearance & Themes</h2>
@@ -222,7 +221,6 @@
                 </div>
             </div>
 
-            <!-- Notification Preferences Section -->
             <div class="settings-section">
                 <div class="settings-section-header">
                     <h2><i class="fas fa-bell icon"></i> Notification Preferences</h2>
@@ -262,7 +260,6 @@
                 </div>
             </div>
 
-            <!-- Login Activity Section -->
             <div class="settings-section">
                 <div class="settings-section-header">
                     <h2><i class="fas fa-history icon"></i> Login Activity</h2>

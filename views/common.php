@@ -2,14 +2,13 @@
 
 /** @var $model \app\models\Appointment */
 /** @var $garages array */
+/** @var $vehicles array */
 
 use gearguard\phpmvc\form\Form;
 use gearguard\phpmvc\form\TextAreaField;
 use gearguard\phpmvc\form\DateField;
 use gearguard\phpmvc\form\TimeField;
-use gearguard\phpmvc\form\DropDownField
-
-
+use gearguard\phpmvc\form\DropDownField;
 ?>
 
 
@@ -306,45 +305,45 @@ use gearguard\phpmvc\form\DropDownField
 </head>
 
 <body>
-    <nav class="navMenu">
-        <a href="#" class="active">Book Appointment</a>
-        <a href="#">My Appointments</a>
-        <a href="#">Service History</a>
-        <a href="#">Spare Parts Warranty</a>
-    </nav>
-    <div class="appointment-form">
-        <h2 class="title">Book Your Appointment</h2>
-        <?php $form = Form::begin('', "post") ?>
-        <div class="form-row">
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'Vehicle Name', $garages)?>
-            </div>
+<nav class="navMenu">
+    <a href="#" class="active">Book Appointment</a>
+    <a href="/customer/appointment/my_appointment" target='_self'>My Appointments</a>
+    <a href="/customer/appointment/service_history" target='_self'>Service History</a>
+    <a href="/customer/appointment/spareparts_warranty" target='_self'>Spare Parts Warranty</a>
+</nav>
+<div class="appointment-form">
+    <h2 class="title">Book Your Appointment</h2>
+    <?php $form = Form::begin('', "post") ?>
+    <div class="form-row">
+        <div class="form-column">
+            <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'vehicle_id', $vehicles)?>
         </div>
-        <div class="form-row">
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages)?>
-            </div>
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', [])?>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'appointment_date') ?>
-            </div>
-            <div class="form-column">
-                <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'appointment_time') ?>
-            </div>
-        </div>
-        <div class="form-group">
-            <?php echo new TextAreaField($model, 'notes') ?>
-        </div>
-        <div class="button-container">
-            <button type="reset" class="clear-button">Clear</button>
-            <button type="submit" class="book-button">Book Appointment</button>
-        </div>
-        <?php echo Form::end() ?>
     </div>
+    <div class="form-row">
+        <div class="form-column">
+            <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'garage_id', $garages)?>
+        </div>
+        <div class="form-column">
+            <?php echo $form->field = new \gearguard\phpmvc\form\DropDownField($model, 'service_id', [])?>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-column">
+            <?php echo $form->field = new \gearguard\phpmvc\form\DateField($model, 'appointment_date') ?>
+        </div>
+        <div class="form-column">
+            <?php echo $form->field = new \gearguard\phpmvc\form\TimeField($model, 'appointment_time') ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <?php echo new TextAreaField($model, 'notes') ?>
+    </div>
+    <div class="button-container">
+        <button type="reset" class="clear-button">Clear</button>
+        <button type="submit" class="book-button">Book Appointment</button>
+    </div>
+    <?php echo Form::end() ?>
+</div>
 </body>
 
 </html>

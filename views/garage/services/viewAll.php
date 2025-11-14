@@ -122,6 +122,13 @@
             background-color: #1b4ebd;
         }
 
+        .no-results {
+            color: var(--primary);
+            font-size: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -159,24 +166,103 @@
     </nav>
     <div class="services-container">
         <h2 class="title">All Garage Services</h2>
-        <table>
-            <tr>
-                <th>Service Type</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-
-            <?php foreach ($services as $service): ?>
+        <table id="servicesTable">
+            <thead>
                 <tr>
-                    <td><?php echo htmlspecialchars($service->type); ?></td>
-                    <td>$<?php echo htmlspecialchars($service->price); ?></td>
-                    <td><button onclick='viewDetails(<?php echo json_encode($service); ?>)' class="view-more-button">View More</button></td>
+                    <th>Service Type</th>
+                    <th>Price</th>
+                    <th>Description</th>
                 </tr>
-            <?php endforeach; ?>
+            </thead>
+            <tbody>
+                <!-- Rows will be appended here dynamically -->
+            </tbody>
         </table>
+        <p id="loader" class="no-results">Loading...</p>
     </div>
 
     <script>
+        let page = 1;
+        let isLoading = false;
+        let hasMoreData = true;
+        const limit = 25;
+        const loader = document.getElementById('loader');
+
+        async function fetchServices() {
+            if (isLoading || !hasMoreData) return;
+
+            isLoading = true;
+            loader.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`/api/garage/getServices?page=${page}`);
+
+                if (!response.ok) {
+                    console.error('Error fetching services:', response.statusText);
+                    showPopup('Sorry', 'Failed to load services. Please try again later.');
+                }
+
+                const result = await response.json();
+
+                if (!result) {
+                    console.error('Error fetching services:', 'Response was not valid JSON');
+                    showPopup('Sorry', 'Failed to load services. Please try again later.');
+                }
+
+                appendRows(result);
+
+                if (result.length < limit) {
+                    loader.textContent = '--- End of Services Table ---';
+                    hasMoreData = false;
+                } else if (result.length === 0 && loadedResults === 0) {
+                    loader.textContent = 'No Services found.';
+                    hasMoreData = false;
+                } else {
+                    page++;
+                }
+            } catch (error) {
+                console.error('Error fetching services:', error);
+                showPopup('Sorry', 'Failed to load services. Please try again later.');
+            } finally {
+                isLoading = false;
+            }
+        }
+
+    function appendRows(data) {
+        const tableBody = document.querySelector('#servicesTable tbody');
+        data.forEach(service => {
+            const row = document.createElement('tr');
+            row.addEventListener('click', () => {
+                viewDetails(service);
+            });
+            row.style.cursor = "pointer";
+            row.onmouseover = function () {
+                this.style.backgroundColor = "#33363f";
+            };
+            row.onmouseout = function () {
+                this.style.backgroundColor = "";
+            };
+            row.innerHTML = `
+                            <td>${service.type}</td>
+                            <td>${service.price}</td>
+                            <td>${service.description}</td>
+
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function handleScroll() {
+        const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+        if ((scrollTop + clientHeight >= scrollHeight - 5) && hasMoreData) {
+            fetchServices();
+        }
+    }
+
+    fetchServices();
+
+    window.addEventListener('scroll', handleScroll);
+
         function viewDetails(service) {
             const modal = document.createElement('div');
             modal.style.position = 'fixed';
